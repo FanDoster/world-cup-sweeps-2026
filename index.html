@@ -829,6 +829,43 @@
     .phc-scores .exact-marker { color: var(--gold); }
     .pred-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
     .pred-empty .pe-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+    /* ── PLAYER PROFILE MODAL ── */
+    .profile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 40px 16px; }
+    .profile-overlay.active { display: flex; }
+    .profile-card { max-width: 680px; width: 100%; background: linear-gradient(180deg, var(--card) 0%, var(--surface) 100%); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .profile-card .pc-header { padding: 28px 28px 20px; text-align: center; border-bottom: 1px solid var(--border-subtle); position: relative; }
+    .profile-card .pc-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; padding: 4px 8px; }
+    .profile-card .pc-close:hover { color: var(--text); }
+    .profile-card .pc-name { font-size: 1.6rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+    .profile-card .pc-badges { display: flex; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+    .profile-card .pc-badge { font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 12px; }
+    .pc-badge.rank { background: var(--gold-dim); color: #000; }
+    .pc-badge.points { background: var(--accent-glow); color: var(--accent); }
+    .profile-card .pc-flags { display: flex; justify-content: center; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+    .profile-card .pc-flags img { width: 32px; height: 21px; border-radius: 3px; object-fit: cover; }
+    .profile-card .pc-body { padding: 20px 28px 28px; }
+    .profile-card .pc-section { margin-bottom: 24px; }
+    .profile-card .pc-section-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+    .profile-card .pc-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .profile-card .pc-stat-box { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+    .profile-card .pc-stat-box .pc-sv { font-size: 1.1rem; font-weight: 800; color: var(--text); }
+    .profile-card .pc-stat-box .pc-sl { font-size: 0.64rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+    .profile-card .pc-team-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); margin-bottom: 4px; }
+    .profile-card .pc-team-row .ptr-flag { width: 26px; height: 17px; border-radius: 2px; object-fit: cover; }
+    .profile-card .pc-team-row .ptr-name { flex: 1; font-weight: 700; font-size: 0.85rem; }
+    .profile-card .pc-team-row .ptr-group { font-size: 0.65rem; color: var(--text-muted); font-family: var(--font-mono); font-weight: 700; }
+    .profile-card .pc-team-row .ptr-record { font-size: 0.7rem; color: var(--text-secondary); font-family: var(--font-mono); }
+    .profile-card .pc-team-row .ptr-pts { font-size: 0.8rem; font-weight: 800; color: var(--accent); font-family: var(--font-mono); }
+    .profile-card .form-dots { display: flex; gap: 3px; }
+    .form-dots .fd { width: 7px; height: 7px; border-radius: 50%; }
+    .fd.w { background: var(--accent); }
+    .fd.d { background: var(--gold); }
+    .fd.l { background: var(--live); }
+    .fd.empty { background: var(--border); }
+    .profile-card .pc-feed-item { padding: 8px 12px; border-left: 2px solid var(--border-subtle); margin-bottom: 6px; font-size: 0.82rem; color: var(--text-secondary); margin-left: 8px; }
+    .profile-card .pc-feed-item .pfi-result { font-weight: 700; color: var(--text); }
+    .profile-card .pc-feed-item .pfi-date { font-size: 0.68rem; color: var(--text-muted); }
+    .profile-card .pc-no-data { color: var(--text-muted); font-size: 0.82rem; padding: 12px; text-align: center; }
   </style>
 </head>
 <body>
@@ -924,6 +961,11 @@
         </div>
         <div class="switch-link">Already have an account? <a onclick="showSignIn()">Sign in</a></div>
       </div>
+    </div>
+
+    <!-- Player Profile Modal -->
+    <div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
+      <div class="profile-card" id="profileCard"></div>
     </div>
 
     <footer>⚽ World Cup 2026 Sweepstakes</footer>
@@ -1247,6 +1289,8 @@
       for (const [name, teams] of Object.entries(people)) {
         const card = document.createElement("div");
         card.className = "person-card";
+        card.style.cursor = 'pointer';
+        card.onclick = () => showProfile(name);
         card.innerHTML = `
           <div class="person-name">${name} <span class="count">${teams.length} teams</span></div>
           <ul class="team-list">
@@ -1315,7 +1359,7 @@
             <td class="stat-cell">${r.ga}</td>
             <td class="stat-cell">${r.gd > 0 ? '+' + r.gd : r.gd}</td>
             <td class="stat-cell pts">${r.pts}</td>
-            <td>${r.owner ? `<span class="owner-tag ${ownerColors[r.owner]}">${r.owner}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
+            <td>${r.owner ? `<span class="owner-tag ${ownerColors[r.owner]}" onclick="event.stopPropagation();showProfile('${r.owner}')" style="cursor:pointer">${r.owner}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
           </tr>
         `).join("");
 
@@ -1735,6 +1779,142 @@
       v = Math.max(0, Math.min(20, v + delta));
       el.value = v;
       el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // ── PLAYER PROFILE ──
+    function showProfile(playerName) {
+      document.getElementById('profileOverlay').classList.add('active');
+      renderProfile(playerName);
+    }
+
+    function closeProfile() {
+      document.getElementById('profileOverlay').classList.remove('active');
+    }
+
+    async function renderProfile(playerName) {
+      const el = document.getElementById('profileCard');
+      const teams = people[playerName] || [];
+      const owner = playerName;
+
+      // Calculate team standings
+      const teamStats = {};
+      for (const m of matchData) {
+        if (m[6] === null || m[7] === null) continue;
+        for (const tn of [m[3], m[4]]) {
+          if (!teamStats[tn]) teamStats[tn] = { p:0,w:0,d:0,l:0,gf:0,ga:0,results:[] };
+        }
+        const t1=m[3], t2=m[4], s1=m[6], s2=m[7];
+        teamStats[t1].p++; teamStats[t2].p++;
+        teamStats[t1].gf+=s1; teamStats[t1].ga+=s2;
+        teamStats[t2].gf+=s2; teamStats[t2].ga+=s1;
+        if(s1>s2){teamStats[t1].w++;teamStats[t2].l++;teamStats[t1].results.push('w');teamStats[t2].results.push('l');}
+        else if(s2>s1){teamStats[t2].w++;teamStats[t1].l++;teamStats[t2].results.push('w');teamStats[t1].results.push('l');}
+        else{teamStats[t1].d++;teamStats[t2].d++;teamStats[t1].results.push('d');teamStats[t2].results.push('d');}
+      }
+
+      // Calculate match points for this owner
+      let matchPts = 0, matchW = 0, matchD = 0, matchL = 0;
+      for (const m of matchData) {
+        if (m[6] === null || m[7] === null) continue;
+        const o1 = teamOwner[m[3]], o2 = teamOwner[m[4]];
+        if (o1 === owner && m[6] > m[7]) { matchPts += 3; matchW++; }
+        else if (o2 === owner && m[7] > m[6]) { matchPts += 3; matchW++; }
+        else if (o1 === owner && m[6] === m[7]) { matchPts += 1; matchD++; }
+        else if (o2 === owner && m[7] === m[6]) { matchPts += 1; matchD++; }
+        else if (o1 === owner || o2 === owner) matchL++;
+      }
+
+      // Get prediction stats
+      let predStats = null;
+      if (currentSession) {
+        const { data: allPreds } = await sb.from('predictions').select('user_id,match_id,predicted_home_score,predicted_away_score');
+        if (allPreds) {
+          // Find this player's user ID
+          const { data: profs } = await sb.from('player_profiles').select('id').eq('player_name', playerName);
+          const uid = profs && profs[0] ? profs[0].id : null;
+          if (uid) {
+            const userPreds = allPreds.filter(p => p.user_id === uid);
+            const { data: allMatches } = await sb.from('matches').select('id,home_score,away_score,home_team_id(name),away_team_id(name)');
+            let total = 0, exact = 0, correct = 0;
+            for (const p of userPreds) {
+              const m = allMatches?.find(am => am.id === p.match_id);
+              if (!m || m.home_score === null) continue;
+              total++;
+              if (p.predicted_home_score === m.home_score && p.predicted_away_score === m.away_score) exact++;
+              else if (Math.sign(p.predicted_home_score - p.predicted_away_score) === Math.sign(m.home_score - m.away_score)) correct++;
+            }
+            if (total > 0) predStats = { total, exact, correct, accuracy: Math.round(((exact + correct) / total) * 100) };
+          }
+        }
+      }
+
+      // Build HTML
+      const recentForm = (t) => {
+        const s = teamStats[t];
+        if (!s || !s.results.length) return '<div class="form-dots"><div class="fd empty"></div><div class="fd empty"></div><div class="fd empty"></div></div>';
+        return '<div class="form-dots">' + s.results.slice(-3).map(r => `<div class="fd ${r}"></div>`).join('') + '</div>';
+      };
+
+      let teamsHtml = teams.map(t => {
+        const s = teamStats[t.team] || { p:0,w:0,d:0,l:0 };
+        return `<div class="pc-team-row">
+          <img class="ptr-flag" src="${flagUrl(t.iso)}" alt="" loading="lazy" onerror="this.style.display='none'">
+          <span class="ptr-name">${t.team}</span>
+          <span class="ptr-group">G${t.group}</span>
+          ${recentForm(t.team)}
+          <span class="ptr-record">${s.w}-${s.d}-${s.l}</span>
+          <span class="ptr-pts">${s.w*3+s.d}pts</span>
+        </div>`;
+      }).join('');
+
+      let predHtml = '';
+      if (predStats) {
+        predHtml = `<div class="pc-section">
+          <div class="pc-section-title">Prediction Accuracy</div>
+          <div class="pc-stats-grid">
+            <div class="pc-stat-box"><div class="pc-sv">${predStats.total}</div><div class="pc-sl">Predictions</div></div>
+            <div class="pc-stat-box"><div class="pc-sv" style="color:var(--gold)">${predStats.exact}</div><div class="pc-sl">Exact ★</div></div>
+            <div class="pc-stat-box"><div class="pc-sv" style="color:var(--accent)">${predStats.accuracy}%</div><div class="pc-sl">Accuracy</div></div>
+          </div>
+        </div>`;
+      }
+
+      // Match feed
+      let feedHtml = '';
+      const playerMatches = matchData
+        .filter(m => m[6] !== null && (teamOwner[m[3]] === owner || teamOwner[m[4]] === owner))
+        .sort((a, b) => toDate(b[0], b[1], b[2]) - toDate(a[0], a[1], a[2]))
+        .slice(0, 10);
+      if (playerMatches.length > 0) {
+        feedHtml = '<div class="pc-section"><div class="pc-section-title">Recent Results</div>';
+        for (const m of playerMatches) {
+          feedHtml += `<div class="pc-feed-item">
+            <span class="pfi-result">${m[3]} ${m[6]}–${m[7]} ${m[4]}</span>
+            <span class="pfi-date"> · ${formatDateLabel(m[0],m[1],m[2])}</span>
+          </div>`;
+        }
+        feedHtml += '</div>';
+      }
+
+      el.innerHTML = `
+        <div class="pc-header">
+          <button class="pc-close" onclick="closeProfile()">✕</button>
+          <div class="pc-name">${owner}</div>
+          <div class="pc-badges">
+            <span class="pc-badge points">${matchPts} match pts</span>
+            ${predStats ? `<span class="pc-badge rank">${predStats.accuracy}% pred accuracy</span>` : ''}
+          </div>
+          <div class="pc-flags">${teams.map(t => `<img src="${flagUrl(t.iso)}" alt="${t.team}" loading="lazy" onerror="this.style.display='none'" title="${t.team}">`).join('')}</div>
+        </div>
+        <div class="pc-body">
+          <div class="pc-section">
+            <div class="pc-section-title">Team Roster</div>
+            ${teamsHtml}
+          </div>
+          ${predHtml}
+          ${feedHtml}
+        </div>
+      `;
     }
   </script>
 </body>
