@@ -969,7 +969,7 @@
     </div>
 
     <div class="section-matches active" id="sectionMatches">
-    <div class="matches-toolbar"><button type="button" class="results-toggle" id="resultsToggle" onclick="togglePastResults()">Show earlier results</button></div>
+    <div class="matches-toolbar"><button type="button" class="results-toggle" id="resultsToggle" onclick="togglePastResults()">Show completed matches</button></div>
     <div class="matches-grid" id="matches"></div>
     </div>
 
@@ -1347,14 +1347,13 @@
     function togglePastResults() {
       showPastResults = !showPastResults;
       const btn = document.getElementById('resultsToggle');
-      btn.textContent = showPastResults ? 'Hide earlier results' : 'Show earlier results';
+      btn.textContent = showPastResults ? 'Hide completed matches' : 'Show completed matches';
       btn.classList.toggle('active', showPastResults);
       renderMatches();
     }
 
     function renderMatches() {
       const now = new Date();
-      const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000);
       const twoDays = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
       const all = matchData
@@ -1362,19 +1361,22 @@
           const kickoff = toDate(m[0], m[1], m[2]);
           return { date: m[0], time: m[1], tz: m[2], team1: m[3], team2: m[4], group: m[5], score1: m[6], score2: m[7], channel: m[8], prob1: m[9], probD: m[10], prob2: m[11], kickoff };
         })
-        .filter(m => showPastResults || m.kickoff > cutoff)
         .sort((a, b) => a.kickoff - b.kickoff);
-      const upcoming = showPastResults ? all : all.slice(0, 36);
+
+      // Split into upcoming vs completed
+      const upcomingOnly = all.filter(m => m.score1 === null);
+      const completed = all.filter(m => m.score1 !== null);
+      const visible = showPastResults ? all : upcomingOnly.slice(0, 36);
 
       const el = document.getElementById('matches');
-      if (upcoming.length === 0) {
+      if (visible.length === 0) {
         el.innerHTML = '<p style="color:var(--text-muted);padding:48px 20px;text-align:center;font-size:0.95rem">All matches completed. Bring on the knockouts!</p>';
         return;
       }
 
       // Group by date
       const byDate = {};
-      for (const m of upcoming) {
+      for (const m of visible) {
         if (!byDate[m.date]) byDate[m.date] = [];
         byDate[m.date].push(m);
       }
