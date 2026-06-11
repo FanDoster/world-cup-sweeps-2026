@@ -13,14 +13,4 @@ Six-player sweepstakes tracker for the 2026 FIFA World Cup. Each player drew 8 t
 - Mobile responsive with touch-friendly probability display
 
 ## Deploy
-Single static HTML file. Deploy to Cloudflare Pages or Surge.
-
-### Surge
-```
-npx surge . --domain world-cup-sweeps-2026.surge.sh
-```
-
-### Cloudflare Pages
-```
-npx wrangler pages deploy . --project-name=world-cup-sweeps-2026
-```
+Single static HTML file. Auto-deploys to Surge on push via GitHub Actions.
