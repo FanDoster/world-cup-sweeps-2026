@@ -864,6 +864,7 @@
     .profile-card .pc-badge { font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 12px; }
     .pc-badge.rank { background: var(--gold-dim); color: #000; }
     .pc-badge.points { background: var(--accent-glow); color: var(--accent); }
+    .pc-badge.pred-pts { background: rgba(168,85,247,0.12); color: #c084fc; }
     .profile-card .pc-flags { display: flex; justify-content: center; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
     .profile-card .pc-flags img { width: 32px; height: 21px; border-radius: 3px; object-fit: cover; }
     .profile-card .pc-body { padding: 20px 28px 28px; }
@@ -2164,6 +2165,7 @@
           <div class="pc-name">${owner}</div>
           <div class="pc-badges">
             <span class="pc-badge points">${matchPts} match pts</span>
+            ${predStats ? `<span class="pc-badge pred-pts">🔮 ${predStats.totalPts} pred pts</span>` : ''}
             ${predStats ? `<span class="pc-badge rank">${predStats.accuracy}% pred accuracy</span>` : ''}
           </div>
           <div class="pc-flags">${teams.map(t => `<img src="${flagUrl(t.iso)}" alt="${t.team}" loading="lazy" onerror="this.style.display='none'" title="${t.team}">`).join('')}</div>
