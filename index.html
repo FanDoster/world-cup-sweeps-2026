@@ -1182,6 +1182,7 @@
       <button type="button" class="tab-btn" data-tab="groups" onclick="switchTab('groups')"><span class="emoji">📋</span><span class="tab-label"> Groups</span></button>
       <button type="button" class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')"><span class="emoji">🏅</span><span class="tab-label"> Leaderboard</span></button>
       <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span><span class="tab-label"> Teams</span></button>
+      <button type="button" class="tab-btn" data-tab="map" onclick="switchTab('map')"><span class="emoji">🌐</span><span class="tab-label"> Map</span></button>
     </div>
 
     <div class="section-players" id="sectionPlayers">
@@ -1211,6 +1212,22 @@
     <div class="section-teams" id="sectionTeams">
       <div class="team-chips" id="teamChips"></div>
       <div id="teamSchedule"></div>
+    </div>
+
+    <div class="section-map" id="sectionMap">
+      <div class="globe-wrap" id="globeWrap">
+        <svg id="globeSvg"></svg>
+      </div>
+      <div class="venue-panel" id="venuePanel">
+        <div class="vp-header">
+          <div>
+            <div class="vp-name" id="vpName"></div>
+            <div class="vp-city" id="vpCity"></div>
+          </div>
+          <button class="vp-close" onclick="closeVenuePanel()">✕</button>
+        </div>
+        <div class="vp-matches" id="vpMatches"></div>
+      </div>
     </div>
 
     <div class="section-myteams" id="sectionMyTeams">
@@ -1277,6 +1294,8 @@
 
   <script src="h2h-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
   <script>
     // ── SUPABASE ──
     const SB_URL = 'https://nkztkzrkbeacyltidqwr.supabase.co';
