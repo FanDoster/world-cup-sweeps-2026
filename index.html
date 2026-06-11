@@ -213,7 +213,7 @@
     /* ── MATCHES ── */
     .matches-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
       gap: 8px;
     }
     .match-date-header {
@@ -291,10 +291,11 @@
     }
     .match-row.finished:hover { opacity: 0.90; }
 
+    /* ── MATCH COUNTDOWN STRIP ── */
     .match-countdown {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text-muted);
@@ -303,14 +304,13 @@
       gap: 6px;
     }
     .match-countdown.soon { color: var(--accent); }
-    .match-countdown.live-now {
-      color: var(--live);
-    }
+    .match-countdown.live-now { color: var(--live); }
     .match-countdown.live-now::before {
       content: '';
       width: 7px; height: 7px;
       background: var(--live);
       border-radius: 50%;
+      flex-shrink: 0;
       animation: dotPulse 1s ease-in-out infinite;
     }
     @keyframes dotPulse {
@@ -327,48 +327,134 @@
       letter-spacing: 0.02em;
     }
 
+    /* ── MATCH BODY — single horizontal row ── */
     .match-body {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 0;
     }
+
+    /* Left time column */
     .match-date {
-      min-width: 68px;
-      max-width: 68px;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      text-align: right;
-      line-height: 1.4;
+      min-width: 52px;
+      max-width: 52px;
       flex-shrink: 0;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      line-height: 1;
+      padding-right: 12px;
+      border-right: 1px solid var(--border-subtle);
+      margin-right: 14px;
     }
-    .match-date .date-label { font-weight: 700; color: var(--text-secondary); font-size: 0.75rem; }
+    .match-date .date-label {
+      font-family: var(--font);
+      font-weight: 600;
+      color: var(--text-muted);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .match-date .time-label {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    /* Teams area — takes remaining width */
     .match-teams {
       flex: 1;
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      font-size: 0.88rem;
-      font-weight: 700;
+      gap: 6px;
     }
-    .match-team-line {
+
+    /* Single team row: [flag+name] on left, [VS/score] centre, [name+flag] on right */
+    .match-team-row {
       display: flex;
-      align-items: center;
-      gap: 7px;
+      align-items: stretch;
+      gap: 8px;
     }
-    .match-team-line .team-name-label { 
-      color: var(--text);
+    .match-team-home {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
       flex: 1;
       min-width: 0;
     }
-    .match-vs-line {
+    .match-team-away {
+      display: flex;
+      align-items: flex-end;
+      flex-direction: row-reverse;
+      gap: 8px;
+      flex: 1;
+      min-width: 0;
+      justify-content: flex-start;
+    }
+    /* Flag stays top-aligned, inline with name */
+    .match-team-home .match-flag,
+    .match-team-away .match-flag {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    /* Name + owner stack vertically */
+    .match-team-home .team-info,
+    .match-team-away .team-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+      flex: 1;
+    }
+    .match-team-home .team-info {
+      align-items: flex-start;
+    }
+    .match-team-away .team-info {
+      align-items: flex-end;
+    }
+    .match-team-home .team-name-label {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.85rem;
+      line-height: 1.2;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .match-team-away .team-name-label {
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.85rem;
+      line-height: 1.2;
+      white-space: normal;
+      word-break: break-word;
+      text-align: right;
+    }
+
+    /* Centre column: score pill or VS — vertically centred */
+    .match-centre {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+    }
+
+    /* Meta row below team row: group + channel */
+    .match-meta-row {
       display: flex;
       align-items: center;
-      gap: 7px;
-      padding-left: 2px;
+      gap: 6px;
     }
+
     .match-flag {
-      width: 32px; height: 21px;
+      width: 28px; height: 19px;
       border-radius: 3px;
       object-fit: cover;
       box-shadow: 0 1px 4px rgba(0,0,0,0.5);
@@ -376,39 +462,59 @@
     }
     .match-vs {
       color: var(--text-muted);
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      min-width: 18px;
+      letter-spacing: 0.1em;
       text-align: center;
-      flex-shrink: 0;
     }
     .match-score-pill {
-      font-size: 0.9rem;
+      font-size: 1rem;
       font-weight: 800;
       color: var(--text);
       background: var(--surface);
-      padding: 4px 12px;
+      padding: 5px 10px;
       border-radius: var(--radius-xs);
       font-family: var(--font-mono);
       letter-spacing: 0.04em;
       white-space: nowrap;
-      flex-shrink: 0;
+      text-align: center;
     }
-    .match-prob-bars {
+
+    /* Full-width probability bar at the bottom of the card */
+    .match-prob-bar {
       display: flex;
-      gap: 2px;
-      height: 4px;
+      height: 3px;
       border-radius: 2px;
       overflow: hidden;
-      min-width: 60px;
-      max-width: 80px;
-      flex-shrink: 0;
+      margin-top: 10px;
+      opacity: 0.6;
+      transition: height 0.2s ease, opacity 0.2s ease;
     }
-    .match-prob-bars .prob-h { background: var(--accent); height: 100%; }
-    .match-prob-bars .prob-d { background: var(--text-muted); height: 100%; }
-    .match-prob-bars .prob-a { background: var(--text-muted); height: 100%; opacity: 0.5; }
+    .match-row:hover .match-prob-bar {
+      height: 18px;
+      opacity: 1;
+    }
+    .match-prob-bar .prob-seg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: transparent;
+      transition: color 0.2s ease;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .match-row:hover .match-prob-bar .prob-seg { color: rgba(0,0,0,0.7); }
+    .match-prob-bar .prob-h { background: var(--accent); }
+    .match-prob-bar .prob-d { background: var(--text-muted); }
+    .match-prob-bar .prob-a { background: #3b6ea0; }
+
+    /* Legacy bars reference — keep so old references don't break */
+    .match-prob-bars { display: none; }
+
     .match-group-badge {
       font-size: 0.62rem;
       color: var(--text-muted);
@@ -492,8 +598,8 @@
 
     /* ── OWNER TAGS ── */
     .owner-tag, .match-owner {
-      font-size: 0.65rem;
-      padding: 2px 8px;
+      font-size: 0.62rem;
+      padding: 2px 6px;
       border-radius: 4px;
       font-weight: 700;
       white-space: nowrap;
@@ -691,56 +797,47 @@
       .match-date-header { font-size: 0.72rem; }
       .groups-grid { grid-template-columns: 1fr; }
 
-      /* Match rows — stack layout on mobile */
+      /* Match rows — compact on mobile */
       .match-row { padding: 10px 12px; }
-      .match-countdown { font-size: 0.68rem; margin-bottom: 6px; }
+      .match-countdown { font-size: 0.65rem; margin-bottom: 8px; }
 
-      .match-body {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
+      /* Keep horizontal layout but tighten up */
+      .match-body { gap: 0; }
+
+      .match-date {
+        min-width: 50px;
+        max-width: 50px;
+        padding-right: 10px;
+        margin-right: 10px;
       }
+      .match-date .time-label { font-size: 0.72rem; }
 
-      /* Teams row — flex with constrained names on mobile */
-      .match-teams {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 0.86rem;
-        flex-wrap: nowrap;
-      }
-      .match-teams .team-name-label {
-        flex: 1;
-        min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      /* Second team name right-align */
-      .match-teams .team-name-label + .match-flag { margin-left: auto; }
-      .match-teams .match-vs,
-      .match-teams .match-result { flex-shrink: 0; }
+      /* Team row: tighter names, smaller flags */
+      .match-team-home { gap: 5px; }
+      .match-team-away { gap: 5px; }
+      .match-team-home .team-name-label,
+      .match-team-away .team-name-label { font-size: 0.78rem; }
+      .match-flag { width: 22px; height: 15px; }
+      .match-centre { width: 56px; }
+      .match-score-pill { font-size: 0.85rem; padding: 4px 7px; }
 
-      /* Hide group badge + channel from desktop match-body row on mobile */
-      .match-body > .match-group-badge,
-      .match-body > .match-channel { display: none; }
+      /* Prob bar: always show on mobile (hover doesn't work) */
+      .match-prob-bar { height: 12px; opacity: 1; }
+      .match-prob-bar .prob-seg { color: rgba(0,0,0,0.65); }
 
-      /* Hide desktop date column on mobile */
+      /* Hide desktop date column via mobile-meta instead */
       .match-date { display: none; }
-
-      /* Show date info inline in the countdown area instead */
       .match-meta-mobile {
         display: flex !important;
         align-items: center;
         gap: 8px;
         font-size: 0.68rem;
         color: var(--text-muted);
-        margin-top: 2px;
+        margin-bottom: 6px;
       }
 
       /* Owner tags in match rows — smaller on mobile */
-      .match-owner { font-size: 0.6rem; padding: 1px 5px; }
+      .match-owner { font-size: 0.58rem; padding: 1px 5px; }
 
       /* Leaderboard — hide W-D-L on very small screens */
       .leaderboard-table .wdl { display: none; }
@@ -887,7 +984,7 @@
     .pred-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
     .pred-empty .pe-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
     /* ── MATCH PREDICTION DOTS ── */
-    .match-pred-dots { display: flex; gap: 4px; margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--border-subtle); flex-wrap: wrap; }
+    .match-pred-dots { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
     .pred-dot { font-size: 0.62rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-family: var(--font); letter-spacing: 0.02em; white-space: nowrap; }
     .pred-dot.has-pred { background: rgba(16,185,129,0.12); color: var(--accent); }
     .pred-dot.no-pred { background: rgba(75,91,110,0.1); color: var(--text-muted); }
@@ -1481,33 +1578,43 @@
             <div class="match-row ${rowCls}" onclick="showPredPanel('${m.team1}|${m.team2}|${m.date}')" style="cursor:pointer">
               <div class="match-countdown ${countdownCls}">
                 ${countdownText}
-                ${hasProbs ? `<span class="match-prob-bars"><span class="prob-h" style="width:${m.prob1}%"></span><span class="prob-d" style="width:${m.probD}%"></span><span class="prob-a" style="width:${m.prob2}%"></span></span>` : ''}
               </div>
               <div class="match-body">
                 <div class="match-date">
-                  <div class="date-label">${dateLabel}</div>
-                  <div>${localTime}</div>
+                  <span class="time-label">${localTime}</span>
                 </div>
                 <div class="match-teams">
-                  <div class="match-team-line">
-                    <img class="match-flag" src="${flagUrl(i1)}" alt="" loading="lazy" onerror="this.style.display='none'">
-                    <span class="team-name-label">${m.team1}</span>
-                    ${o1 ? `<span class="match-owner ${ownerColors[o1]}">${o1}</span>` : ''}
+                  <div class="match-team-row">
+                    <div class="match-team-home">
+                      <img class="match-flag" src="${flagUrl(i1)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                      <div class="team-info">
+                        <span class="team-name-label">${m.team1}</span>
+                        ${o1 ? `<span class="match-owner ${ownerColors[o1]}">${o1}</span>` : ''}
+                      </div>
+                    </div>
+                    <div class="match-centre">
+                      ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<span class="match-vs">vs</span>'}
+                    </div>
+                    <div class="match-team-away">
+                      <img class="match-flag" src="${flagUrl(i2)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                      <div class="team-info">
+                        <span class="team-name-label">${m.team2}</span>
+                        ${o2 ? `<span class="match-owner ${ownerColors[o2]}">${o2}</span>` : ''}
+                      </div>
+                    </div>
                   </div>
-                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<div class="match-vs-line"><span class="match-vs">vs</span></div>'}
-                  <div class="match-team-line">
-                    <img class="match-flag" src="${flagUrl(i2)}" alt="" loading="lazy" onerror="this.style.display='none'">
-                    <span class="team-name-label">${m.team2}</span>
-                    ${o2 ? `<span class="match-owner ${ownerColors[o2]}">${o2}</span>` : ''}
+                  <div class="match-meta-row">
+                    <span class="match-group-badge">G${m.group}</span>
+                    ${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
                   </div>
                 </div>
-                <span class="match-group-badge">G${m.group}</span>${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
               </div>
               <div class="match-meta-mobile" style="display:none">
                 <span>${dateLabel} ${localTime}</span>
                 <span class="match-group-badge" style="margin:0">G${m.group}</span>
                 ${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
               </div>
+              ${hasProbs ? `<div class="match-prob-bar"><span class="prob-seg prob-h" style="width:${m.prob1}%" title="${m.team1} win ${m.prob1}%">${m.prob1}%</span><span class="prob-seg prob-d" style="width:${m.probD}%" title="Draw ${m.probD}%">${m.probD}%</span><span class="prob-seg prob-a" style="width:${m.prob2}%" title="${m.team2} win ${m.prob2}%">${m.prob2}%</span></div>` : ''}
               ${(() => {
                 const key = `${m.team1}|${m.team2}|${m.date}`;
                 const mid = matchIdByTeamDate[key];
@@ -1824,11 +1931,19 @@
                   <div>${formatLocalTime(m.date, m.time, m.tz)}</div>
                 </div>
                 <div class="match-teams">
-                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<div class="match-vs-line"><span class="match-vs">vs</span></div>'}
+                  <div class="match-team-top">
+                    <div class="team-col"><span style="color:var(--text-secondary);font-size:0.75rem">vs</span></div>
+                    <div class="team-col"><span class="team-name-label">${opponent}</span></div>
+                  </div>
                   <div class="match-team-line">
-                    <img class="match-flag" src="${flagUrl(oppIso)}" alt="" loading="lazy" onerror="this.style.display='none'">
-                    <span class="team-name-label">${opponent}</span>
-                    ${oppOwner ? `<span class="match-owner ${ownerColors[oppOwner]}">${oppOwner}</span>` : ''}
+                    <div class="team-col"></div>
+                    <div class="team-col"></div>
+                    <div class="team-col">
+                      <span style="display:flex;align-items:center;gap:5px">
+                        <img class="match-flag" src="${flagUrl(oppIso)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                        ${oppOwner ? `<span class="match-owner ${ownerColors[oppOwner]}">${oppOwner}</span>` : ''}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 <span class="match-group-badge">G${m.group}</span>${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
