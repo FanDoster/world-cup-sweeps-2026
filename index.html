@@ -169,6 +169,15 @@
       border-radius: 10px;
       white-space: nowrap;
     }
+    .match-pts-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(234,179,8,0.1);
+      padding: 2px 9px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
     .team-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
     .team-item {
       cursor: pointer;
@@ -1391,13 +1400,19 @@
     function renderPeople() {
       const peopleEl = document.getElementById("people");
       peopleEl.innerHTML = '';
+      const standings = calcLeaderboard();
+      const matchPts = {};
+      standings.forEach(s => { matchPts[s.name] = s.pts; });
       for (const [name, teams] of Object.entries(people)) {
         const card = document.createElement("div");
         card.className = "person-card";
         card.style.cursor = 'pointer';
         card.onclick = () => showProfile(name);
+        const badges = [];
+        if (matchPts[name]) badges.push(`<span class="match-pts-badge">⚽${matchPts[name]}pts</span>`);
+        if (predPointsByPlayer[name]) badges.push(`<span class="pred-pts-badge">🔮${predPointsByPlayer[name]}pts</span>`);
         card.innerHTML = `
-          <div class="person-name">${name} <span class="count">${teams.length} teams</span>${predPointsByPlayer[name] ? ` <span class="pred-pts-badge">🔮${predPointsByPlayer[name]}pts</span>` : ''}</div>
+          <div class="person-name">${name} <span class="count">${teams.length} teams</span>${badges.length ? ' ' + badges.join(' ') : ''}</div>
           <ul class="team-list">
             ${teams.map(t => `
               <li class="team-item" onclick="selectTeam('${t.team}')" title="View ${t.team} schedule">
