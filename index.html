@@ -394,14 +394,14 @@
     }
     .match-team-home {
       display: flex;
-      align-items: flex-start;
+      align-items: stretch;
       gap: 8px;
       flex: 1;
       min-width: 0;
     }
     .match-team-away {
       display: flex;
-      align-items: flex-end;
+      align-items: stretch;
       flex-direction: row-reverse;
       gap: 8px;
       flex: 1;
@@ -412,13 +412,15 @@
     .match-team-home .match-flag,
     .match-team-away .match-flag {
       flex-shrink: 0;
-      margin-top: 2px;
+      align-self: flex-start;
+      margin-top: 3px;
     }
     /* Name + owner stack vertically */
     .match-team-home .team-info,
     .match-team-away .team-info {
       display: flex;
       flex-direction: column;
+      justify-content: space-between;
       gap: 4px;
       min-width: 0;
       flex: 1;
@@ -432,7 +434,7 @@
     .match-team-home .team-name-label {
       color: var(--text);
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 1rem;
       line-height: 1.2;
       white-space: normal;
       word-break: break-word;
@@ -440,7 +442,7 @@
     .match-team-away .team-name-label {
       color: var(--text);
       font-weight: 700;
-      font-size: 0.85rem;
+      font-size: 1rem;
       line-height: 1.2;
       white-space: normal;
       word-break: break-word;
@@ -465,7 +467,7 @@
     }
 
     .match-flag {
-      width: 28px; height: 19px;
+      width: 90px; height: 61px;
       border-radius: 3px;
       object-fit: cover;
       box-shadow: 0 1px 4px rgba(0,0,0,0.5);
@@ -473,7 +475,7 @@
     }
     .match-vs {
       color: var(--text-muted);
-      font-size: 0.58rem;
+      font-size: 1.1rem;
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.1em;
@@ -828,7 +830,7 @@
       .match-team-away { gap: 5px; }
       .match-team-home .team-name-label,
       .match-team-away .team-name-label { font-size: 0.78rem; }
-      .match-flag { width: 22px; height: 15px; }
+      .match-flag { width: 70px; height: 48px; }
       .match-centre { width: 56px; }
       .match-score-pill { font-size: 0.85rem; padding: 4px 7px; }
 
@@ -1345,7 +1347,7 @@
     };
 
     function flagUrl(iso) {
-      return `https://flagcdn.com/w80/${iso}.png`;
+      return `https://flagcdn.com/${iso}.svg`;
     }
 
     async function loadData() {
