@@ -959,15 +959,13 @@
     for (const [name, teams] of Object.entries(people)) {
       const card = document.createElement("div");
       card.className = "person-card";
-      const playerAvg = Math.round(teams.reduce((s, t) => s + (teamWinPct[t.team] || 50), 0) / teams.length);
       card.innerHTML = `
-        <div class="person-name">${name} <span class="count">${teams.length} teams</span><span class="player-win-pct" title="Avg win probability">${playerAvg}</span></div>
+        <div class="person-name">${name} <span class="count">${teams.length} teams</span></div>
         <ul class="team-list">
           ${teams.map(t => `
             <li class="team-item" onclick="selectTeam('${t.team}')" title="View ${t.team} schedule">
               <img class="team-flag" src="${flagUrl(t.iso)}" alt="" loading="lazy" onerror="this.style.display='none'">
               <span class="team-name">${t.team}</span>
-              <span class="team-win-badge ${(teamWinPct[t.team] || 50) >= 60 ? 'win-high' : (teamWinPct[t.team] || 50) >= 35 ? 'win-mid' : 'win-low'}">${teamWinPct[t.team] || 50}</span>
               <span class="team-group">Group ${t.group}</span>
             </li>
           `).join("")}
