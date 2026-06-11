@@ -943,6 +943,61 @@
     .pred-panel .pp-locked { color: var(--text-muted); font-size: 0.72rem; }
     .pred-panel .pp-no-pred { color: var(--text-muted); font-size: 0.72rem; font-style: italic; }
     .pred-panel .pp-footer { padding: 12px 16px; border-top: 1px solid var(--border-subtle); font-size: 0.68rem; color: var(--text-muted); text-align: center; }
+    /* ── H2H ── */
+    .pp-h2h { padding: 14px 18px 6px; border-bottom: 1px solid var(--border-subtle); }
+    .pp-h2h-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 9px; }
+    .h2h-legend { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-secondary); font-weight: 700; gap: 8px; }
+    .h2h-legend .h2h-mid { color: var(--text-muted); font-weight: 600; }
+    .h2h-bar { display: flex; height: 7px; border-radius: 4px; overflow: hidden; background: var(--surface); margin: 7px 0 10px; }
+    .h2h-bar span { height: 100%; }
+    .h2h-w1 { background: var(--accent); }
+    .h2h-d { background: var(--text-muted); }
+    .h2h-w2 { background: var(--gold-dim); }
+    .h2h-facts { display: flex; flex-direction: column; gap: 5px; padding-bottom: 8px; }
+    .h2h-fact { font-size: 0.74rem; color: var(--text-secondary); display: flex; gap: 8px; align-items: baseline; line-height: 1.45; }
+    .h2h-fact .hf-icon { flex-shrink: 0; }
+    .h2h-fact strong { color: var(--text); }
+    .h2h-first { font-size: 0.78rem; color: var(--text-secondary); padding: 2px 0 10px; }
+    /* ── JOKER ── */
+    .joker-chip { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: pointer; font-family: var(--font); transition: all 0.15s; white-space: nowrap; }
+    .joker-chip:hover { border-color: var(--gold-dim); color: var(--gold); }
+    .joker-chip.active { background: rgba(245,158,11,0.15); border-color: var(--gold-dim); color: var(--gold); }
+    .joker-mini { color: var(--gold); font-size: 0.74rem; font-weight: 800; }
+    /* ── COMMENTS ── */
+    .pp-comments { border-top: 1px solid var(--border-subtle); padding: 13px 18px 16px; }
+    .pp-comments-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .pp-comment { display: flex; gap: 8px; padding: 5px 0; font-size: 0.8rem; align-items: baseline; }
+    .pp-comment .c-author { font-weight: 700; flex-shrink: 0; }
+    .pp-comment .c-body { color: var(--text-secondary); word-break: break-word; }
+    .pp-comment .c-time { margin-left: auto; font-size: 0.62rem; color: var(--text-muted); flex-shrink: 0; }
+    .pp-comment-empty { font-size: 0.75rem; color: var(--text-muted); padding: 2px 0 6px; font-style: italic; }
+    .pp-comment-form { display: flex; gap: 6px; margin-top: 9px; }
+    .pp-comment-form input { flex: 1; padding: 8px 11px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--font); font-size: 0.8rem; }
+    .pp-comment-form input:focus { outline: none; border-color: var(--accent); }
+    .pp-comment-form button { padding: 8px 15px; border: none; border-radius: 6px; background: var(--accent); color: #000; font-weight: 700; font-size: 0.75rem; cursor: pointer; font-family: var(--font); transition: background 0.15s; }
+    .pp-comment-form button:hover { background: var(--accent-dim); }
+    .pp-comment-signin { font-size: 0.72rem; color: var(--text-muted); margin-top: 8px; }
+    /* ── BADGES ── */
+    .badge-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .stat-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 6px 13px; font-size: 0.74rem; font-weight: 700; color: var(--text-secondary); }
+    .stat-badge .sb-val { color: var(--text); }
+    /* ── AWARDS ── */
+    .awards-title { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin: 28px 0 10px; }
+    .awards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 10px; }
+    .award-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 13px 15px; display: flex; gap: 12px; align-items: center; transition: border-color 0.15s; }
+    .award-card:hover { border-color: var(--border); }
+    .award-card .aw-icon { font-size: 1.45rem; }
+    .award-card .aw-name { font-size: 0.66rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+    .award-card .aw-holder { font-weight: 800; font-size: 0.92rem; margin-top: 1px; }
+    .award-card .aw-detail { font-size: 0.68rem; color: var(--text-secondary); margin-top: 1px; }
+    /* ── QUALIFICATION SCENARIOS ── */
+    .qual-line { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--border-subtle); font-size: 0.7rem; color: var(--text-secondary); line-height: 1.9; }
+    .qual-line .ql-team { white-space: nowrap; margin-right: 12px; }
+    .qual-line .ql-range { color: var(--text-muted); font-family: var(--font-mono); }
+    .qual-tag { font-size: 0.58rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; margin-left: 4px; letter-spacing: 0.03em; }
+    .qual-tag.in { background: rgba(16,185,129,0.15); color: var(--accent); }
+    .qual-tag.out { background: rgba(239,68,68,0.12); color: #f87171; }
+    .qual-tag.third { background: rgba(245,158,11,0.13); color: var(--gold); }
   </style>
 </head>
 <body>
@@ -984,7 +1039,8 @@
           <tbody></tbody>
         </table>
       </div>
-      <p style="color:var(--text-muted);font-size:0.72rem;margin-top:14px;text-align:center;letter-spacing:0.02em">Match points: 3 win, 1 draw &middot; Prediction points: 1 correct result, 2 per correct score</p>
+      <p style="color:var(--text-muted);font-size:0.72rem;margin-top:14px;text-align:center;letter-spacing:0.02em">Match points: 3 win, 1 draw &middot; Prediction points: 1 correct result, 2 per correct score &middot; 🃏 joker doubles a match's prediction points</p>
+      <div id="awardsWrap"></div>
     </div>
 
     <div class="section-teams" id="sectionTeams">
@@ -1054,6 +1110,7 @@
     <footer>⚽ World Cup 2026 Sweepstakes</footer>
   </div>
 
+  <script src="h2h-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
     // ── SUPABASE ──
@@ -1231,11 +1288,25 @@
       loadPredData();
     }
 
-    let predLookup = {}; // { matchId: [{player_name, home, away, user_id}, ...] }
+    let predLookup = {}; // { matchId: [{player_name, home, away, j, user_id}, ...] }
     let matchIdByTeamDate = {}; // {"Team1|Team2|date": matchId}
-    let predPointsByPlayer = {}; // { playerName: totalPredPoints }
+    let predPointsByPlayer = {}; // { playerName: totalPredPoints (jokers doubled) }
+    // Feature flags — detected from the DB so the app works before
+    // supabase-features.sql has been run
+    let jokersEnabled = false;
+    let commentsEnabled = false;
+    let featureProbeDone = false;
 
     async function loadPredData() {
+      if (!featureProbeDone) {
+        const [j, c] = await Promise.all([
+          sb.from('predictions').select('is_joker').limit(1),
+          sb.from('match_comments').select('id').limit(1),
+        ]);
+        jokersEnabled = !j.error;
+        commentsEnabled = !c.error;
+        featureProbeDone = true;
+      }
       // Get match IDs
       const { data: allM } = await sb.from('matches').select('id,match_date,home_team_id(name),away_team_id(name)');
       if (allM) {
@@ -1249,7 +1320,7 @@
       // players' scores until kickoff) plus existence-only rows from the
       // prediction_status view so the ✓/✗ dots still work before kickoff.
       // Falls back to the scores query while the view doesn't exist yet.
-      const { data: preds } = await sb.from('predictions').select('user_id,match_id,predicted_home_score,predicted_away_score');
+      const { data: preds } = await sb.from('predictions').select('user_id,match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : ''));
       const { data: status } = await sb.from('prediction_status').select('user_id,match_id');
       const { data: profs } = await sb.from('player_profiles').select('id,player_name');
       if (profs) {
@@ -1266,7 +1337,8 @@
             user_id: p.user_id,
             player_name: nameById[p.user_id] || 'Unknown',
             home: sc ? sc.predicted_home_score : undefined,
-            away: sc ? sc.predicted_away_score : undefined
+            away: sc ? sc.predicted_away_score : undefined,
+            j: sc ? !!sc.is_joker : false
           });
         });
       }
@@ -1446,7 +1518,7 @@
                   if (pred && showScores) {
                     let icon = '';
                     if (isFinished) {
-                      icon = predResultBadge(pred.home, pred.away, m.score1, m.score2);
+                      icon = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j);
                     }
                     dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
                   } else if (pred) {
@@ -1494,6 +1566,45 @@
         `;
         peopleEl.appendChild(card);
       }
+    }
+
+    // ── QUALIFICATION SCENARIOS ──
+    // Enumerate every W/D/L outcome of a group's remaining matches and track
+    // each team's best/worst possible finishing position. Ties are broken
+    // with current goal difference plus ±1 per simulated result — a heuristic,
+    // so "THROUGH"/"OUT" only show when points alone can't be overturned.
+    function qualScenarios(letter, rows) {
+      const remaining = matchData
+        .filter(m => m[5] === letter && (m[6] === null || m[7] === null))
+        .map(m => [m[3], m[4]]);
+      if (!remaining.length || remaining.length > 6) return null;
+      const base = {};
+      rows.forEach(r => { base[r.team] = { pts: r.pts, gd: r.gd, gf: r.gf }; });
+      const best = {}, worst = {};
+      rows.forEach(r => { best[r.team] = 4; worst[r.team] = 1; });
+      const total = Math.pow(3, remaining.length);
+      for (let s = 0; s < total; s++) {
+        const sim = {};
+        rows.forEach(r => { sim[r.team] = { ...base[r.team] }; });
+        let code = s;
+        for (const [h, a] of remaining) {
+          const o = code % 3; code = Math.floor(code / 3);
+          if (o === 0) { sim[h].pts += 3; sim[h].gd++; sim[h].gf++; sim[a].gd--; }
+          else if (o === 1) { sim[a].pts += 3; sim[a].gd++; sim[a].gf++; sim[h].gd--; }
+          else { sim[h].pts++; sim[a].pts++; }
+        }
+        const order = rows.map(r => r.team).sort((x, y) =>
+          sim[y].pts - sim[x].pts || sim[y].gd - sim[x].gd || sim[y].gf - sim[x].gf || x.localeCompare(y));
+        order.forEach((t, i) => {
+          best[t] = Math.min(best[t], i + 1);
+          worst[t] = Math.max(worst[t], i + 1);
+        });
+      }
+      return { best, worst };
+    }
+
+    function ordinal(n) {
+      return n + (['', 'st', 'nd', 'rd'][n] || 'th');
     }
 
     // ── RENDER GROUPS ──
@@ -1553,12 +1664,26 @@
           </tr>
         `).join("");
 
+        const scen = qualScenarios(letter, rows);
+        let scenHtml = '';
+        if (scen) {
+          scenHtml = '<div class="qual-line" title="Possible finishing positions across all remaining results (ties broken on current goal difference)">' + rows.map(r => {
+            const b = scen.best[r.team], w = scen.worst[r.team];
+            let tag = '';
+            if (w <= 2) tag = '<span class="qual-tag in">THROUGH</span>';
+            else if (b > 3) tag = '<span class="qual-tag out">OUT</span>';
+            else if (b === 3) tag = '<span class="qual-tag third">3RD AT BEST</span>';
+            return `<span class="ql-team">${r.team} <span class="ql-range">${b === w ? ordinal(b) : ordinal(b) + '–' + ordinal(w)}</span>${tag}</span>`;
+          }).join('') + '</div>';
+        }
+
         card.innerHTML = `
           <div class="group-title">Group ${letter}</div>
           <table class="group-table">
             <thead><tr><th>#</th><th></th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Owner</th></tr></thead>
             <tbody>${rowsHtml}</tbody>
           </table>
+          ${scenHtml}
         `;
         groupsEl.appendChild(card);
 
@@ -1721,7 +1846,7 @@
                   if (pred && showScores) {
                     let icon = '';
                     if (isFinished) {
-                      icon = predResultBadge(pred.home, pred.away, m.score1, m.score2);
+                      icon = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j);
                     }
                     dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
                   } else if (pred) {
@@ -1777,6 +1902,42 @@
           <td class="pts">${p.total}</td>
         </tr>
       `).join('');
+      renderAwards(standings);
+    }
+
+    // ── TOURNAMENT AWARDS ──
+    function renderAwards(standings) {
+      const el = document.getElementById('awardsWrap');
+      if (!el) return;
+      const stats = getPredStatsByPlayer();
+      const entries = Object.entries(stats);
+      const awards = [];
+
+      // best by a metric, naming everyone on a tie
+      const pick = (metric, min, icon, name, fmt) => {
+        const eligible = entries.filter(([, s]) => s[metric] >= min)
+          .sort((x, y) => y[1][metric] - x[1][metric]);
+        if (!eligible.length) return;
+        const top = eligible[0][1][metric];
+        const holders = eligible.filter(([, s]) => s[metric] === top).map(([n]) => n);
+        awards.push([icon, name, holders.join(' & '), fmt(eligible[0][1])]);
+      };
+
+      const acc = entries.filter(([, s]) => s.settled >= 3)
+        .map(([n, s]) => [n, Math.round((s.scored / s.settled) * 100), s.settled])
+        .sort((x, y) => y[1] - x[1]);
+      if (acc.length) awards.push(['🎯', 'Sharpshooter', acc[0][0], `${acc[0][1]}% results called right`]);
+      pick('exact', 1, '⭐', 'Star Gazer', s => `${s.exact} exact score${s.exact > 1 ? 's' : ''}`);
+      pick('best', 2, '🔥', 'Hot Streak', s => `${s.best} correct results in a row`);
+      pick('upsets', 1, '💣', 'Upset Oracle', s => `${s.upsets} underdog win${s.upsets > 1 ? 's' : ''} called`);
+      pick('jokerPts', 1, '🃏', 'Joker Master', s => `+${s.jokerPts} bonus pts from jokers`);
+      const bottom = standings[standings.length - 1];
+      if (bottom && standings.length > 1 && bottom.total < standings[0].total) {
+        awards.push(['🥄', 'Wooden Spoon', bottom.name, `${bottom.total} total pts… so far`]);
+      }
+
+      el.innerHTML = awards.length ? `<div class="awards-title">🏆 Tournament Awards</div><div class="awards-grid">${awards.map(([icon, name, holder, detail]) => `
+        <div class="award-card"><span class="aw-icon">${icon}</span><div><div class="aw-name">${name}</div><div class="aw-holder">${holder}</div><div class="aw-detail">${detail}</div></div></div>`).join('')}</div>` : '';
     }
 
     // ── TABS ──
@@ -1856,7 +2017,7 @@
         .sort((a, b) => a.kickoff - b.kickoff)
         .slice(0, 20);
 
-      const { data: existing } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score').eq('user_id', currentSession.user.id);
+      const { data: existing } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '')).eq('user_id', currentSession.user.id);
       const predMap = {};
       if (existing) existing.forEach(p => { predMap[p.match_id] = p; });
 
@@ -1895,7 +2056,7 @@
             <div class="pmc-inner">
               <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
               <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
-              <span class="pmc-status locked">🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}</span>
+              <span class="pmc-status locked">🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}${ep.is_joker ? ' <span class="joker-mini" title="Joker — points doubled">🃏2×</span>' : ''}</span>
             </div></div>`;
         } else if (ep) {
           const lockMs = m.kickoff - 5 * 60 * 1000;
@@ -1906,6 +2067,7 @@
               <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
               <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
               <span class="pmc-status predicted" id="pred-display-${mid}">${ep.predicted_home_score}–${ep.predicted_away_score}</span>
+              ${jokersEnabled ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
               <div class="pmc-score" id="pred-edit-${mid}" style="display:none">
                 <div class="pmc-score-wrap">
                   <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
@@ -1959,7 +2121,7 @@
       }
 
       // History
-      const { data: history } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score').eq('user_id', currentSession.user.id).order('created_at', { ascending: false }).limit(30);
+      const { data: history } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '')).eq('user_id', currentSession.user.id).order('created_at', { ascending: false }).limit(30);
       if (history && history.length > 0) {
         let historyHtml = '';
         let exactCount = 0, correctCount = 0;
@@ -1972,7 +2134,7 @@
           const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m[6], m[7]);
           if (pts === 5) exactCount++; else if (pts >= 1) correctCount++;
 
-          const badge = predResultBadge(p.predicted_home_score, p.predicted_away_score, m[6], m[7]);
+          const badge = predResultBadge(p.predicted_home_score, p.predicted_away_score, m[6], m[7], p.is_joker);
           historyHtml += `<div class="pred-history-card">
             <div class="phc-result">${badge}</div>
             <div class="phc-match">
@@ -2007,6 +2169,29 @@
       }, { onConflict: 'user_id,match_id' });
       if (error) { alert('Error: ' + error.message); return; }
       renderPredictions(); // refresh
+    }
+
+    async function toggleJoker(matchId) {
+      if (!jokersEnabled || !currentSession) return;
+      const uid = currentSession.user.id;
+      const { data: cur } = await sb.from('predictions').select('is_joker').eq('user_id', uid).eq('match_id', matchId).single();
+      const turningOn = !(cur && cur.is_joker);
+      if (turningOn) {
+        // one joker per match day — clear any other joker that day first
+        const { data: target } = await sb.from('matches').select('match_date').eq('id', matchId).single();
+        if (target) {
+          const { data: sameDay } = await sb.from('matches').select('id').eq('match_date', target.match_date);
+          const ids = (sameDay || []).map(m => m.id).filter(id => id !== matchId);
+          if (ids.length) await sb.from('predictions').update({ is_joker: false }).eq('user_id', uid).in('match_id', ids);
+        }
+      }
+      const { error } = await sb.from('predictions').update({ is_joker: turningOn }).eq('user_id', uid).eq('match_id', matchId);
+      if (error) {
+        alert(error.message.includes('one joker') ? 'Your 🃏 is already locked in on another match that day.' : 'Error: ' + error.message);
+        return;
+      }
+      loadPredData();
+      renderPredictions();
     }
 
     function editPrediction(matchId) {
@@ -2045,35 +2230,53 @@
       return pts;
     }
 
-    function calcPredPointsForAll() {
-      // Build matchId -> scores from matchData
-      const matchScores = {};
-      for (const m of matchData) {
-        if (m[6] === null || m[7] === null) continue; // not played
-        const key = `${m[3]}|${m[4]}|${m[0]}`;
-        const mid = matchIdByTeamDate[key];
-        if (mid) matchScores[mid] = { home: m[6], away: m[7] };
-      }
-      // Aggregate prediction points by player
-      predPointsByPlayer = {};
-      for (const [matchId, preds] of Object.entries(predLookup)) {
-        const scores = matchScores[matchId];
-        if (!scores) continue;
-        for (const p of preds) {
+    // Per-player prediction stats over settled matches, in kickoff order.
+    // Shared by the leaderboard, profile badges, and tournament awards.
+    function getPredStatsByPlayer() {
+      const stats = {};
+      const finished = matchData
+        .filter(m => m[6] !== null && m[7] !== null)
+        .sort((a, b) => toDate(a[0], a[1], a[2]) - toDate(b[0], b[1], b[2]));
+      for (const m of finished) {
+        const mid = matchIdByTeamDate[`${m[3]}|${m[4]}|${m[0]}`];
+        if (!mid) continue;
+        for (const p of (predLookup[mid] || [])) {
           if (p.home === undefined || p.home === null) continue; // scores hidden by RLS
-          const pts = calcPredPoints(p.home, p.away, scores.home, scores.away);
-          if (!predPointsByPlayer[p.player_name]) predPointsByPlayer[p.player_name] = 0;
-          predPointsByPlayer[p.player_name] += pts;
+          if (!stats[p.player_name]) stats[p.player_name] = { settled: 0, pts: 0, exact: 0, scored: 0, cur: 0, best: 0, upsets: 0, jokerPts: 0 };
+          const st = stats[p.player_name];
+          const base = calcPredPoints(p.home, p.away, m[6], m[7]);
+          st.settled++;
+          st.pts += p.j ? base * 2 : base;
+          if (p.j) st.jokerPts += base; // the bonus half earned from jokers
+          if (base === 5) st.exact++;
+          const resultRight = Math.sign(p.home - p.away) === Math.sign(m[6] - m[7]);
+          if (resultRight) { st.scored++; st.cur++; st.best = Math.max(st.best, st.cur); }
+          else st.cur = 0;
+          // upset: backed a winner the probabilities gave under 35%
+          const predWinner = p.home > p.away ? 1 : p.away > p.home ? 2 : 0;
+          const actualWinner = m[6] > m[7] ? 1 : m[7] > m[6] ? 2 : 0;
+          if (predWinner !== 0 && predWinner === actualWinner) {
+            const prob = predWinner === 1 ? m[9] : m[11];
+            if (prob != null && prob < 35) st.upsets++;
+          }
         }
       }
+      return stats;
     }
 
-    function predResultBadge(homePred, awayPred, homeActual, awayActual) {
-      const pts = calcPredPoints(homePred, awayPred, homeActual, awayActual);
-      if (pts === 5) return '<span style="color:var(--gold);font-weight:700">5★</span>';
-      if (pts >= 2) return `<span style="color:var(--accent);font-weight:700">${pts}</span>`;
-      if (pts === 1) return `<span style="color:var(--text-secondary);font-weight:700">1</span>`;
-      return '<span style="color:var(--live)">✗</span>';
+    function calcPredPointsForAll() {
+      predPointsByPlayer = {};
+      for (const [name, st] of Object.entries(getPredStatsByPlayer())) predPointsByPlayer[name] = st.pts;
+    }
+
+    function predResultBadge(homePred, awayPred, homeActual, awayActual, joker) {
+      const base = calcPredPoints(homePred, awayPred, homeActual, awayActual);
+      const pts = joker ? base * 2 : base;
+      const j = joker ? '<span class="joker-mini" title="Joker — points doubled">🃏</span>' : '';
+      if (base === 5) return `<span style="color:var(--gold);font-weight:700">${pts}★</span>${j}`;
+      if (base >= 2) return `<span style="color:var(--accent);font-weight:700">${pts}</span>${j}`;
+      if (base === 1) return `<span style="color:var(--text-secondary);font-weight:700">${pts}</span>${j}`;
+      return `<span style="color:var(--live)">✗</span>${j}`;
     }
 
     // ── PLAYER PROFILE ──
@@ -2094,6 +2297,7 @@
 
     function closePredPanel() {
       document.getElementById('predPanelOverlay').classList.remove('active');
+      if (commentsChannel) { sb.removeChannel(commentsChannel); commentsChannel = null; }
     }
 
     function renderPredPanel(key) {
@@ -2121,11 +2325,10 @@
         let predCell, statusCell;
 
         if (pred && isFinished) {
-          const pts = calcPredPoints(pred.home, pred.away, m[6], m[7]);
-          predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>`;
-          statusCell = predResultBadge(pred.home, pred.away, m[6], m[7]);
+          predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
+          statusCell = predResultBadge(pred.home, pred.away, m[6], m[7], pred.j);
         } else if (pred && showScores) {
-          predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>`;
+          predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
           statusCell = '<span class="pp-locked">🔒</span>';
         } else if (pred) {
           predCell = '<span class="pp-hidden">🔒 Hidden</span>';
@@ -2154,12 +2357,104 @@
           </div>
           <button class="pp-close" onclick="closePredPanel()">✕</button>
         </div>
+        ${h2hHtml(t1, t2)}
         <table class="pp-table">
           <thead><tr><th>Player</th><th>Prediction</th><th></th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
         <div class="pp-footer">${footerText}</div>
+        ${commentsEnabled && mid ? `<div class="pp-comments">
+          <div class="pp-comments-title">Banter</div>
+          <div id="ppCommentsList"><div class="pp-comment-empty">Loading…</div></div>
+          ${currentSession ? `<div class="pp-comment-form">
+            <input id="ppCommentInput" maxlength="500" placeholder="Say something…" onkeydown="if(event.key==='Enter')postComment(${mid})">
+            <button onclick="postComment(${mid})">Send</button>
+          </div>` : '<div class="pp-comment-signin">Sign in to join the banter.</div>'}
+        </div>` : ''}
       `;
+
+      if (commentsEnabled && mid) {
+        loadComments(mid);
+        // live updates while the panel is open
+        if (commentsChannel) sb.removeChannel(commentsChannel);
+        commentsChannel = sb.channel('comments-' + mid)
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_comments', filter: `match_id=eq.${mid}` }, () => loadComments(mid))
+          .subscribe();
+      }
+    }
+
+    // ── H2H HISTORY ──
+    function h2hHtml(t1, t2) {
+      if (typeof H2H_DATA === 'undefined') return '';
+      const [a, b] = [t1, t2].sort();
+      const e = H2H_DATA[a + '|' + b];
+      if (!e) return `<div class="pp-h2h">
+        <div class="pp-h2h-title">Head to Head</div>
+        <div class="h2h-first">🎉 First ever meeting between these two!</div>
+      </div>`;
+      const pct = n => (n / e.m) * 100;
+      let facts = '';
+      if (e.wc[0] > 0) {
+        const bits = [];
+        if (e.wc[1]) bits.push(`${a} won ${e.wc[1]}`);
+        if (e.wc[3]) bits.push(`${b} won ${e.wc[3]}`);
+        if (e.wc[2]) bits.push(`${e.wc[2]} drawn`);
+        facts += `<div class="h2h-fact"><span class="hf-icon">🏆</span><span>${e.wc[0]} World Cup meeting${e.wc[0] > 1 ? 's' : ''} — ${bits.join(', ')}</span></div>`;
+      }
+      if (e.l) facts += `<div class="h2h-fact"><span class="hf-icon">🕐</span><span>Last met ${e.l.y} (${e.l.t}): <strong>${e.l.h} ${e.l.s}</strong></span></div>`;
+      if (e.b && e.b.mg >= 3) facts += `<div class="h2h-fact"><span class="hf-icon">💥</span><span>Biggest win: <strong>${e.b.h} ${e.b.s}</strong> (${e.b.y})</span></div>`;
+      facts += `<div class="h2h-fact"><span class="hf-icon">📜</span><span>First met in <strong>${e.f}</strong> · ${e.g[0]}–${e.g[1]} goals on aggregate</span></div>`;
+      return `<div class="pp-h2h">
+        <div class="pp-h2h-title">Head to Head · ${e.m} meeting${e.m > 1 ? 's' : ''}</div>
+        <div class="h2h-legend"><span>${a} ${e.w[0]}</span><span class="h2h-mid">${e.d} draw${e.d === 1 ? '' : 's'}</span><span>${e.w[1]} ${b}</span></div>
+        <div class="h2h-bar">
+          <span class="h2h-w1" style="width:${pct(e.w[0])}%"></span>
+          <span class="h2h-d" style="width:${pct(e.d)}%"></span>
+          <span class="h2h-w2" style="width:${pct(e.w[1])}%"></span>
+        </div>
+        <div class="h2h-facts">${facts}</div>
+      </div>`;
+    }
+
+    // ── MATCH COMMENTS ──
+    let commentsChannel = null;
+
+    function escapeHtml(s) {
+      return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    async function loadComments(mid) {
+      const el = document.getElementById('ppCommentsList');
+      if (!el) return;
+      const { data: comments } = await sb.from('match_comments')
+        .select('user_id,body,created_at').eq('match_id', mid)
+        .order('created_at').limit(100);
+      const { data: profs } = await sb.from('player_profiles').select('id,player_name');
+      const nameById = {};
+      (profs || []).forEach(p => { nameById[p.id] = p.player_name; });
+      if (!comments || !comments.length) {
+        el.innerHTML = '<div class="pp-comment-empty">No banter yet — get it started.</div>';
+        return;
+      }
+      el.innerHTML = comments.map(c => {
+        const t = new Date(c.created_at);
+        const sameDay = t.toDateString() === new Date().toDateString();
+        const when = sameDay
+          ? `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`
+          : t.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+        return `<div class="pp-comment"><span class="c-author">${nameById[c.user_id] || '?'}</span><span class="c-body">${escapeHtml(c.body)}</span><span class="c-time">${when}</span></div>`;
+      }).join('');
+    }
+
+    async function postComment(mid) {
+      const input = document.getElementById('ppCommentInput');
+      if (!input || !currentSession) return;
+      const body = input.value.trim();
+      if (!body) return;
+      input.value = '';
+      const { error } = await sb.from('match_comments').insert({ match_id: mid, user_id: currentSession.user.id, body });
+      if (error) { alert('Error: ' + error.message); return; }
+      loadComments(mid);
     }
 
     async function renderProfile(playerName) {
@@ -2240,6 +2535,19 @@
         </div>`;
       }).join('');
 
+      // Badges — streaks, exact scores, upsets, joker bonus
+      let badgesHtml = '';
+      const pstats = getPredStatsByPlayer()[playerName];
+      if (pstats && pstats.settled > 0) {
+        const items = [];
+        if (pstats.best >= 2) items.push(`<span class="stat-badge">🔥 <span class="sb-val">${pstats.best}</span>&nbsp;result streak</span>`);
+        if (pstats.exact > 0) items.push(`<span class="stat-badge">⭐ <span class="sb-val">${pstats.exact}</span>&nbsp;exact score${pstats.exact > 1 ? 's' : ''}</span>`);
+        if (pstats.upsets > 0) items.push(`<span class="stat-badge">💣 <span class="sb-val">${pstats.upsets}</span>&nbsp;upset${pstats.upsets > 1 ? 's' : ''} called</span>`);
+        if (pstats.jokerPts > 0) items.push(`<span class="stat-badge">🃏 <span class="sb-val">+${pstats.jokerPts}</span>&nbsp;joker bonus</span>`);
+        items.push(`<span class="stat-badge">🔮 <span class="sb-val">${pstats.pts}</span>&nbsp;pred pts</span>`);
+        badgesHtml = `<div class="pc-section"><div class="pc-section-title">Badges</div><div class="badge-row">${items.join('')}</div></div>`;
+      }
+
       let predHtml = '';
       if (predStats) {
         predHtml = `<div class="pc-section">
@@ -2282,6 +2590,7 @@
           <div class="pc-flags">${teams.map(t => `<img src="${flagUrl(t.iso)}" alt="${t.team}" loading="lazy" onerror="this.style.display='none'" title="${t.team}">`).join('')}</div>
         </div>
         <div class="pc-body">
+          ${badgesHtml}
           <div class="pc-section">
             <div class="pc-section-title">Team Roster</div>
             ${teamsHtml}

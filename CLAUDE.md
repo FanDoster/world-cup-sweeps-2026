@@ -4,13 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A six-player sweepstakes tracker for the 2026 FIFA World Cup (live at world-cup-sweeps-2026.surge.sh). The entire app is **one static file, `index.html`** (~2100 lines: CSS, HTML, and vanilla JS in `<style>`/`<script>` blocks). There is no build step, no package.json, no tests, and no linter. Backend is Supabase (Postgres + Auth) accessed directly from the browser via the supabase-js CDN bundle.
+A six-player sweepstakes tracker for the 2026 FIFA World Cup (live at world-cup-sweeps-2026.surge.sh). The app is **one static file, `index.html`** (CSS, HTML, and vanilla JS in `<style>`/`<script>` blocks) plus `h2h-data.js`, a generated head-to-head dataset. There is no build step, no package.json, no tests, and no linter. Backend is Supabase (Postgres + Auth) accessed directly from the browser via the supabase-js CDN bundle.
+
+`h2h-data.js` holds all-time records between every pair of the 48 qualified teams (record, draws, goals, World Cup meetings, first/last meeting, biggest win), crunched from the martj42/international_results dataset by `.claude/build-h2h.mjs` — re-run that script to refresh it; never hand-edit the data file.
 
 ## Commands
 
 - **Run locally**: just open `index.html` in a browser (or any static server). It talks to the live Supabase project.
 - **Deploy**: pushing to `main` auto-deploys to Surge via `.github/workflows/deploy.yml`. Manual deploy: `./deploy.sh` (needs `SURGE_TOKEN` env var). `.surgeignore` keeps SQL/markdown/config files off the public site — never weaken it: the invite code lives in SQL, and that file was once publicly readable.
-- **Database changes**: the `.sql` files are not run by any tooling — they are pasted into the Supabase SQL Editor by hand. `supabase-schema.sql` (teams, matches, picks + seed data) is **destructive**: it starts with `DROP TABLE ... CASCADE` and reseeds everything. `supabase-auth.sql` adds `player_profiles`, `predictions`, and the `validate_invite_code` RPC. `supabase-fixes.sql` (June 2026) adds the prediction UPDATE policy, the server-side kickoff lock (`match_locked`), the `prediction_status` existence-only view, and rotates the invite code.
+- **Database changes**: the `.sql` files are not run by any tooling — they are pasted into the Supabase SQL Editor by hand. `supabase-schema.sql` (teams, matches, picks + seed data) is **destructive**: it starts with `DROP TABLE ... CASCADE` and reseeds everything. `supabase-auth.sql` adds `player_profiles`, `predictions`, and the `validate_invite_code` RPC. `supabase-fixes.sql` (June 2026) adds the prediction UPDATE policy, the server-side kickoff lock (`match_locked`), the `prediction_status` existence-only view, and rotates the invite code. `supabase-features.sql` adds the `is_joker` column (one 2× confidence pick per player per match day, enforced by trigger) and the `match_comments` table (banter thread, realtime-enabled). The frontend **feature-detects** both (`jokersEnabled`/`commentsEnabled` probes in `loadPredData`) and hides the UI until the SQL has been run.
 
 ## Architecture
 
@@ -27,7 +29,7 @@ Rendering is full innerHTML regeneration: `renderMatches()`, `renderGroups()`, `
 ### Scoring rules (duplicated client-side, keep consistent)
 
 - **Leaderboard** (`calcLeaderboard`): an owner gets 3 pts when their team wins, 1 pt for a draw; the table also shows prediction points (`predPointsByPlayer`) and ranks by the combined total. Standings/group tables are computed entirely client-side from match scores — nothing is stored. Group tables highlight qualification (top 2 + best 8 third-placed of 12 groups in the 2026 format) plus a best-thirds ranking card.
-- **Predictions** (`calcPredPoints`): 1 pt for correct result (win/draw/loss sign), +2 pts per correct team score, max 5 ("5★" exact score). Predictions lock 5 minutes before kickoff and other players' picks stay hidden until then — enforced server-side by the RLS policies in `supabase-fixes.sql` (`match_locked`). The ✓/✗ "has predicted" dots read the `prediction_status` view, which exposes existence but not scores; `loadPredData` falls back to the predictions table if the view is missing.
+- **Predictions** (`calcPredPoints`): 1 pt for correct result (win/draw/loss sign), +2 pts per correct team score, max 5 ("5★" exact score); a joker doubles a match's points. All per-player aggregates (leaderboard pred pts, profile badges, tournament awards) flow through `getPredStatsByPlayer()` — change scoring there, not in the renderers. Predictions lock 5 minutes before kickoff and other players' picks stay hidden until then — enforced server-side by the RLS policies in `supabase-fixes.sql` (`match_locked`). The ✓/✗ "has predicted" dots read the `prediction_status` view, which exposes existence but not scores; `loadPredData` falls back to the predictions table if the view is missing.
 
 ### Auth
 
