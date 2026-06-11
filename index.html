@@ -251,27 +251,38 @@
       border-left: 4px solid var(--border-subtle);
       border-radius: 0 var(--radius) var(--radius) 0;
       padding: 14px 18px;
-      transition: transform 0.15s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
       position: relative;
       overflow: hidden;
     }
-    .match-row::after {
-      content: '';
+    /* All direct children sit above the flag backgrounds */
+    .match-row > * { position: relative; z-index: 1; }
+
+    /* Flag background halves */
+    .flag-bg {
       position: absolute;
-      top: 0; right: 0; bottom: 0;
-      width: 60px;
-      background: linear-gradient(to right, transparent, var(--card));
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
+      top: 0; bottom: 0;
+      width: 50%;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0.18;
+      transition: opacity 0.25s;
     }
-    .match-row:hover {
-      background: var(--card-hover);
-      border-color: var(--border);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
-      transform: translateX(2px);
+    .flag-bg-home {
+      left: 0;
+      /* dark scrim + fade toward centre */
+      mask-image: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
     }
-    .match-row:hover::after { opacity: 1; }
+    .flag-bg-away {
+      right: 0;
+      mask-image: linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
+    }
+    .match-row:hover .flag-bg { opacity: 0.32; }
+    .match-row.finished .flag-bg { opacity: 0.08; }
     .match-row.kicking-off {
       border-left-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(16,185,129,0.08);
@@ -1576,6 +1587,8 @@
 
           html += `
             <div class="match-row ${rowCls}" onclick="showPredPanel('${m.team1}|${m.team2}|${m.date}')" style="cursor:pointer">
+              <div class="flag-bg flag-bg-home" style="background-image:url('${flagUrl(i1)}')"></div>
+              <div class="flag-bg flag-bg-away" style="background-image:url('${flagUrl(i2)}')"></div>
               <div class="match-countdown ${countdownCls}">
                 ${countdownText}
               </div>
@@ -1921,9 +1934,10 @@
 
           html += `
             <div class="match-row ${rowCls}" onclick="showPredPanel('${m.team1}|${m.team2}|${m.date}')" style="cursor:pointer">
+              <div class="flag-bg flag-bg-home" style="background-image:url('${flagUrl(i1)}')"></div>
+              <div class="flag-bg flag-bg-away" style="background-image:url('${flagUrl(i2)}')"></div>
               <div class="match-countdown ${countdownCls}">
                 ${countdownText}
-                ${hasProbs ? `<span class="match-prob-bars"><span class="prob-h" style="width:${m.prob1}%"></span><span class="prob-d" style="width:${m.probD}%"></span><span class="prob-a" style="width:${m.prob2}%"></span></span>` : ''}
               </div>
               <div class="match-body">
                 <div class="match-date">
