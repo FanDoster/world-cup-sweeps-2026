@@ -1,0 +1,7 @@
+*.md
+*.sql
+*.sh
+.claude/
+.github/
+.gitignore
+supabase/
