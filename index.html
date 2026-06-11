@@ -1331,9 +1331,7 @@
                   if (pred && showScores) {
                     let icon = '';
                     if (isFinished) {
-                      const exact = pred.home === m.score1 && pred.away === m.score2;
-                      const correct = !exact && Math.sign(pred.home - pred.away) === Math.sign(m.score1 - m.score2);
-                      icon = exact ? '★' : correct ? '✓' : '✗';
+                      icon = predResultBadge(pred.home, pred.away, m.score1, m.score2);
                     }
                     dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
                   } else if (pred) {
@@ -1565,9 +1563,7 @@
                   if (pred && showScores) {
                     let icon = '';
                     if (isFinished) {
-                      const exact = pred.home === m.score1 && pred.away === m.score2;
-                      const correct = !exact && Math.sign(pred.home - pred.away) === Math.sign(m.score1 - m.score2);
-                      icon = exact ? '★' : correct ? '✓' : '✗';
+                      icon = predResultBadge(pred.home, pred.away, m.score1, m.score2);
                     }
                     dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
                   } else if (pred) {
@@ -1810,14 +1806,12 @@
           const m = matchData.find(m => m[3] === am.home_team_id.name && m[4] === am.away_team_id.name && m[0] === am.match_date);
           if (!m || m[6] === null) continue;
 
-          const exact = p.predicted_home_score === m[6] && p.predicted_away_score === m[7];
-          const correct = !exact && Math.sign(p.predicted_home_score - p.predicted_away_score) === Math.sign(m[6] - m[7]);
-          if (exact) exactCount++; else if (correct) correctCount++;
+          const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m[6], m[7]);
+          if (pts === 5) exactCount++; else if (pts >= 1) correctCount++;
 
-          const icon = exact ? '★' : correct ? '✓' : '✗';
-          const iconCls = exact ? 'exact-marker' : correct ? 'hit-marker' : 'miss-marker';
+          const badge = predResultBadge(p.predicted_home_score, p.predicted_away_score, m[6], m[7]);
           historyHtml += `<div class="pred-history-card">
-            <div class="phc-result"><span class="phc-icon ${iconCls}">${icon}</span></div>
+            <div class="phc-result">${badge}</div>
             <div class="phc-match">
               <div class="phc-teams">${m[3]} vs ${m[4]} <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem">G${m[5]}</span></div>
               <div class="phc-scores">
@@ -1829,8 +1823,8 @@
         let statsHtml = '';
         if (exactCount + correctCount > 0) {
           statsHtml = `<div class="pred-summary" style="margin-top:16px">
-            <div class="pred-stat gold"><div class="ps-num">${exactCount}</div><div class="ps-label">Exact ★</div></div>
-            <div class="pred-stat accent"><div class="ps-num">${correctCount}</div><div class="ps-label">Correct ✓</div></div>
+            <div class="pred-stat gold"><div class="ps-num">${exactCount}</div><div class="ps-label">Perfect 5★</div></div>
+            <div class="pred-stat accent"><div class="ps-num">${correctCount}</div><div class="ps-label">Scored</div></div>
           </div>`;
         }
         html += `<div class="pred-section-title">Your History</div>${statsHtml}${historyHtml}`;
@@ -1878,6 +1872,22 @@
       v = Math.max(0, Math.min(20, v + delta));
       el.value = v;
       el.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function calcPredPoints(homePred, awayPred, homeActual, awayActual) {
+      let pts = 0;
+      if (Math.sign(homePred - awayPred) === Math.sign(homeActual - awayActual)) pts += 1;
+      if (homePred === homeActual) pts += 2;
+      if (awayPred === awayActual) pts += 2;
+      return pts;
+    }
+
+    function predResultBadge(homePred, awayPred, homeActual, awayActual) {
+      const pts = calcPredPoints(homePred, awayPred, homeActual, awayActual);
+      if (pts === 5) return '<span style="color:var(--gold);font-weight:700">5★</span>';
+      if (pts >= 3) return `<span style="color:var(--accent);font-weight:700">${pts}</span>`;
+      if (pts === 1) return `<span style="color:var(--text-secondary);font-weight:700">1</span>`;
+      return '<span style="color:var(--live)">✗</span>';
     }
 
     // ── PLAYER PROFILE ──
@@ -1939,8 +1949,9 @@
               const m = allMatches?.find(am => am.id === p.match_id);
               if (!m || m.home_score === null) continue;
               total++;
-              if (p.predicted_home_score === m.home_score && p.predicted_away_score === m.away_score) exact++;
-              else if (Math.sign(p.predicted_home_score - p.predicted_away_score) === Math.sign(m.home_score - m.away_score)) correct++;
+              const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.home_score, m.away_score);
+              if (pts === 5) exact++;
+              else if (pts >= 1) correct++;
             }
             if (total > 0) predStats = { total, exact, correct, accuracy: Math.round(((exact + correct) / total) * 100) };
           }
