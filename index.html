@@ -1337,9 +1337,9 @@
                     }
                     dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
                   } else if (pred) {
-                    dots += `<span class="pred-dot has-pred" title="${p} predicted">${p[0]}🔒</span>`;
+                    dots += `<span class="pred-dot has-pred" title="${p} predicted">${p[0]}✓</span>`;
                   } else {
-                    dots += `<span class="pred-dot no-pred" title="${p} hasn't predicted">${p[0]}</span>`;
+                    dots += `<span class="pred-dot no-pred" title="${p} hasn't predicted">${p[0]}✗</span>`;
                   }
                 }
                 return `<div class="match-pred-dots">${dots}</div>`;
@@ -1571,9 +1571,9 @@
                     }
                     dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
                   } else if (pred) {
-                    dots += `<span class="pred-dot has-pred" title="${p} predicted">${p[0]}🔒</span>`;
+                    dots += `<span class="pred-dot has-pred" title="${p} predicted">${p[0]}✓</span>`;
                   } else {
-                    dots += `<span class="pred-dot no-pred" title="${p} hasn't predicted">${p[0]}</span>`;
+                    dots += `<span class="pred-dot no-pred" title="${p} hasn't predicted">${p[0]}✗</span>`;
                   }
                 }
                 return `<div class="match-pred-dots">${dots}</div>`;
