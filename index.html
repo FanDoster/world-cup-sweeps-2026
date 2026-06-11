@@ -346,14 +346,26 @@
       flex: 1;
       min-width: 0;
       display: flex;
-      align-items: center;
-      gap: 8px;
+      flex-direction: column;
+      gap: 4px;
       font-size: 0.88rem;
       font-weight: 700;
     }
-    .match-teams span.team-name-label { 
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+    .match-team-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .match-team-line .team-name-label { 
       color: var(--text);
+      flex: 1;
+      min-width: 0;
+    }
+    .match-vs-line {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding-left: 2px;
     }
     .match-flag {
       width: 32px; height: 21px;
@@ -1405,13 +1417,17 @@
                   <div>${localTime}</div>
                 </div>
                 <div class="match-teams">
-                  <img class="match-flag" src="${flagUrl(i1)}" alt="" loading="lazy" onerror="this.style.display='none'">
-                  <span class="team-name-label">${m.team1}</span>
-                  ${o1 ? `<span class="match-owner ${ownerColors[o1]}">${o1}</span>` : ''}
-                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<span class="match-vs">vs</span>'}
-                  ${o2 ? `<span class="match-owner ${ownerColors[o2]}">${o2}</span>` : ''}
-                  <span class="team-name-label">${m.team2}</span>
-                  <img class="match-flag" src="${flagUrl(i2)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                  <div class="match-team-line">
+                    <img class="match-flag" src="${flagUrl(i1)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span class="team-name-label">${m.team1}</span>
+                    ${o1 ? `<span class="match-owner ${ownerColors[o1]}">${o1}</span>` : ''}
+                  </div>
+                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<div class="match-vs-line"><span class="match-vs">vs</span></div>'}
+                  <div class="match-team-line">
+                    <img class="match-flag" src="${flagUrl(i2)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span class="team-name-label">${m.team2}</span>
+                    ${o2 ? `<span class="match-owner ${ownerColors[o2]}">${o2}</span>` : ''}
+                  </div>
                 </div>
                 <span class="match-group-badge">G${m.group}</span>${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
               </div>
@@ -1683,10 +1699,12 @@
                   <div>${formatLocalTime(m.date, m.time, m.tz)}</div>
                 </div>
                 <div class="match-teams">
-                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<span class="match-vs">vs</span>'}
-                  <img class="match-flag" src="${flagUrl(oppIso)}" alt="" loading="lazy" onerror="this.style.display='none'">
-                  <span class="team-name-label">${opponent}</span>
-                  ${oppOwner ? `<span class="match-owner ${ownerColors[oppOwner]}">${oppOwner}</span>` : ''}
+                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<div class="match-vs-line"><span class="match-vs">vs</span></div>'}
+                  <div class="match-team-line">
+                    <img class="match-flag" src="${flagUrl(oppIso)}" alt="" loading="lazy" onerror="this.style.display='none'">
+                    <span class="team-name-label">${opponent}</span>
+                    ${oppOwner ? `<span class="match-owner ${ownerColors[oppOwner]}">${oppOwner}</span>` : ''}
+                  </div>
                 </div>
                 <span class="match-group-badge">G${m.group}</span>${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
               </div>
