@@ -1163,6 +1163,44 @@
     .qual-tag.in { background: rgba(16,185,129,0.15); color: var(--accent); }
     .qual-tag.out { background: rgba(239,68,68,0.12); color: #f87171; }
     .qual-tag.third { background: rgba(245,158,11,0.13); color: var(--gold); }
+    /* ── MAP / GLOBE ── */
+    .section-map { display: none; position: relative; min-height: 80vh; }
+    .section-map.active { display: flex; align-items: stretch; }
+    .globe-wrap { flex: 1; display: flex; align-items: center; justify-content: center; background: var(--bg); min-height: 70vh; position: relative; overflow: hidden; }
+    #globeSvg { width: 100%; height: 100%; display: block; cursor: grab; }
+    #globeSvg:active { cursor: grabbing; }
+    .venue-marker { cursor: pointer; }
+    .venue-marker circle.outer { animation: pulse-marker 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+    @keyframes pulse-marker { 0%,100% { opacity: 0.55; r: 11; } 50% { opacity: 0.15; r: 14; } }
+    .venue-marker:hover circle.inner { filter: brightness(1.4); }
+    .venue-tooltip { position: absolute; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-xs); padding: 6px 10px; font-size: 0.75rem; color: var(--text); pointer-events: none; white-space: nowrap; z-index: 10; display: none; }
+    /* Venue panel */
+    .venue-panel { width: 0; overflow: hidden; transition: width 0.28s ease; background: var(--surface); border-left: 1px solid var(--border); display: flex; flex-direction: column; }
+    .venue-panel.open { width: 380px; overflow-y: auto; }
+    .vp-header { padding: 20px 20px 14px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
+    .vp-name { font-weight: 800; font-size: 1rem; color: var(--text); }
+    .vp-city { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
+    .vp-close { background: none; border: none; color: var(--text-muted); font-size: 1rem; cursor: pointer; padding: 2px 6px; line-height: 1; }
+    .vp-close:hover { color: var(--text); }
+    .vp-matches { padding: 12px 0; flex: 1; }
+    .vm-row { padding: 12px 20px; border-bottom: 1px solid var(--border-subtle); }
+    .vm-row:last-child { border-bottom: none; }
+    .vm-teams { display: flex; align-items: center; gap: 6px; font-size: 0.88rem; font-weight: 700; color: var(--text); }
+    .vm-teams img { width: 18px; height: 13px; object-fit: cover; border-radius: 2px; }
+    .vm-vs { color: var(--text-muted); font-size: 0.72rem; font-weight: 400; }
+    .vm-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+    .vm-score { font-family: var(--font-mono); font-weight: 800; color: var(--text); }
+    .vm-preds { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+    .vm-pred-dot { font-size: 0.7rem; padding: 2px 5px; border-radius: 3px; font-family: var(--font-mono); font-weight: 700; background: var(--card); border: 1px solid var(--border); color: var(--text-secondary); }
+    .vm-pred-dot.has-pred { border-color: var(--accent); color: var(--accent); }
+    .vm-pred-dot.no-pred { color: var(--text-muted); }
+    /* Mobile: bottom sheet */
+    @media (max-width: 700px) {
+      .section-map.active { flex-direction: column; }
+      .globe-wrap { min-height: 55vw; }
+      .venue-panel { width: 100% !important; height: 0; border-left: none; border-top: 1px solid var(--border); transition: height 0.28s ease; }
+      .venue-panel.open { height: 55vh; overflow-y: auto; }
+    }
   </style>
 </head>
 <body>
