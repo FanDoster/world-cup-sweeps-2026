@@ -722,13 +722,15 @@
     let currentProfile = null;
 
     async function restoreSession() {
-      const { data } = await sb.auth.getSession();
-      currentSession = data.session;
-      updateAuthBar();
-      if (currentSession) {
-        const { data: profile } = await sb.from('player_profiles').select('player_name').eq('id', currentSession.user.id).single();
+      // getUser() checks stored token + validates with server
+      const { data: { user } } = await sb.auth.getUser();
+      if (user) {
+        const { data: { session } } = await sb.auth.getSession();
+        currentSession = session;
+        const { data: profile } = await sb.from('player_profiles').select('player_name').eq('id', user.id).single();
         if (profile) currentProfile = profile;
       }
+      updateAuthBar();
     }
 
     function updateAuthBar() {
