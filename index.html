@@ -871,6 +871,25 @@
     .profile-card .pc-feed-item .pfi-result { font-weight: 700; color: var(--text); }
     .profile-card .pc-feed-item .pfi-date { font-size: 0.68rem; color: var(--text-muted); }
     .profile-card .pc-no-data { color: var(--text-muted); font-size: 0.82rem; padding: 12px; text-align: center; }
+    /* ── MATCH PREDICTIONS PANEL ── */
+    .pred-panel-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 210; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 60px 16px; }
+    .pred-panel-overlay.active { display: flex; }
+    .pred-panel { max-width: 520px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .pred-panel .pp-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
+    .pred-panel .pp-match { font-weight: 800; font-size: 1rem; }
+    .pred-panel .pp-meta { font-size: 0.72rem; color: var(--text-muted); margin-top: 3px; }
+    .pred-panel .pp-close { background: none; border: none; color: var(--text-muted); font-size: 1.1rem; cursor: pointer; padding: 4px 8px; }
+    .pred-panel .pp-close:hover { color: var(--text); }
+    .pred-panel .pp-table { width: 100%; border-collapse: collapse; }
+    .pred-panel .pp-table th { text-align: left; font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 16px 6px; border-bottom: 1px solid var(--border-subtle); }
+    .pred-panel .pp-table td { padding: 10px 16px; font-size: 0.85rem; border-bottom: 1px solid var(--border-subtle); }
+    .pred-panel .pp-table tr:last-child td { border-bottom: none; }
+    .pred-panel .pp-table tr.me td { background: var(--accent-glow); }
+    .pred-panel .pp-score { font-family: var(--font-mono); font-weight: 700; font-size: 1rem; }
+    .pred-panel .pp-hidden { color: var(--text-muted); font-size: 0.75rem; }
+    .pred-panel .pp-locked { color: var(--text-muted); font-size: 0.72rem; }
+    .pred-panel .pp-no-pred { color: var(--text-muted); font-size: 0.72rem; font-style: italic; }
+    .pred-panel .pp-footer { padding: 12px 16px; border-top: 1px solid var(--border-subtle); font-size: 0.68rem; color: var(--text-muted); text-align: center; }
   </style>
 </head>
 <body>
@@ -971,6 +990,11 @@
     <!-- Player Profile Modal -->
     <div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
       <div class="profile-card" id="profileCard"></div>
+    </div>
+
+    <!-- Match Predictions Panel -->
+    <div class="pred-panel-overlay" id="predPanelOverlay" onclick="if(event.target===this)closePredPanel()">
+      <div class="pred-panel" id="predPanel"></div>
     </div>
 
     <footer>⚽ World Cup 2026 Sweepstakes</footer>
@@ -1282,7 +1306,7 @@
           const countdownCls = isFinished ? '' : cd.cls;
 
           html += `
-            <div class="match-row ${rowCls}">
+            <div class="match-row ${rowCls}" onclick="showPredPanel('${m.team1}|${m.team2}|${m.date}')" style="cursor:pointer">
               <div class="match-countdown ${countdownCls}">${countdownText}</div>
               <div class="match-body">
                 <div class="match-date">
@@ -1522,7 +1546,7 @@
           const oppIso = teamIso[opponent];
 
           html += `
-            <div class="match-row ${rowCls}">
+            <div class="match-row ${rowCls}" onclick="showPredPanel('${m.team1}|${m.team2}|${m.date}')" style="cursor:pointer">
               <div class="match-countdown ${countdownCls}">${countdownText}</div>
               <div class="match-body">
                 <div class="match-date">
@@ -1898,6 +1922,82 @@
 
     function closeProfile() {
       document.getElementById('profileOverlay').classList.remove('active');
+    }
+
+    // ── MATCH PREDICTIONS PANEL ──
+    function showPredPanel(key) {
+      document.getElementById('predPanelOverlay').classList.add('active');
+      renderPredPanel(key);
+    }
+
+    function closePredPanel() {
+      document.getElementById('predPanelOverlay').classList.remove('active');
+    }
+
+    function renderPredPanel(key) {
+      const el = document.getElementById('predPanel');
+      const [t1, t2, date] = key.split('|');
+      const mid = matchIdByTeamDate[key];
+      const m = matchData.find(m => m[3] === t1 && m[4] === t2 && m[0] === date);
+      if (!m) { el.innerHTML = '<p style="padding:20px;color:var(--text-muted)">Match not found.</p>'; return; }
+
+      const now = new Date();
+      const kickoff = toDate(m[0], m[1], m[2]);
+      const isLocked = kickoff - now < 5 * 60 * 1000;
+      const isFinished = m[6] !== null && m[7] !== null;
+      const showScores = isLocked || isFinished;
+
+      const preds = predLookup[mid] || [];
+      const predByPlayer = {};
+      preds.forEach(p => { predByPlayer[p.player_name] = p; });
+
+      const players = ['Anton','Chris','Dan','Laurie','Pat','Steven'];
+      let rows = '';
+      for (const p of players) {
+        const pred = predByPlayer[p];
+        const isMe = currentProfile && currentProfile.player_name === p;
+        let predCell, statusCell;
+
+        if (pred && isFinished) {
+          const pts = calcPredPoints(pred.home, pred.away, m[6], m[7]);
+          predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>`;
+          statusCell = predResultBadge(pred.home, pred.away, m[6], m[7]);
+        } else if (pred && showScores) {
+          predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>`;
+          statusCell = '<span class="pp-locked">🔒</span>';
+        } else if (pred) {
+          predCell = '<span class="pp-hidden">🔒 Hidden</span>';
+          statusCell = '<span style="color:var(--accent);font-size:0.72rem">✓</span>';
+        } else {
+          predCell = '<span class="pp-no-pred">No prediction</span>';
+          statusCell = '<span style="color:var(--live);font-size:0.72rem">✗</span>';
+        }
+
+        rows += `<tr${isMe ? ' class="me"' : ''}>
+          <td>${p}</td>
+          <td>${predCell}</td>
+          <td>${statusCell}</td>
+        </tr>`;
+      }
+
+      const footerText = isFinished ? 'Results in — points awarded' :
+        isLocked ? 'Predictions locked — kickoff imminent' :
+        'Predictions hidden until 5 min before kickoff';
+
+      el.innerHTML = `
+        <div class="pp-header">
+          <div>
+            <div class="pp-match">${t1} vs ${t2}</div>
+            <div class="pp-meta">${formatDateLabel(m[0],m[1],m[2])} · ${formatLocalTime(m[0],m[1],m[2])} · G${m[5]}</div>
+          </div>
+          <button class="pp-close" onclick="closePredPanel()">✕</button>
+        </div>
+        <table class="pp-table">
+          <thead><tr><th>Player</th><th>Prediction</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="pp-footer">${footerText}</div>
+      `;
     }
 
     async function renderProfile(playerName) {
