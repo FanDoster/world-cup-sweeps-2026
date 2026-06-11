@@ -1351,11 +1351,27 @@
         const locked = m.kickoff - now < 5 * 60 * 1000; // 5 min lock
 
         if (existingPred) {
-          html += `<div class="predict-match">
-            <span class="pm-teams">${m.team1} vs ${m.team2}</span>
-            <span class="pm-done">✅ ${existingPred.predicted_home_score}–${existingPred.predicted_away_score}</span>
-            <span style="color:var(--text-muted);font-size:0.72rem">${formatDateLabel(m.date,m.time,m.tz)} ${formatLocalTime(m.date,m.time,m.tz)}</span>
-          </div>`;
+          if (locked) {
+            html += `<div class="predict-match">
+              <span class="pm-teams">${m.team1} vs ${m.team2}</span>
+              <span class="pm-done">🔒 ${existingPred.predicted_home_score}–${existingPred.predicted_away_score}</span>
+              <span style="color:var(--text-muted);font-size:0.72rem">${formatDateLabel(m.date,m.time,m.tz)} ${formatLocalTime(m.date,m.time,m.tz)}</span>
+            </div>`;
+          } else {
+            hasOpen = true;
+            html += `<div class="predict-match" id="pred-${mid}">
+              <span class="pm-teams">${m.team1} vs ${m.team2}</span>
+              <span class="pm-done" id="pred-display-${mid}">✅ ${existingPred.predicted_home_score}–${existingPred.predicted_away_score}</span>
+              <div class="pm-inputs" id="pred-edit-${mid}" style="display:none">
+                <input type="number" id="ph-${mid}" min="0" max="20" value="${existingPred.predicted_home_score}" style="width:44px">
+                <span class="pm-vs">–</span>
+                <input type="number" id="pa-${mid}" min="0" max="20" value="${existingPred.predicted_away_score}" style="width:44px">
+              </div>
+              <button class="pm-submit" id="pred-edit-btn-${mid}" onclick="editPrediction(${mid})">Edit</button>
+              <button class="pm-submit" id="pred-save-btn-${mid}" onclick="submitPrediction(${mid})" style="display:none">Save</button>
+              <span style="color:var(--text-muted);font-size:0.72rem">${formatDateLabel(m.date,m.time,m.tz)} ${formatLocalTime(m.date,m.time,m.tz)}</span>
+            </div>`;
+          }
         } else if (locked) {
           html += `<div class="predict-match">
             <span class="pm-teams">${m.team1} vs ${m.team2}</span>
@@ -1411,6 +1427,13 @@
       }, { onConflict: 'user_id,match_id' });
       if (error) { alert('Error: ' + error.message); return; }
       renderPredictions(); // refresh
+    }
+
+    function editPrediction(matchId) {
+      document.getElementById(`pred-display-${matchId}`).style.display = 'none';
+      document.getElementById(`pred-edit-${matchId}`).style.display = 'flex';
+      document.getElementById(`pred-edit-btn-${matchId}`).style.display = 'none';
+      document.getElementById(`pred-save-btn-${matchId}`).style.display = 'inline-block';
     }
   </script>
 </body>
