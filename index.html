@@ -160,6 +160,15 @@
       padding: 2px 9px;
       border-radius: 10px;
     }
+    .pred-pts-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(96,165,250,0.1);
+      padding: 2px 9px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
     .team-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
     .team-item {
       cursor: pointer;
@@ -1163,6 +1172,7 @@
 
     let predLookup = {}; // { matchId: [{player_name, home, away, user_id}, ...] }
     let matchIdByTeamDate = {}; // {"Team1|Team2|date": matchId}
+    let predPointsByPlayer = {}; // { playerName: totalPredPoints }
 
     async function loadPredData() {
       // Get match IDs
@@ -1193,6 +1203,9 @@
       }
       // Re-render matches to show dots
       renderMatches();
+      // Calculate prediction points per player
+      calcPredPointsForAll();
+      renderPeople();
     }
 
     // teamOwner and teamIso built in loadData() above
@@ -1384,7 +1397,7 @@
         card.style.cursor = 'pointer';
         card.onclick = () => showProfile(name);
         card.innerHTML = `
-          <div class="person-name">${name} <span class="count">${teams.length} teams</span></div>
+          <div class="person-name">${name} <span class="count">${teams.length} teams</span>${predPointsByPlayer[name] ? ` <span class="pred-pts-badge">🔮${predPointsByPlayer[name]}pts</span>` : ''}</div>
           <ul class="team-list">
             ${teams.map(t => `
               <li class="team-item" onclick="selectTeam('${t.team}')" title="View ${t.team} schedule">
@@ -1904,6 +1917,28 @@
       if (homePred === homeActual) pts += 2;
       if (awayPred === awayActual) pts += 2;
       return pts;
+    }
+
+    function calcPredPointsForAll() {
+      // Build matchId -> scores from matchData
+      const matchScores = {};
+      for (const m of matchData) {
+        if (m[6] === null || m[7] === null) continue; // not played
+        const key = `${m[3]}|${m[4]}|${m[0]}`;
+        const mid = matchIdByTeamDate[key];
+        if (mid) matchScores[mid] = { home: m[6], away: m[7] };
+      }
+      // Aggregate prediction points by player
+      predPointsByPlayer = {};
+      for (const [matchId, preds] of Object.entries(predLookup)) {
+        const scores = matchScores[matchId];
+        if (!scores) continue;
+        for (const p of preds) {
+          const pts = calcPredPoints(p.home, p.away, scores.home, scores.away);
+          if (!predPointsByPlayer[p.player_name]) predPointsByPlayer[p.player_name] = 0;
+          predPointsByPlayer[p.player_name] += pts;
+        }
+      }
     }
 
     function predResultBadge(homePred, awayPred, homeActual, awayActual) {
