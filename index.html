@@ -1949,6 +1949,8 @@
         html += `<div class="match-date-header">${formatDateHeader(date, matches[0].time, matches[0].tz)}</div>`;
         for (const m of matches) {
           const cd = getCountdown(m.date, m.time, m.tz);
+          const i1 = teamIso[m.team1];
+          const i2 = teamIso[m.team2];
           const isFinished = m.score1 !== null && m.score2 !== null;
           const rowCls = isFinished ? 'finished' : cd.rowCls;
           const countdownText = isFinished ? (m.score1 + '–' + m.score2) : (m.kickoff <= twoDays ? cd.text : formatLocalTime(m.date, m.time, m.tz));
