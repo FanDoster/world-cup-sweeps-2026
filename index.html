@@ -632,23 +632,52 @@
     .myteam-card .mt-next strong { color: var(--text); }
     .myteam-card .mt-countdown { font-size: 0.72rem; color: var(--accent); font-weight: 700; }
     /* ── PREDICTIONS ── */
-    .predict-match { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .predict-match .pm-teams { font-weight: 700; min-width: 180px; }
-    .predict-match .pm-inputs { display: flex; align-items: center; gap: 6px; }
-    .predict-match input[type=number] { width: 44px; padding: 6px 4px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: var(--font); font-size: 0.9rem; }
-    .predict-match input[type=number]:focus { outline: none; border-color: var(--accent); }
-    .predict-match .pm-vs { color: var(--text-muted); font-size: 0.75rem; font-weight: 700; }
-    .predict-match .pm-submit { background: var(--accent); color: #000; border: none; padding: 7px 14px; border-radius: 5px; font-weight: 700; cursor: pointer; font-family: var(--font); font-size: 0.8rem; }
-    .predict-match .pm-submit:hover { background: var(--accent-dim); }
-    .predict-match .pm-done { color: var(--accent); font-size: 0.75rem; font-weight: 700; }
-    .predict-match .pm-locked { color: var(--text-muted); font-size: 0.72rem; }
-    .pred-history { margin-top: 24px; }
-    .pred-history h3 { font-size: 1rem; margin-bottom: 12px; color: var(--text); }
-    .pred-history .ph-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.85rem; }
-    .ph-icon { font-weight: 700; }
-    .ph-icon.hit { color: var(--accent); }
-    .ph-icon.miss { color: var(--live); }
-    .ph-icon.exact { color: var(--gold); }
+    .predictions-wrap { max-width: 780px; margin: 0 auto; }
+    .pred-summary { display: flex; gap: 16px; margin-bottom: 28px; }
+    .pred-stat { flex: 1; background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px; text-align: center; }
+    .pred-stat .ps-num { font-size: 1.6rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .pred-stat .ps-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .pred-stat.accent .ps-num { color: var(--accent); }
+    .pred-stat.gold .ps-num { color: var(--gold); }
+    .pred-section-title { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; margin-top: 28px; }
+    .pred-section-title:first-child { margin-top: 0; }
+    .pred-match-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0; margin-bottom: 6px; overflow: hidden; transition: border-color 0.15s; }
+    .pred-match-card:hover { border-color: var(--border); }
+    .pred-match-card .pmc-inner { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+    .pred-match-card .pmc-date { min-width: 90px; }
+    .pred-match-card .pmc-date .pmc-day { font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); }
+    .pred-match-card .pmc-date .pmc-time { font-size: 0.68rem; color: var(--text-muted); }
+    .pred-match-card .pmc-teams { flex: 1; font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 8px; }
+    .pred-match-card .pmc-group { font-size: 0.66rem; color: var(--text-muted); background: var(--surface); padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-weight: 700; }
+    .pred-match-card .pmc-score { display: flex; align-items: center; gap: 8px; }
+    .pred-match-card .pmc-score input { width: 48px; height: 40px; text-align: center; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700; }
+    .pred-match-card .pmc-score input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .pred-match-card .pmc-score .pmc-dash { color: var(--text-muted); font-weight: 700; font-size: 1rem; }
+    .pred-match-card .pmc-status { font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 5px; white-space: nowrap; }
+    .pmc-status.predicted { background: rgba(16,185,129,0.12); color: var(--accent); }
+    .pmc-status.locked { background: rgba(75,91,110,0.15); color: var(--text-muted); }
+    .pmc-status.open { color: var(--text-secondary); }
+    .pred-match-card .pmc-btn { padding: 6px 14px; border-radius: 5px; border: none; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 0.78rem; transition: all 0.15s; white-space: nowrap; }
+    .pmc-btn.predict { background: var(--accent); color: #000; }
+    .pmc-btn.predict:hover { background: var(--accent-dim); }
+    .pmc-btn.edit { background: transparent; color: var(--accent); border: 1px solid var(--accent-dim); }
+    .pmc-btn.edit:hover { background: var(--accent-glow); }
+    .pmc-btn.save { background: var(--accent); color: #000; }
+    /* ── HISTORY ── */
+    .pred-history-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 6px; display: flex; align-items: center; gap: 14px; }
+    .pred-history-card .phc-result { min-width: 52px; text-align: center; }
+    .pred-history-card .phc-icon { font-size: 1.3rem; }
+    .pred-history-card .phc-match { flex: 1; }
+    .pred-history-card .phc-teams { font-weight: 700; font-size: 0.88rem; }
+    .pred-history-card .phc-scores { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+    .pred-history-card .phc-scores span { font-weight: 700; }
+    .phc-scores .actual { color: var(--text); }
+    .phc-scores .pred { color: var(--text-muted); }
+    .phc-scores .hit-marker { color: var(--accent); }
+    .phc-scores .miss-marker { color: var(--live); }
+    .phc-scores .exact-marker { color: var(--gold); }
+    .pred-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+    .pred-empty .pe-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
   </style>
 </head>
 <body>
@@ -1319,9 +1348,8 @@
     // ── PREDICTIONS ──
     async function renderPredictions() {
       const el = document.getElementById('predictionsWrap');
-      if (!currentSession) { el.innerHTML = '<p style="color:var(--text-muted);padding:32px;text-align:center">Sign in to make predictions.</p>'; return; }
+      if (!currentSession) { el.innerHTML = '<div class="pred-empty"><div class="pe-icon">🔮</div>Sign in to make predictions.</div>'; return; }
 
-      // Upcoming matches (no scores yet)
       const now = new Date();
       const upcoming = matchData
         .filter(m => m[6] === null)
@@ -1329,88 +1357,123 @@
         .sort((a, b) => a.kickoff - b.kickoff)
         .slice(0, 20);
 
-      // Get existing predictions
       const { data: existing } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score').eq('user_id', currentSession.user.id);
       const predMap = {};
       if (existing) existing.forEach(p => { predMap[p.match_id] = p; });
 
-      // Get match IDs for upcoming matches
       const { data: allMatches } = await sb.from('matches').select('id,match_date,kickoff_time,home_team_id(name),away_team_id(name)').order('match_date').order('kickoff_time');
       const matchIdMap = {};
       if (allMatches) allMatches.forEach(m => {
-        const key = `${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`;
-        matchIdMap[key] = m.id;
+        matchIdMap[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
       });
 
-      let html = '<h3 style="margin-bottom:12px;color:var(--text)">Upcoming — make your predictions</h3>';
+      // Summary stats
+      let predicted = 0, open = 0, locked = 0;
+      for (const m of upcoming) {
+        const mid = matchIdMap[`${m.team1}|${m.team2}|${m.date}`];
+        if (mid && predMap[mid]) predicted++;
+        else if (m.kickoff - now < 5 * 60 * 1000) locked++;
+        else open++;
+      }
+
+      let html = `<div class="pred-summary">
+        <div class="pred-stat accent"><div class="ps-num">${predicted}</div><div class="ps-label">Predicted</div></div>
+        <div class="pred-stat"><div class="ps-num">${open}</div><div class="ps-label">Open</div></div>
+        <div class="pred-stat"><div class="ps-num">${locked}</div><div class="ps-label">Locked</div></div>
+      </div>`;
+
+      // Upcoming matches
+      html += '<div class="pred-section-title">Upcoming Matches</div>';
       let hasOpen = false;
       for (const m of upcoming) {
         const key = `${m.team1}|${m.team2}|${m.date}`;
         const mid = matchIdMap[key];
-        const existingPred = mid ? predMap[mid] : null;
-        const locked = m.kickoff - now < 5 * 60 * 1000; // 5 min lock
+        const ep = mid ? predMap[mid] : null;
+        const isLocked = m.kickoff - now < 5 * 60 * 1000;
 
-        if (existingPred) {
-          if (locked) {
-            html += `<div class="predict-match">
-              <span class="pm-teams">${m.team1} vs ${m.team2}</span>
-              <span class="pm-done">🔒 ${existingPred.predicted_home_score}–${existingPred.predicted_away_score}</span>
-              <span style="color:var(--text-muted);font-size:0.72rem">${formatDateLabel(m.date,m.time,m.tz)} ${formatLocalTime(m.date,m.time,m.tz)}</span>
-            </div>`;
-          } else {
-            hasOpen = true;
-            html += `<div class="predict-match" id="pred-${mid}">
-              <span class="pm-teams">${m.team1} vs ${m.team2}</span>
-              <span class="pm-done" id="pred-display-${mid}">✅ ${existingPred.predicted_home_score}–${existingPred.predicted_away_score}</span>
-              <div class="pm-inputs" id="pred-edit-${mid}" style="display:none">
-                <input type="number" id="ph-${mid}" min="0" max="20" value="${existingPred.predicted_home_score}" style="width:44px">
-                <span class="pm-vs">–</span>
-                <input type="number" id="pa-${mid}" min="0" max="20" value="${existingPred.predicted_away_score}" style="width:44px">
+        if (ep && isLocked) {
+          html += `<div class="pred-match-card">
+            <div class="pmc-inner">
+              <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div></div>
+              <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
+              <span class="pmc-status locked">🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}</span>
+            </div></div>`;
+        } else if (ep) {
+          hasOpen = true;
+          html += `<div class="pred-match-card" id="pred-${mid}">
+            <div class="pmc-inner">
+              <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div></div>
+              <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
+              <span class="pmc-status predicted" id="pred-display-${mid}">${ep.predicted_home_score}–${ep.predicted_away_score}</span>
+              <div class="pmc-score" id="pred-edit-${mid}" style="display:none">
+                <input type="number" id="ph-${mid}" min="0" max="20" value="${ep.predicted_home_score}">
+                <span class="pmc-dash">–</span>
+                <input type="number" id="pa-${mid}" min="0" max="20" value="${ep.predicted_away_score}">
               </div>
-              <button class="pm-submit" id="pred-edit-btn-${mid}" onclick="editPrediction(${mid})">Edit</button>
-              <button class="pm-submit" id="pred-save-btn-${mid}" onclick="submitPrediction(${mid})" style="display:none">Save</button>
-              <span style="color:var(--text-muted);font-size:0.72rem">${formatDateLabel(m.date,m.time,m.tz)} ${formatLocalTime(m.date,m.time,m.tz)}</span>
-            </div>`;
-          }
-        } else if (locked) {
-          html += `<div class="predict-match">
-            <span class="pm-teams">${m.team1} vs ${m.team2}</span>
-            <span class="pm-locked">🔒 Locked</span>
-          </div>`;
+              <button class="pmc-btn edit" id="pred-edit-btn-${mid}" onclick="editPrediction(${mid})">Edit</button>
+              <button class="pmc-btn save" id="pred-save-btn-${mid}" onclick="submitPrediction(${mid})" style="display:none">Save</button>
+            </div></div>`;
+        } else if (isLocked) {
+          html += `<div class="pred-match-card">
+            <div class="pmc-inner">
+              <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div></div>
+              <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
+              <span class="pmc-status locked">Locked</span>
+            </div></div>`;
         } else {
           hasOpen = true;
-          html += `<div class="predict-match" id="pred-${mid}">
-            <span class="pm-teams">${m.team1} vs ${m.team2}</span>
-            <div class="pm-inputs">
-              <input type="number" id="ph-${mid}" min="0" max="20" value="0" style="width:44px">
-              <span class="pm-vs">–</span>
-              <input type="number" id="pa-${mid}" min="0" max="20" value="0" style="width:44px">
-            </div>
-            <button class="pm-submit" onclick="submitPrediction(${mid})">Predict</button>
-            <span style="color:var(--text-muted);font-size:0.72rem">${formatDateLabel(m.date,m.time,m.tz)} ${formatLocalTime(m.date,m.time,m.tz)}</span>
-          </div>`;
+          html += `<div class="pred-match-card" id="pred-${mid}">
+            <div class="pmc-inner">
+              <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div></div>
+              <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
+              <div class="pmc-score">
+                <input type="number" id="ph-${mid}" min="0" max="20" value="0">
+                <span class="pmc-dash">–</span>
+                <input type="number" id="pa-${mid}" min="0" max="20" value="0">
+              </div>
+              <button class="pmc-btn predict" onclick="submitPrediction(${mid})">Predict</button>
+            </div></div>`;
         }
       }
-      if (!hasOpen && !existing || !upcoming.length) html += '<p style="color:var(--text-muted)">No open matches to predict right now.</p>';
+      if (!hasOpen && predicted === 0 && upcoming.length === 0) {
+        html += '<div class="pred-empty"><div class="pe-icon">🏁</div>No upcoming matches to predict.</div>';
+      }
 
-      // Prediction history
-      const { data: history } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score').eq('user_id', currentSession.user.id).order('created_at', { ascending: false }).limit(20);
+      // History
+      const { data: history } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score').eq('user_id', currentSession.user.id).order('created_at', { ascending: false }).limit(30);
       if (history && history.length > 0) {
-        html += '<div class="pred-history"><h3>Your prediction history</h3>';
+        let historyHtml = '';
+        let exactCount = 0, correctCount = 0;
         for (const p of history) {
-          const m = matchData.find(m => {
-            const key = `${m[3]}|${m[4]}|${m[0]}`;
-            const allKey = allMatches?.find(am => am.id === p.match_id);
-            return allKey && `${allKey.home_team_id.name}|${allKey.away_team_id.name}|${allKey.match_date}` === key;
-          });
-          if (m && m[6] !== null) {
-            const exact = p.predicted_home_score === m[6] && p.predicted_away_score === m[7];
-            const correct = !exact && Math.sign(p.predicted_home_score - p.predicted_away_score) === Math.sign(m[6] - m[7]);
-            const icon = exact ? '<span class="ph-icon exact">★</span>' : correct ? '<span class="ph-icon hit">✓</span>' : '<span class="ph-icon miss">✗</span>';
-            html += `<div class="ph-row">${icon} ${m[3]} ${m[6]}–${m[7]} ${m[4]} — you predicted ${p.predicted_home_score}–${p.predicted_away_score}</div>`;
-          }
+          const am = allMatches?.find(am => am.id === p.match_id);
+          if (!am) continue;
+          const m = matchData.find(m => m[3] === am.home_team_id.name && m[4] === am.away_team_id.name && m[0] === am.match_date);
+          if (!m || m[6] === null) continue;
+
+          const exact = p.predicted_home_score === m[6] && p.predicted_away_score === m[7];
+          const correct = !exact && Math.sign(p.predicted_home_score - p.predicted_away_score) === Math.sign(m[6] - m[7]);
+          if (exact) exactCount++; else if (correct) correctCount++;
+
+          const icon = exact ? '★' : correct ? '✓' : '✗';
+          const iconCls = exact ? 'exact-marker' : correct ? 'hit-marker' : 'miss-marker';
+          historyHtml += `<div class="pred-history-card">
+            <div class="phc-result"><span class="phc-icon ${iconCls}">${icon}</span></div>
+            <div class="phc-match">
+              <div class="phc-teams">${m[3]} vs ${m[4]} <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem">G${m[5]}</span></div>
+              <div class="phc-scores">
+                Result <span class="actual">${m[6]}–${m[7]}</span> &nbsp;·&nbsp; Your pick <span class="pred">${p.predicted_home_score}–${p.predicted_away_score}</span>
+              </div>
+            </div>
+          </div>`;
         }
-        html += '</div>';
+        let statsHtml = '';
+        if (exactCount + correctCount > 0) {
+          statsHtml = `<div class="pred-summary" style="margin-top:16px">
+            <div class="pred-stat gold"><div class="ps-num">${exactCount}</div><div class="ps-label">Exact ★</div></div>
+            <div class="pred-stat accent"><div class="ps-num">${correctCount}</div><div class="ps-label">Correct ✓</div></div>
+          </div>`;
+        }
+        html += `<div class="pred-section-title">Your History</div>${statsHtml}${historyHtml}`;
       }
 
       el.innerHTML = html;
