@@ -591,12 +591,44 @@
       .match-prob-bar { transition: none; }
     }
   </style>
+  <!-- ── AUTH STYLES ── -->
+  <style>
+    .auth-bar { position: absolute; top: 12px; right: 0; display: flex; align-items: center; gap: 10px; font-size: 0.82rem; }
+    .auth-bar .signed-in { color: var(--accent); font-weight: 600; }
+    .auth-bar button { background: var(--card); color: var(--text-secondary); border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: var(--font); font-size: 0.8rem; font-weight: 600; transition: all 0.15s; }
+    .auth-bar button:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
+    .auth-bar button.sign-out-btn { border-color: transparent; color: var(--text-muted); }
+    .auth-bar button.sign-out-btn:hover { color: var(--live); border-color: var(--live); }
+    .auth-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
+    .auth-modal-overlay.active { display: flex; }
+    .auth-modal { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; width: 360px; max-width: 92vw; }
+    .auth-modal h2 { font-size: 1.15rem; margin-bottom: 20px; color: var(--text); }
+    .auth-modal label { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; letter-spacing: 0.02em; }
+    .auth-modal input, .auth-modal select { width: 100%; padding: 10px 12px; margin-bottom: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--font); font-size: 0.9rem; }
+    .auth-modal input:focus, .auth-modal select:focus { outline: none; border-color: var(--accent); }
+    .auth-modal select { cursor: pointer; }
+    .auth-modal .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+    .auth-modal button { flex: 1; padding: 10px; border-radius: 6px; border: none; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 0.88rem; transition: all 0.15s; }
+    .auth-modal .btn-primary { background: var(--accent); color: #000; }
+    .auth-modal .btn-primary:hover { background: var(--accent-dim); }
+    .auth-modal .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+    .auth-modal .btn-ghost:hover { color: var(--text); }
+    .auth-modal .error-msg { color: var(--live); font-size: 0.78rem; margin-bottom: 10px; display: none; }
+    .auth-modal .switch-link { text-align: center; margin-top: 12px; font-size: 0.78rem; color: var(--text-muted); }
+    .auth-modal .switch-link a { color: var(--accent); cursor: pointer; text-decoration: none; }
+    .auth-modal .switch-link a:hover { text-decoration: underline; }
+    .my-teams-badge { background: var(--accent); color: #000; font-size: 0.68rem; font-weight: 800; padding: 1px 7px; border-radius: 4px; margin-left: 6px; }
+  </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1><span class="trophy">⚽</span> World Cup 2026 Sweepstakes</h1>
       <p class="subtitle"><span class="host">Canada</span> &middot; <span class="host">Mexico</span> &middot; <span class="host">United States</span> &mdash; June 11 to July 19, 2026</p>
+      <div class="auth-bar" id="authBar">
+        <button onclick="showSignIn()">Sign in</button>
+        <button onclick="showSignUp()">Create account</button>
+      </div>
     </header>
 
     <div class="tab-bar" id="tabBar">
@@ -634,6 +666,47 @@
       <div id="teamSchedule"></div>
     </div>
 
+    <!-- Sign In Modal -->
+    <div class="auth-modal-overlay" id="signInModal">
+      <div class="auth-modal">
+        <h2>Sign in</h2>
+        <div class="error-msg" id="signInError"></div>
+        <label>Email</label>
+        <input type="email" id="signInEmail" placeholder="you@email.com">
+        <label>Password</label>
+        <input type="password" id="signInPassword" placeholder="Your password">
+        <div class="btn-row">
+          <button class="btn-ghost" onclick="closeModals()">Cancel</button>
+          <button class="btn-primary" onclick="doSignIn()">Sign in</button>
+        </div>
+        <div class="switch-link">No account? <a onclick="showSignUp()">Create one</a></div>
+      </div>
+    </div>
+    <!-- Sign Up Modal -->
+    <div class="auth-modal-overlay" id="signUpModal">
+      <div class="auth-modal">
+        <h2>Create account</h2>
+        <div class="error-msg" id="signUpError"></div>
+        <label>Your name</label>
+        <select id="signUpPlayer">
+          <option value="">Choose your sweepstakes name…</option>
+          <option>Anton</option><option>Chris</option><option>Dan</option>
+          <option>Laurie</option><option>Pat</option><option>Steven</option>
+        </select>
+        <label>Email</label>
+        <input type="email" id="signUpEmail" placeholder="you@email.com">
+        <label>Password</label>
+        <input type="password" id="signUpPassword" placeholder="6+ characters">
+        <label>Invite code</label>
+        <input type="text" id="signUpCode" placeholder="Enter sweepstakes code">
+        <div class="btn-row">
+          <button class="btn-ghost" onclick="closeModals()">Cancel</button>
+          <button class="btn-primary" onclick="doSignUp()">Create account</button>
+        </div>
+        <div class="switch-link">Already have an account? <a onclick="showSignIn()">Sign in</a></div>
+      </div>
+    </div>
+
     <footer>⚽ World Cup 2026 Sweepstakes</footer>
   </div>
 
@@ -643,6 +716,86 @@
     const SB_URL = 'https://nkztkzrkbeacyltidqwr.supabase.co';
     const SB_KEY = 'sb_publishable_gSNbsrsq5ZV0glBJBeCZmQ_kBajhUPn';
     const sb = supabase.createClient(SB_URL, SB_KEY);
+
+    // ── AUTH ──
+    let currentSession = null;
+    let currentProfile = null;
+
+    async function restoreSession() {
+      const { data } = await sb.auth.getSession();
+      currentSession = data.session;
+      updateAuthBar();
+      if (currentSession) {
+        const { data: profile } = await sb.from('player_profiles').select('player_name').eq('id', currentSession.user.id).single();
+        if (profile) currentProfile = profile;
+      }
+    }
+
+    function updateAuthBar() {
+      const bar = document.getElementById('authBar');
+      if (currentSession && currentProfile) {
+        bar.innerHTML = `<span class="signed-in">🟢 ${currentProfile.player_name}</span>
+          <button class="sign-out-btn" onclick="doSignOut()">Sign out</button>`;
+      } else {
+        bar.innerHTML = `<button onclick="showSignIn()">Sign in</button>
+          <button onclick="showSignUp()">Create account</button>`;
+      }
+    }
+
+    function showSignIn() { closeModals(); document.getElementById('signInModal').classList.add('active'); }
+    function showSignUp() { closeModals(); document.getElementById('signUpModal').classList.add('active'); }
+    function closeModals() { document.querySelectorAll('.auth-modal-overlay').forEach(el => el.classList.remove('active')); }
+
+    async function doSignIn() {
+      const email = document.getElementById('signInEmail').value;
+      const password = document.getElementById('signInPassword').value;
+      const errEl = document.getElementById('signInError');
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+      currentSession = data.session;
+      const { data: profile } = await sb.from('player_profiles').select('player_name').eq('id', data.user.id).single();
+      currentProfile = profile;
+      closeModals();
+      updateAuthBar();
+    }
+
+    async function doSignUp() {
+      const playerName = document.getElementById('signUpPlayer').value;
+      const email = document.getElementById('signUpEmail').value;
+      const password = document.getElementById('signUpPassword').value;
+      const code = document.getElementById('signUpCode').value;
+      const errEl = document.getElementById('signUpError');
+      errEl.style.display = 'none';
+
+      if (!playerName) { errEl.textContent = 'Pick your sweepstakes name.'; errEl.style.display = 'block'; return; }
+      if (password.length < 6) { errEl.textContent = 'Password needs 6+ characters.'; errEl.style.display = 'block'; return; }
+
+      // Validate invite code server-side
+      const { data: valid } = await sb.rpc('validate_invite_code', { code });
+      if (!valid) { errEl.textContent = 'Wrong invite code.'; errEl.style.display = 'block'; return; }
+
+      // Create auth user
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
+
+      // Create player profile
+      const { error: profileErr } = await sb.from('player_profiles').insert({
+        id: data.user.id, player_name: playerName
+      });
+      if (profileErr) { errEl.textContent = profileErr.message; errEl.style.display = 'block'; return; }
+
+      currentSession = data.session;
+      currentProfile = { player_name: playerName };
+      closeModals();
+      updateAuthBar();
+    }
+
+    async function doSignOut() {
+      await sb.auth.signOut();
+      currentSession = null;
+      currentProfile = null;
+      updateAuthBar();
+    }
 
     // ── DATA (loaded from Supabase) ──
     let people = {};
@@ -917,7 +1070,7 @@
     let selectedTeam = null;
 
     // ── INIT ──
-    loadData();
+    restoreSession().then(() => loadData());
     setInterval(renderMatches, 60000);
 
     function renderTeamChips() {
