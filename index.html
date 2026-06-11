@@ -1073,6 +1073,31 @@
     .h2h-fact .hf-icon { flex-shrink: 0; }
     .h2h-fact strong { color: var(--text); }
     .h2h-first { font-size: 0.78rem; color: var(--text-secondary); padding: 2px 0 10px; }
+    /* ── YOUR PREDICTION (in panel) ── */
+    .pp-your-pred { padding: 14px 18px 10px; border-bottom: 1px solid var(--border-subtle); }
+    .pp-your-pred-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+    .pp-pred-form { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .pp-pred-form .pmc-score { display: flex; align-items: center; gap: 6px; }
+    .pp-pred-form .pmc-score-wrap { display: flex; flex-direction: column; align-items: center; }
+    .pp-pred-form .pmc-score input { width: 52px; height: 46px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); text-align: center; font-family: var(--font-mono); font-size: 1.15rem; font-weight: 700; -moz-appearance: textfield; appearance: textfield; padding: 0; }
+    .pp-pred-form .pmc-score input::-webkit-inner-spin-button,
+    .pp-pred-form .pmc-score input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .pp-pred-form .pmc-score input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .pp-pred-form .pmc-score .pmc-step { width: 36px; height: 20px; background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); font-size: 0.68rem; display: flex; align-items: center; justify-content: center; cursor: pointer; user-select: none; transition: all 0.12s; }
+    .pp-pred-form .pmc-score .pmc-step:first-of-type { border-radius: 5px 5px 0 0; border-bottom: none; }
+    .pp-pred-form .pmc-score .pmc-step:last-of-type { border-radius: 0 0 5px 5px; }
+    .pp-pred-form .pmc-score .pmc-step:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
+    .pp-pred-form .pmc-score .pmc-dash { color: var(--text-muted); font-weight: 700; font-size: 1rem; }
+    .pp-pred-form .pmc-btn { padding: 6px 14px; border-radius: 5px; border: none; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 0.78rem; transition: all 0.15s; white-space: nowrap; }
+    .pp-pred-form .pmc-btn.predict { background: var(--accent); color: #000; }
+    .pp-pred-form .pmc-btn.predict:hover { background: var(--accent-dim); }
+    .pp-pred-form .pmc-btn.edit { background: transparent; color: var(--accent); border: 1px solid var(--accent-dim); }
+    .pp-pred-form .pmc-btn.edit:hover { background: var(--accent-glow); }
+    .pp-pred-form .pmc-btn.save { background: var(--accent); color: #000; }
+    .pp-pred-form .pmc-btn.save:hover { background: var(--accent-dim); }
+    .pp-pred-form .pp-pred-display { font-family: var(--font-mono); font-weight: 700; font-size: 1.05rem; margin-right: 8px; }
+    .pp-your-pred-signin { font-size: 0.78rem; color: var(--text-muted); }
+    .pp-your-pred-locked { font-size: 0.78rem; color: var(--text-muted); }
     /* ── JOKER ── */
     .joker-chip { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; cursor: pointer; font-family: var(--font); transition: all 0.15s; white-space: nowrap; }
     .joker-chip:hover { border-color: var(--gold-dim); color: var(--gold); }
@@ -2335,6 +2360,62 @@
       document.getElementById(`pred-save-btn-${matchId}`).style.display = 'inline-block';
     }
 
+    // ── Prediction panel inline functions ──
+    function editPredictionFromPanel(matchId) {
+      document.getElementById(`pp-pred-display-${matchId}`).style.display = 'none';
+      document.getElementById(`pp-pred-edit-${matchId}`).style.display = 'flex';
+      document.getElementById(`pp-pred-edit-btn-${matchId}`).style.display = 'none';
+      document.getElementById(`pp-pred-save-btn-${matchId}`).style.display = 'inline-block';
+      const jokerEl = document.getElementById(`pp-joker-${matchId}`);
+      if (jokerEl) jokerEl.style.display = 'none';
+    }
+
+    async function submitPredictionFromPanel(matchId) {
+      const h = parseInt(document.getElementById(`pp-ph-${matchId}`).value) || 0;
+      const a = parseInt(document.getElementById(`pp-pa-${matchId}`).value) || 0;
+      const { error } = await sb.from('predictions').upsert({
+        user_id: currentSession.user.id,
+        match_id: matchId,
+        predicted_home_score: h,
+        predicted_away_score: a
+      }, { onConflict: 'user_id,match_id' });
+      if (error) { alert('Error: ' + error.message); return; }
+      await loadPredData();
+      // Re-render the panel with the new prediction visible
+      const m = matchData.find(m => {
+        const key = `${m[3]}|${m[4]}|${m[0]}`;
+        return matchIdByTeamDate[key] === matchId;
+      });
+      if (m) renderPredPanel(`${m[3]}|${m[4]}|${m[0]}`);
+    }
+
+    async function toggleJokerFromPanel(matchId) {
+      if (!jokersEnabled || !currentSession) return;
+      const uid = currentSession.user.id;
+      const { data: cur } = await sb.from('predictions').select('is_joker').eq('user_id', uid).eq('match_id', matchId).single();
+      const turningOn = !(cur && cur.is_joker);
+      if (turningOn) {
+        const { data: target } = await sb.from('matches').select('match_date').eq('id', matchId).single();
+        if (target) {
+          const { data: sameDay } = await sb.from('matches').select('id').eq('match_date', target.match_date);
+          const ids = (sameDay || []).map(m => m.id).filter(id => id !== matchId);
+          if (ids.length) await sb.from('predictions').update({ is_joker: false }).eq('user_id', uid).in('match_id', ids);
+        }
+      }
+      const { error } = await sb.from('predictions').update({ is_joker: turningOn }).eq('user_id', uid).eq('match_id', matchId);
+      if (error) {
+        alert(error.message.includes('one joker') ? 'Your 🃏 is already locked in on another match that day.' : 'Error: ' + error.message);
+        return;
+      }
+      await loadPredData();
+      // Re-render the panel
+      const m = matchData.find(m => {
+        const key = `${m[3]}|${m[4]}|${m[0]}`;
+        return matchIdByTeamDate[key] === matchId;
+      });
+      if (m) renderPredPanel(`${m[3]}|${m[4]}|${m[0]}`);
+    }
+
     function getLockCountdown(lockTime) {
       const diff = lockTime - new Date();
       if (diff <= 0) return 'Locked';
@@ -2479,6 +2560,72 @@
         </tr>`;
       }
 
+      // ── "Your Prediction" section ──
+      let yourPredHtml = '';
+      const yourPred = currentProfile ? predByPlayer[currentProfile.player_name] : null;
+
+      if (!currentSession) {
+        yourPredHtml = `<div class="pp-your-pred">
+          <div class="pp-your-pred-title">Your Prediction</div>
+          <div class="pp-your-pred-signin">Sign in to make predictions</div>
+        </div>`;
+      } else if (isLocked || isFinished) {
+        if (yourPred && yourPred.home !== undefined) {
+          yourPredHtml = `<div class="pp-your-pred">
+            <div class="pp-your-pred-title">Your Prediction</div>
+            <div class="pp-your-pred-locked">🔒 ${yourPred.home}–${yourPred.away}${yourPred.j ? ' 🃏' : ''}</div>
+          </div>`;
+        } else {
+          yourPredHtml = `<div class="pp-your-pred">
+            <div class="pp-your-pred-title">Your Prediction</div>
+            <div class="pp-your-pred-locked">Not predicted</div>
+          </div>`;
+        }
+      } else if (yourPred && yourPred.home !== undefined) {
+        yourPredHtml = `<div class="pp-your-pred" id="pp-your-pred-${mid}">
+          <div class="pp-your-pred-title">Your Prediction</div>
+          <div class="pp-pred-form">
+            <span class="pp-pred-display" id="pp-pred-display-${mid}">${yourPred.home}–${yourPred.away}${yourPred.j ? ' 🃏' : ''}</span>
+            ${jokersEnabled ? `<button class="joker-chip${yourPred.j ? ' active' : ''}" id="pp-joker-${mid}" onclick="toggleJokerFromPanel(${mid})">🃏 2×</button>` : ''}
+            <button class="pmc-btn edit" id="pp-pred-edit-btn-${mid}" onclick="editPredictionFromPanel(${mid})">Edit</button>
+            <div class="pmc-score" id="pp-pred-edit-${mid}" style="display:none">
+              <div class="pmc-score-wrap">
+                <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',1)">▴</div>
+                <input type="number" id="pp-ph-${mid}" min="0" max="20" value="${yourPred.home}">
+                <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',-1)">▾</div>
+              </div>
+              <span class="pmc-dash">–</span>
+              <div class="pmc-score-wrap">
+                <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',1)">▴</div>
+                <input type="number" id="pp-pa-${mid}" min="0" max="20" value="${yourPred.away}">
+                <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',-1)">▾</div>
+              </div>
+            </div>
+            <button class="pmc-btn save" id="pp-pred-save-btn-${mid}" onclick="submitPredictionFromPanel(${mid})" style="display:none">Save</button>
+          </div>
+        </div>`;
+      } else {
+        yourPredHtml = `<div class="pp-your-pred" id="pp-your-pred-${mid}">
+          <div class="pp-your-pred-title">Your Prediction</div>
+          <div class="pp-pred-form">
+            <div class="pmc-score">
+              <div class="pmc-score-wrap">
+                <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',1)">▴</div>
+                <input type="number" id="pp-ph-${mid}" min="0" max="20" value="0">
+                <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',-1)">▾</div>
+              </div>
+              <span class="pmc-dash">–</span>
+              <div class="pmc-score-wrap">
+                <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',1)">▴</div>
+                <input type="number" id="pp-pa-${mid}" min="0" max="20" value="0">
+                <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',-1)">▾</div>
+              </div>
+            </div>
+            <button class="pmc-btn predict" onclick="submitPredictionFromPanel(${mid})">Predict</button>
+          </div>
+        </div>`;
+      }
+
       const footerText = isFinished ? 'Results in — points awarded' :
         isLocked ? 'Predictions locked — kickoff imminent' :
         'Predictions hidden until 5 min before kickoff';
@@ -2492,6 +2639,7 @@
           <button class="pp-close" onclick="closePredPanel()">✕</button>
         </div>
         ${h2hHtml(t1, t2)}
+        ${yourPredHtml}
         <table class="pp-table">
           <thead><tr><th>Player</th><th>Prediction</th><th></th></tr></thead>
           <tbody>${rows}</tbody>
