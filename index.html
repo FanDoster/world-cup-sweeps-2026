@@ -251,9 +251,39 @@
       border-left: 4px solid var(--border-subtle);
       border-radius: 0 var(--radius) var(--radius) 0;
       padding: 14px 18px;
-      transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+      transition: transform 0.15s ease, border-color 0.2s, box-shadow 0.2s, background 0.2s;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
+    }
+    .match-row:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      transition: transform 0.05s, box-shadow 0.05s;
+    }
+    @media (hover: hover) {
+      .match-row:hover {
+        transform: translateY(-1px);
+        border-color: var(--border);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        background: var(--card-hover);
+      }
+      .match-row:hover .flag-bg { opacity: 0.32; }
+      .match-row.kicking-off:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 1px rgba(16,185,129,0.12);
+        background: var(--card-hover);
+      }
+      .match-row.live:hover {
+        transform: translateY(-1px);
+        background: rgba(19,29,42,0.95);
+      }
+      .match-row.finished:hover { opacity: 0.90; }
+      .match-row:hover .match-prob-bar {
+        height: 18px;
+        opacity: 1;
+      }
+      .match-row:hover .match-prob-bar .prob-seg { color: rgba(0,0,0,0.7); }
     }
     /* All direct children sit above the flag backgrounds */
     .match-row > * { position: relative; z-index: 1; }
@@ -281,7 +311,6 @@
       mask-image: linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
       -webkit-mask-image: linear-gradient(to left, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%);
     }
-    .match-row:hover .flag-bg { opacity: 0.32; }
     .match-row.finished .flag-bg { opacity: 0.08; }
     .match-row.kicking-off {
       border-left-color: var(--accent);
@@ -300,7 +329,6 @@
       opacity: 0.70;
       border-left-color: var(--border-subtle);
     }
-    .match-row.finished:hover { opacity: 0.90; }
 
     /* ── MATCH COUNTDOWN STRIP ── */
     .match-countdown {
@@ -504,10 +532,6 @@
       opacity: 0.6;
       transition: height 0.2s ease, opacity 0.2s ease;
     }
-    .match-row:hover .match-prob-bar {
-      height: 18px;
-      opacity: 1;
-    }
     .match-prob-bar .prob-seg {
       display: flex;
       align-items: center;
@@ -520,7 +544,6 @@
       overflow: hidden;
       white-space: nowrap;
     }
-    .match-row:hover .match-prob-bar .prob-seg { color: rgba(0,0,0,0.7); }
     .match-prob-bar .prob-h { background: var(--accent); }
     .match-prob-bar .prob-d { background: var(--text-muted); }
     .match-prob-bar .prob-a { background: #3b6ea0; }
