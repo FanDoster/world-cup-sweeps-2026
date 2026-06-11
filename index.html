@@ -869,7 +869,7 @@
     .profile-card .pc-body { padding: 20px 28px 28px; }
     .profile-card .pc-section { margin-bottom: 24px; }
     .profile-card .pc-section-title { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-    .profile-card .pc-stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .profile-card .pc-stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .profile-card .pc-stat-box { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
     .profile-card .pc-stat-box .pc-sv { font-size: 1.1rem; font-weight: 800; color: var(--text); }
     .profile-card .pc-stat-box .pc-sl { font-size: 0.64rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
@@ -2094,16 +2094,17 @@
           if (uid) {
             const userPreds = allPreds.filter(p => p.user_id === uid);
             const { data: allMatches } = await sb.from('matches').select('id,home_score,away_score,home_team_id(name),away_team_id(name)');
-            let total = 0, exact = 0, correct = 0;
+            let total = 0, exact = 0, correct = 0, totalPts = 0;
             for (const p of userPreds) {
               const m = allMatches?.find(am => am.id === p.match_id);
               if (!m || m.home_score === null) continue;
               total++;
               const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.home_score, m.away_score);
+              totalPts += pts;
               if (pts === 5) exact++;
               else if (pts >= 1) correct++;
             }
-            if (total > 0) predStats = { total, exact, correct, accuracy: Math.round(((exact + correct) / total) * 100) };
+            if (total > 0) predStats = { total, exact, correct, totalPts, accuracy: Math.round(((exact + correct) / total) * 100) };
           }
         }
       }
@@ -2132,6 +2133,7 @@
         predHtml = `<div class="pc-section">
           <div class="pc-section-title">Prediction Accuracy</div>
           <div class="pc-stats-grid">
+            <div class="pc-stat-box"><div class="pc-sv">${predStats.totalPts}</div><div class="pc-sl">Points</div></div>
             <div class="pc-stat-box"><div class="pc-sv">${predStats.total}</div><div class="pc-sl">Predictions</div></div>
             <div class="pc-stat-box"><div class="pc-sv" style="color:var(--gold)">${predStats.exact}</div><div class="pc-sl">Exact ★</div></div>
             <div class="pc-stat-box"><div class="pc-sv" style="color:var(--accent)">${predStats.accuracy}%</div><div class="pc-sl">Accuracy</div></div>
