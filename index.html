@@ -161,6 +161,7 @@
     }
     .team-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
     .team-item {
+      cursor: pointer;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -937,7 +938,7 @@
         <div class="person-name">${name} <span class="count">${teams.length} teams</span></div>
         <ul class="team-list">
           ${teams.map(t => `
-            <li class="team-item">
+            <li class="team-item" onclick="selectTeam('${t.team}')" title="View ${t.team} schedule">
               <img class="team-flag" src="${flagUrl(t.iso)}" alt="" loading="lazy" onerror="this.style.display='none'">
               <span class="team-name">${t.team}</span>
               <span class="team-group">Group ${t.group}</span>
@@ -1121,6 +1122,13 @@
     }
 
     // ── TABS ──
+    function selectTeam(teamName) {
+      selectedTeam = teamName;
+      switchTab('teams');
+      renderTeamChips();
+      renderTeamSchedule();
+    }
+
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
