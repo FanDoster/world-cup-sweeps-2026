@@ -248,114 +248,155 @@
     .match-row {
       background: var(--card);
       border: 1px solid var(--border-subtle);
-      border-left: 3px solid transparent;
-      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-      padding: 11px 16px;
-      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      border-left: 4px solid var(--border-subtle);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 14px 18px;
+      transition: transform 0.15s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
       position: relative;
+      overflow: hidden;
+    }
+    .match-row::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 60px;
+      background: linear-gradient(to right, transparent, var(--card));
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s;
     }
     .match-row:hover {
       background: var(--card-hover);
       border-color: var(--border);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      transform: translateX(2px);
     }
+    .match-row:hover::after { opacity: 1; }
     .match-row.kicking-off {
       border-left-color: var(--accent);
-      box-shadow: inset 4px 0 12px var(--accent-glow);
+      box-shadow: 0 0 0 1px rgba(16,185,129,0.08);
     }
     .match-row.live {
       border-left-color: var(--live);
-      box-shadow: inset 4px 0 12px var(--live-glow);
-      animation: livePulse 2.5s ease-in-out infinite;
+      box-shadow: 0 0 0 1px rgba(239,68,68,0.1);
+      animation: liveGlow 2.5s ease-in-out infinite;
     }
-    @keyframes livePulse {
-      0%, 100% { border-left-color: var(--live); box-shadow: inset 4px 0 16px var(--live-glow); }
-      50% { border-left-color: #dc2626; box-shadow: inset 4px 0 6px var(--live-glow); }
+    @keyframes liveGlow {
+      0%, 100% { border-left-color: var(--live); box-shadow: 0 0 0 1px rgba(239,68,68,0.1); }
+      50% { border-left-color: #dc2626; box-shadow: 0 0 0 1px rgba(239,68,68,0.2); }
     }
     .match-row.finished {
-      opacity: 0.62;
+      opacity: 0.70;
       border-left-color: var(--border-subtle);
     }
-    .match-row.finished:hover { opacity: 0.8; }
+    .match-row.finished:hover { opacity: 0.90; }
 
     .match-countdown {
-      font-size: 0.72rem;
-      font-weight: 800;
-      margin-bottom: 5px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      margin-bottom: 8px;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.08em;
       color: var(--text-muted);
-    }
-    .match-countdown.soon { color: var(--accent); }
-    .match-countdown.live-now {
-      color: var(--live);
       display: flex;
       align-items: center;
       gap: 6px;
     }
+    .match-countdown.soon { color: var(--accent); }
+    .match-countdown.live-now {
+      color: var(--live);
+    }
     .match-countdown.live-now::before {
       content: '';
-      width: 6px; height: 6px;
+      width: 7px; height: 7px;
       background: var(--live);
       border-radius: 50%;
       animation: dotPulse 1s ease-in-out infinite;
     }
     @keyframes dotPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.7); }
+    }
+    .match-countdown-badge {
+      display: inline-block;
+      background: var(--surface);
+      padding: 3px 10px;
+      border-radius: var(--radius-xs);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.02em;
     }
 
     .match-body {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
     .match-date {
-      min-width: 74px;
-      max-width: 74px;
-      font-size: 0.76rem;
+      min-width: 68px;
+      max-width: 68px;
+      font-size: 0.72rem;
       color: var(--text-muted);
       text-align: right;
-      line-height: 1.35;
+      line-height: 1.4;
       flex-shrink: 0;
     }
-    .match-date .date-label { font-weight: 700; color: var(--text-secondary); }
+    .match-date .date-label { font-weight: 700; color: var(--text-secondary); font-size: 0.75rem; }
     .match-teams {
       flex: 1;
       min-width: 0;
       display: flex;
       align-items: center;
-      gap: 7px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 700;
     }
-    .match-teams span.team-name-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .match-teams span.team-name-label { 
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+      color: var(--text);
+    }
     .match-flag {
-      width: 26px; height: 17px;
-      border-radius: 2px;
+      width: 32px; height: 21px;
+      border-radius: 3px;
       object-fit: cover;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.5);
       flex-shrink: 0;
     }
     .match-vs {
       color: var(--text-muted);
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      min-width: 20px;
+      letter-spacing: 0.08em;
+      min-width: 18px;
       text-align: center;
       flex-shrink: 0;
     }
-    .match-result {
-      font-size: 0.88rem;
+    .match-score-pill {
+      font-size: 0.9rem;
       font-weight: 800;
       color: var(--text);
-      margin: 0 4px;
-      white-space: nowrap;
+      background: var(--surface);
+      padding: 4px 12px;
+      border-radius: var(--radius-xs);
       font-family: var(--font-mono);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
+    .match-prob-bars {
+      display: flex;
+      gap: 2px;
+      height: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+      min-width: 60px;
+      max-width: 80px;
+      flex-shrink: 0;
+    }
+    .match-prob-bars .prob-h { background: var(--accent); height: 100%; }
+    .match-prob-bars .prob-d { background: var(--text-muted); height: 100%; }
+    .match-prob-bars .prob-a { background: var(--text-muted); height: 100%; opacity: 0.5; }
     .match-group-badge {
       font-size: 0.62rem;
       color: var(--text-muted);
@@ -554,38 +595,6 @@
     .channel-itv { background: #10b98118; color: #34d399; }
 
 
-    .match-prob-bar {
-      display: flex;
-      height: 3px;
-      border-radius: 2px;
-      overflow: hidden;
-      margin-top: 6px;
-      background: var(--surface);
-      font-size: 0;
-      opacity: 0.7;
-      transition: opacity 0.2s, height 0.2s;
-    }
-    .match-row:hover .match-prob-bar { opacity: 1; height: 16px; }
-    .prob-seg {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.55rem;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      letter-spacing: 0.02em;
-      transition: width 0.3s ease;
-      overflow: hidden;
-      white-space: nowrap;
-      color: transparent;
-      min-width: 0;
-    }
-    .match-row:hover .prob-seg { color: var(--text); }
-    .prob-a { background: var(--accent); }
-    .prob-d { background: var(--text-muted); }
-    .prob-b { background: var(--gold-dim); }
-    .match-prob-text { display: none; }
-
     .team-win-badge {
       font-size: 0.6rem;
       font-weight: 700;
@@ -718,21 +727,6 @@
         margin-top: 2px;
       }
 
-      /* Prob bar hidden, show text */
-      .match-prob-bar { display: none; }
-      .match-prob-text {
-        display: flex;
-        gap: 8px;
-        margin-top: 4px;
-        font-size: 0.6rem;
-        font-weight: 700;
-        font-family: var(--font-mono);
-        letter-spacing: 0.02em;
-      }
-      .prob-text-a { color: var(--accent); }
-      .prob-text-d { color: var(--text-muted); }
-      .prob-text-b { color: var(--gold-dim); }
-
       /* Owner tags in match rows — smaller on mobile */
       .match-owner { font-size: 0.6rem; padding: 1px 5px; }
 
@@ -755,7 +749,6 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .match-prob-bar { transition: none; }
     }
   </style>
   <!-- ── AUTH STYLES ── -->
@@ -1397,10 +1390,15 @@
           const rowCls = isFinished ? 'finished' : cd.rowCls;
           const countdownText = isFinished ? (m.score1 + '–' + m.score2) : (showCountdown ? cd.text : localTime);
           const countdownCls = isFinished ? '' : cd.cls;
+          const probTotal = m.prob1 + m.probD + m.prob2;
+          const hasProbs = probTotal > 0 && !isFinished;
 
           html += `
             <div class="match-row ${rowCls}" onclick="showPredPanel('${m.team1}|${m.team2}|${m.date}')" style="cursor:pointer">
-              <div class="match-countdown ${countdownCls}">${countdownText}</div>
+              <div class="match-countdown ${countdownCls}">
+                ${countdownText}
+                ${hasProbs ? `<span class="match-prob-bars"><span class="prob-h" style="width:${m.prob1}%"></span><span class="prob-d" style="width:${m.probD}%"></span><span class="prob-a" style="width:${m.prob2}%"></span></span>` : ''}
+              </div>
               <div class="match-body">
                 <div class="match-date">
                   <div class="date-label">${dateLabel}</div>
@@ -1410,7 +1408,7 @@
                   <img class="match-flag" src="${flagUrl(i1)}" alt="" loading="lazy" onerror="this.style.display='none'">
                   <span class="team-name-label">${m.team1}</span>
                   ${o1 ? `<span class="match-owner ${ownerColors[o1]}">${o1}</span>` : ''}
-                  ${isFinished ? `<span class="match-result">${m.score1}–${m.score2}</span>` : '<span class="match-vs">vs</span>'}
+                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<span class="match-vs">vs</span>'}
                   ${o2 ? `<span class="match-owner ${ownerColors[o2]}">${o2}</span>` : ''}
                   <span class="team-name-label">${m.team2}</span>
                   <img class="match-flag" src="${flagUrl(i2)}" alt="" loading="lazy" onerror="this.style.display='none'">
@@ -1421,16 +1419,6 @@
                 <span>${dateLabel} ${localTime}</span>
                 <span class="match-group-badge" style="margin:0">G${m.group}</span>
                 ${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
-              </div>
-              <div class="match-prob-bar">
-                <span class="prob-seg prob-a" style="width:${m.prob1}%" title="${m.team1} win ${m.prob1}%">${m.prob1}%</span>
-                <span class="prob-seg prob-d" style="width:${m.probD}%" title="Draw ${m.probD}%">${m.probD}%</span>
-                <span class="prob-seg prob-b" style="width:${m.prob2}%" title="${m.team2} win ${m.prob2}%">${m.prob2}%</span>
-              </div>
-              <div class="match-prob-text">
-                <span class="prob-text-a">${m.team1} ${m.prob1}%</span>
-                <span class="prob-text-d">Draw ${m.probD}%</span>
-                <span class="prob-text-b">${m.team2} ${m.prob2}%</span>
               </div>
               ${(() => {
                 const key = `${m.team1}|${m.team2}|${m.date}`;
@@ -1680,32 +1668,27 @@
           const opponent = m.team1 === selectedTeam ? m.team2 : m.team1;
           const oppOwner = teamOwner[opponent];
           const oppIso = teamIso[opponent];
+          const probTotal = m.prob1 + m.probD + m.prob2;
+          const hasProbs = probTotal > 0 && !isFinished;
 
           html += `
             <div class="match-row ${rowCls}" onclick="showPredPanel('${m.team1}|${m.team2}|${m.date}')" style="cursor:pointer">
-              <div class="match-countdown ${countdownCls}">${countdownText}</div>
+              <div class="match-countdown ${countdownCls}">
+                ${countdownText}
+                ${hasProbs ? `<span class="match-prob-bars"><span class="prob-h" style="width:${m.prob1}%"></span><span class="prob-d" style="width:${m.probD}%"></span><span class="prob-a" style="width:${m.prob2}%"></span></span>` : ''}
+              </div>
               <div class="match-body">
                 <div class="match-date">
                   <div class="date-label">${formatDateLabel(m.date, m.time, m.tz)}</div>
                   <div>${formatLocalTime(m.date, m.time, m.tz)}</div>
                 </div>
                 <div class="match-teams">
-                  <span style="font-weight:700;color:var(--text-secondary);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em">vs</span>
+                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<span class="match-vs">vs</span>'}
                   <img class="match-flag" src="${flagUrl(oppIso)}" alt="" loading="lazy" onerror="this.style.display='none'">
                   <span class="team-name-label">${opponent}</span>
                   ${oppOwner ? `<span class="match-owner ${ownerColors[oppOwner]}">${oppOwner}</span>` : ''}
                 </div>
                 <span class="match-group-badge">G${m.group}</span>${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
-              </div>
-              <div class="match-prob-bar">
-                <span class="prob-seg prob-a" style="width:${m.prob1}%" title="${m.team1} win ${m.prob1}%">${m.prob1}%</span>
-                <span class="prob-seg prob-d" style="width:${m.probD}%" title="Draw ${m.probD}%">${m.probD}%</span>
-                <span class="prob-seg prob-b" style="width:${m.prob2}%" title="${m.team2} win ${m.prob2}%">${m.prob2}%</span>
-              </div>
-              <div class="match-prob-text">
-                <span class="prob-text-a">${m.team1} ${m.prob1}%</span>
-                <span class="prob-text-d">Draw ${m.probD}%</span>
-                <span class="prob-text-b">${m.team2} ${m.prob2}%</span>
               </div>
               ${(() => {
                 const key = `${m.team1}|${m.team2}|${m.date}`;
