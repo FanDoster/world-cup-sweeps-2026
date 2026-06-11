@@ -829,6 +829,11 @@
     .phc-scores .exact-marker { color: var(--gold); }
     .pred-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
     .pred-empty .pe-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+    /* ── MATCH PREDICTION DOTS ── */
+    .match-pred-dots { display: flex; gap: 4px; margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--border-subtle); flex-wrap: wrap; }
+    .pred-dot { font-size: 0.62rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-family: var(--font); letter-spacing: 0.02em; white-space: nowrap; }
+    .pred-dot.has-pred { background: rgba(16,185,129,0.12); color: var(--accent); }
+    .pred-dot.no-pred { background: rgba(75,91,110,0.1); color: var(--text-muted); }
     /* ── PLAYER PROFILE MODAL ── */
     .profile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: flex-start; overflow-y: auto; padding: 40px 16px; }
     .profile-overlay.active { display: flex; }
@@ -1128,6 +1133,42 @@
       renderGroups();
       renderLeaderboard();
       renderTeamChips();
+      // Fetch predictions for match card status dots
+      loadPredData();
+    }
+
+    let predLookup = {}; // { matchId: [{player_name, home, away, user_id}, ...] }
+    let matchIdByTeamDate = {}; // {"Team1|Team2|date": matchId}
+
+    async function loadPredData() {
+      // Get match IDs
+      const { data: allM } = await sb.from('matches').select('id,match_date,home_team_id(name),away_team_id(name)');
+      if (allM) {
+        matchIdByTeamDate = {};
+        allM.forEach(m => {
+          matchIdByTeamDate[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
+        });
+      }
+
+      // Get all predictions with player names
+      const { data: preds } = await sb.from('predictions').select('user_id,match_id,predicted_home_score,predicted_away_score');
+      const { data: profs } = await sb.from('player_profiles').select('id,player_name');
+      if (preds && profs) {
+        const nameById = {};
+        profs.forEach(p => { nameById[p.id] = p.player_name; });
+        predLookup = {};
+        preds.forEach(p => {
+          if (!predLookup[p.match_id]) predLookup[p.match_id] = [];
+          predLookup[p.match_id].push({
+            user_id: p.user_id,
+            player_name: nameById[p.user_id] || 'Unknown',
+            home: p.predicted_home_score,
+            away: p.predicted_away_score
+          });
+        });
+      }
+      // Re-render matches to show dots
+      renderMatches();
     }
 
     // teamOwner and teamIso built in loadData() above
@@ -1274,6 +1315,35 @@
                 <span class="prob-text-d">Draw ${m.probD}%</span>
                 <span class="prob-text-b">${m.team2} ${m.prob2}%</span>
               </div>
+              ${(() => {
+                const key = `${m.team1}|${m.team2}|${m.date}`;
+                const mid = matchIdByTeamDate[key];
+                if (!mid) return '';
+                const preds = predLookup[mid] || [];
+                const predByPlayer = {};
+                preds.forEach(p => { predByPlayer[p.player_name] = p; });
+                const players = ['Anton','Chris','Dan','Laurie','Pat','Steven'];
+                const locked = m.kickoff - now < 5 * 60 * 1000;
+                const showScores = locked || isFinished;
+                let dots = '';
+                for (const p of players) {
+                  const pred = predByPlayer[p];
+                  if (pred && showScores) {
+                    let icon = '';
+                    if (isFinished) {
+                      const exact = pred.home === m.score1 && pred.away === m.score2;
+                      const correct = !exact && Math.sign(pred.home - pred.away) === Math.sign(m.score1 - m.score2);
+                      icon = exact ? '★' : correct ? '✓' : '✗';
+                    }
+                    dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
+                  } else if (pred) {
+                    dots += `<span class="pred-dot has-pred" title="${p} predicted">${p[0]}🔒</span>`;
+                  } else {
+                    dots += `<span class="pred-dot no-pred" title="${p} hasn't predicted">${p[0]}</span>`;
+                  }
+                }
+                return `<div class="match-pred-dots">${dots}</div>`;
+              })()}
             </div>
           `;
         }
@@ -1479,6 +1549,35 @@
                 <span class="prob-text-d">Draw ${m.probD}%</span>
                 <span class="prob-text-b">${m.team2} ${m.prob2}%</span>
               </div>
+              ${(() => {
+                const key = `${m.team1}|${m.team2}|${m.date}`;
+                const mid = matchIdByTeamDate[key];
+                if (!mid) return '';
+                const preds = predLookup[mid] || [];
+                const predByPlayer = {};
+                preds.forEach(p => { predByPlayer[p.player_name] = p; });
+                const players = ['Anton','Chris','Dan','Laurie','Pat','Steven'];
+                const locked = m.kickoff - now < 5 * 60 * 1000;
+                const showScores = locked || isFinished;
+                let dots = '';
+                for (const p of players) {
+                  const pred = predByPlayer[p];
+                  if (pred && showScores) {
+                    let icon = '';
+                    if (isFinished) {
+                      const exact = pred.home === m.score1 && pred.away === m.score2;
+                      const correct = !exact && Math.sign(pred.home - pred.away) === Math.sign(m.score1 - m.score2);
+                      icon = exact ? '★' : correct ? '✓' : '✗';
+                    }
+                    dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
+                  } else if (pred) {
+                    dots += `<span class="pred-dot has-pred" title="${p} predicted">${p[0]}🔒</span>`;
+                  } else {
+                    dots += `<span class="pred-dot no-pred" title="${p} hasn't predicted">${p[0]}</span>`;
+                  }
+                }
+                return `<div class="match-pred-dots">${dots}</div>`;
+              })()}
             </div>
           `;
         }
