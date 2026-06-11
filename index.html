@@ -530,6 +530,29 @@
     .prob-b { background: var(--gold-dim); }
     .match-prob-text { display: none; }
 
+    .team-win-badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      flex-shrink: 0;
+    }
+    .win-high { background: #10b98122; color: var(--accent); }
+    .win-mid { background: #f59e0b22; color: var(--gold); }
+    .win-low { background: #ef444422; color: #f87171; }
+    .player-win-pct {
+      font-size: 0.7rem;
+      font-weight: 800;
+      margin-left: auto;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--accent-glow);
+      color: var(--accent);
+      font-family: var(--font-mono);
+      letter-spacing: 0.02em;
+    }
+
     /* ── FOOTER ── */
     footer {
       text-align: center;
@@ -767,6 +790,8 @@
       return `https://flagcdn.com/w80/${iso}.png`;
     }
 
+    const teamWinPct = {"Mexico":62,"South Africa":19,"South Korea":47,"Czech Republic":30,"Canada":47,"Bosnia & Herzegovina":25,"Qatar":26,"Switzerland":56,"Brazil":73,"Morocco":57,"Haiti":10,"Scotland":29,"United States":57,"Paraguay":21,"Australia":42,"Turkey":34,"Germany":75,"Curaçao":14,"Ivory Coast":32,"Ecuador":43,"Netherlands":69,"Japan":46,"Sweden":32,"Tunisia":15,"Belgium":72,"Egypt":33,"Iran":47,"New Zealand":13,"Spain":78,"Cape Verde":13,"Saudi Arabia":22,"Uruguay":58,"France":81,"Senegal":51,"Iraq":11,"Norway":29,"Argentina":84,"Algeria":29,"Austria":44,"Jordan":13,"Portugal":74,"DR Congo":16,"Uzbekistan":15,"Colombia":63,"England":75,"Croatia":62,"Ghana":19,"Panama":14};
+
     // ── MATCH DATA & COUNTDOWNS ──
     const matchData = [["2026-06-11","13:00",-6,"Mexico","South Africa","A",null,null,"ITV1",74,14,13],["2026-06-11","20:00",-6,"South Korea","Czech Republic","A",null,null,"ITV1",52,23,24],["2026-06-18","12:00",-4,"Czech Republic","Mexico","A",null,null,"BBC One",18,18,64],["2026-06-18","19:00",-6,"South Africa","South Korea","A",null,null,"BBC Two",18,19,63],["2026-06-24","19:00",-6,"Czech Republic","South Africa","A",null,null,"BBC One",47,25,27],["2026-06-24","19:00",-6,"Mexico","South Korea","A",null,null,"BBC Two",48,25,27],["2026-06-12","12:00",-4,"Canada","Bosnia & Herzegovina","B",null,null,"BBC One",56,22,22],["2026-06-12","20:00",-4,"Qatar","Switzerland","B",null,null,"ITV1",19,20,61],["2026-06-19","12:00",-4,"Switzerland","Canada","B",null,null,"ITV1",43,27,30],["2026-06-19","19:00",-6,"Bosnia & Herzegovina","Qatar","B",null,null,"ITV4",34,29,37],["2026-06-25","18:00",-6,"Switzerland","Bosnia & Herzegovina","B",null,null,"ITV1",63,19,18],["2026-06-25","18:00",-6,"Canada","Qatar","B",null,null,"ITV1",54,23,23],["2026-06-13","12:00",-4,"Brazil","Morocco","C",null,null,"BBC One",53,23,24],["2026-06-13","16:00",-4,"Haiti","Scotland","C",null,null,"BBC One",19,19,62],["2026-06-20","12:00",-4,"Scotland","Brazil","C",null,null,"BBC One",9,12,79],["2026-06-20","16:00",-4,"Morocco","Haiti","C",null,null,"BBC Two",82,12,6],["2026-06-26","18:00",-4,"Scotland","Morocco","C",null,null,"ITV1",16,17,66],["2026-06-26","18:00",-4,"Brazil","Haiti","C",null,null,"ITV1",87,8,5],["2026-06-12","12:00",-7,"United States","Paraguay","D",null,null,"BBC One",68,17,16],["2026-06-12","19:00",-7,"Australia","Turkey","D",null,null,"ITV1",43,27,30],["2026-06-20","12:00",-7,"Turkey","United States","D",null,null,"ITV1",22,22,56],["2026-06-20","19:00",-7,"Paraguay","Australia","D",null,null,"ITV4",22,22,56],["2026-06-26","18:00",-7,"Turkey","Paraguay","D",null,null,"ITV1",49,25,26],["2026-06-26","18:00",-7,"United States","Australia","D",null,null,"BBC One",48,25,27],["2026-06-13","12:00",-5,"Germany","Curaçao","E",null,null,"ITV1",84,11,5],["2026-06-13","16:00",-5,"Ivory Coast","Ecuador","E",null,null,"BBC One",27,25,47],["2026-06-21","12:00",-5,"Ecuador","Germany","E",null,null,"BBC One",16,17,66],["2026-06-21","16:00",-5,"Curaçao","Ivory Coast","E",null,null,"BBC Two",22,22,56],["2026-06-27","18:00",-5,"Ecuador","Curaçao","E",null,null,"BBC One",66,17,16],["2026-06-27","18:00",-5,"Germany","Ivory Coast","E",null,null,"ITV1",75,13,12],["2026-06-14","12:00",-5,"Netherlands","Japan","F",null,null,"ITV1",57,21,21],["2026-06-14","16:00",-5,"Sweden","Tunisia","F",null,null,"ITV1",54,23,23],["2026-06-21","12:00",-5,"Tunisia","Netherlands","F",null,null,"BBC One",7,12,81],["2026-06-21","16:00",-5,"Japan","Sweden","F",null,null,"BBC Two",50,24,26],["2026-06-27","18:00",-5,"Tunisia","Japan","F",null,null,"BBC One",16,17,67],["2026-06-27","18:00",-5,"Netherlands","Sweden","F",null,null,"BBC One",70,16,15],["2026-06-14","12:00",-4,"Belgium","Egypt","G",null,null,"BBC One",72,15,14],["2026-06-14","16:00",-4,"Iran","New Zealand","G",null,null,"BBC One",71,15,14],["2026-06-22","12:00",-4,"New Zealand","Belgium","G",null,null,"BBC One",5,12,83],["2026-06-22","16:00",-4,"Egypt","Iran","G",null,null,"BBC Two",26,24,50],["2026-06-28","18:00",-4,"New Zealand","Egypt","G",null,null,"ITV1",21,21,59],["2026-06-28","18:00",-4,"Belgium","Iran","G",null,null,"ITV1",60,20,20],["2026-06-15","12:00",-5,"Spain","Cape Verde","H",null,null,"ITV1",88,7,5],["2026-06-15","16:00",-5,"Saudi Arabia","Uruguay","H",null,null,"ITV1",13,13,74],["2026-06-22","12:00",-5,"Uruguay","Spain","H",null,null,"ITV1",20,20,60],["2026-06-22","16:00",-5,"Cape Verde","Saudi Arabia","H",null,null,"ITV4",27,25,48],["2026-06-28","18:00",-5,"Uruguay","Cape Verde","H",null,null,"BBC One",81,12,7],["2026-06-28","18:00",-5,"Spain","Saudi Arabia","H",null,null,"BBC One",85,10,5],["2026-06-15","12:00",-4,"France","Senegal","I",null,null,"BBC One",70,15,14],["2026-06-15","16:00",-4,"Iraq","Norway","I",null,null,"BBC One",19,19,62],["2026-06-23","12:00",-4,"Norway","France","I",null,null,"ITV1",5,12,83],["2026-06-23","16:00",-4,"Senegal","Iraq","I",null,null,"ITV4",79,12,9],["2026-06-29","18:00",-4,"Norway","Senegal","I",null,null,"ITV1",21,21,59],["2026-06-29","18:00",-4,"France","Iraq","I",null,null,"BBC One",89,6,5],["2026-06-16","12:00",-5,"Argentina","Algeria","J",null,null,"ITV1",85,10,5],["2026-06-16","16:00",-5,"Austria","Jordan","J",null,null,"BBC One",72,15,14],["2026-06-23","12:00",-5,"Jordan","Argentina","J",null,null,"BBC One",5,6,89],["2026-06-23","16:00",-5,"Algeria","Austria","J",null,null,"BBC Two",24,23,52],["2026-06-29","18:00",-5,"Jordan","Algeria","J",null,null,"ITV1",21,21,57],["2026-06-29","18:00",-5,"Argentina","Austria","J",null,null,"BBC One",79,12,9],["2026-06-16","12:00",-4,"Portugal","DR Congo","K",null,null,"BBC One",86,9,5],["2026-06-16","16:00",-4,"Uzbekistan","Colombia","K",null,null,"BBC One",6,12,82],["2026-06-24","12:00",-4,"Colombia","Portugal","K",null,null,"BBC One",26,25,49],["2026-06-24","16:00",-4,"DR Congo","Uzbekistan","K",null,null,"BBC Two",36,30,34],["2026-06-30","18:00",-4,"Colombia","DR Congo","K",null,null,"ITV1",81,12,7],["2026-06-30","18:00",-4,"Portugal","Uzbekistan","K",null,null,"ITV1",86,9,5],["2026-06-17","12:00",-4,"England","Croatia","L",null,null,"ITV1",52,24,25],["2026-06-17","16:00",-4,"Ghana","Panama","L",null,null,"ITV1",42,27,31],["2026-06-24","12:00",-4,"Panama","England","L",null,null,"ITV1",5,8,87],["2026-06-24","16:00",-4,"Croatia","Ghana","L",null,null,"ITV4",79,12,9],["2026-06-30","18:00",-4,"Panama","Croatia","L",null,null,"BBC One",6,12,82],["2026-06-30","18:00",-4,"England","Ghana","L",null,null,"BBC One",85,10,5]];
 
@@ -934,13 +959,15 @@
     for (const [name, teams] of Object.entries(people)) {
       const card = document.createElement("div");
       card.className = "person-card";
+      const playerAvg = Math.round(teams.reduce((s, t) => s + (teamWinPct[t.team] || 50), 0) / teams.length);
       card.innerHTML = `
-        <div class="person-name">${name} <span class="count">${teams.length} teams</span></div>
+        <div class="person-name">${name} <span class="count">${teams.length} teams</span><span class="player-win-pct" title="Avg win probability">${playerAvg}%</span></div>
         <ul class="team-list">
           ${teams.map(t => `
             <li class="team-item" onclick="selectTeam('${t.team}')" title="View ${t.team} schedule">
               <img class="team-flag" src="${flagUrl(t.iso)}" alt="" loading="lazy" onerror="this.style.display='none'">
               <span class="team-name">${t.team}</span>
+              <span class="team-win-badge ${(teamWinPct[t.team] || 50) >= 60 ? 'win-high' : (teamWinPct[t.team] || 50) >= 35 ? 'win-mid' : 'win-low'}">${teamWinPct[t.team] || 50}%</span>
               <span class="team-group">Group ${t.group}</span>
             </li>
           `).join("")}
