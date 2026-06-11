@@ -119,6 +119,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
     }
     .tab-btn .emoji { margin-right: 4px; }
+    .tab-btn .tab-label { /* inline by default on desktop */ }
 
     /* ── SECTION VISIBILITY ── */
     .section-players, .section-matches, .section-groups, .section-leaderboard, .section-teams { display: none; }
@@ -336,7 +337,7 @@
     /* ── GROUP TABLES ── */
     .groups-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
       gap: 14px;
     }
     .group-card {
@@ -345,6 +346,7 @@
       border-radius: var(--radius);
       padding: 18px 20px;
       transition: border-color 0.2s;
+      overflow-x: auto;
     }
     .group-card:hover { border-color: var(--border); }
     .group-title {
@@ -375,6 +377,8 @@
     .group-table tbody tr:hover td { background: var(--surface); border-radius: 4px; }
     .group-table .pos { width: 26px; color: var(--text-muted); text-align: center; font-weight: 700; font-family: var(--font-mono); }
     .group-table .flag-cell { width: 32px; }
+    .group-table .stat-cell { width: 28px; text-align: center; font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-secondary); }
+    .group-table .stat-cell.pts { font-weight: 700; color: var(--text); }
     .group-flag {
       width: 24px; height: 16px;
       border-radius: 2px;
@@ -566,18 +570,108 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
-      header h1 { font-size: 1.5rem; }
-      .tab-btn { font-size: 0.75rem; padding: 8px 4px; }
-      .tab-btn .emoji { display: none; }
+      /* Container */
+      .container { padding: 0 12px 48px; }
+
+      /* Header */
+      header { padding: 20px 0 24px; }
+      header h1 { font-size: 1.35rem; }
+      header .subtitle { font-size: 0.82rem; }
+
+      /* Tabs — equal width, emoji over label, two-line */
+      .tab-bar {
+        flex-wrap: nowrap;
+        gap: 2px;
+        padding: 3px;
+        margin-bottom: 20px;
+      }
+      .tab-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        padding: 7px 2px;
+        white-space: nowrap;
+        overflow: hidden;
+        font-size: 0.62rem;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+      .tab-btn .emoji {
+        display: block;
+        font-size: 1.1rem;
+        line-height: 1;
+        margin: 0;
+      }
+      .tab-btn .tab-label {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      }
+
+      /* Grids */
       .people-grid { grid-template-columns: 1fr; }
       .matches-grid { grid-template-columns: 1fr; }
       .match-date-header { font-size: 0.72rem; }
       .groups-grid { grid-template-columns: 1fr; }
+
+      /* Match rows — stack layout on mobile */
+      .match-row { padding: 10px 12px; }
+      .match-countdown { font-size: 0.68rem; margin-bottom: 6px; }
+
+      .match-body {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+
+      /* Teams row — flex with constrained names on mobile */
+      .match-teams {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.86rem;
+        flex-wrap: nowrap;
+      }
+      .match-teams .team-name-label {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      /* Second team name right-align */
+      .match-teams .team-name-label + .match-flag { margin-left: auto; }
+      .match-teams .match-vs,
+      .match-teams .match-result { flex-shrink: 0; }
+
+      /* Hide group badge + channel from desktop match-body row on mobile */
+      .match-body > .match-group-badge,
+      .match-body > .match-channel { display: none; }
+
+      /* Hide desktop date column on mobile */
+      .match-date { display: none; }
+
+      /* Show date info inline in the countdown area instead */
+      .match-meta-mobile {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+
+      /* Prob bar hidden, show text */
       .match-prob-bar { display: none; }
       .match-prob-text {
         display: flex;
         gap: 8px;
-        margin-top: 6px;
+        margin-top: 4px;
         font-size: 0.6rem;
         font-weight: 700;
         font-family: var(--font-mono);
@@ -586,7 +680,28 @@
       .prob-text-a { color: var(--accent); }
       .prob-text-d { color: var(--text-muted); }
       .prob-text-b { color: var(--gold-dim); }
+
+      /* Owner tags in match rows — smaller on mobile */
+      .match-owner { font-size: 0.6rem; padding: 1px 5px; }
+
+      /* Leaderboard — hide W-D-L on very small screens */
+      .leaderboard-table .wdl { display: none; }
+      .leaderboard-table th, .leaderboard-table td { padding: 10px 12px; }
+
+      /* Predictions cards — stack on mobile */
+      .pred-match-card .pmc-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
+      }
+      .pred-match-card .pmc-date { min-width: unset; }
+      .pred-match-card .pmc-teams { font-size: 0.85rem; }
+      .pred-summary { gap: 8px; }
+      .pred-stat { padding: 10px 12px; }
+      .pred-stat .ps-num { font-size: 1.3rem; }
     }
+
     @media (prefers-reduced-motion: reduce) {
       .match-prob-bar { transition: none; }
     }
@@ -599,6 +714,15 @@
     .auth-bar button:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
     .auth-bar button.sign-out-btn { border-color: transparent; color: var(--text-muted); }
     .auth-bar button.sign-out-btn:hover { color: var(--live); border-color: var(--live); }
+    @media (max-width: 700px) {
+      .auth-bar {
+        position: static;
+        justify-content: center;
+        margin-top: 12px;
+        font-size: 0.78rem;
+      }
+      .auth-bar button { padding: 6px 12px; font-size: 0.76rem; }
+    }
     .auth-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
     .auth-modal-overlay.active { display: flex; }
     .auth-modal { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; width: 360px; max-width: 92vw; }
@@ -719,11 +843,11 @@
     </header>
 
     <div class="tab-bar" id="tabBar">
-      <button type="button" class="tab-btn" data-tab="players" onclick="switchTab('players')"><span class="emoji">🏆</span> Players</button>
-      <button type="button" class="tab-btn active" data-tab="matches" onclick="switchTab('matches')"><span class="emoji">⏱</span> Matches</button>
-      <button type="button" class="tab-btn" data-tab="groups" onclick="switchTab('groups')"><span class="emoji">📋</span> Groups</button>
-      <button type="button" class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')"><span class="emoji">🏅</span> Leaderboard</button>
-      <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span> Teams</button>
+      <button type="button" class="tab-btn" data-tab="players" onclick="switchTab('players')"><span class="emoji">🏆</span><span class="tab-label"> Players</span></button>
+      <button type="button" class="tab-btn active" data-tab="matches" onclick="switchTab('matches')"><span class="emoji">⏱</span><span class="tab-label"> Matches</span></button>
+      <button type="button" class="tab-btn" data-tab="groups" onclick="switchTab('groups')"><span class="emoji">📋</span><span class="tab-label"> Groups</span></button>
+      <button type="button" class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')"><span class="emoji">🏅</span><span class="tab-label"> Leaderboard</span></button>
+      <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span><span class="tab-label"> Teams</span></button>
     </div>
 
     <div class="section-players" id="sectionPlayers">
@@ -838,8 +962,8 @@
         bar.innerHTML = `<span class="signed-in">🟢 ${currentProfile.player_name}</span>
           <button class="sign-out-btn" onclick="doSignOut()">Sign out</button>`;
         // Inject logged-in tabs
-        tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="myteams" onclick="switchTab('myteams')">⭐ My Teams</button>`);
-        tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="predictions" onclick="switchTab('predictions')">🔮 Predictions</button>`);
+        tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="myteams" onclick="switchTab('myteams')"><span class="emoji">⭐</span><span class="tab-label"> My Teams</span></button>`);
+        tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="predictions" onclick="switchTab('predictions')"><span class="emoji">🔮</span><span class="tab-label"> Predictions</span></button>`);
       } else {
         bar.innerHTML = `<button onclick="showSignIn()">Sign in</button>
           <button onclick="showSignUp()">Create account</button>`;
@@ -1093,6 +1217,11 @@
                 </div>
                 <span class="match-group-badge">G${m.group}</span>${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
               </div>
+              <div class="match-meta-mobile" style="display:none">
+                <span>${dateLabel} ${localTime}</span>
+                <span class="match-group-badge" style="margin:0">G${m.group}</span>
+                ${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
+              </div>
               <div class="match-prob-bar">
                 <span class="prob-seg prob-a" style="width:${m.prob1}%" title="${m.team1} win ${m.prob1}%">${m.prob1}%</span>
                 <span class="prob-seg prob-d" style="width:${m.probD}%" title="Draw ${m.probD}%">${m.probD}%</span>
@@ -1138,22 +1267,63 @@
     function renderGroups() {
       const groupsEl = document.getElementById("groups");
       groupsEl.innerHTML = '';
-      for (const [letter, teams] of Object.entries(groups)) {
+
+      // Calculate standings per group
+      const standings = {};
+      for (const m of matchData) {
+        const s1 = m[6], s2 = m[7];
+        if (s1 === null || s2 === null) continue; // not played yet
+        const t1 = m[3], t2 = m[4], grp = m[5];
+
+        for (const tn of [t1, t2]) {
+          if (!standings[tn]) standings[tn] = { p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
+        }
+
+        standings[t1].p++; standings[t2].p++;
+        standings[t1].gf += s1; standings[t1].ga += s2;
+        standings[t2].gf += s2; standings[t2].ga += s1;
+
+        if (s1 > s2) { standings[t1].w++; standings[t2].l++; }
+        else if (s2 > s1) { standings[t2].w++; standings[t1].l++; }
+        else { standings[t1].d++; standings[t2].d++; }
+      }
+
+      for (const [letter, teams] of Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0]))) {
+        // Compute standings for this group's teams, sort
+        const rows = teams.map(t => {
+          const s = standings[t.team] || { p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 };
+          return {
+            team: t.team, iso: t.iso, owner: t.owner,
+            p: s.p, w: s.w, d: s.d, l: s.l, gf: s.gf, ga: s.ga,
+            gd: s.gf - s.ga, pts: s.w * 3 + s.d
+          };
+        }).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team));
+
         const card = document.createElement("div");
         card.className = "group-card";
-        const rows = teams.map((t, i) => `
+
+        const rowsHtml = rows.map((r, i) => `
           <tr>
             <td class="pos">${i + 1}</td>
-            <td class="flag-cell"><img class="group-flag" src="${flagUrl(t.iso)}" alt="" loading="lazy" onerror="this.style.display='none'"></td>
-            <td>${t.team}</td>
-            <td>${t.owner ? `<span class="owner-tag ${ownerColors[t.owner]}">${t.owner}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
+            <td class="flag-cell"><img class="group-flag" src="${flagUrl(r.iso)}" alt="" loading="lazy" onerror="this.style.display='none'"></td>
+            <td>${r.team}</td>
+            <td class="stat-cell">${r.p}</td>
+            <td class="stat-cell">${r.w}</td>
+            <td class="stat-cell">${r.d}</td>
+            <td class="stat-cell">${r.l}</td>
+            <td class="stat-cell">${r.gf}</td>
+            <td class="stat-cell">${r.ga}</td>
+            <td class="stat-cell">${r.gd > 0 ? '+' + r.gd : r.gd}</td>
+            <td class="stat-cell pts">${r.pts}</td>
+            <td>${r.owner ? `<span class="owner-tag ${ownerColors[r.owner]}">${r.owner}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
           </tr>
         `).join("");
+
         card.innerHTML = `
           <div class="group-title">Group ${letter}</div>
           <table class="group-table">
-            <thead><tr><th>#</th><th></th><th>Team</th><th>Owner</th></tr></thead>
-            <tbody>${rows}</tbody>
+            <thead><tr><th>#</th><th></th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>GD</th><th>Pts</th><th>Owner</th></tr></thead>
+            <tbody>${rowsHtml}</tbody>
           </table>
         `;
         groupsEl.appendChild(card);
