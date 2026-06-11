@@ -1,0 +1,14 @@
+# Build artifacts
+.DS_Store
+
+# Old data files (everything lives in index.html now)
+matchdata.js
+matchdata2.js
+matches.json
+
+# Deploy helpers
+check-and-deploy.sh
+update-scores.py
+
+# Cloudflare
+.wrangler/
