@@ -1201,6 +1201,8 @@
       .venue-panel { width: 100% !important; height: 0; border-left: none; border-top: 1px solid var(--border); transition: height 0.28s ease; }
       .venue-panel.open { height: 55vh; overflow-y: auto; }
     }
+    .globe-reset { position: absolute; bottom: 14px; right: 14px; width: 32px; height: 32px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); color: var(--text-muted); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; z-index: 5; }
+    .globe-reset:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
     /* Territory standings */
     .territory-standings { padding: 20px; border-top: 1px solid var(--border-subtle); background: var(--bg); }
     .ts-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
@@ -1278,6 +1280,7 @@
       <div class="globe-row" style="display:flex;align-items:stretch;flex:1;min-height:70vh">
         <div class="globe-wrap" id="globeWrap">
           <svg id="globeSvg"></svg>
+          <button class="globe-reset" id="globeReset" onclick="resetGlobe()" title="Reset view">↺</button>
         </div>
         <div class="venue-panel" id="venuePanel">
           <div class="vp-header">
@@ -3246,6 +3249,7 @@
       // Ocean sphere
       svg.append('circle')
         .attr('cx', W / 2).attr('cy', H / 2).attr('r', radius)
+        .attr('class', 'ocean-sphere')
         .attr('fill', '#070b10')
         .attr('filter', 'url(#globe-glow)');
 
@@ -3345,7 +3349,7 @@
       const drag = d3.drag()
         .on('start', () => { isDragging = true; stopAutoRotate(); })
         .on('drag', (event) => {
-          const sens = 0.3;
+          const sens = 0.3 * (window._globe.baseScale / projection.scale());
           globeRotation[0] += event.dx * sens;
           globeRotation[1] -= event.dy * sens;
           globeRotation[1] = Math.max(-90, Math.min(90, globeRotation[1]));
@@ -3360,8 +3364,40 @@
 
       svg.call(drag);
 
+      const minScale = radius * 0.5;
+      const maxScale = radius * 6;
+
+      svg.on('wheel', (event) => {
+        event.preventDefault();
+        const [tx, ty] = projection.translate();
+        const scale = projection.scale();
+        const factor = event.deltaY < 0 ? 1.12 : 1 / 1.12;
+        const newScale = Math.max(minScale, Math.min(maxScale, scale * factor));
+        const rect = wrap.getBoundingClientRect();
+        const mx = event.clientX - rect.left;
+        const my = event.clientY - rect.top;
+        const newTx = mx - (newScale / scale) * (mx - tx);
+        const newTy = my - (newScale / scale) * (my - ty);
+        projection.scale(newScale).translate([newTx, newTy]);
+        updateGlobeZoomElements();
+      });
+
+      svg.on('dblclick', (event) => {
+        event.preventDefault();
+        const [tx, ty] = projection.translate();
+        const scale = projection.scale();
+        const newScale = Math.min(maxScale, scale * 1.8);
+        const rect = wrap.getBoundingClientRect();
+        const mx = event.clientX - rect.left;
+        const my = event.clientY - rect.top;
+        const newTx = mx - (newScale / scale) * (mx - tx);
+        const newTy = my - (newScale / scale) * (my - ty);
+        projection.scale(newScale).translate([newTx, newTy]);
+        updateGlobeZoomElements();
+      });
+
       // Store refs for use in update functions
-      window._globe = { svg, projection, path, radius, W, H };
+      window._globe = { svg, projection, path, radius, W, H, baseScale: radius, baseTranslate: [W / 2, H / 2] };
 
       if (typeof renderVenueMarkers === 'function') renderVenueMarkers(markerGroup, projection, tooltip);
       startAutoRotate();
@@ -3386,6 +3422,28 @@
                   Math.cos(lat * toRad) * Math.cos(clat * toRad) * Math.cos((lng - clng) * toRad);
       const d = Math.acos(Math.max(-1, Math.min(1, dot)));
       return d < Math.PI / 2;
+    }
+
+    function updateGlobeZoomElements() {
+      if (!window._globe) return;
+      const { svg, projection, path } = window._globe;
+      const [tx, ty] = projection.translate();
+      const r = projection.scale();
+      svg.select('.ocean-sphere').attr('cx', tx).attr('cy', ty).attr('r', r);
+      d3.select('#globe-clip circle').attr('cx', tx).attr('cy', ty).attr('r', r);
+      svg.select('.graticule').attr('d', path);
+      svg.select('.land').attr('d', path);
+      svg.selectAll('.territory-fill').attr('d', path);
+      updateMarkers(projection);
+      if (typeof updateTerritoryLabels === 'function') updateTerritoryLabels(projection);
+    }
+
+    function resetGlobe() {
+      if (!window._globe) return;
+      const { projection, baseScale, baseTranslate } = window._globe;
+      globeRotation = [-100, -25, 0];
+      projection.rotate(globeRotation).scale(baseScale).translate(baseTranslate);
+      updateGlobeZoomElements();
     }
 
     function updateTerritoryFills() {
