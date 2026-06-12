@@ -3197,6 +3197,47 @@
     function stopAutoRotate() {
       if (autoRotateRaf) { cancelAnimationFrame(autoRotateRaf); autoRotateRaf = null; }
     }
+
+    function renderVenueMarkers(markerGroup, projection, tooltip) {
+      const countryColor = { MX: '#10b981', CA: '#ef4444', US: '#f59e0b' };
+
+      Object.entries(VENUE_DATA).forEach(([name, v]) => {
+        const [x, y] = projection([v.lng, v.lat]);
+        const color = countryColor[v.country];
+        const visible = isVisible(v.lat, v.lng, projection);
+
+        const g = markerGroup.append('g')
+          .datum(v)
+          .attr('class', 'venue-marker')
+          .attr('transform', `translate(${x},${y})`)
+          .attr('opacity', visible ? 1 : 0)
+          .attr('pointer-events', visible ? 'all' : 'none');
+
+        g.append('circle')
+          .attr('class', 'outer')
+          .attr('r', 11)
+          .attr('fill', color)
+          .attr('opacity', 0.35);
+
+        g.append('circle')
+          .attr('class', 'inner')
+          .attr('r', 6)
+          .attr('fill', color)
+          .attr('opacity', 0.9);
+
+        g.on('mouseenter', (event) => {
+            tooltip.style.display = 'block';
+            tooltip.textContent = `${name} · ${v.city} · ${v.matches.length} matches`;
+          })
+          .on('mousemove', (event) => {
+            const rect = document.getElementById('globeWrap').getBoundingClientRect();
+            tooltip.style.left = (event.clientX - rect.left + 14) + 'px';
+            tooltip.style.top  = (event.clientY - rect.top  - 8) + 'px';
+          })
+          .on('mouseleave', () => { tooltip.style.display = 'none'; })
+          .on('click', () => { tooltip.style.display = 'none'; openVenuePanel(name); });
+      });
+    }
   </script>
 </body>
 </html>
