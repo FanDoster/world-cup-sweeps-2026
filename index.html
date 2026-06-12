@@ -3240,6 +3240,37 @@
         .attr('stroke', '#1e2e40')
         .attr('stroke-width', 0.6);
 
+      // Stripe patterns for contested territories (all 15 player pairs)
+      const playerList = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat', 'Steven'];
+      for (let i = 0; i < playerList.length; i++) {
+        for (let j = i + 1; j < playerList.length; j++) {
+          const pA = playerList[i], pB = playerList[j];
+          const pat = defs.append('pattern')
+            .attr('id', `stripe-${pA}-${pB}`)
+            .attr('x', 0).attr('y', 0)
+            .attr('width', 10).attr('height', 10)
+            .attr('patternUnits', 'userSpaceOnUse')
+            .attr('patternTransform', 'rotate(45)');
+          pat.append('rect').attr('width', 5).attr('height', 10).attr('fill', ownerHexColors[pA]).attr('fill-opacity', 0.55);
+          pat.append('rect').attr('x', 5).attr('width', 5).attr('height', 10).attr('fill', ownerHexColors[pB]).attr('fill-opacity', 0.55);
+        }
+      }
+
+      // Territory fill layer (clipped to globe sphere, beneath venue markers)
+      const territoryGroup = svg.append('g').attr('clip-path', 'url(#globe-clip)').attr('id', 'territoryFills');
+      territoryFeatures.forEach(({ name, feature }) => {
+        territoryGroup.append('path')
+          .datum(feature)
+          .attr('class', 'territory-fill')
+          .attr('data-territory', name)
+          .attr('d', path)
+          .attr('fill', 'rgba(255,255,255,0.04)')
+          .attr('fill-opacity', 0.45)
+          .attr('stroke', 'rgba(255,255,255,0.12)')
+          .attr('stroke-width', 0.8);
+      });
+      updateTerritoryFills();
+
       // Clip path for markers
       defs.append('clipPath').attr('id', 'globe-clip')
         .append('circle').attr('cx', W / 2).attr('cy', H / 2).attr('r', radius);
@@ -3264,6 +3295,7 @@
           projection.rotate(globeRotation);
           svg.select('.graticule').attr('d', path);
           svg.select('.land').attr('d', path);
+          svg.selectAll('.territory-fill').attr('d', path);
           updateMarkers(projection);
         })
         .on('end', () => { isDragging = false; if (!venuePanelOpen) startAutoRotate(); });
@@ -3298,6 +3330,23 @@
       return d < Math.PI / 2;
     }
 
+    function updateTerritoryFills() {
+      const controlMap = Object.fromEntries(territoryControl.map(t => [t.name, t]));
+      d3.selectAll('.territory-fill').each(function() {
+        const name = this.dataset.territory;
+        const tc = controlMap[name];
+        if (!tc || tc.matchesPlayed === 0) {
+          d3.select(this).attr('fill', 'rgba(255,255,255,0.04)');
+        } else if (tc.contested) {
+          const [pA, pB] = tc.contestedPlayers;
+          const id = pA < pB ? `stripe-${pA}-${pB}` : `stripe-${pB}-${pA}`;
+          d3.select(this).attr('fill', `url(#${id})`);
+        } else {
+          d3.select(this).attr('fill', ownerHexColors[tc.controller]);
+        }
+      });
+    }
+
     function startAutoRotate() {
       stopAutoRotate();
       if (venuePanelOpen) return;
@@ -3308,6 +3357,7 @@
           window._globe.projection.rotate(globeRotation);
           window._globe.svg.select('.graticule').attr('d', window._globe.path);
           window._globe.svg.select('.land').attr('d', window._globe.path);
+          window._globe.svg.selectAll('.territory-fill').attr('d', window._globe.path);
           updateMarkers(window._globe.projection);
         }
         autoRotateRaf = requestAnimationFrame(tick);
