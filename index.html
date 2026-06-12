@@ -1730,6 +1730,9 @@
       // Re-render views that depend on prediction data
       renderMatches();
       calcPredPointsForAll();
+        calcTerritoryControl();
+        renderTerritoryStandings();
+        if (globeInitialised) updateTerritoryFills();
       renderPeople();
       renderLeaderboard();
     }
@@ -2366,7 +2369,7 @@
       document.getElementById('sectionMyTeams').classList.toggle('active', tab === 'myteams');
       document.getElementById('sectionPredictions').classList.toggle('active', tab === 'predictions');
       document.getElementById('sectionMap').classList.toggle('active', tab === 'map');
-      if (tab === 'map') initGlobe();
+      if (tab === 'map') { initGlobe(); renderTerritoryStandings(); }
       if (tab !== 'map') stopAutoRotate();
       if (tab === 'leaderboard') renderLeaderboard();
       if (tab === 'myteams') renderMyTeams();
