@@ -1194,6 +1194,18 @@
     .vm-pred-dot { font-size: 0.7rem; padding: 2px 5px; border-radius: 3px; font-family: var(--font-mono); font-weight: 700; background: var(--card); border: 1px solid var(--border); color: var(--text-secondary); }
     .vm-pred-dot.has-pred { border-color: var(--accent); color: var(--accent); }
     .vm-pred-dot.no-pred { color: var(--text-muted); }
+    .territory-fill { cursor: pointer; }
+    .tp-section-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--text-muted); text-transform: uppercase; padding: 14px 20px 6px; }
+    .tp-standings { padding: 0 20px 8px; }
+    .tp-player-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid var(--border-subtle); }
+    .tp-player-row:last-child { border-bottom: none; }
+    .tp-rank { font-size: 0.72rem; color: var(--text-muted); width: 14px; text-align: right; font-family: var(--font-mono); }
+    .tp-player-name { flex: 1; font-weight: 600; color: var(--text); }
+    .tp-avg { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); }
+    .tp-venue-header { padding: 10px 20px 4px; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; border-top: 1px solid var(--border-subtle); margin-top: 4px; }
+    .tp-venue-header:first-of-type { margin-top: 0; border-top: none; }
+    .vm-row.tp-clickable { cursor: pointer; }
+    .vm-row.tp-clickable:hover { background: rgba(255,255,255,0.03); }
     /* Mobile: bottom sheet */
     @media (max-width: 700px) {
       .section-map.active { flex-direction: column; }
@@ -3346,15 +3358,20 @@
           .attr('stroke', 'none')
           .attr('pointer-events', 'all')
           .on('mouseenter', function() {
+            const base = parseFloat(this.dataset.baseOpacity || 0.45);
             d3.select(this)
               .attr('stroke', 'rgba(255,255,255,0.75)')
               .attr('stroke-width', 1.5)
-              .attr('fill-opacity', 0.65);
+              .attr('fill-opacity', Math.min(base + 0.18, 1));
           })
           .on('mouseleave', function() {
+            const base = parseFloat(this.dataset.baseOpacity || 0.45);
             d3.select(this)
               .attr('stroke', 'none')
-              .attr('fill-opacity', 0.45);
+              .attr('fill-opacity', base);
+          })
+          .on('click', function() {
+            openTerritoryPanel(this.dataset.territory);
           });
       });
       updateTerritoryFills();
@@ -3501,13 +3518,13 @@
         const name = this.dataset.territory;
         const tc = controlMap[name];
         if (!tc || tc.matchesPlayed === 0) {
-          d3.select(this).attr('fill', neutralColor[name]).attr('fill-opacity', 0.85);
+          d3.select(this).attr('fill', neutralColor[name]).attr('fill-opacity', 0.85).attr('data-base-opacity', 0.85);
         } else if (tc.contested) {
           const [pA, pB] = tc.contestedPlayers;
           const id = pA < pB ? `stripe-${pA}-${pB}` : `stripe-${pB}-${pA}`;
-          d3.select(this).attr('fill', `url(#${id})`);
+          d3.select(this).attr('fill', `url(#${id})`).attr('fill-opacity', 0.75).attr('data-base-opacity', 0.75);
         } else {
-          d3.select(this).attr('fill', ownerHexColors[tc.controller]);
+          d3.select(this).attr('fill', ownerHexColors[tc.controller]).attr('fill-opacity', 0.65).attr('data-base-opacity', 0.65);
         }
       });
       updateMarkerColors();
@@ -3707,6 +3724,110 @@
         const avg = t.avgPts[t.controller]?.toFixed(2) ?? '0.00';
         return `<div class="ts-card controlled" style="border-left-color:${ownerHexColors[t.controller]}"><div class="ts-name">${t.name}</div><div class="ts-controller"><span class="ts-dot" style="background:${ownerHexColors[t.controller]}"></span><span style="color:${ownerHexColors[t.controller]}">${t.controller}</span></div><div class="ts-avg">${avg} avg pts/match</div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
       }).join('');
+    }
+
+    function openTerritoryPanel(name) {
+      venuePanelOpen = true;
+      stopAutoRotate();
+      const tc = territoryControl.find(t => t.name === name);
+      document.getElementById('vpName').textContent = name;
+      let subtitle = 'Uncontested';
+      if (tc && tc.matchesPlayed > 0) {
+        if (tc.contested) {
+          subtitle = '⚔️ Contested';
+        } else if (tc.controller) {
+          const avg = tc.avgPts[tc.controller]?.toFixed(2) ?? '0.00';
+          subtitle = `Controlled by ${tc.controller} · ${avg} avg`;
+        }
+      }
+      document.getElementById('vpCity').textContent = subtitle;
+      document.getElementById('venuePanel').classList.add('open');
+      renderTerritoryPanel(name);
+    }
+
+    function renderTerritoryPanel(territoryName) {
+      const players = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat', 'Steven'];
+      const territory = TERRITORY_DATA.find(t => t.name === territoryName);
+      const tc = territoryControl.find(t => t.name === territoryName);
+      const now = Date.now();
+      let html = '';
+
+      // Standings
+      html += `<div class="tp-section-title">Standings</div>`;
+      if (!tc || tc.matchesPlayed === 0) {
+        html += `<div style="padding:6px 20px 12px;color:var(--text-muted);font-size:0.82rem">No matches played yet</div>`;
+      } else {
+        const ranked = players.slice().sort((a, b) => (tc.avgPts[b] || 0) - (tc.avgPts[a] || 0));
+        html += `<div class="tp-standings">`;
+        ranked.forEach((p, i) => {
+          const avg = (tc.avgPts[p] ?? 0).toFixed(2);
+          const isLeader = p === tc.controller || (tc.contested && tc.contestedPlayers.includes(p));
+          html += `<div class="tp-player-row">
+            <span class="tp-rank">${i + 1}</span>
+            <span class="ts-dot" style="background:${ownerHexColors[p]}"></span>
+            <span class="tp-player-name" style="${isLeader ? `color:${ownerHexColors[p]}` : ''}">${p}</span>
+            <span class="tp-avg">${avg} avg</span>
+          </div>`;
+        });
+        html += `</div>`;
+      }
+
+      // Matches grouped by venue
+      html += `<div class="tp-section-title">Matches</div>`;
+      for (const venueName of territory.venues) {
+        const venue = VENUE_DATA[venueName];
+        if (!venue) continue;
+        html += `<div class="tp-venue-header">${venueName}</div>`;
+        for (const key of venue.matches) {
+          const m = matchByKey[key];
+          if (!m) continue;
+          const [date, time, tz, team1, team2, group, score1, score2] = m;
+          const kickoff = toDate(date, time, tz);
+          const isFinished = score1 !== null && score2 !== null;
+          const locked = kickoff - now < 5 * 60 * 1000;
+          const iso1 = teamIso[team1] || '', iso2 = teamIso[team2] || '';
+          const mid = matchIdByTeamDate[key];
+          const preds = mid ? (predLookup[mid] || []) : [];
+          const predByPlayer = {};
+          preds.forEach(p => { predByPlayer[p.player_name] = p; });
+
+          let scoreOrTime = '';
+          if (isFinished) {
+            scoreOrTime = `<span class="vm-score">${score1}–${score2}</span>`;
+          } else if (locked) {
+            scoreOrTime = `<span style="color:var(--live);font-size:0.7rem;font-weight:700">LIVE / SOON</span>`;
+          } else {
+            scoreOrTime = `<span style="color:var(--text-muted)">${formatLocalTime(date, time, tz)}</span>`;
+          }
+
+          let predHtml = '';
+          for (const p of players) {
+            const pred = predByPlayer[p];
+            if (pred && (locked || isFinished) && pred.home !== undefined && pred.home !== null) {
+              let badge = '';
+              if (isFinished) badge = predResultBadge(pred.home, pred.away, score1, score2);
+              predHtml += `<span class="vm-pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]} ${pred.home}–${pred.away}${badge}</span>`;
+            } else if (pred) {
+              predHtml += `<span class="vm-pred-dot has-pred" title="${p} has predicted">✓${p[0]}</span>`;
+            } else {
+              predHtml += `<span class="vm-pred-dot no-pred" title="${p} hasn't predicted">✗${p[0]}</span>`;
+            }
+          }
+
+          const safeVenue = venueName.replace(/'/g, "\\'");
+          html += `<div class="vm-row tp-clickable" onclick="openVenuePanel('${safeVenue}')">
+            <div class="vm-teams">
+              <img src="${flagUrl(iso1)}" alt="" loading="lazy" onerror="this.style.display='none'">
+              ${team1} <span class="vm-vs">vs</span> ${team2}
+              <img src="${flagUrl(iso2)}" alt="" loading="lazy" onerror="this.style.display='none'">
+            </div>
+            <div class="vm-meta">${formatDateLabel(date, time, tz)} · Grp ${group} · ${scoreOrTime}</div>
+            <div class="vm-preds">${predHtml}</div>
+          </div>`;
+        }
+      }
+
+      document.getElementById('vpMatches').innerHTML = html;
     }
 
     function closeVenuePanel() {
