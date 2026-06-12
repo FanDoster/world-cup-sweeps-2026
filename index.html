@@ -3451,6 +3451,55 @@
       renderVenueMatches(name);
     }
 
+    function renderTerritoryStandings() {
+      if (!territoryControl.length) return;
+      const panel = document.getElementById('territoryStandings');
+      if (!panel) return;
+      panel.style.display = 'block';
+
+      const players = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat', 'Steven'];
+      const allDone = territoryControl.every(t => t.matchesPlayed > 0 && t.matchesPlayed === t.totalMatches);
+
+      // Per-player territory counts
+      const scores = Object.fromEntries(players.map(p => [p, 0]));
+      for (const t of territoryControl) {
+        if (t.controller) scores[t.controller]++;
+      }
+
+      // Champion banner (only when every territory has all its matches played)
+      const champion = document.getElementById('tsChampion');
+      if (allDone) {
+        const maxScore = Math.max(...Object.values(scores));
+        const winners = players.filter(p => scores[p] === maxScore);
+        if (winners.length === 1) {
+          champion.innerHTML = `<div class="ts-champion"><div class="tc-icon">🏆</div><div><div class="tc-label">Territory Champion</div><div class="tc-name">${winners[0]}</div><div class="tc-detail">Controls ${maxScore} of 6 territories</div></div></div>`;
+        } else {
+          champion.innerHTML = `<div class="ts-champion"><div class="tc-icon">⚔️</div><div><div class="tc-label">Tied for Territory Champion</div><div class="tc-name">${winners.join(' · ')}</div><div class="tc-detail">${maxScore} territories each</div></div></div>`;
+        }
+      } else {
+        champion.innerHTML = '';
+      }
+
+      // Score badges
+      document.getElementById('tsScores').innerHTML = players.map(p =>
+        `<div class="ts-score-badge"><span class="tsb-dot" style="background:${ownerHexColors[p]}"></span>${p} <span style="color:var(--text-muted);font-weight:400">${scores[p]}</span></div>`
+      ).join('');
+
+      // Territory cards
+      document.getElementById('tsGrid').innerHTML = territoryControl.map(t => {
+        const pct = t.totalMatches > 0 ? Math.round((t.matchesPlayed / t.totalMatches) * 100) : 0;
+        if (t.matchesPlayed === 0) {
+          return `<div class="ts-card uncontested"><div class="ts-name">${t.name}</div><div class="ts-controller" style="color:var(--text-muted)">Uncontested</div><div class="ts-progress"><div class="ts-progress-bar" style="width:0%"></div></div><div class="ts-avg" style="margin-top:4px">0/${t.totalMatches} matches</div></div>`;
+        }
+        if (t.contested) {
+          const dots = t.contestedPlayers.map(p => `<span class="ts-dot" style="background:${ownerHexColors[p]}"></span>`).join('');
+          return `<div class="ts-card contested"><div class="ts-name">${t.name}</div><div class="ts-controller">${dots}<span style="color:var(--text-muted)">Contested</span></div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
+        }
+        const avg = t.avgPts[t.controller]?.toFixed(2) ?? '0.00';
+        return `<div class="ts-card controlled" style="border-left-color:${ownerHexColors[t.controller]}"><div class="ts-name">${t.name}</div><div class="ts-controller"><span class="ts-dot" style="background:${ownerHexColors[t.controller]}"></span><span style="color:${ownerHexColors[t.controller]}">${t.controller}</span></div><div class="ts-avg">${avg} avg pts/match</div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
+      }).join('');
+    }
+
     function closeVenuePanel() {
       venuePanelOpen = false;
       document.getElementById('venuePanel').classList.remove('open');
