@@ -3238,6 +3238,86 @@
           .on('click', () => { tooltip.style.display = 'none'; openVenuePanel(name); });
       });
     }
+
+    function openVenuePanel(name) {
+      venuePanelOpen = true;
+      stopAutoRotate();
+      const v = VENUE_DATA[name];
+      const flagMap = { MX: '🇲🇽', CA: '🇨🇦', US: '🇺🇸' };
+      document.getElementById('vpName').textContent = name;
+      document.getElementById('vpCity').textContent = `${flagMap[v.country]} ${v.city}`;
+      document.getElementById('venuePanel').classList.add('open');
+      renderVenueMatches(name);
+    }
+
+    function closeVenuePanel() {
+      venuePanelOpen = false;
+      document.getElementById('venuePanel').classList.remove('open');
+      document.getElementById('vpMatches').innerHTML = '';
+      if (!isDragging) startAutoRotate();
+    }
+
+    function renderVenueMatches(venueName) {
+      const v = VENUE_DATA[venueName];
+      const now = Date.now();
+      const players = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat', 'Steven'];
+      let html = '';
+
+      for (const key of v.matches) {
+        const m = matchByKey[key];
+        if (!m) continue;
+
+        const [date, time, tz, team1, team2, group, score1, score2] = m;
+        const kickoff = toDate(date, time, tz);
+        const isFinished = score1 !== null && score2 !== null;
+        const locked = kickoff - now < 5 * 60 * 1000;
+        const iso1 = teamIso[team1] || '', iso2 = teamIso[team2] || '';
+        const mid = matchIdByTeamDate[key];
+        const preds = mid ? (predLookup[mid] || []) : [];
+        const predByPlayer = {};
+        preds.forEach(p => { predByPlayer[p.player_name] = p; });
+
+        let scoreOrTime = '';
+        if (isFinished) {
+          scoreOrTime = `<span class="vm-score">${score1}–${score2}</span>`;
+        } else if (locked) {
+          scoreOrTime = `<span style="color:var(--live);font-size:0.7rem;font-weight:700">LIVE / SOON</span>`;
+        } else {
+          scoreOrTime = `<span style="color:var(--text-muted)">${formatLocalTime(date, time, tz)}</span>`;
+        }
+
+        let predHtml = '';
+        for (const p of players) {
+          const pred = predByPlayer[p];
+          if (pred && (locked || isFinished) && pred.home !== undefined && pred.home !== null) {
+            let badge = '';
+            if (isFinished) badge = predResultBadge(pred.home, pred.away, score1, score2);
+            predHtml += `<span class="vm-pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]} ${pred.home}–${pred.away}${badge}</span>`;
+          } else if (pred) {
+            predHtml += `<span class="vm-pred-dot has-pred" title="${p} has predicted">✓${p[0]}</span>`;
+          } else {
+            predHtml += `<span class="vm-pred-dot no-pred" title="${p} hasn't predicted">✗${p[0]}</span>`;
+          }
+        }
+
+        html += `
+          <div class="vm-row">
+            <div class="vm-teams">
+              <img src="${flagUrl(iso1)}" alt="" loading="lazy" onerror="this.style.display='none'">
+              ${team1}
+              <span class="vm-vs">vs</span>
+              ${team2}
+              <img src="${flagUrl(iso2)}" alt="" loading="lazy" onerror="this.style.display='none'">
+            </div>
+            <div class="vm-meta">
+              ${formatDateLabel(date, time, tz)} · Grp ${group} · ${scoreOrTime}
+            </div>
+            <div class="vm-preds">${predHtml}</div>
+          </div>`;
+      }
+
+      document.getElementById('vpMatches').innerHTML = html || '<div style="padding:20px;color:var(--text-muted);font-size:0.82rem">No matches yet</div>';
+    }
   </script>
 </body>
 </html>
