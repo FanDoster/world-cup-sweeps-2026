@@ -2787,7 +2787,6 @@
         const totalMatches = territory.venues.reduce((n, v) => n + (VENUE_DATA[v]?.matches.length || 0), 0);
         let matchesPlayed = 0;
         const totals = Object.fromEntries(players.map(p => [p, 0]));
-        const counts = Object.fromEntries(players.map(p => [p, 0]));
 
         for (const venueName of territory.venues) {
           const venue = VENUE_DATA[venueName];
@@ -2804,27 +2803,22 @@
               if (pred && pred.home !== null && pred.home !== undefined) {
                 totals[player] += calcPredPoints(pred.home, pred.away, m[6], m[7]);
               }
-              counts[player]++;
             }
           }
         }
 
         if (matchesPlayed === 0) {
-          return { name: territory.name, controller: null, contested: false, contestedPlayers: [], avgPts: {}, totalPts: {}, matchesPlayed: 0, totalMatches };
+          return { name: territory.name, controller: null, contested: false, contestedPlayers: [], totalPts: {}, matchesPlayed: 0, totalMatches };
         }
 
-        const avgs = Object.fromEntries(
-          players.map(p => [p, counts[p] > 0 ? totals[p] / counts[p] : 0])
-        );
-        const maxAvg = Math.max(...Object.values(avgs));
-        const leaders = players.filter(p => avgs[p] === maxAvg);
+        const maxPts = Math.max(...Object.values(totals));
+        const leaders = players.filter(p => totals[p] === maxPts);
 
         return {
           name: territory.name,
           controller: leaders.length === 1 ? leaders[0] : null,
           contested: leaders.length > 1,
           contestedPlayers: leaders.length > 1 ? leaders : [],
-          avgPts: avgs,
           totalPts: { ...totals },
           matchesPlayed,
           totalMatches,
@@ -3742,8 +3736,8 @@
           const dots = t.contestedPlayers.map(p => `<span class="ts-dot" style="background:${ownerHexColors[p]}"></span>`).join('');
           return `<div class="ts-card contested"><div class="ts-name">${t.name}</div><div class="ts-controller">${dots}<span style="color:var(--text-muted)">Contested</span></div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
         }
-        const avg = t.avgPts[t.controller]?.toFixed(2) ?? '0.00';
-        return `<div class="ts-card controlled" style="border-left-color:${ownerHexColors[t.controller]}"><div class="ts-name">${t.name}</div><div class="ts-controller"><span class="ts-dot" style="background:${ownerHexColors[t.controller]}"></span><span style="color:${ownerHexColors[t.controller]}">${t.controller}</span></div><div class="ts-avg">${avg} avg pts/match</div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
+        const pts = t.totalPts[t.controller] ?? 0;
+        return `<div class="ts-card controlled" style="border-left-color:${ownerHexColors[t.controller]}"><div class="ts-name">${t.name}</div><div class="ts-controller"><span class="ts-dot" style="background:${ownerHexColors[t.controller]}"></span><span style="color:${ownerHexColors[t.controller]}">${t.controller}</span></div><div class="ts-avg">${pts} pts</div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
       }).join('');
     }
 
@@ -3780,7 +3774,7 @@
       if (!tc || tc.matchesPlayed === 0) {
         html += `<div style="padding:6px 20px 12px;color:var(--text-muted);font-size:0.82rem">No matches played yet</div>`;
       } else {
-        const ranked = players.slice().sort((a, b) => (tc.avgPts[b] || 0) - (tc.avgPts[a] || 0));
+        const ranked = players.slice().sort((a, b) => (tc.totalPts[b] || 0) - (tc.totalPts[a] || 0));
         html += `<div class="tp-standings">`;
         ranked.forEach((p, i) => {
           const pts = tc.totalPts[p] ?? 0;
