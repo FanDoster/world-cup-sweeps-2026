@@ -1498,7 +1498,10 @@
     let matchByKey = {};
     let globeInitialised = false;
     let worldGeoData = null;
-    let globeRotation = [-100, -25, 0];
+    let usStatesTopoData = null;
+    let globeRotation = [96.3, -35.1, 0];
+    let globeIntroPlaying = false;
+    let driftBase = [96.3, -35.1, 0];
     let autoRotateRaf = null;
     let isDragging = false;
     let venuePanelOpen = false;
@@ -3194,7 +3197,7 @@
 
     // ── GLOBE ──
     async function initGlobe() {
-      if (globeInitialised) { startAutoRotate(); return; }
+      if (globeInitialised) { startIdleDrift(); return; }
       globeInitialised = true;
 
       if (!worldGeoData) {
@@ -3347,7 +3350,7 @@
 
       // Drag rotation
       const drag = d3.drag()
-        .on('start', () => { isDragging = true; stopAutoRotate(); })
+        .on('start', () => { isDragging = true; stopAutoRotate(); globeIntroPlaying = false; })
         .on('drag', (event) => {
           const sens = 0.3 * (window._globe.baseScale / projection.scale());
           globeRotation[0] += event.dx * sens;
@@ -3360,7 +3363,7 @@
           updateTerritoryLabels(projection);
           updateMarkers(projection);
         })
-        .on('end', () => { isDragging = false; if (!venuePanelOpen) startAutoRotate(); });
+        .on('end', () => { isDragging = false; if (!venuePanelOpen) startIdleDrift(); });
 
       svg.call(drag);
 
@@ -3400,7 +3403,7 @@
       window._globe = { svg, projection, path, radius, W, H, baseScale: radius, baseTranslate: [W / 2, H / 2] };
 
       if (typeof renderVenueMarkers === 'function') renderVenueMarkers(markerGroup, projection, tooltip);
-      startAutoRotate();
+      playIntroAnimation();
     }
 
     function updateMarkers(projection) {
@@ -3441,7 +3444,7 @@
     function resetGlobe() {
       if (!window._globe) return;
       const { projection, baseScale, baseTranslate } = window._globe;
-      globeRotation = [-100, -25, 0];
+      globeRotation = [96.3, -35.1, 0];
       projection.rotate(globeRotation).scale(baseScale).translate(baseTranslate);
       updateGlobeZoomElements();
     }
@@ -3486,27 +3489,71 @@
       });
     }
 
-    function startAutoRotate() {
+    function stopAutoRotate() {
+      if (autoRotateRaf) { cancelAnimationFrame(autoRotateRaf); autoRotateRaf = null; }
+    }
+
+    function startIdleDrift() {
       stopAutoRotate();
       if (venuePanelOpen) return;
-      function tick() {
-        if (isDragging || venuePanelOpen) return;
-        globeRotation[0] += 0.08;
+      driftBase = [globeRotation[0], globeRotation[1], 0];
+      const t0 = performance.now();
+      function tick(now) {
+        if (isDragging || venuePanelOpen || globeIntroPlaying) {
+          autoRotateRaf = requestAnimationFrame(tick);
+          return;
+        }
+        const t = (now - t0) / 1000;
+        globeRotation[0] = driftBase[0] + 14 * Math.sin(t * 0.14);
+        globeRotation[1] = driftBase[1] + 6 * Math.sin(t * 0.09);
         if (window._globe) {
-          window._globe.projection.rotate(globeRotation);
-          window._globe.svg.select('.graticule').attr('d', window._globe.path);
-          window._globe.svg.select('.land').attr('d', window._globe.path);
-          window._globe.svg.selectAll('.territory-fill').attr('d', window._globe.path);
-          updateTerritoryLabels(window._globe.projection);
-          updateMarkers(window._globe.projection);
+          const { projection, path, svg } = window._globe;
+          projection.rotate(globeRotation);
+          svg.select('.graticule').attr('d', path);
+          svg.select('.land').attr('d', path);
+          svg.selectAll('.territory-fill').attr('d', path);
+          updateTerritoryLabels(projection);
+          updateMarkers(projection);
         }
         autoRotateRaf = requestAnimationFrame(tick);
       }
       autoRotateRaf = requestAnimationFrame(tick);
     }
 
-    function stopAutoRotate() {
-      if (autoRotateRaf) { cancelAnimationFrame(autoRotateRaf); autoRotateRaf = null; }
+    function playIntroAnimation() {
+      if (!window._globe) return;
+      stopAutoRotate();
+      globeIntroPlaying = true;
+      const { projection, baseTranslate, radius } = window._globe;
+      const startRot = [0, -15, 0];
+      const endRot = [96.3, -35.1, 0];
+      const startScale = radius * 0.65;
+      const endScale = radius * 1.8;
+      const duration = 2800;
+      globeRotation = [...startRot];
+      projection.rotate(globeRotation).scale(startScale).translate(baseTranslate);
+      updateGlobeZoomElements();
+      const t0 = performance.now();
+      function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+      function tick(now) {
+        if (!globeIntroPlaying) return;
+        const raw = Math.min((now - t0) / duration, 1);
+        const e = ease(raw);
+        globeRotation[0] = startRot[0] + (endRot[0] - startRot[0]) * e;
+        globeRotation[1] = startRot[1] + (endRot[1] - startRot[1]) * e;
+        const scale = startScale + (endScale - startScale) * e;
+        projection.rotate(globeRotation).scale(scale).translate(baseTranslate);
+        updateGlobeZoomElements();
+        if (raw < 1) {
+          autoRotateRaf = requestAnimationFrame(tick);
+        } else {
+          globeIntroPlaying = false;
+          globeRotation = [...endRot];
+          driftBase = [...endRot];
+          startIdleDrift();
+        }
+      }
+      autoRotateRaf = requestAnimationFrame(tick);
     }
 
     function renderVenueMarkers(markerGroup, projection, tooltip) {
@@ -3620,7 +3667,7 @@
       venuePanelOpen = false;
       document.getElementById('venuePanel').classList.remove('open');
       document.getElementById('vpMatches').innerHTML = '';
-      if (!isDragging) startAutoRotate();
+      if (!isDragging) startIdleDrift();
     }
 
     function renderVenueMatches(venueName) {
