@@ -1367,6 +1367,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-server@3/dist/topojson-server.min.js"></script>
   <script>
     // ── SUPABASE ──
     const SB_URL = 'https://nkztkzrkbeacyltidqwr.supabase.co';
@@ -1459,33 +1460,36 @@
       {
         name: 'The Great North',
         venues: ['BMO Field', 'BC Place'],
-        geo: 'country', countryId: 124,
+        geo: 'states',
+        states: ['AK','AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT'],
+        labelPoint: [-96, 60],
       },
       {
         name: 'Empire',
         venues: ['MetLife Stadium', 'Gillette Stadium', 'Lincoln Financial Field'],
-        geo: 'polygon',
-        coords: [[-83,42],[-83,45],[-79,47.5],[-67,47.5],[-67,44],[-75,38.5],[-79,38.5],[-83,42]],
+        geo: 'states',
+        states: ['ME','NH','VT','MA','RI','CT','NY','NJ','PA','DE','MD'],
         labelPoint: [-75, 41],
       },
       {
         name: 'Dixie',
         venues: ['Hard Rock Stadium', 'Mercedes-Benz Stadium'],
-        geo: 'polygon',
-        coords: [[-97,37],[-89,37],[-83,38.5],[-79,38.5],[-75,35],[-80,24.5],[-97,26],[-97,37]],
+        geo: 'states',
+        states: ['VA','WV','NC','SC','GA','FL','AL','MS','TN','KY','AR','LA'],
         labelPoint: [-84, 32],
       },
       {
         name: 'The Frontier',
         venues: ['AT&T Stadium', 'NRG Stadium', 'Arrowhead Stadium'],
-        geo: 'polygon',
-        coords: [[-104,49],[-97,49],[-80,43],[-80,38.5],[-83,38.5],[-89,37],[-97,37],[-104,37],[-104,49]],
+        geo: 'states',
+        states: ['TX','OK','KS','MO','NE','IA','MN','WI','IL','IN','OH','MI','ND','SD'],
+        labelPoint: [-93, 40],
       },
       {
         name: 'El Pacífico',
         venues: ['SoFi Stadium', "Levi's Stadium", 'Lumen Field'],
-        geo: 'polygon',
-        coords: [[-141,60],[-104,49],[-104,37],[-117,32],[-125,38],[-125,49],[-141,60]],
+        geo: 'states',
+        states: ['CA','OR','WA','NV','AZ','ID','MT','WY','CO','NM','UT','HI'],
         labelPoint: [-118, 37],
       },
     ];
@@ -3204,9 +3208,35 @@
         const res = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
         worldGeoData = await res.json();
       }
+      if (!usStatesTopoData) {
+        const res = await fetch('https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_1_states_provinces.geojson');
+        const geojson = await res.json();
+        const usStates = { type: 'FeatureCollection', features: geojson.features.filter(f => f.properties.iso_a2 === 'US' || f.properties.iso_a2 === 'CA') };
+        usStatesTopoData = topojson.topology({ states: usStates });
+      }
 
       // Build territory GeoJSON features (once; reused on every render)
       if (territoryFeatures.length === 0) {
+        const statesGeoms = usStatesTopoData.objects.states.geometries;
+
+        const mergeStates = (codes) => topojson.merge(
+          usStatesTopoData,
+          statesGeoms.filter(g =>
+            codes.includes(g.properties.postal || g.properties.abbrev || '')
+          )
+        );
+
+        const combineFeatures = (...features) => {
+          const coords = [];
+          for (const f of features) {
+            if (!f) continue;
+            const geom = f.geometry || f;
+            if (geom.type === 'Polygon') coords.push(geom.coordinates);
+            else if (geom.type === 'MultiPolygon') coords.push(...geom.coordinates);
+          }
+          return { type: 'Feature', geometry: { type: 'MultiPolygon', coordinates: coords } };
+        };
+
         for (const t of TERRITORY_DATA) {
           let feature;
           if (t.geo === 'country') {
@@ -3214,11 +3244,10 @@
               worldGeoData,
               worldGeoData.objects.countries.geometries.filter(g => +g.id === t.countryId)
             );
+          } else if (t.geo === 'states') {
+            feature = mergeStates(t.states);
           } else {
-            feature = {
-              type: 'Feature',
-              geometry: { type: 'Polygon', coordinates: [t.coords] },
-            };
+            feature = { type: 'Feature', geometry: { type: 'Polygon', coordinates: [t.coords] } };
           }
           territoryFeatures.push({ name: t.name, feature });
         }
