@@ -1207,12 +1207,28 @@
     .vm-row.tp-clickable { cursor: pointer; }
     .vm-row.tp-clickable:hover { background: rgba(255,255,255,0.03); }
     /* Mobile: bottom sheet */
+    .drawer-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 199; opacity: 0; transition: opacity 0.25s; pointer-events: none; }
+    .drawer-backdrop.active { opacity: 1; pointer-events: auto; }
+    @media (min-width: 701px) { .drawer-backdrop { display: none !important; } }
     @media (max-width: 700px) {
       .section-map.active { flex-direction: column; }
       .globe-row { flex-direction: column !important; }
       .globe-wrap { min-height: 55vw; }
-      .venue-panel { width: 100% !important; height: 0; border-left: none; border-top: 1px solid var(--border); transition: height 0.28s ease; max-height: none; overflow-y: hidden; }
-      .venue-panel.open { height: 55vh; overflow-y: auto; }
+      .venue-panel {
+        position: fixed !important;
+        bottom: 0; left: 0; right: 0;
+        width: 100% !important;
+        height: 0;
+        max-height: none !important;
+        border-left: none;
+        border-top: none;
+        border-radius: 14px 14px 0 0;
+        box-shadow: 0 -4px 24px rgba(0,0,0,0.5);
+        transition: height 0.3s cubic-bezier(0.32,0.72,0,1);
+        overflow: hidden;
+        z-index: 200;
+      }
+      .venue-panel.open { height: 62vh; }
     }
     .globe-reset { position: absolute; bottom: 14px; right: 14px; width: 32px; height: 32px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); color: var(--text-muted); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; z-index: 5; }
     .globe-reset:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
@@ -1295,6 +1311,7 @@
           <svg id="globeSvg"></svg>
           <button class="globe-reset" id="globeReset" onclick="resetGlobe()" title="Reset view">↺</button>
         </div>
+        <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeVenuePanel()"></div>
         <div class="venue-panel" id="venuePanel">
           <div class="vp-header">
             <div>
@@ -3676,6 +3693,8 @@
       document.getElementById('vpName').textContent = name;
       document.getElementById('vpCity').textContent = `${flagMap[v.country]} ${v.city}`;
       document.getElementById('venuePanel').classList.add('open');
+      document.getElementById('drawerBackdrop').style.display = 'block';
+      requestAnimationFrame(() => document.getElementById('drawerBackdrop').classList.add('active'));
       renderVenueMatches(name);
     }
 
@@ -3731,6 +3750,8 @@
     function openTerritoryPanel(name) {
       venuePanelOpen = true;
       stopAutoRotate();
+      document.getElementById('drawerBackdrop').style.display = 'block';
+      requestAnimationFrame(() => document.getElementById('drawerBackdrop').classList.add('active'));
       const tc = territoryControl.find(t => t.name === name);
       document.getElementById('vpName').textContent = name;
       let subtitle = 'Uncontested';
@@ -3836,6 +3857,9 @@
       venuePanelOpen = false;
       document.getElementById('venuePanel').classList.remove('open');
       document.getElementById('vpMatches').innerHTML = '';
+      const backdrop = document.getElementById('drawerBackdrop');
+      backdrop.classList.remove('active');
+      backdrop.addEventListener('transitionend', () => { backdrop.style.display = 'none'; }, { once: true });
       if (!isDragging) startIdleDrift();
     }
 
