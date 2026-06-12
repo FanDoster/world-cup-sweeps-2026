@@ -3163,6 +3163,25 @@
         worldGeoData = await res.json();
       }
 
+      // Build territory GeoJSON features (once; reused on every render)
+      if (territoryFeatures.length === 0) {
+        for (const t of TERRITORY_DATA) {
+          let feature;
+          if (t.geo === 'country') {
+            feature = topojson.merge(
+              worldGeoData,
+              worldGeoData.objects.countries.geometries.filter(g => +g.id === t.countryId)
+            );
+          } else {
+            feature = {
+              type: 'Feature',
+              geometry: { type: 'Polygon', coordinates: [t.coords] },
+            };
+          }
+          territoryFeatures.push({ name: t.name, feature });
+        }
+      }
+
       const wrap = document.getElementById('globeWrap');
       const svg = d3.select('#globeSvg');
       const W = wrap.clientWidth, H = wrap.clientHeight;
