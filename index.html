@@ -1209,8 +1209,9 @@
     /* Mobile: bottom sheet */
     @media (max-width: 700px) {
       .section-map.active { flex-direction: column; }
+      .globe-row { flex-direction: column !important; }
       .globe-wrap { min-height: 55vw; }
-      .venue-panel { width: 100% !important; height: 0; border-left: none; border-top: 1px solid var(--border); transition: height 0.28s ease; }
+      .venue-panel { width: 100% !important; height: 0; border-left: none; border-top: 1px solid var(--border); transition: height 0.28s ease; max-height: none; overflow-y: hidden; }
       .venue-panel.open { height: 55vh; overflow-y: auto; }
     }
     .globe-reset { position: absolute; bottom: 14px; right: 14px; width: 32px; height: 32px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); color: var(--text-muted); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; z-index: 5; }
