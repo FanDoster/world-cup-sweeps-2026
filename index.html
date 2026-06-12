@@ -2699,6 +2699,56 @@
       return stats;
     }
 
+    function calcTerritoryControl() {
+      const players = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat', 'Steven'];
+      territoryControl = TERRITORY_DATA.map(territory => {
+        const totalMatches = territory.venues.reduce((n, v) => n + (VENUE_DATA[v]?.matches.length || 0), 0);
+        let matchesPlayed = 0;
+        const totals = Object.fromEntries(players.map(p => [p, 0]));
+        const counts = Object.fromEntries(players.map(p => [p, 0]));
+
+        for (const venueName of territory.venues) {
+          const venue = VENUE_DATA[venueName];
+          if (!venue) continue;
+          for (const key of venue.matches) {
+            const m = matchByKey[key];
+            if (!m || m[6] === null || m[7] === null) continue;
+            matchesPlayed++;
+            const matchId = matchIdByTeamDate[key];
+            if (!matchId) continue;
+            const preds = predLookup[matchId] || [];
+            for (const player of players) {
+              const pred = preds.find(p => p.player_name === player);
+              if (pred && pred.home !== null && pred.home !== undefined) {
+                totals[player] += calcPredPoints(pred.home, pred.away, m[6], m[7]);
+              }
+              counts[player]++;
+            }
+          }
+        }
+
+        if (matchesPlayed === 0) {
+          return { name: territory.name, controller: null, contested: false, contestedPlayers: [], avgPts: {}, matchesPlayed: 0, totalMatches };
+        }
+
+        const avgs = Object.fromEntries(
+          players.map(p => [p, counts[p] > 0 ? totals[p] / counts[p] : 0])
+        );
+        const maxAvg = Math.max(...Object.values(avgs));
+        const leaders = players.filter(p => avgs[p] === maxAvg);
+
+        return {
+          name: territory.name,
+          controller: leaders.length === 1 ? leaders[0] : null,
+          contested: leaders.length > 1,
+          contestedPlayers: leaders.length > 1 ? leaders : [],
+          avgPts: avgs,
+          matchesPlayed,
+          totalMatches,
+        };
+      });
+    }
+
     function calcPredPointsForAll() {
       predPointsByPlayer = {};
       for (const [name, st] of Object.entries(getPredStatsByPlayer())) predPointsByPlayer[name] = st.pts;
