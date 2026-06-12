@@ -3304,6 +3304,26 @@
       });
       updateTerritoryFills();
 
+      // Territory centroid labels
+      const labelGroup = svg.append('g').attr('clip-path', 'url(#globe-clip)').attr('id', 'territoryLabels');
+      territoryFeatures.forEach(({ name, feature }) => {
+        const c = d3.geoCentroid(feature);
+        labelGroup.append('text')
+          .datum({ lat: c[1], lng: c[0] })
+          .attr('class', 'territory-label')
+          .attr('data-territory', name)
+          .attr('text-anchor', 'middle')
+          .attr('dominant-baseline', 'middle')
+          .attr('fill', 'rgba(255,255,255,0.85)')
+          .attr('font-size', '9')
+          .attr('font-weight', '700')
+          .attr('letter-spacing', '1')
+          .attr('pointer-events', 'none')
+          .attr('style', 'text-transform:uppercase;text-shadow:0 1px 4px rgba(0,0,0,0.9);font-family:var(--font)')
+          .text(name);
+      });
+      updateTerritoryLabels(projection);
+
       // Clip path for markers
       defs.append('clipPath').attr('id', 'globe-clip')
         .append('circle').attr('cx', W / 2).attr('cy', H / 2).attr('r', radius);
@@ -3329,6 +3349,7 @@
           svg.select('.graticule').attr('d', path);
           svg.select('.land').attr('d', path);
           svg.selectAll('.territory-fill').attr('d', path);
+          updateTerritoryLabels(projection);
           updateMarkers(projection);
         })
         .on('end', () => { isDragging = false; if (!venuePanelOpen) startAutoRotate(); });
@@ -3378,6 +3399,29 @@
           d3.select(this).attr('fill', ownerHexColors[tc.controller]);
         }
       });
+      updateMarkerColors();
+    }
+
+    function updateTerritoryLabels(projection) {
+      d3.selectAll('.territory-label').each(function(d) {
+        if (!d) return;
+        const [x, y] = projection([d.lng, d.lat]);
+        const visible = isVisible(d.lat, d.lng, projection);
+        d3.select(this).attr('x', x).attr('y', y).attr('opacity', visible ? 0.85 : 0);
+      });
+    }
+
+    function updateMarkerColors() {
+      const venueToTerr = {};
+      for (const t of TERRITORY_DATA) { for (const vn of t.venues) venueToTerr[vn] = t.name; }
+      const controlMap = Object.fromEntries(territoryControl.map(t => [t.name, t]));
+      d3.selectAll('.venue-marker').each(function(d) {
+        if (!d || !d.name) return;
+        const tc = controlMap[venueToTerr[d.name]];
+        const color = tc?.controller ? ownerHexColors[tc.controller] : 'rgba(255,255,255,0.35)';
+        d3.select(this).select('circle.inner').attr('fill', color);
+        d3.select(this).select('circle.outer').attr('fill', color);
+      });
     }
 
     function startAutoRotate() {
@@ -3391,6 +3435,7 @@
           window._globe.svg.select('.graticule').attr('d', window._globe.path);
           window._globe.svg.select('.land').attr('d', window._globe.path);
           window._globe.svg.selectAll('.territory-fill').attr('d', window._globe.path);
+          updateTerritoryLabels(window._globe.projection);
           updateMarkers(window._globe.projection);
         }
         autoRotateRaf = requestAnimationFrame(tick);
@@ -3403,15 +3448,21 @@
     }
 
     function renderVenueMarkers(markerGroup, projection, tooltip) {
-      const countryColor = { MX: '#10b981', CA: '#ef4444', US: '#f59e0b' };
+      const venueToTerr = {};
+      for (const t of TERRITORY_DATA) { for (const vn of t.venues) venueToTerr[vn] = t.name; }
+      const terrControl = Object.fromEntries(territoryControl.map(t => [t.name, t]));
+      const markerColor = venueName => {
+        const tc = terrControl[venueToTerr[venueName]];
+        return tc?.controller ? ownerHexColors[tc.controller] : 'rgba(255,255,255,0.35)';
+      };
 
       Object.entries(VENUE_DATA).forEach(([name, v]) => {
         const [x, y] = projection([v.lng, v.lat]);
-        const color = countryColor[v.country];
+        const color = markerColor(name);
         const visible = isVisible(v.lat, v.lng, projection);
 
         const g = markerGroup.append('g')
-          .datum(v)
+          .datum({ ...v, name })
           .attr('class', 'venue-marker')
           .attr('transform', `translate(${x},${y})`)
           .attr('opacity', visible ? 1 : 0)
