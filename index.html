@@ -1481,6 +1481,7 @@
         venues: ['SoFi Stadium', "Levi's Stadium", 'Lumen Field'],
         geo: 'polygon',
         coords: [[-141,60],[-104,49],[-104,37],[-117,32],[-125,38],[-125,49],[-141,60]],
+        labelPoint: [-120, 38],
       },
     ];
 
@@ -3307,7 +3308,8 @@
       // Territory centroid labels
       const labelGroup = svg.append('g').attr('clip-path', 'url(#globe-clip)').attr('id', 'territoryLabels');
       territoryFeatures.forEach(({ name, feature }) => {
-        const c = d3.geoCentroid(feature);
+        const tData = TERRITORY_DATA.find(t => t.name === name);
+        const c = tData?.labelPoint || d3.geoCentroid(feature);
         labelGroup.append('text')
           .datum({ lat: c[1], lng: c[0] })
           .attr('class', 'territory-label')
