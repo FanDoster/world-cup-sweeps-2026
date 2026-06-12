@@ -1408,6 +1408,55 @@
       }
     };
 
+    const ownerHexColors = {
+      Anton:  '#39d353',
+      Chris:  '#3b82f6',
+      Dan:    '#22c55e',
+      Laurie: '#a855f7',
+      Pat:    '#f97316',
+      Steven: '#ef4444',
+    };
+
+    const TERRITORY_DATA = [
+      {
+        name: 'Mesoamerica',
+        venues: ['Estadio Azteca', 'Estadio Akron', 'Estadio BBVA'],
+        geo: 'country', countryId: 484,
+      },
+      {
+        name: 'The Great North',
+        venues: ['BMO Field', 'BC Place'],
+        geo: 'country', countryId: 124,
+      },
+      {
+        name: 'Empire',
+        venues: ['MetLife Stadium', 'Gillette Stadium', 'Lincoln Financial Field'],
+        geo: 'polygon',
+        coords: [[-83,42],[-79,38.5],[-75,38.5],[-67,44],[-67,47.5],[-79,47.5],[-83,45],[-83,42]],
+      },
+      {
+        name: 'Dixie',
+        venues: ['Hard Rock Stadium', 'Mercedes-Benz Stadium'],
+        geo: 'polygon',
+        coords: [[-97,37],[-97,26],[-80,24.5],[-75,35],[-79,38.5],[-83,38.5],[-89,37],[-97,37]],
+      },
+      {
+        name: 'The Frontier',
+        venues: ['AT&T Stadium', 'NRG Stadium', 'Arrowhead Stadium'],
+        geo: 'polygon',
+        coords: [[-104,49],[-97,49],[-80,43],[-80,38.5],[-83,38.5],[-89,37],[-97,37],[-104,37],[-104,49]],
+      },
+      {
+        name: 'El Pacífico',
+        venues: ['SoFi Stadium', "Levi's Stadium", 'Lumen Field'],
+        geo: 'polygon',
+        coords: [[-141,60],[-104,49],[-104,37],[-117,32],[-125,38],[-125,49],[-141,60]],
+      },
+    ];
+
+    let territoryFeatures = [];
+    let territoryControl  = [];
+
     // Build matchByKey lookup from matchData for globe use
     // (populated after matchData is loaded in loadData)
     let matchByKey = {};
