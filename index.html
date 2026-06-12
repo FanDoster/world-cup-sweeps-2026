@@ -1577,6 +1577,12 @@
         r.prob_home, r.prob_draw, r.prob_away
       ]);
 
+      // Build matchByKey for globe venue panel
+      matchByKey = {};
+      for (const m of matchData) {
+        matchByKey[`${m[3]}|${m[4]}|${m[0]}`] = m;
+      }
+
       // Render everything
       renderMatches();
       renderPeople();
@@ -1615,12 +1621,6 @@
           matchIdByTeamDate[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
         });
       }
-
-        // Build matchByKey for globe venue panel
-        matchByKey = {};
-        for (const m of matchData) {
-          matchByKey[`${m[3]}|${m[4]}|${m[0]}`] = m;
-        }
 
       // Prediction scores (once supabase-fixes.sql has run, RLS hides other
       // players' scores until kickoff) plus existence-only rows from the
@@ -3152,7 +3152,7 @@
       // Store refs for use in update functions
       window._globe = { svg, projection, path, radius, W, H };
 
-      renderVenueMarkers(markerGroup, projection, tooltip);
+      if (typeof renderVenueMarkers === 'function') renderVenueMarkers(markerGroup, projection, tooltip);
       startAutoRotate();
     }
 
@@ -3171,10 +3171,9 @@
       const r = projection.rotate();
       const clat = -r[1], clng = -r[0];
       const toRad = Math.PI / 180;
-      const d = Math.acos(
-        Math.sin(lat * toRad) * Math.sin(clat * toRad) +
-        Math.cos(lat * toRad) * Math.cos(clat * toRad) * Math.cos((lng - clng) * toRad)
-      );
+      const dot = Math.sin(lat * toRad) * Math.sin(clat * toRad) +
+                  Math.cos(lat * toRad) * Math.cos(clat * toRad) * Math.cos((lng - clng) * toRad);
+      const d = Math.acos(Math.max(-1, Math.min(1, dot)));
       return d < Math.PI / 2;
     }
 
