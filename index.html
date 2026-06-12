@@ -1472,6 +1472,75 @@
       </div>
     </header>
 
+    <div class="tickers-container">
+      <div class="tickers-rows">
+
+        <!-- Sponsors ticker -->
+        <div class="ticker-outer">
+          <div class="ticker-label">
+            <img src="sponsors/wc2026-badge.jpg" alt="FIFA World Cup 2026">
+            <span class="tl-partners">Official Partners®</span>
+          </div>
+          <div class="ticker-wrap">
+            <div class="ticker-track">
+              <!-- set 1 -->
+              <div class="sponsor"><img src="sponsors/greggs.png" class="invert" alt="Greggs"><span class="sponsor-tag">Official Sausage Roll Provider of the FIFA World Cup 2026</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/lynx.png" class="invert" alt="Lynx Africa"><span class="sponsor-tag">Official scent of the away end</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/strongbow.png" class="invert" alt="Strongbow Dark Fruits"><span class="sponsor-tag">As drunk by Chris Lee</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/lambrini.png" class="invert" alt="Lambrini"><span class="sponsor-tag">Official drink of the park bench</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/white-lightning.png" class="gs" alt="White Lightning"><span class="sponsor-tag">3 litres. £3.49</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/wonga.png" class="gs" alt="Wonga"><span class="sponsor-tag">They shut us down. Now you have Polymarket</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/sports-direct.png" class="gs" alt="Sports Direct"><span class="sponsor-tag">Changing rooms are at the back</span></div>
+              <div class="ticker-divider">·</div>
+              <!-- set 2 — duplicate for seamless loop -->
+              <div class="sponsor"><img src="sponsors/greggs.png" class="invert" alt="Greggs"><span class="sponsor-tag">Official Sausage Roll Provider of the FIFA World Cup 2026</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/lynx.png" class="invert" alt="Lynx Africa"><span class="sponsor-tag">Official scent of the away end</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/strongbow.png" class="invert" alt="Strongbow Dark Fruits"><span class="sponsor-tag">As drunk by Chris Lee</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/lambrini.png" class="invert" alt="Lambrini"><span class="sponsor-tag">Official drink of the park bench</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/white-lightning.png" class="gs" alt="White Lightning"><span class="sponsor-tag">3 litres. £3.49</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/wonga.png" class="gs" alt="Wonga"><span class="sponsor-tag">They shut us down. Now you have Polymarket</span></div>
+              <div class="ticker-divider">·</div>
+              <div class="sponsor"><img src="sponsors/sports-direct.png" class="gs" alt="Sports Direct"><span class="sponsor-tag">Changing rooms are at the back</span></div>
+              <div class="ticker-divider">·</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Polymarket odds ticker -->
+        <div class="odds-outer">
+          <div class="odds-label">
+            <span class="ol-top">LIVE ODDS</span>
+            <span class="ol-brand">POLYMARKET</span>
+            <span class="ol-sub">PREDICTION MARKET</span>
+          </div>
+          <div class="odds-wrap">
+            <div class="odds-track" id="oddsTrack">
+              <span class="odds-loading">LOADING LIVE MARKETS…</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /.tickers-rows -->
+
+      <!-- Clock spans both rows -->
+      <div class="ticker-clock">
+        <span class="tc-time" id="tcTime">00:00:00</span>
+        <span class="tc-date" id="tcDate"></span>
+        <span class="tc-tz">BST</span>
+      </div>
+    </div><!-- /.tickers-container -->
+
     <div class="tab-bar" id="tabBar">
       <button type="button" class="tab-btn" data-tab="players" onclick="switchTab('players')"><span class="emoji">🏆</span><span class="tab-label"> Players</span></button>
       <button type="button" class="tab-btn active" data-tab="matches" onclick="switchTab('matches')"><span class="emoji">⏱</span><span class="tab-label"> Matches</span></button>
