@@ -1456,6 +1456,7 @@
         name: 'Mesoamerica',
         venues: ['Estadio Azteca', 'Estadio Akron', 'Estadio BBVA'],
         geo: 'country', countryId: 484,
+        color: '#243320',
       },
       {
         name: 'The Great North',
@@ -1463,6 +1464,7 @@
         geo: 'states',
         states: ['AK','AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT'],
         labelPoint: [-96, 60],
+        color: '#1a2a38',
       },
       {
         name: 'Empire',
@@ -1470,6 +1472,7 @@
         geo: 'states',
         states: ['ME','NH','VT','MA','RI','CT','NY','NJ','PA','DE','MD'],
         labelPoint: [-75, 41],
+        color: '#1e1e38',
       },
       {
         name: 'Dixie',
@@ -1477,6 +1480,7 @@
         geo: 'states',
         states: ['VA','WV','NC','SC','GA','FL','AL','MS','TN','KY','AR','LA'],
         labelPoint: [-84, 32],
+        color: '#382020',
       },
       {
         name: 'The Frontier',
@@ -1484,6 +1488,7 @@
         geo: 'states',
         states: ['TX','OK','KS','MO','NE','IA','MN','WI','IL','IN','OH','MI','ND','SD'],
         labelPoint: [-93, 40],
+        color: '#281e32',
       },
       {
         name: 'El Pacífico',
@@ -1491,6 +1496,7 @@
         geo: 'states',
         states: ['CA','OR','WA','NV','AZ','ID','MT','WY','CO','NM','UT','HI'],
         labelPoint: [-118, 37],
+        color: '#1a2e32',
       },
     ];
 
@@ -1504,11 +1510,11 @@
     let worldGeoData = null;
     let usStatesTopoData = null;
     let globeRotation = [96.3, -35.1, 0];
-    let globeIntroPlaying = false;
-    let driftBase = [96.3, -35.1, 0];
     let autoRotateRaf = null;
     let isDragging = false;
     let venuePanelOpen = false;
+    let globeIntroPlaying = false;
+    let driftBase = [96.3, -35.1, 0];
 
     // ── AUTH ──
     let currentSession = null;
@@ -3309,8 +3315,7 @@
         .attr('class', 'land')
         .attr('d', path)
         .attr('fill', '#0e1620')
-        .attr('stroke', '#1e2e40')
-        .attr('stroke-width', 0.6);
+        .attr('stroke', 'none');
 
       // Stripe patterns for contested territories (all 15 player pairs)
       const playerList = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat', 'Steven'];
@@ -3338,8 +3343,19 @@
           .attr('d', path)
           .attr('fill', 'rgba(255,255,255,0.04)')
           .attr('fill-opacity', 0.45)
-          .attr('stroke', 'rgba(255,255,255,0.12)')
-          .attr('stroke-width', 0.8);
+          .attr('stroke', 'none')
+          .attr('pointer-events', 'all')
+          .on('mouseenter', function() {
+            d3.select(this)
+              .attr('stroke', 'rgba(255,255,255,0.75)')
+              .attr('stroke-width', 1.5)
+              .attr('fill-opacity', 0.65);
+          })
+          .on('mouseleave', function() {
+            d3.select(this)
+              .attr('stroke', 'none')
+              .attr('fill-opacity', 0.45);
+          });
       });
       updateTerritoryFills();
 
@@ -3480,11 +3496,12 @@
 
     function updateTerritoryFills() {
       const controlMap = Object.fromEntries(territoryControl.map(t => [t.name, t]));
+      const neutralColor = Object.fromEntries(TERRITORY_DATA.map(t => [t.name, t.color || 'rgba(255,255,255,0.15)']));
       d3.selectAll('.territory-fill').each(function() {
         const name = this.dataset.territory;
         const tc = controlMap[name];
         if (!tc || tc.matchesPlayed === 0) {
-          d3.select(this).attr('fill', 'rgba(255,255,255,0.04)');
+          d3.select(this).attr('fill', neutralColor[name]).attr('fill-opacity', 0.85);
         } else if (tc.contested) {
           const [pA, pB] = tc.contestedPlayers;
           const id = pA < pB ? `stripe-${pA}-${pB}` : `stripe-${pB}-${pA}`;
