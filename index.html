@@ -786,6 +786,209 @@
     footer a { color: var(--text-secondary); text-decoration: none; }
     footer a:hover { color: var(--accent); }
 
+    /* ── TICKERS ── */
+    .tickers-container {
+      display: flex;
+      align-items: stretch;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .tickers-rows {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    .tickers-rows .ticker-outer { border-bottom: 1px solid rgba(255,255,255,0.06); }
+
+    .ticker-outer {
+      display: flex;
+      align-items: stretch;
+      background: rgba(0,0,0,0.2);
+    }
+    .ticker-label {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 12px;
+      background: #000;
+      gap: 3px;
+      border-right: 1px solid rgba(255,255,255,0.12);
+    }
+    .ticker-label img { height: 36px; width: auto; display: block; }
+    .ticker-label .tl-partners {
+      font-size: 0.42rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      white-space: nowrap;
+    }
+    .ticker-wrap {
+      flex: 1;
+      overflow: hidden;
+      padding: 14px 0;
+      -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    }
+    .ticker-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      animation: ticker-scroll 30s linear infinite;
+    }
+    @keyframes ticker-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .sponsor {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      padding: 0 36px;
+      flex-shrink: 0;
+    }
+    .sponsor img {
+      height: 32px;
+      width: auto;
+      max-width: 100px;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+    .sponsor img.invert { filter: brightness(0) invert(1) opacity(0.75); }
+    .sponsor img.gs     { filter: brightness(100%) grayscale(1) opacity(0.75); }
+    .sponsor-tag {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.55);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    .ticker-divider {
+      color: rgba(255,255,255,0.15);
+      font-size: 1rem;
+      padding: 0 4px;
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    /* Polymarket odds ticker */
+    .odds-outer {
+      display: flex;
+      align-items: stretch;
+      background: rgba(0,0,0,0.35);
+    }
+    .odds-label {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 12px;
+      background: #2E5CFF;
+      gap: 1px;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    .odds-label .ol-top {
+      font-size: 0.5rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.8);
+      text-transform: uppercase;
+    }
+    .odds-label .ol-brand {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #fff;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .odds-label .ol-sub {
+      font-size: 0.38rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .odds-wrap {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+    }
+    .odds-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      white-space: nowrap;
+    }
+    .odds-track.scrolling { animation: odds-scroll 75s linear infinite; }
+    @keyframes odds-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .odds-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 28px;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      color: rgba(255,255,255,0.75);
+      text-transform: uppercase;
+    }
+    .odds-item .oi-match { color: #fff; font-weight: 700; }
+    .odds-item .oi-prob  { color: #f90; font-weight: 700; }
+    .odds-item .oi-vol   { color: rgba(255,255,255,0.75); font-size: 0.8rem; }
+    .odds-divider { color: #2E5CFF; font-size: 1rem; opacity: 0.6; padding: 0 2px; }
+    .odds-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
+
+    /* Broadcast clock */
+    .ticker-clock {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 18px;
+      background: #0a0a0a;
+      gap: 3px;
+      border-left: 1px solid rgba(255,255,255,0.1);
+      min-width: 88px;
+      box-shadow: inset 4px 0 0 #2E5CFF;
+    }
+    .ticker-clock .tc-time {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      color: #fff;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .ticker-clock .tc-date {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.38rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      white-space: nowrap;
+    }
+    .ticker-clock .tc-tz {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: #2E5CFF;
+      text-transform: uppercase;
+    }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 700px) {
       /* Container */
