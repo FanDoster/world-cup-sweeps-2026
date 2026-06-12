@@ -1411,6 +1411,12 @@
     // Build matchByKey lookup from matchData for globe use
     // (populated after matchData is loaded in loadData)
     let matchByKey = {};
+    let globeInitialised = false;
+    let worldGeoData = null;
+    let globeRotation = [-100, -25, 0];
+    let autoRotateRaf = null;
+    let isDragging = false;
+    let venuePanelOpen = false;
 
     // ── AUTH ──
     let currentSession = null;
@@ -1609,6 +1615,12 @@
           matchIdByTeamDate[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
         });
       }
+
+        // Build matchByKey for globe venue panel
+        matchByKey = {};
+        for (const m of matchData) {
+          matchByKey[`${m[3]}|${m[4]}|${m[0]}`] = m;
+        }
 
       // Prediction scores (once supabase-fixes.sql has run, RLS hides other
       // players' scores until kickoff) plus existence-only rows from the
@@ -3037,6 +3049,154 @@
           ${feedHtml}
         </div>
       `;
+    }
+
+    // ── GLOBE ──
+    async function initGlobe() {
+      if (globeInitialised) { startAutoRotate(); return; }
+      globeInitialised = true;
+
+      if (!worldGeoData) {
+        const res = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+        worldGeoData = await res.json();
+      }
+
+      const wrap = document.getElementById('globeWrap');
+      const svg = d3.select('#globeSvg');
+      const W = wrap.clientWidth, H = wrap.clientHeight;
+      const radius = Math.min(W, H) * 0.44;
+
+      const projection = d3.geoOrthographic()
+        .scale(radius)
+        .translate([W / 2, H / 2])
+        .rotate(globeRotation)
+        .clipAngle(90);
+
+      const path = d3.geoPath().projection(projection);
+      const graticule = d3.geoGraticule()();
+      const land = topojson.feature(worldGeoData, worldGeoData.objects.land);
+
+      svg.attr('viewBox', `0 0 ${W} ${H}`);
+
+      // Outer glow
+      const defs = svg.append('defs');
+      const filter = defs.append('filter').attr('id', 'globe-glow').attr('x', '-20%').attr('y', '-20%').attr('width', '140%').attr('height', '140%');
+      filter.append('feGaussianBlur').attr('stdDeviation', '8').attr('result', 'blur');
+      const merge = filter.append('feMerge');
+      merge.append('feMergeNode').attr('in', 'blur');
+      merge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      // Ocean sphere
+      svg.append('circle')
+        .attr('cx', W / 2).attr('cy', H / 2).attr('r', radius)
+        .attr('fill', '#070b10')
+        .attr('filter', 'url(#globe-glow)');
+
+      // Stars
+      const starData = Array.from({length: 60}, () => ({
+        x: Math.random() * W, y: Math.random() * H,
+        r: Math.random() * 1.2 + 0.3,
+        op: Math.random() * 0.5 + 0.2
+      })).filter(s => Math.hypot(s.x - W/2, s.y - H/2) > radius + 15);
+      svg.selectAll('.star').data(starData).enter()
+        .append('circle').attr('class', 'star')
+        .attr('cx', d => d.x).attr('cy', d => d.y).attr('r', d => d.r)
+        .attr('fill', 'white').attr('opacity', d => d.op);
+
+      // Graticule
+      svg.append('path').datum(graticule)
+        .attr('class', 'graticule')
+        .attr('d', path)
+        .attr('fill', 'none')
+        .attr('stroke', 'rgba(255,255,255,0.04)')
+        .attr('stroke-width', 0.5);
+
+      // Land
+      svg.append('path').datum(land)
+        .attr('class', 'land')
+        .attr('d', path)
+        .attr('fill', '#0e1620')
+        .attr('stroke', '#1e2e40')
+        .attr('stroke-width', 0.6);
+
+      // Clip path for markers
+      defs.append('clipPath').attr('id', 'globe-clip')
+        .append('circle').attr('cx', W / 2).attr('cy', H / 2).attr('r', radius);
+
+      // Marker group (rendered on top, clipped to globe face)
+      const markerGroup = svg.append('g').attr('clip-path', 'url(#globe-clip)').attr('id', 'venueMarkers');
+
+      // Tooltip
+      const tooltip = document.createElement('div');
+      tooltip.className = 'venue-tooltip';
+      tooltip.id = 'venueTooltip';
+      wrap.appendChild(tooltip);
+
+      // Drag rotation
+      const drag = d3.drag()
+        .on('start', () => { isDragging = true; stopAutoRotate(); })
+        .on('drag', (event) => {
+          const sens = 0.3;
+          globeRotation[0] += event.dx * sens;
+          globeRotation[1] -= event.dy * sens;
+          globeRotation[1] = Math.max(-90, Math.min(90, globeRotation[1]));
+          projection.rotate(globeRotation);
+          svg.select('.graticule').attr('d', path);
+          svg.select('.land').attr('d', path);
+          updateMarkers(projection);
+        })
+        .on('end', () => { isDragging = false; if (!venuePanelOpen) startAutoRotate(); });
+
+      svg.call(drag);
+
+      // Store refs for use in update functions
+      window._globe = { svg, projection, path, radius, W, H };
+
+      renderVenueMarkers(markerGroup, projection, tooltip);
+      startAutoRotate();
+    }
+
+    function updateMarkers(projection) {
+      d3.selectAll('.venue-marker').each(function(d) {
+        const [x, y] = projection([d.lng, d.lat]);
+        const visible = isVisible(d.lat, d.lng, projection);
+        d3.select(this)
+          .attr('transform', `translate(${x},${y})`)
+          .attr('opacity', visible ? 1 : 0)
+          .attr('pointer-events', visible ? 'all' : 'none');
+      });
+    }
+
+    function isVisible(lat, lng, projection) {
+      const r = projection.rotate();
+      const clat = -r[1], clng = -r[0];
+      const toRad = Math.PI / 180;
+      const d = Math.acos(
+        Math.sin(lat * toRad) * Math.sin(clat * toRad) +
+        Math.cos(lat * toRad) * Math.cos(clat * toRad) * Math.cos((lng - clng) * toRad)
+      );
+      return d < Math.PI / 2;
+    }
+
+    function startAutoRotate() {
+      stopAutoRotate();
+      if (venuePanelOpen) return;
+      function tick() {
+        if (isDragging || venuePanelOpen) return;
+        globeRotation[0] += 0.08;
+        if (window._globe) {
+          window._globe.projection.rotate(globeRotation);
+          window._globe.svg.select('.graticule').attr('d', window._globe.path);
+          window._globe.svg.select('.land').attr('d', window._globe.path);
+          updateMarkers(window._globe.projection);
+        }
+        autoRotateRaf = requestAnimationFrame(tick);
+      }
+      autoRotateRaf = requestAnimationFrame(tick);
+    }
+
+    function stopAutoRotate() {
+      if (autoRotateRaf) { cancelAnimationFrame(autoRotateRaf); autoRotateRaf = null; }
     }
   </script>
 </body>
