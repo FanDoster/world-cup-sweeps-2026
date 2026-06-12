@@ -2792,7 +2792,7 @@
         }
 
         if (matchesPlayed === 0) {
-          return { name: territory.name, controller: null, contested: false, contestedPlayers: [], avgPts: {}, matchesPlayed: 0, totalMatches };
+          return { name: territory.name, controller: null, contested: false, contestedPlayers: [], avgPts: {}, totalPts: {}, matchesPlayed: 0, totalMatches };
         }
 
         const avgs = Object.fromEntries(
@@ -2807,6 +2807,7 @@
           contested: leaders.length > 1,
           contestedPlayers: leaders.length > 1 ? leaders : [],
           avgPts: avgs,
+          totalPts: { ...totals },
           matchesPlayed,
           totalMatches,
         };
@@ -3736,8 +3737,8 @@
         if (tc.contested) {
           subtitle = '⚔️ Contested';
         } else if (tc.controller) {
-          const avg = tc.avgPts[tc.controller]?.toFixed(2) ?? '0.00';
-          subtitle = `Controlled by ${tc.controller} · ${avg} avg`;
+          const pts = tc.totalPts?.[tc.controller] ?? 0;
+          subtitle = `Controlled by ${tc.controller} · ${pts} pts`;
         }
       }
       document.getElementById('vpCity').textContent = subtitle;
@@ -3760,13 +3761,13 @@
         const ranked = players.slice().sort((a, b) => (tc.avgPts[b] || 0) - (tc.avgPts[a] || 0));
         html += `<div class="tp-standings">`;
         ranked.forEach((p, i) => {
-          const avg = (tc.avgPts[p] ?? 0).toFixed(2);
+          const pts = tc.totalPts[p] ?? 0;
           const isLeader = p === tc.controller || (tc.contested && tc.contestedPlayers.includes(p));
           html += `<div class="tp-player-row">
             <span class="tp-rank">${i + 1}</span>
             <span class="ts-dot" style="background:${ownerHexColors[p]}"></span>
             <span class="tp-player-name" style="${isLeader ? `color:${ownerHexColors[p]}` : ''}">${p}</span>
-            <span class="tp-avg">${avg} avg</span>
+            <span class="tp-avg">${pts} pts</span>
           </div>`;
         });
         html += `</div>`;
