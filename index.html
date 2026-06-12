@@ -2286,6 +2286,9 @@
       document.getElementById('sectionTeams').classList.toggle('active', tab === 'teams');
       document.getElementById('sectionMyTeams').classList.toggle('active', tab === 'myteams');
       document.getElementById('sectionPredictions').classList.toggle('active', tab === 'predictions');
+      document.getElementById('sectionMap').classList.toggle('active', tab === 'map');
+      if (tab === 'map') initGlobe();
+      if (tab !== 'map') stopAutoRotate();
       if (tab === 'leaderboard') renderLeaderboard();
       if (tab === 'myteams') renderMyTeams();
       if (tab === 'predictions') renderPredictions();
