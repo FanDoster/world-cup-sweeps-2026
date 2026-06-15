@@ -19,8 +19,9 @@ function switchTab(tab) {
 }
 
 // ── INIT ──
-restoreSession().then(() => loadData().then(() => { loadOdds(); buildCountdownTicker(); }));
+restoreSession().then(() => loadData().then(() => { loadOdds(); buildCountdownTicker(); loadStatsTracker(); }));
 setInterval(renderMatches, 60000);
 setInterval(loadData, 180000);
 setInterval(loadOdds, 600000);
 setInterval(buildCountdownTicker, 30000);
+setInterval(loadStatsTracker, 300000);
