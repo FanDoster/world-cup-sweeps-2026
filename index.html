@@ -1690,6 +1690,17 @@
       </div>
     </div>
 
+    <!-- Joker Reset Notification -->
+    <div class="auth-modal-overlay" id="jokerResetModal">
+      <div class="auth-modal">
+        <h2>🃏 Jokers Reset</h2>
+        <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.5;margin-bottom:18px">All jokers have been wiped from previous matchdays. Please re-apply your jokers on upcoming matches before they kick off.</p>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="dismissJokerNotification()">Got it</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Player Profile Modal -->
     <div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
       <div class="profile-card" id="profileCard"></div>
@@ -1870,6 +1881,7 @@
         if (profile) currentProfile = profile;
       }
       updateAuthBar();
+      if (currentSession) showJokerNotification();
     }
 
     function updateAuthBar() {
@@ -1894,6 +1906,15 @@
     function showSignUp() { closeModals(); document.getElementById('signUpModal').classList.add('active'); }
     function closeModals() { document.querySelectorAll('.auth-modal-overlay').forEach(el => el.classList.remove('active')); }
 
+    function showJokerNotification() {
+      if (localStorage.getItem('jokerResetDismissed')) return;
+      document.getElementById('jokerResetModal').classList.add('active');
+    }
+    function dismissJokerNotification() {
+      localStorage.setItem('jokerResetDismissed', '1');
+      document.getElementById('jokerResetModal').classList.remove('active');
+    }
+
     async function doSignIn() {
       const email = document.getElementById('signInEmail').value;
       const password = document.getElementById('signInPassword').value;
@@ -1905,6 +1926,7 @@
       currentProfile = profile;
       closeModals();
       updateAuthBar();
+      showJokerNotification();
     }
 
     async function doSignUp() {
@@ -1947,6 +1969,7 @@
       currentProfile = { player_name: playerName };
       closeModals();
       updateAuthBar();
+      showJokerNotification();
     }
 
     async function doSignOut() {
