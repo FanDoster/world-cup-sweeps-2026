@@ -1,5 +1,6 @@
 const SB_URL = 'https://nkztkzrkbeacyltidqwr.supabase.co';
 const SB_KEY = 'sb_publishable_gSNbsrsq5ZV0glBJBeCZmQ_kBajhUPn';
+const FOOTBALL_DATA_TOKEN = ''; // Register free at football-data.org and paste token here
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
 const PLAYERS = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat', 'Steven'];
