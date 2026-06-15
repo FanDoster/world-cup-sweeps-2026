@@ -139,7 +139,7 @@ function renderPredPanel(key) {
     'Predictions hidden until 5 min before kickoff';
 
   el.innerHTML = `
-    ${showEnglandVideo ? `<iframe src="https://www.youtube.com/embed/va6nPu-1auE?autoplay=1&controls=0&rel=0&modestbranding=1" width="100%" style="aspect-ratio:16/9;display:block;border:none" allow="autoplay; fullscreen" allowfullscreen></iframe>` : ''}
+    ${showEnglandVideo ? `<div style="position:relative"><iframe src="https://www.youtube.com/embed/va6nPu-1auE?autoplay=1&controls=0&rel=0&modestbranding=1&start=11" width="100%" style="aspect-ratio:16/9;display:block;border:none" allow="autoplay; fullscreen" allowfullscreen></iframe><div style="position:absolute;inset:0"></div></div>` : ''}
     <div class="pp-header">
       <div>
         <div class="pp-match">${t1} vs ${t2}</div>
