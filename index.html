@@ -1054,12 +1054,14 @@
       text-transform: uppercase;
     }
     .stats-label .sl-brand {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 900;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.05em;
       color: #fff;
       text-transform: uppercase;
       white-space: nowrap;
+      min-width: 4ch;
+      text-align: center;
     }
     .stats-label .sl-sub {
       font-size: 0.38rem;
@@ -1088,15 +1090,7 @@
       0%   { transform: translateX(0); }
       100% { transform: translateX(-50%); }
     }
-    .st-section {
-      padding: 0 20px 0 28px;
-      font-size: 0.72rem;
-      font-weight: 900;
-      letter-spacing: 0.14em;
-      color: #4ade80;
-      text-transform: uppercase;
-      white-space: nowrap;
-    }
+    .st-cat { font-size: 0; }
     .st-item {
       display: inline-flex;
       align-items: center;
@@ -1707,8 +1701,8 @@
         <div class="stats-outer">
           <div class="stats-label">
             <span class="sl-top">LIVE</span>
-            <span class="sl-brand">STATS</span>
-            <span class="sl-sub">2026</span>
+            <span class="sl-brand"></span>
+            <span class="sl-sub">STATS</span>
           </div>
           <div class="stats-wrap">
             <div class="stats-track" id="statsTrack">

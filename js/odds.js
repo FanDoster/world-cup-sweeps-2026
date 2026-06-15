@@ -159,6 +159,33 @@ function buildCountdownTicker() {
 }
 
 // ── TOURNAMENT STATS TICKER ──
+let _statsLabelInterval = null;
+
+function updateStatsLabel() {
+  const wrap = document.querySelector('.stats-wrap');
+  const brandEl = document.querySelector('.stats-label .sl-brand');
+  if (!wrap || !brandEl) return;
+
+  const wrapRect = wrap.getBoundingClientRect();
+  const detectX = wrapRect.left + wrapRect.width * 0.15;
+  const anchors = document.querySelectorAll('#statsTrack .st-cat[data-category]');
+
+  let currentCat = null;
+  let bestDist = Infinity;
+
+  for (const anchor of anchors) {
+    const dist = detectX - anchor.getBoundingClientRect().left;
+    if (dist >= 0 && dist < bestDist) {
+      bestDist = dist;
+      currentCat = anchor.dataset.category;
+    }
+  }
+
+  if (currentCat && brandEl.textContent !== currentCat) {
+    brandEl.textContent = currentCat;
+  }
+}
+
 async function loadStatsTracker() {
   const track = document.getElementById('statsTrack');
   if (!track) return;
@@ -227,7 +254,7 @@ async function loadStatsTracker() {
 
   // Build HTML
   const dot = () => '<span class="st-divider">\xB7</span>';
-  const sec = label => `<span class="st-section">&#x258C; ${label} &#x258C;</span>`;
+  const sec = label => `<span class="st-cat" data-category="${escapeHtml(label)}"></span>`;
   const itm = (name, stat) =>
     `<span class="st-item"><span class="si-name">${escapeHtml(name)}</span>&nbsp;<span class="si-stat">${escapeHtml(stat)}</span></span>`;
 
@@ -268,4 +295,8 @@ async function loadStatsTracker() {
   const content = parts.join(divider) + divider;
   track.innerHTML = content + content;
   track.classList.add('scrolling');
+
+  if (!_statsLabelInterval) {
+    _statsLabelInterval = setInterval(updateStatsLabel, 500);
+  }
 }
