@@ -1029,6 +1029,88 @@
     .kickoff-divider { color: rgba(255,255,255,0.2); font-size: 1rem; padding: 0 2px; }
     .kickoff-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
 
+    /* Tournament stats ticker */
+    .stats-outer {
+      display: flex;
+      align-items: stretch;
+      background: rgba(0,0,0,0.3);
+    }
+    .stats-label {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 12px;
+      background: #15803d;
+      gap: 1px;
+      border-right: 1px solid rgba(255,255,255,0.15);
+    }
+    .stats-label .sl-top {
+      font-size: 0.5rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.8);
+      text-transform: uppercase;
+    }
+    .stats-label .sl-brand {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #fff;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .stats-label .sl-sub {
+      font-size: 0.38rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .stats-wrap {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+    }
+    .stats-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      white-space: nowrap;
+    }
+    .stats-track.scrolling { animation: stats-scroll 35s linear infinite; }
+    @keyframes stats-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .st-section {
+      padding: 0 20px 0 28px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.14em;
+      color: #4ade80;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .st-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .st-item .si-name { color: #fff; font-weight: 700; }
+    .st-item .si-stat { color: #f90; font-weight: 700; }
+    .st-divider { color: rgba(255,255,255,0.2); font-size: 1rem; padding: 0 4px; }
+    .stats-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
+
     /* Broadcast clock */
     .ticker-clock {
       flex-shrink: 0;
