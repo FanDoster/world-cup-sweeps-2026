@@ -1101,15 +1101,17 @@
     .st-item {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-size: 0.9rem;
       letter-spacing: 0.04em;
       text-transform: uppercase;
       white-space: nowrap;
     }
+    .st-item .si-flag { width: 17px; height: 12px; object-fit: cover; border-radius: 1px; flex-shrink: 0; }
+    .st-item .si-rank { color: rgba(255,255,255,0.45); font-size: 0.7rem; font-weight: 700; min-width: 1ch; }
     .st-item .si-name { color: #fff; font-weight: 700; }
-    .st-item .si-stat { color: #f90; font-weight: 700; }
-    .st-divider { color: rgba(255,255,255,0.2); font-size: 1rem; padding: 0 4px; }
+    .st-item .si-stat { color: #f90; font-weight: 700; padding-left: 2px; }
+    .st-divider { color: rgba(255,255,255,0.45); font-size: 1rem; padding: 0 8px; }
     .stats-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
 
     /* Broadcast clock */

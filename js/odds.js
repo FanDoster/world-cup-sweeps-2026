@@ -174,26 +174,39 @@ function showStatsCategory(index, gen) {
   track.style.opacity = '0';
 
   setTimeout(() => {
-    if (gen !== _statsGeneration) return; // stale call after data refresh
+    if (gen !== _statsGeneration) return;
 
     brandEl.textContent = cat.label;
-    track.innerHTML = cat.html + cat.html; // duplicate for seamless one-pass scroll
 
-    // Compute duration from content width so longer categories scroll longer
+    // Measure single copy width first to decide whether to scroll
     track.style.animation = 'none';
-    void track.offsetWidth; // reflow
-    const contentWidth = (track.scrollWidth / 2) || 600;
-    const dur = Math.max(8, contentWidth / 80).toFixed(1); // 80px/s reading speed
-    track.style.animation = `stats-scroll ${dur}s linear 1 forwards`;
+    track.innerHTML = cat.html;
+    void track.offsetWidth;
+    const singleWidth = track.scrollWidth;
+    const containerWidth = (track.parentElement?.offsetWidth) || 600;
 
     brandEl.style.opacity = '1';
     track.style.opacity = '1';
 
-    track.addEventListener('animationend', () => {
-      if (gen !== _statsGeneration) return;
-      _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
-      showStatsCategory(_statsCatIndex, gen);
-    }, { once: true });
+    if (singleWidth < containerWidth) {
+      // Content fits — no duplicate, just show and advance after a pause
+      setTimeout(() => {
+        if (gen !== _statsGeneration) return;
+        _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
+        showStatsCategory(_statsCatIndex, gen);
+      }, 7000);
+    } else {
+      // Content overflows — duplicate for seamless one-pass scroll
+      track.innerHTML = cat.html + cat.html;
+      void track.offsetWidth;
+      const dur = Math.max(8, singleWidth / 80).toFixed(1);
+      track.style.animation = `stats-scroll ${dur}s linear 1 forwards`;
+      track.addEventListener('animationend', () => {
+        if (gen !== _statsGeneration) return;
+        _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
+        showStatsCategory(_statsCatIndex, gen);
+      }, { once: true });
+    }
   }, 350);
 }
 
@@ -266,21 +279,26 @@ async function loadStatsTracker() {
   // Build per-category HTML
   const dot = '<span class="st-divider">\xB7</span>';
   const itm = (name, stat) =>
-    `<span class="st-item"><span class="si-name">${escapeHtml(name)}</span>&nbsp;<span class="si-stat">${escapeHtml(stat)}</span></span>`;
+    `<span class="st-item"><span class="si-name">${escapeHtml(name)}</span><span class="si-stat">${escapeHtml(stat)}</span></span>`;
+  const teamItm = (rank, teamName, stat) => {
+    const iso = teamIso[teamName];
+    const flag = iso ? `<img class="si-flag" src="${flagUrl(iso)}" alt="">` : '';
+    return `<span class="st-item">${flag}<span class="si-rank">${rank}</span><span class="si-name">${escapeHtml(teamName.toUpperCase())}</span><span class="si-stat">${escapeHtml(stat)}</span></span>`;
+  };
 
   const categories = [];
 
   if (topScorers.length)
-    categories.push({ label: 'GOLDEN BOOT', html: topScorers.map(s => itm(s.name, s.stat)).join(dot) });
+    categories.push({ label: 'GOLDEN BOOT', html: topScorers.map((s, i) => itm(`${i + 1}. ${s.name}`, s.stat)).join(dot) });
 
   if (topAssisters.length)
-    categories.push({ label: 'TOP ASSISTS', html: topAssisters.map(s => itm(s.name, s.stat)).join(dot) });
+    categories.push({ label: 'TOP ASSISTS', html: topAssisters.map((s, i) => itm(`${i + 1}. ${s.name}`, s.stat)).join(dot) });
 
   if (topCleanSheets.length)
-    categories.push({ label: 'CLEAN SHEETS', html: topCleanSheets.map(([t, n]) => itm(t.toUpperCase(), `${n} CS`)).join(dot) });
+    categories.push({ label: 'CLEAN SHEETS', html: topCleanSheets.map(([t, n], i) => teamItm(i + 1, t, `${n} CS`)).join(dot) });
 
   if (topGoals.length)
-    categories.push({ label: 'MOST GOALS', html: topGoals.map(([t, n]) => itm(t.toUpperCase(), `${n}G`)).join(dot) });
+    categories.push({ label: 'MOST GOALS', html: topGoals.map(([t, n], i) => teamItm(i + 1, t, `${n}G`)).join(dot) });
 
   if (biggestWins.length)
     categories.push({ label: 'BIGGEST WIN', html: biggestWins.map(w =>
