@@ -112,6 +112,8 @@ async function loadOdds() {
     const oddsSingleWidth = track.scrollWidth / 2;
     const oddsDur = Math.max(10, oddsSingleWidth / 90).toFixed(1);
     track.style.animation = `odds-scroll ${oddsDur}s linear infinite`;
+    track.style.animationPlayState = '';
+    track.classList.add('scrolling');
   } catch (e) {
     console.warn('Polymarket ticker failed to load:', e);
   }
@@ -162,6 +164,8 @@ function buildCountdownTicker() {
   const kiSingleWidth = track.scrollWidth / 2;
   const kiDur = Math.max(10, kiSingleWidth / 90).toFixed(1);
   track.style.animation = `kickoff-scroll ${kiDur}s linear infinite`;
+  track.style.animationPlayState = '';
+  track.classList.add('scrolling');
 }
 
 // ── TOURNAMENT STATS TICKER ──
@@ -190,6 +194,7 @@ function showStatsCategory(index, gen) {
     const singleWidth = track.scrollWidth / 2;
     const dur = Math.max(8, singleWidth / 90).toFixed(1);
     track.style.animation = `stats-scroll ${dur}s linear infinite`;
+    track.style.animationPlayState = '';
 
     brandEl.style.opacity = '1';
     track.style.opacity = '1';
