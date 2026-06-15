@@ -879,7 +879,7 @@
     .ticker-outer:hover .ticker-track          { animation-duration: 220s; }
     .odds-outer:hover .odds-track.scrolling    { animation-duration: 300s; }
     .kickoff-outer:hover .kickoff-track.scrolling { animation-duration: 200s; }
-    .stats-outer:hover .stats-track.scrolling  { animation-duration: 350s; }
+    .stats-outer:hover .stats-track.scrolling  { animation-duration: 100s; }
 
     .ticker-divider {
       color: rgba(255,255,255,0.15);
@@ -1067,6 +1067,7 @@
       white-space: nowrap;
       min-width: 4ch;
       text-align: center;
+      transition: opacity 0.35s ease;
     }
     .stats-label .sl-sub {
       font-size: 0.38rem;
@@ -1090,7 +1091,8 @@
       width: max-content;
       white-space: nowrap;
     }
-    .stats-track.scrolling { animation: stats-scroll 35s linear infinite; }
+    .stats-track { transition: opacity 0.35s ease; }
+    .stats-track.scrolling { animation: stats-scroll 10s linear infinite; }
     @keyframes stats-scroll {
       0%   { transform: translateX(0); }
       100% { transform: translateX(-50%); }

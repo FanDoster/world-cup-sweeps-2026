@@ -159,31 +159,29 @@ function buildCountdownTicker() {
 }
 
 // ── TOURNAMENT STATS TICKER ──
-let _statsLabelInterval = null;
+let _statsCategories = [];
+let _statsCatIndex = 0;
+let _statsRotateTimer = null;
 
-function updateStatsLabel() {
-  const wrap = document.querySelector('.stats-wrap');
+function showStatsCategory(index) {
+  const track = document.getElementById('statsTrack');
   const brandEl = document.querySelector('.stats-label .sl-brand');
-  if (!wrap || !brandEl) return;
+  if (!track || !brandEl || !_statsCategories.length) return;
 
-  const wrapRect = wrap.getBoundingClientRect();
-  const detectX = wrapRect.left + wrapRect.width * 0.15;
-  const anchors = document.querySelectorAll('#statsTrack .st-cat[data-category]');
+  const cat = _statsCategories[index % _statsCategories.length];
 
-  let currentCat = null;
-  let bestDist = Infinity;
+  brandEl.style.opacity = '0';
+  track.style.opacity = '0';
 
-  for (const anchor of anchors) {
-    const dist = detectX - anchor.getBoundingClientRect().left;
-    if (dist >= 0 && dist < bestDist) {
-      bestDist = dist;
-      currentCat = anchor.dataset.category;
-    }
-  }
-
-  if (currentCat && brandEl.textContent !== currentCat) {
-    brandEl.textContent = currentCat;
-  }
+  setTimeout(() => {
+    brandEl.textContent = cat.label;
+    track.innerHTML = cat.html + cat.html;
+    track.classList.remove('scrolling');
+    void track.offsetWidth; // force reflow to restart animation
+    track.classList.add('scrolling');
+    brandEl.style.opacity = '1';
+    track.style.opacity = '1';
+  }, 350);
 }
 
 async function loadStatsTracker() {
@@ -252,51 +250,48 @@ async function loadStatsTracker() {
     }
   }
 
-  // Build HTML
-  const dot = () => '<span class="st-divider">\xB7</span>';
-  const sec = label => `<span class="st-cat" data-category="${escapeHtml(label)}"></span>`;
+  // Build per-category HTML
+  const dot = '<span class="st-divider">\xB7</span>';
   const itm = (name, stat) =>
     `<span class="st-item"><span class="si-name">${escapeHtml(name)}</span>&nbsp;<span class="si-stat">${escapeHtml(stat)}</span></span>`;
 
-  const parts = [];
+  const categories = [];
 
   if (topScorers.length)
-    parts.push(sec('GOLDEN BOOT') + topScorers.map(s => itm(s.name, s.stat)).join(dot()));
+    categories.push({ label: 'GOLDEN BOOT', html: topScorers.map(s => itm(s.name, s.stat)).join(dot) });
 
   if (topAssisters.length)
-    parts.push(sec('TOP ASSISTS') + topAssisters.map(s => itm(s.name, s.stat)).join(dot()));
+    categories.push({ label: 'TOP ASSISTS', html: topAssisters.map(s => itm(s.name, s.stat)).join(dot) });
 
   if (topCleanSheets.length)
-    parts.push(sec('CLEAN SHEETS') + topCleanSheets.map(([t, n]) => itm(t.toUpperCase(), `${n} CS`)).join(dot()));
+    categories.push({ label: 'CLEAN SHEETS', html: topCleanSheets.map(([t, n]) => itm(t.toUpperCase(), `${n} CS`)).join(dot) });
 
   if (topGoals.length)
-    parts.push(sec('MOST GOALS') + topGoals.map(([t, n]) => itm(t.toUpperCase(), `${n}G`)).join(dot()));
+    categories.push({ label: 'MOST GOALS', html: topGoals.map(([t, n]) => itm(t.toUpperCase(), `${n}G`)).join(dot) });
 
   if (biggestWins.length)
-    parts.push(sec('BIGGEST WIN') + biggestWins.map(w =>
+    categories.push({ label: 'BIGGEST WIN', html: biggestWins.map(w =>
       `<span class="st-item"><span class="si-name">${escapeHtml(w.label)}</span></span>`
-    ).join(dot()));
+    ).join(dot) });
 
   if (played.length)
-    parts.push(
-      sec('TOURNAMENT') +
-      itm(`${totalGoals} GOALS`, `IN ${played.length} GAMES`) +
-      dot() +
-      itm(avgGoals, 'PER GAME')
-    );
+    categories.push({ label: 'TOURNAMENT', html:
+      itm(`${totalGoals} GOALS`, `IN ${played.length} GAMES`) + dot + itm(avgGoals, 'PER GAME')
+    });
 
-  if (!parts.length) {
+  if (!categories.length) {
     track.innerHTML = '<span class="stats-loading">NO MATCH DATA YET</span>';
     track.classList.remove('scrolling');
     return;
   }
 
-  const divider = '<span class="st-divider" style="padding:0 24px">|</span>';
-  const content = parts.join(divider) + divider;
-  track.innerHTML = content + content;
-  track.classList.add('scrolling');
-
-  if (!_statsLabelInterval) {
-    _statsLabelInterval = setInterval(updateStatsLabel, 500);
-  }
+  // Reset rotation
+  if (_statsRotateTimer) { clearInterval(_statsRotateTimer); _statsRotateTimer = null; }
+  _statsCategories = categories;
+  _statsCatIndex = 0;
+  showStatsCategory(0);
+  _statsRotateTimer = setInterval(() => {
+    _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
+    showStatsCategory(_statsCatIndex);
+  }, 13000);
 }
