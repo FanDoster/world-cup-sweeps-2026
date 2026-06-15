@@ -161,9 +161,9 @@ function buildCountdownTicker() {
 // ── TOURNAMENT STATS TICKER ──
 let _statsCategories = [];
 let _statsCatIndex = 0;
-let _statsRotateTimer = null;
+let _statsGeneration = 0;
 
-function showStatsCategory(index) {
+function showStatsCategory(index, gen) {
   const track = document.getElementById('statsTrack');
   const brandEl = document.querySelector('.stats-label .sl-brand');
   if (!track || !brandEl || !_statsCategories.length) return;
@@ -174,13 +174,26 @@ function showStatsCategory(index) {
   track.style.opacity = '0';
 
   setTimeout(() => {
+    if (gen !== _statsGeneration) return; // stale call after data refresh
+
     brandEl.textContent = cat.label;
-    track.innerHTML = cat.html + cat.html;
-    track.classList.remove('scrolling');
-    void track.offsetWidth; // force reflow to restart animation
-    track.classList.add('scrolling');
+    track.innerHTML = cat.html + cat.html; // duplicate for seamless one-pass scroll
+
+    // Compute duration from content width so longer categories scroll longer
+    track.style.animation = 'none';
+    void track.offsetWidth; // reflow
+    const contentWidth = (track.scrollWidth / 2) || 600;
+    const dur = Math.max(8, contentWidth / 80).toFixed(1); // 80px/s reading speed
+    track.style.animation = `stats-scroll ${dur}s linear 1 forwards`;
+
     brandEl.style.opacity = '1';
     track.style.opacity = '1';
+
+    track.addEventListener('animationend', () => {
+      if (gen !== _statsGeneration) return;
+      _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
+      showStatsCategory(_statsCatIndex, gen);
+    }, { once: true });
   }, 350);
 }
 
@@ -285,13 +298,8 @@ async function loadStatsTracker() {
     return;
   }
 
-  // Reset rotation
-  if (_statsRotateTimer) { clearInterval(_statsRotateTimer); _statsRotateTimer = null; }
   _statsCategories = categories;
   _statsCatIndex = 0;
-  showStatsCategory(0);
-  _statsRotateTimer = setInterval(() => {
-    _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
-    showStatsCategory(_statsCatIndex);
-  }, 13000);
+  _statsGeneration++;
+  showStatsCategory(0, _statsGeneration);
 }
