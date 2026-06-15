@@ -108,7 +108,10 @@ async function loadOdds() {
 
     const track = document.getElementById('oddsTrack');
     track.innerHTML = buildItems() + buildItems();
-    track.classList.add('scrolling');
+    void track.offsetWidth;
+    const oddsSingleWidth = track.scrollWidth / 2;
+    const oddsDur = Math.max(10, oddsSingleWidth / 90).toFixed(1);
+    track.style.animation = `odds-scroll ${oddsDur}s linear infinite`;
   } catch (e) {
     console.warn('Polymarket ticker failed to load:', e);
   }
@@ -155,7 +158,10 @@ function buildCountdownTicker() {
 
   const html = upcoming.map(buildItem).join('');
   track.innerHTML = html + html;
-  track.classList.add('scrolling');
+  void track.offsetWidth;
+  const kiSingleWidth = track.scrollWidth / 2;
+  const kiDur = Math.max(10, kiSingleWidth / 90).toFixed(1);
+  track.style.animation = `kickoff-scroll ${kiDur}s linear infinite`;
 }
 
 // ── TOURNAMENT STATS TICKER ──
@@ -177,36 +183,24 @@ function showStatsCategory(index, gen) {
     if (gen !== _statsGeneration) return;
 
     brandEl.textContent = cat.label;
-
-    // Measure single copy width first to decide whether to scroll
     track.style.animation = 'none';
-    track.innerHTML = cat.html;
+    track.innerHTML = cat.html + cat.html;
     void track.offsetWidth;
-    const singleWidth = track.scrollWidth;
-    const containerWidth = (track.parentElement?.offsetWidth) || 600;
+
+    const singleWidth = track.scrollWidth / 2;
+    const dur = Math.max(8, singleWidth / 90).toFixed(1);
+    track.style.animation = `stats-scroll ${dur}s linear infinite`;
 
     brandEl.style.opacity = '1';
     track.style.opacity = '1';
 
-    if (singleWidth < containerWidth) {
-      // Content fits — no duplicate, just show and advance after a pause
-      setTimeout(() => {
-        if (gen !== _statsGeneration) return;
-        _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
-        showStatsCategory(_statsCatIndex, gen);
-      }, 7000);
-    } else {
-      // Content overflows — duplicate for seamless one-pass scroll
-      track.innerHTML = cat.html + cat.html;
-      void track.offsetWidth;
-      const dur = Math.max(8, singleWidth / 80).toFixed(1);
-      track.style.animation = `stats-scroll ${dur}s linear 1 forwards`;
-      track.addEventListener('animationend', () => {
-        if (gen !== _statsGeneration) return;
-        _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
-        showStatsCategory(_statsCatIndex, gen);
-      }, { once: true });
-    }
+    // Show for ~2 full passes (min 8s, max 20s) then advance
+    const displayMs = Math.min(20000, Math.max(8000, (singleWidth / 90) * 2000));
+    setTimeout(() => {
+      if (gen !== _statsGeneration) return;
+      _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
+      showStatsCategory(_statsCatIndex, gen);
+    }, displayMs);
   }, 350);
 }
 
