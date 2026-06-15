@@ -33,8 +33,7 @@ function renderPredPanel(key) {
   const isFinished = m.score1 !== null && m.score2 !== null;
 
   const isEngland = t1 === 'England' || t2 === 'England';
-  const testMode = new URLSearchParams(location.search).get('englandTest') === '1';
-  const showEnglandVideo = isEngland && !isFinished && (testMode || kickoff - now < 10 * 60 * 1000);
+  const showEnglandVideo = isEngland && !isFinished;
   if (showEnglandVideo) el.classList.add('england-mode'); else el.classList.remove('england-mode');
   const showScores = isLocked || isFinished;
 
