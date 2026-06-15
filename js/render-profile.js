@@ -353,7 +353,7 @@ async function renderProfile(playerName) {
   el.innerHTML = `
     <div class="pc-header">
       <button class="pc-close" onclick="closeProfile()">✕</button>
-      <div class="pc-name">${owner}</div>
+      <div class="pc-name">${playerDisplayName(owner)}</div>
       <div class="pc-badges">
         <span class="pc-badge points">${matchPts} match pts</span>
         ${predStats ? `<span class="pc-badge pred-pts">🔮 ${predStats.totalPts} pred pts</span>` : ''}

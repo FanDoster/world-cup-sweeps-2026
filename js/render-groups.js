@@ -13,7 +13,7 @@ function renderPeople() {
     if (matchPts[name]) badges.push(`<span class="match-pts-badge">⚽${matchPts[name]}pts</span>`);
     if (predPointsByPlayer[name]) badges.push(`<span class="pred-pts-badge">🔮${predPointsByPlayer[name]}pts</span>`);
     card.innerHTML = `
-      <div class="person-name">${name} <span class="count">${teams.length} teams</span>${badges.length ? ' ' + badges.join(' ') : ''}</div>
+      <div class="person-name">${playerDisplayName(name)} <span class="count">${teams.length} teams</span>${badges.length ? ' ' + badges.join(' ') : ''}</div>
       <ul class="team-list">
         ${teams.map(t => `
           <li class="team-item" onclick="selectTeam('${t.team}')" title="View ${t.team} schedule">

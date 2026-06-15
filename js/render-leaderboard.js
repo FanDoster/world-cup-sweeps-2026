@@ -27,7 +27,7 @@ function renderLeaderboard() {
   tbody.innerHTML = standings.map((p, i) => `
     <tr>
       <td class="rank rank-${i+1}">${i+1}</td>
-      <td class="player-cell">${p.name}</td>
+      <td class="player-cell">${playerDisplayName(p.name)}</td>
       <td class="wdl">${p.w}–${p.d}–${p.l}</td>
       <td class="sub-pts">${p.pts}</td>
       <td class="sub-pts">${p.predPts}</td>
@@ -68,7 +68,7 @@ function renderAwards(standings) {
   }
 
   el.innerHTML = awards.length ? `<div class="awards-title">🏆 Tournament Awards</div><div class="awards-grid">${awards.map(([icon, name, holder, detail]) => `
-    <div class="award-card"><span class="aw-icon">${icon}</span><div><div class="aw-name">${name}</div><div class="aw-holder">${holder}</div><div class="aw-detail">${detail}</div></div></div>`).join('')}</div>` : '';
+    <div class="award-card"><span class="aw-icon">${icon}</span><div><div class="aw-name">${name}</div><div class="aw-holder">${holder.split(' & ').map(playerDisplayName).join(' & ')}</div><div class="aw-detail">${detail}</div></div></div>`).join('')}</div>` : '';
 }
 
 function calcPredPoints(homePred, awayPred, homeActual, awayActual) {

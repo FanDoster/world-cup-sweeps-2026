@@ -2,6 +2,11 @@ function flagUrl(iso) {
   return `https://flagcdn.com/${iso}.svg`;
 }
 
+function playerDisplayName(name) {
+  if (name !== 'Laurie') return name;
+  return `Laurie <span class="sponsor-tag">sponsored by <img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Coca-Cola_logo.svg" alt="Coca-Cola" class="sponsor-logo"></span>`;
+}
+
 function formatDateLabel(dateStr, timeStr, tz) {
   const d = toDate(dateStr, timeStr, tz);
   const now = new Date();
