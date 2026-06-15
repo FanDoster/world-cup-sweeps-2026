@@ -959,6 +959,76 @@
     .odds-divider { color: #2E5CFF; font-size: 1rem; opacity: 0.6; padding: 0 2px; }
     .odds-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
 
+    /* Kickoff countdown ticker */
+    .kickoff-outer {
+      display: flex;
+      align-items: stretch;
+      background: rgba(0,0,0,0.25);
+    }
+    .kickoff-label {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5px 12px;
+      background: #000;
+      gap: 1px;
+      border-right: 1px solid rgba(255,255,255,0.12);
+    }
+    .kickoff-label .kl-top {
+      font-size: 0.5rem;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      color: rgba(255,255,255,0.8);
+      text-transform: uppercase;
+    }
+    .kickoff-label .kl-brand {
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      color: #fff;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .kickoff-wrap {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+      mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+    }
+    .kickoff-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      white-space: nowrap;
+    }
+    .kickoff-track.scrolling { animation: kickoff-scroll 60s linear infinite; }
+    @keyframes kickoff-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .kickoff-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 28px;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+    }
+    .ki-flag { height: 18px; width: auto; }
+    .ki-team { color: #fff; font-weight: 700; }
+    .ki-vs   { color: rgba(255,255,255,0.4); font-size: 0.75rem; }
+    .ki-sep  { color: rgba(255,255,255,0.3); }
+    .ki-cd   { color: #f90; font-weight: 700; }
+    .ki-live { color: #4ade80; font-weight: 700; }
+    .kickoff-divider { color: rgba(255,255,255,0.2); font-size: 1rem; padding: 0 2px; }
+    .kickoff-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
+
     /* Broadcast clock */
     .ticker-clock {
       flex-shrink: 0;
@@ -1109,6 +1179,7 @@
 
       /* Tickers on mobile */
       .ticker-clock { display: none; }
+      .kickoff-outer { display: none; }
       .ticker-label img { height: 28px; }
       .ticker-label .tl-partners { display: none; }
       .sponsor-tag { font-size: 0.75rem; }
@@ -1545,6 +1616,19 @@
           <div class="odds-wrap">
             <div class="odds-track" id="oddsTrack">
               <span class="odds-loading">LOADING LIVE MARKETS…</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kickoff countdown ticker -->
+        <div class="kickoff-outer">
+          <div class="kickoff-label">
+            <span class="kl-top">KICK OFF</span>
+            <span class="kl-brand">UPCOMING</span>
+          </div>
+          <div class="kickoff-wrap">
+            <div class="kickoff-track" id="kickoffTrack">
+              <span class="kickoff-loading">LOADING…</span>
             </div>
           </div>
         </div>
