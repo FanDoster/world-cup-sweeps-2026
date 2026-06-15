@@ -114,7 +114,7 @@ async function loadOdds() {
   }
 }
 
-// loadOdds() is called from main.js after matchData is populated by loadData()
+// loadOdds() and loadStatsTracker() are called from main.js after matchData is populated by loadData()
 
 // ── KICKOFF COUNTDOWN TICKER ──
 function buildCountdownTicker() {
@@ -155,5 +155,117 @@ function buildCountdownTicker() {
 
   const html = upcoming.map(buildItem).join('');
   track.innerHTML = html + html;
+  track.classList.add('scrolling');
+}
+
+// ── TOURNAMENT STATS TICKER ──
+async function loadStatsTracker() {
+  const track = document.getElementById('statsTrack');
+  if (!track) return;
+
+  const played = matchData.filter(m => m.score1 !== null && m.score2 !== null);
+
+  // Clean sheets (goals conceded = 0)
+  const cleanSheets = {};
+  for (const m of played) {
+    if (m.score2 === 0) cleanSheets[m.team1] = (cleanSheets[m.team1] || 0) + 1;
+    if (m.score1 === 0) cleanSheets[m.team2] = (cleanSheets[m.team2] || 0) + 1;
+  }
+  const topCleanSheets = Object.entries(cleanSheets)
+    .sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  // Most goals scored
+  const goalsFor = {};
+  for (const m of played) {
+    goalsFor[m.team1] = (goalsFor[m.team1] || 0) + m.score1;
+    goalsFor[m.team2] = (goalsFor[m.team2] || 0) + m.score2;
+  }
+  const topGoals = Object.entries(goalsFor)
+    .sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  // Biggest wins (show winner first)
+  const biggestWins = played
+    .map(m => {
+      const diff = m.score1 - m.score2;
+      if (diff > 0) return { label: `${m.team1.toUpperCase()} ${m.score1}–${m.score2} ${m.team2.toUpperCase()}`, diff };
+      if (diff < 0) return { label: `${m.team2.toUpperCase()} ${m.score2}–${m.score1} ${m.team1.toUpperCase()}`, diff: -diff };
+      return null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.diff - a.diff)
+    .slice(0, 3);
+
+  // Tournament totals
+  const totalGoals = played.reduce((s, m) => s + m.score1 + m.score2, 0);
+  const avgGoals = played.length ? (totalGoals / played.length).toFixed(1) : '0.0';
+
+  // Optional API: scorers from football-data.org
+  let topScorers = [];
+  let topAssisters = [];
+  if (typeof FOOTBALL_DATA_TOKEN === 'string' && FOOTBALL_DATA_TOKEN) {
+    try {
+      const res = await fetch('https://api.football-data.org/v4/competitions/WC/scorers?limit=10', {
+        headers: { 'X-Auth-Token': FOOTBALL_DATA_TOKEN }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const scorers = data.scorers || [];
+        topScorers = scorers
+          .filter(s => s.goals > 0)
+          .slice(0, 5)
+          .map(s => ({ name: s.player.name.toUpperCase(), stat: `${s.goals}G` }));
+        topAssisters = scorers
+          .filter(s => (s.assists || 0) > 0)
+          .sort((a, b) => (b.assists || 0) - (a.assists || 0))
+          .slice(0, 5)
+          .map(s => ({ name: s.player.name.toUpperCase(), stat: `${s.assists}A` }));
+      }
+    } catch (e) {
+      console.warn('Stats ticker: API fetch failed', e);
+    }
+  }
+
+  // Build HTML
+  const dot = () => '<span class="st-divider">\xB7</span>';
+  const sec = label => `<span class="st-section">&#x258C; ${label} &#x258C;</span>`;
+  const itm = (name, stat) =>
+    `<span class="st-item"><span class="si-name">${escapeHtml(name)}</span>&nbsp;<span class="si-stat">${escapeHtml(stat)}</span></span>`;
+
+  const parts = [];
+
+  if (topScorers.length)
+    parts.push(sec('GOLDEN BOOT') + topScorers.map(s => itm(s.name, s.stat)).join(dot()));
+
+  if (topAssisters.length)
+    parts.push(sec('TOP ASSISTS') + topAssisters.map(s => itm(s.name, s.stat)).join(dot()));
+
+  if (topCleanSheets.length)
+    parts.push(sec('CLEAN SHEETS') + topCleanSheets.map(([t, n]) => itm(t.toUpperCase(), `${n} CS`)).join(dot()));
+
+  if (topGoals.length)
+    parts.push(sec('MOST GOALS') + topGoals.map(([t, n]) => itm(t.toUpperCase(), `${n}G`)).join(dot()));
+
+  if (biggestWins.length)
+    parts.push(sec('BIGGEST WIN') + biggestWins.map(w =>
+      `<span class="st-item"><span class="si-name">${escapeHtml(w.label)}</span></span>`
+    ).join(dot()));
+
+  if (played.length)
+    parts.push(
+      sec('TOURNAMENT') +
+      itm(`${totalGoals} GOALS`, `IN ${played.length} GAMES`) +
+      dot() +
+      itm(avgGoals, 'PER GAME')
+    );
+
+  if (!parts.length) {
+    track.innerHTML = '<span class="stats-loading">NO MATCH DATA YET</span>';
+    track.classList.remove('scrolling');
+    return;
+  }
+
+  const divider = '<span class="st-divider" style="padding:0 24px">|</span>';
+  const content = parts.join(divider) + divider;
+  track.innerHTML = content + content;
   track.classList.add('scrolling');
 }
