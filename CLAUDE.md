@@ -4,9 +4,31 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A six-player sweepstakes tracker for the 2026 FIFA World Cup (live at world-cup-sweeps-2026.surge.sh). The app is **one static file, `index.html`** (CSS, HTML, and vanilla JS in `<style>`/`<script>` blocks) plus `h2h-data.js`, a generated head-to-head dataset. There is no build step, no package.json, no tests, and no linter. Backend is Supabase (Postgres + Auth) accessed directly from the browser via the supabase-js CDN bundle.
+A six-player sweepstakes tracker for the 2026 FIFA World Cup (live at world-cup-sweeps-2026.surge.sh). The app is **`index.html`** (CSS + HTML only) plus a `js/` directory of plain JS files loaded via `<script src>` tags — no build step, no package.json, no tests, no linter. All scripts run in global scope (no ES modules — required for `file://` compatibility). Backend is Supabase (Postgres + Auth) accessed directly from the browser via the supabase-js CDN bundle.
 
 `h2h-data.js` holds all-time records between every pair of the 48 qualified teams (record, draws, goals, World Cup meetings, first/last meeting, biggest win), crunched from the martj42/international_results dataset by `.claude/build-h2h.mjs` — re-run that script to refresh it; never hand-edit the data file.
+
+### JS file layout
+
+Scripts load in dependency order (each file can call globals defined by earlier ones):
+
+| File | Responsibility |
+|------|---------------|
+| `h2h-data.js` | Head-to-head lookup table (generated) |
+| `js/config.js` | Supabase client, `PLAYERS`, `ownerColors`, `ownerHexColors`, `VENUE_DATA`, `TERRITORY_DATA` |
+| `js/utils.js` | `flagUrl`, date/time helpers (`toDate`, `formatLocalTime`, `formatDateLabel`, `formatDateHeader`, `getCountdown`), `ordinal`, `escapeHtml` |
+| `js/auth.js` | `currentSession`, `currentProfile`, sign-in/up/out, `updateAuthBar`, joker notification |
+| `js/data.js` | Data globals, `loadData`, `loadPredData`; also globe state vars (`territoryControl` etc.) |
+| `js/render-matches.js` | Match list with 3-way filters (`matchFilter`, `matchTeamFilter`) |
+| `js/render-groups.js` | Group tables, qual scenarios, player cards (`renderPeople`) |
+| `js/render-leaderboard.js` | `calcLeaderboard`, `renderLeaderboard`, `renderAwards`, `calcPredPoints`, `getPredStatsByPlayer`, `calcTerritoryControl`, `calcPredPointsForAll`, `predResultBadge`, `renderTerritoryStandings` |
+| `js/render-predictions.js` | Prediction entry/edit UI, `submitPrediction`, joker toggle, `getLockCountdown`, `stepScore` |
+| `js/render-teams.js` | `selectedTeam`, team chips, team schedule, `selectTeam` |
+| `js/render-myteams.js` | My Teams tab cards |
+| `js/render-profile.js` | Profile overlay, match pred panel, H2H block, match comments |
+| `js/globe.js` | D3 globe, territory fills/stripes, venue/territory panels |
+| `js/odds.js` | Broadcast clock, Polymarket odds ticker |
+| `js/main.js` | `switchTab`, init calls (`restoreSession`, `setInterval`) |
 
 ## Commands
 
@@ -21,8 +43,9 @@ A six-player sweepstakes tracker for the 2026 FIFA World Cup (live at world-cup-
 All data lives in Supabase; the client is anonymous-readable via RLS (`SELECT USING (true)` on every table). Writes are restricted to the authenticated user's own rows (`auth.uid() = user_id`). On page load, `restoreSession().then(() => loadData())` fetches teams + matches and populates module-level globals that every render function reads:
 
 - `people` (owner → teams), `groups` (letter → teams), `teamOwner`, `teamIso`, `teamWinPct` — lookups built from the `teams` table
-- `matchData` — **positional arrays**: `[date, time, tz_offset, team1, team2, group, score1, score2, channel, prob_home, prob_draw, prob_away]`. Most logic indexes these numerically (`m[6] === null` means "not played yet").
+- `matchData` — **named-field objects**: `{ date, time, tz, team1, team2, group, score1, score2, channel, prob1, probD, prob2 }`. Built in `loadData` from the raw Supabase rows; all render functions use field names (e.g. `m.score1 === null` means "not played yet").
 - `predLookup` (matchId → predictions) and `matchIdByTeamDate` — matches are keyed client-side by the string `"team1|team2|date"`, which is also what `showPredPanel()` receives via inline `onclick`.
+- `matchByKey` — same `"team1|team2|date"` key → matchData object, used by the globe's venue panel.
 
 Rendering is full innerHTML regeneration: `renderMatches()`, `renderGroups()`, `renderLeaderboard()`, etc. rebuild their section from the globals. `renderMatches` re-runs every 60s for countdowns. Tabs are show/hide via `switchTab()`; the My Teams and Predictions tabs only exist when signed in (injected by `updateAuthBar()`).
 
@@ -33,7 +56,7 @@ Rendering is full innerHTML regeneration: `renderMatches()`, `renderGroups()`, `
 
 ### Auth
 
-Supabase email/password, no email confirmation (private game). Sign-up requires an invite code validated by the `validate_invite_code` RPC (SECURITY DEFINER, code lives in the SQL) and a player name picked from the fixed six: Anton, Chris, Dan, Laurie, Pat, Steven. That list is hardcoded in several places (sign-up dropdown, `ownerColors`, prediction-dot loops, pred panel) — adding/renaming a player means touching all of them plus the `teams.owner` column. `player_profiles` maps auth user id → player name. See `LOGIN-PLAN.md` for the original design rationale.
+Supabase email/password, no email confirmation (private game). Sign-up requires an invite code validated by the `validate_invite_code` RPC (SECURITY DEFINER, code lives in the SQL) and a player name picked from the fixed six: Anton, Chris, Dan, Laurie, Pat, Steven. The canonical list is `PLAYERS` in `js/config.js` — render functions that iterate players use that constant. Adding/renaming a player still requires updating `PLAYERS`, `ownerColors`, `ownerHexColors`, the sign-up dropdown HTML, and the `teams.owner` column. `player_profiles` maps auth user id → player name. See `LOGIN-PLAN.md` for the original design rationale.
 
 ### Dates and times
 
@@ -41,7 +64,7 @@ Matches store local-to-venue `kickoff_time` plus `tz_offset` (hours, negative fo
 
 ### Conventions
 
-- The Supabase URL and publishable (anon) key are intentionally hardcoded in `index.html` — security comes from RLS, not key secrecy.
+- The Supabase URL and publishable (anon) key are intentionally hardcoded in `js/config.js` — security comes from RLS, not key secrecy.
 - Team flags come from flagcdn.com using the `teams.iso` code (`gb-eng`, `gb-sct` for England/Scotland).
 - Owner color classes (`owner-anton` etc.) and TV channel styling (`channel-bbc`/`channel-itv`, inferred from the channel string prefix) are CSS conventions used by multiple render functions.
 - Mobile layout (≤700px) is a separate set of rules in the main `<style>` block; match rows render extra mobile-only markup (`.match-meta-mobile`, `.match-prob-text`) that is hidden on desktop.
