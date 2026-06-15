@@ -39,7 +39,7 @@ function renderPredPanel(key) {
   const showMatchVideo = showEnglandVideo || showScotlandVideo;
   const videoSrc = showEnglandVideo
     ? 'https://www.youtube.com/embed/va6nPu-1auE?autoplay=1&controls=0&rel=0&modestbranding=1&start=11'
-    : 'https://www.youtube.com/embed/32wDFCM7iSI?autoplay=1&controls=0&rel=0&modestbranding=1&start=68';
+    : 'https://www.youtube.com/embed/32wDFCM7iSI?autoplay=1&controls=0&rel=0&modestbranding=1&start=71';
   if (showMatchVideo) el.classList.add('england-mode'); else el.classList.remove('england-mode');
   const showScores = isLocked || isFinished;
 
