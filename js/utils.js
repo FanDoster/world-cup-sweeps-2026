@@ -45,7 +45,9 @@ function getCountdown(dateStr, timeStr, tz) {
 
   if (hours >= 24) {
     const days = Math.floor(hours / 24);
-    return { text: `in ${days}d ${hours % 24}h`, cls: '', rowCls: '' };
+    const remHours = hours % 24;
+    const text = remHours > 0 ? `in ${days}d ${remHours}h` : `in ${days}d`;
+    return { text, cls: '', rowCls: '' };
   }
   if (hours > 0) return { text: `in ${hours}h ${mins}m`, cls: '', rowCls: '' };
   return { text: `in ${mins}m`, cls: 'soon', rowCls: 'kicking-off' };
