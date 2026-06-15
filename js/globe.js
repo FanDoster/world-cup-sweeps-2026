@@ -516,7 +516,7 @@ function renderTerritoryPanel(territoryName) {
     for (const key of venue.matches) {
       const m = matchByKey[key];
       if (!m) continue;
-      const [date, time, tz, team1, team2, group, score1, score2] = m;
+      const { date, time, tz, team1, team2, group, score1, score2 } = m;
       const kickoff = toDate(date, time, tz);
       const isFinished = score1 !== null && score2 !== null;
       const locked = kickoff - now < 5 * 60 * 1000;
@@ -585,7 +585,7 @@ function renderVenueMatches(venueName) {
     const m = matchByKey[key];
     if (!m) continue;
 
-    const [date, time, tz, team1, team2, group, score1, score2] = m;
+    const { date, time, tz, team1, team2, group, score1, score2 } = m;
     const kickoff = toDate(date, time, tz);
     const isFinished = score1 !== null && score2 !== null;
     const locked = kickoff - now < 5 * 60 * 1000;
