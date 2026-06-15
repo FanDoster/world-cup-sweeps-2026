@@ -16,6 +16,7 @@ function showPredPanel(key) {
 
 function closePredPanel() {
   document.getElementById('predPanelOverlay').classList.remove('active');
+  document.getElementById('predPanel').classList.remove('england-mode');
   if (commentsChannel) { sb.removeChannel(commentsChannel); commentsChannel = null; }
 }
 
@@ -30,6 +31,11 @@ function renderPredPanel(key) {
   const kickoff = toDate(m.date, m.time, m.tz);
   const isLocked = kickoff - now < 5 * 60 * 1000;
   const isFinished = m.score1 !== null && m.score2 !== null;
+
+  const isEngland = t1 === 'England' || t2 === 'England';
+  const testMode = new URLSearchParams(location.search).get('englandTest') === '1';
+  const showEnglandVideo = isEngland && !isFinished && (testMode || kickoff - now < 10 * 60 * 1000);
+  if (showEnglandVideo) el.classList.add('england-mode'); else el.classList.remove('england-mode');
   const showScores = isLocked || isFinished;
 
   const preds = predLookup[mid] || [];
@@ -133,6 +139,7 @@ function renderPredPanel(key) {
     'Predictions hidden until 5 min before kickoff';
 
   el.innerHTML = `
+    ${showEnglandVideo ? `<iframe src="https://www.youtube.com/embed/va6nPu-1auE?autoplay=1&controls=0&rel=0&modestbranding=1" width="100%" style="aspect-ratio:16/9;display:block;border:none" allow="autoplay; fullscreen" allowfullscreen></iframe>` : ''}
     <div class="pp-header">
       <div>
         <div class="pp-match">${t1} vs ${t2}</div>
