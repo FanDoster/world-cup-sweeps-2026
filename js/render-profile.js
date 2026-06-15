@@ -33,8 +33,14 @@ function renderPredPanel(key) {
   const isFinished = m.score1 !== null && m.score2 !== null;
 
   const isEngland = t1 === 'England' || t2 === 'England';
+  const isScotland = t1 === 'Scotland' || t2 === 'Scotland';
   const showEnglandVideo = isEngland && !isFinished;
-  if (showEnglandVideo) el.classList.add('england-mode'); else el.classList.remove('england-mode');
+  const showScotlandVideo = isScotland && !isFinished;
+  const showMatchVideo = showEnglandVideo || showScotlandVideo;
+  const videoSrc = showEnglandVideo
+    ? 'https://www.youtube.com/embed/va6nPu-1auE?autoplay=1&controls=0&rel=0&modestbranding=1&start=11'
+    : 'https://www.youtube.com/embed/32wDFCM7iSI?autoplay=1&controls=0&rel=0&modestbranding=1&start=68';
+  if (showMatchVideo) el.classList.add('england-mode'); else el.classList.remove('england-mode');
   const showScores = isLocked || isFinished;
 
   const preds = predLookup[mid] || [];
@@ -138,7 +144,7 @@ function renderPredPanel(key) {
     'Predictions hidden until 5 min before kickoff';
 
   el.innerHTML = `
-    ${showEnglandVideo ? `<div style="position:relative"><iframe src="https://www.youtube.com/embed/va6nPu-1auE?autoplay=1&controls=0&rel=0&modestbranding=1&start=11" width="100%" style="aspect-ratio:16/9;display:block;border:none" allow="autoplay; fullscreen" allowfullscreen></iframe><div style="position:absolute;inset:0"></div></div>` : ''}
+    ${showMatchVideo ? `<div style="position:relative"><iframe src="${videoSrc}" width="100%" style="aspect-ratio:16/9;display:block;border:none" allow="autoplay; fullscreen" allowfullscreen></iframe><div style="position:absolute;inset:0"></div></div>` : ''}
     <div class="pp-header">
       <div>
         <div class="pp-match">${t1} vs ${t2}</div>
