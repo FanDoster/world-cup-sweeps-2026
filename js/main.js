@@ -19,6 +19,7 @@ function switchTab(tab) {
 }
 
 // ── INIT ──
-restoreSession().then(() => loadData());
+restoreSession().then(() => loadData().then(loadOdds));
 setInterval(renderMatches, 60000);
 setInterval(loadData, 180000);
+setInterval(loadOdds, 600000);

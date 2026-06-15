@@ -14,17 +14,34 @@ updateClock();
 setInterval(updateClock, 1000);
 
 // ── POLYMARKET ODDS TICKER ──
-const POLYMARKET_SLUGS = [
-  'fifwc-can-bih-2026-06-12',
-  'fifwc-usa-par-2026-06-12',
-  'fifwc-qat-che-2026-06-13',
-  'fifwc-bra-mar-2026-06-13',
-  'fifwc-hai-sco-2026-06-13',
-  'fifwc-ger-kor-2026-06-14',
-  'fifwc-nld-jpn-2026-06-14',
-  'fifwc-esp-cvi-2026-06-15',
-  'fifwc-fra-sen-2026-06-16',
-];
+
+// Maps team ISO codes (from teamIso global) → Polymarket 3-letter slug codes
+const ISO_TO_POLY = {
+  'us': 'usa', 'ca': 'can', 'br': 'bra', 'fr': 'fra', 'de': 'ger',
+  'es': 'esp', 'nl': 'nld', 'gb-eng': 'eng', 'gb-sct': 'sco',
+  'jp': 'jpn', 'kr': 'kor', 'ar': 'arg', 'pt': 'por', 'uy': 'uru',
+  'py': 'par', 'ec': 'ecu', 'co': 'col', 'mx': 'mex', 'ma': 'mar',
+  'sn': 'sen', 'gh': 'gha', 'eg': 'egy', 'dz': 'alg', 'tn': 'tun',
+  'za': 'rsa', 'cd': 'cod', 'cv': 'cvi', 'be': 'bel', 'ch': 'che',
+  'at': 'aut', 'hr': 'cro', 'cz': 'cze', 'se': 'swe', 'no': 'nor',
+  'tr': 'tur', 'ir': 'irn', 'iq': 'irq', 'sa': 'ksa', 'qa': 'qat',
+  'jo': 'jor', 'uz': 'uzb', 'au': 'aus', 'nz': 'nzl', 'ht': 'hai',
+  'pa': 'pan', 'ci': 'civ', 'cw': 'cur', 'ba': 'bih',
+};
+
+function getMatchSlugs() {
+  if (!matchData.length) return [];
+  const todayStr = new Date().toISOString().slice(0, 10);
+  return matchData
+    .filter(m => m.date >= todayStr && m.score1 === null && m.score2 === null)
+    .slice(0, 9)
+    .map(m => {
+      const poly1 = ISO_TO_POLY[teamIso[m.team1]];
+      const poly2 = ISO_TO_POLY[teamIso[m.team2]];
+      return poly1 && poly2 ? `fifwc-${poly1}-${poly2}-${m.date}` : null;
+    })
+    .filter(Boolean);
+}
 
 function fmtVol(v) {
   if (v >= 1e9) return `$${(v/1e9).toFixed(2)}B`;
@@ -45,8 +62,11 @@ function oddsTeamName(question) {
 
 async function loadOdds() {
   try {
+    const slugs = getMatchSlugs();
+    if (!slugs.length) return;
+
     const [matchRes, winnerRes] = await Promise.all([
-      Promise.all(POLYMARKET_SLUGS.map(slug =>
+      Promise.all(slugs.map(slug =>
         fetch(`https://gamma-api.polymarket.com/events?slug=${slug}`).then(r => r.json())
       )),
       fetch('https://gamma-api.polymarket.com/events?slug=world-cup-winner').then(r => r.json())
@@ -94,4 +114,4 @@ async function loadOdds() {
   }
 }
 
-loadOdds();
+// loadOdds() is called from main.js after matchData is populated by loadData()
