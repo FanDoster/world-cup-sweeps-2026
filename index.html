@@ -231,21 +231,30 @@
     }
     .match-date-header:first-child { margin-top: 0; padding-top: 4px; }
 
-    .matches-toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-    .results-toggle {
+    .matches-toolbar { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .teams-toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+    .filter-bar {
+      display: inline-flex;
       background: var(--card);
       border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .filter-btn {
+      background: transparent;
+      border: none;
       color: var(--text-secondary);
       font-family: var(--font);
       font-size: 0.75rem;
       font-weight: 600;
       padding: 6px 13px;
-      border-radius: var(--radius-sm);
       cursor: pointer;
       transition: all 0.15s;
+      border-right: 1px solid var(--border-subtle);
     }
-    .results-toggle:hover { color: var(--text); border-color: var(--border); background: var(--card-hover); }
-    .results-toggle.active { color: var(--accent); border-color: var(--accent-dim); }
+    .filter-btn:last-child { border-right: none; }
+    .filter-btn:hover { color: var(--text); background: var(--card-hover); }
+    .filter-btn.active { color: var(--accent); background: var(--surface); }
 
     .match-row {
       background: var(--card);
@@ -1565,7 +1574,17 @@
     </div>
 
     <div class="section-matches active" id="sectionMatches">
-    <div class="matches-toolbar"><button type="button" class="results-toggle" id="resultsToggle" onclick="togglePastResults()">Show completed matches</button></div>
+    <div class="matches-toolbar">
+      <div class="filter-bar" id="matchTeamFilterBar">
+        <button type="button" class="filter-btn active" data-filter="all" onclick="setMatchTeamFilter('all')">All Teams</button>
+        <button type="button" class="filter-btn" data-filter="mine" onclick="setMatchTeamFilter('mine')">My Teams</button>
+      </div>
+      <div class="filter-bar" id="matchFilterBar">
+        <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'matches')">Upcoming</button>
+        <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'matches')">Completed</button>
+        <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'matches')">All</button>
+      </div>
+    </div>
     <div class="matches-grid" id="matches"></div>
     </div>
 
@@ -1585,6 +1604,13 @@
     </div>
 
     <div class="section-teams" id="sectionTeams">
+      <div class="teams-toolbar">
+        <div class="filter-bar" id="teamFilterBar">
+          <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'teams')">Upcoming</button>
+          <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'teams')">Completed</button>
+          <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'teams')">All</button>
+        </div>
+      </div>
       <div class="team-chips" id="teamChips"></div>
       <div id="teamSchedule"></div>
     </div>
@@ -2135,13 +2161,32 @@
       if (diffDays >= -1 && diffDays <= 6) return days[d.getDay()];
       return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
     }
+    let matchFilter = 'upcoming';
+    let teamScheduleFilter = 'upcoming';
+    let matchTeamFilter = 'all';
 
-    let showPastResults = false;
-    function togglePastResults() {
-      showPastResults = !showPastResults;
-      const btn = document.getElementById('resultsToggle');
-      btn.textContent = showPastResults ? 'Hide completed matches' : 'Show completed matches';
-      btn.classList.toggle('active', showPastResults);
+    function setMatchFilter(filter, tab) {
+      if (tab === 'matches') {
+        matchFilter = filter;
+        // Update button states
+        document.querySelectorAll('#matchFilterBar .filter-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.filter === filter);
+        });
+        renderMatches();
+      } else if (tab === 'teams') {
+        teamScheduleFilter = filter;
+        document.querySelectorAll('#teamFilterBar .filter-btn').forEach(b => {
+          b.classList.toggle('active', b.dataset.filter === filter);
+        });
+        renderTeamSchedule();
+      }
+    }
+
+    function setMatchTeamFilter(filter) {
+      matchTeamFilter = filter;
+      document.querySelectorAll('#matchTeamFilterBar .filter-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.filter === filter);
+      });
       renderMatches();
     }
 
@@ -2149,17 +2194,27 @@
       const now = new Date();
       const twoDays = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
-      const all = matchData
+      let all = matchData
         .map(m => {
           const kickoff = toDate(m[0], m[1], m[2]);
           return { date: m[0], time: m[1], tz: m[2], team1: m[3], team2: m[4], group: m[5], score1: m[6], score2: m[7], channel: m[8], prob1: m[9], probD: m[10], prob2: m[11], kickoff };
         })
         .sort((a, b) => a.kickoff - b.kickoff);
 
+      // Filter by team ownership if 'My Teams' is selected
+      if (matchTeamFilter === 'mine' && currentProfile) {
+        const playerTeams = people[currentProfile.player_name] || [];
+        const teamNames = playerTeams.map(t => t.team);
+        all = all.filter(m => teamNames.includes(m.team1) || teamNames.includes(m.team2));
+      }
+
       // Split into upcoming vs completed
       const upcomingOnly = all.filter(m => m.score1 === null);
       const completed = all.filter(m => m.score1 !== null);
-      const visible = showPastResults ? all : upcomingOnly.slice(0, 36);
+      let visible;
+      if (matchFilter === 'all') visible = all;
+      else if (matchFilter === 'completed') visible = completed;
+      else visible = upcomingOnly.slice(0, 36);
 
       const el = document.getElementById('matches');
       if (visible.length === 0) {
@@ -2515,12 +2570,17 @@
         }))
         .sort((a, b) => a.kickoff - b.kickoff);
 
+      // Apply team schedule filter
+      let filtered = teamMatches;
+      if (teamScheduleFilter === 'upcoming') filtered = teamMatches.filter(m => m.score1 === null);
+      else if (teamScheduleFilter === 'completed') filtered = teamMatches.filter(m => m.score1 !== null);
+
       const now = new Date();
       const twoDays = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
       // Group by date
       const byDate = {};
-      for (const m of teamMatches) {
+      for (const m of filtered) {
         if (!byDate[m.date]) byDate[m.date] = [];
         byDate[m.date].push(m);
       }
@@ -2702,6 +2762,7 @@
       document.getElementById('sectionMyTeams').classList.toggle('active', tab === 'myteams');
       document.getElementById('sectionPredictions').classList.toggle('active', tab === 'predictions');
       document.getElementById('sectionMap').classList.toggle('active', tab === 'map');
+      if (tab === 'teams') { renderTeamChips(); }
       if (tab === 'map') { initGlobe(); renderTerritoryStandings(); }
       if (tab !== 'map') stopAutoRotate();
       if (tab === 'leaderboard') renderLeaderboard();
