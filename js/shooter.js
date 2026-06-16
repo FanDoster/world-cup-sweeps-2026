@@ -489,6 +489,7 @@ function sLoop(ts) {
   sLastTime = ts;
   if (sGameState === 'playing' || sGameState === 'wave-clear') sUpdatePlayer(dt);
   if (sGameState === 'playing') sUpdateEnemies(dt);
+  if (sGameState === 'playing' && sWave > 0 && !sEnemies.some(e => e.alive)) sCheckWaveClear();
   sRender();
 }
 
