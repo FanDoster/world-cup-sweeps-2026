@@ -1,0 +1,35 @@
+/* ── AUTH STYLES ── */
+.auth-bar { position: absolute; top: 12px; right: 0; display: flex; align-items: center; gap: 10px; font-size: 0.82rem; }
+.auth-bar .signed-in { color: var(--accent); font-weight: 600; }
+.auth-bar button { background: var(--card); color: var(--text-secondary); border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: var(--font); font-size: 0.8rem; font-weight: 600; transition: all 0.15s; }
+.auth-bar button:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
+.auth-bar button.sign-out-btn { border-color: transparent; color: var(--text-muted); }
+.auth-bar button.sign-out-btn:hover { color: var(--live); border-color: var(--live); }
+@media (max-width: 700px) {
+  .auth-bar {
+    position: static;
+    justify-content: center;
+    margin-top: 12px;
+    font-size: 0.78rem;
+  }
+  .auth-bar button { padding: 6px 12px; font-size: 0.76rem; }
+}
+.auth-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; }
+.auth-modal-overlay.active { display: flex; }
+.auth-modal { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 24px; width: 360px; max-width: 92vw; }
+.auth-modal h2 { font-size: 1.15rem; margin-bottom: 20px; color: var(--text); }
+.auth-modal label { display: block; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 4px; font-weight: 600; letter-spacing: 0.02em; }
+.auth-modal input, .auth-modal select { width: 100%; padding: 10px 12px; margin-bottom: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--font); font-size: 0.9rem; }
+.auth-modal input:focus, .auth-modal select:focus { outline: none; border-color: var(--accent); }
+.auth-modal select { cursor: pointer; }
+.auth-modal .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+.auth-modal button { flex: 1; padding: 10px; border-radius: 6px; border: none; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 0.88rem; transition: all 0.15s; }
+.auth-modal .btn-primary { background: var(--accent); color: #000; }
+.auth-modal .btn-primary:hover { background: var(--accent-dim); }
+.auth-modal .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+.auth-modal .btn-ghost:hover { color: var(--text); }
+.auth-modal .error-msg { color: var(--live); font-size: 0.78rem; margin-bottom: 10px; display: none; }
+.auth-modal .switch-link { text-align: center; margin-top: 12px; font-size: 0.78rem; color: var(--text-muted); }
+.auth-modal .switch-link a { color: var(--accent); cursor: pointer; text-decoration: none; }
+.auth-modal .switch-link a:hover { text-decoration: underline; }
+.my-teams-badge { background: var(--accent); color: #000; font-size: 0.68rem; font-weight: 800; padding: 1px 7px; border-radius: 4px; margin-left: 6px; }

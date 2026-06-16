@@ -1,0 +1,125 @@
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  /* Container */
+  .container { padding: 0 12px 48px; }
+
+  /* Header */
+  header { padding: 20px 0 24px; }
+  header h1 { font-size: 1.35rem; }
+  header .subtitle { font-size: 0.82rem; }
+
+  /* Tabs — equal width, emoji over label, two-line */
+  .tab-bar {
+    flex-wrap: nowrap;
+    gap: 2px;
+    padding: 3px;
+    margin-bottom: 20px;
+  }
+  .tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 7px 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    font-size: 0.62rem;
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+  .tab-btn .emoji {
+    display: block;
+    font-size: 1.1rem;
+    line-height: 1;
+    margin: 0;
+  }
+  .tab-btn .tab-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Grids */
+  .people-grid { grid-template-columns: 1fr; }
+  .matches-grid { grid-template-columns: 1fr; }
+  .match-date-header { font-size: 0.72rem; }
+  .groups-grid { grid-template-columns: 1fr; }
+
+  /* Match rows — compact on mobile */
+  .match-row { padding: 10px 12px; }
+  .match-countdown { font-size: 0.65rem; margin-bottom: 8px; }
+
+  /* Keep horizontal layout but tighten up */
+  .match-body { gap: 0; }
+
+  .match-date {
+    min-width: 50px;
+    max-width: 50px;
+    padding-right: 10px;
+    margin-right: 10px;
+  }
+  .match-date .time-label { font-size: 0.72rem; }
+
+  /* Team row: tighter names, smaller flags */
+  .match-team-home { gap: 5px; }
+  .match-team-away { gap: 5px; }
+  .match-team-home .team-name-label,
+  .match-team-away .team-name-label { font-size: 0.78rem; }
+  .match-flag { width: 70px; height: 48px; }
+  .match-centre { width: 56px; }
+  .match-score-pill { font-size: 0.85rem; padding: 4px 7px; }
+
+  /* Prob bar: always show on mobile (hover doesn't work) */
+  .match-prob-bar { height: 12px; opacity: 1; }
+  .match-prob-bar .prob-seg { color: rgba(0,0,0,0.65); }
+
+  /* Hide desktop date column via mobile-meta instead */
+  .match-date { display: none; }
+  .match-meta-mobile {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  /* Owner tags in match rows — smaller on mobile */
+  .match-owner { font-size: 0.58rem; padding: 1px 5px; }
+
+  /* Leaderboard — hide W-D-L on very small screens */
+  .leaderboard-table .wdl { display: none; }
+  .leaderboard-table th, .leaderboard-table td { padding: 10px 12px; }
+
+  /* Predictions cards — stack on mobile */
+  .pred-match-card .pmc-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .pred-match-card .pmc-date { min-width: unset; }
+  .pred-match-card .pmc-teams { font-size: 0.85rem; }
+  .pred-summary { gap: 8px; }
+  .pred-stat { padding: 10px 12px; }
+  .pred-stat .ps-num { font-size: 1.3rem; }
+
+  /* Tickers on mobile */
+  .ticker-clock { display: none; }
+  .ticker-label img { height: 22px; }
+  .ticker-label .tl-partners { display: none; }
+  .ticker-track .sponsor-tag { font-size: 0.75rem; }
+  .odds-item { font-size: 0.72rem; }
+  .odds-item .oi-vol { font-size: 0.65rem; }
+  .kickoff-item { font-size: 0.72rem; }
+  .ki-flag { height: 14px; }
+  .sponsor img { height: 18px; max-width: 72px; }
+  .sponsor { padding: 0 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+}
+
