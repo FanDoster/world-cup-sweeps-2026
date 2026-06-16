@@ -62,6 +62,71 @@ function sCastRay(px, py, rdx, rdy) {
   return { dist: Math.max(side === 0 ? sdx - ddx : sdy - ddy, 0.01), side };
 }
 
+// ── PLAYER CONTROLS ────────────────────────────────────────────────────────
+function sShoot() {
+  if (sGameState !== 'playing') return;
+  const now = performance.now();
+  if (now - sLastFireTime < 300) return;
+  sLastFireTime = now;
+  // Hit detection added in Task 6
+}
+
+function sUpdatePlayer(dt) {
+  if (sGameState !== 'playing') return;
+  const p = sPlayer;
+  const cos = Math.cos(p.angle), sin = Math.sin(p.angle);
+  const spd = S_MOVE_SPEED * dt;
+
+  p.angle += sMouseDX * S_ROT_SPEED;
+  sMouseDX = 0;
+
+  if (sKeys['KeyW'] || sKeys['ArrowUp']) {
+    const nx = p.x + cos * spd, ny = p.y + sin * spd;
+    if (!sIsWall(nx, p.y)) p.x = nx;
+    if (!sIsWall(p.x, ny)) p.y = ny;
+  }
+  if (sKeys['KeyS'] || sKeys['ArrowDown']) {
+    const nx = p.x - cos * spd, ny = p.y - sin * spd;
+    if (!sIsWall(nx, p.y)) p.x = nx;
+    if (!sIsWall(p.x, ny)) p.y = ny;
+  }
+  if (sKeys['KeyA']) {
+    const nx = p.x + sin * spd, ny = p.y - cos * spd;
+    if (!sIsWall(nx, p.y)) p.x = nx;
+    if (!sIsWall(p.x, ny)) p.y = ny;
+  }
+  if (sKeys['KeyD']) {
+    const nx = p.x - sin * spd, ny = p.y + cos * spd;
+    if (!sIsWall(nx, p.y)) p.x = nx;
+    if (!sIsWall(p.x, ny)) p.y = ny;
+  }
+}
+
+function sSetupInput() {
+  document.addEventListener('keydown', e => {
+    sKeys[e.code] = true;
+    if (e.code === 'Space') { e.preventDefault(); sShoot(); }
+  });
+  document.addEventListener('keyup', e => { sKeys[e.code] = false; });
+
+  sCanvas.addEventListener('click', () => {
+    if (sGameState === 'idle' || sGameState === 'dead') { sStartGame(); return; }
+    if (sGameState === 'paused') { sCanvas.requestPointerLock(); return; }
+    sCanvas.requestPointerLock();
+  });
+
+  document.addEventListener('pointerlockchange', () => {
+    sPointerLocked = document.pointerLockElement === sCanvas;
+    if (!sPointerLocked && sGameState === 'playing') sGameState = 'paused';
+    if (sPointerLocked && sGameState === 'paused') sGameState = 'playing';
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!sPointerLocked) return;
+    sMouseDX += e.movementX;
+  });
+}
+
 // ── RENDER ─────────────────────────────────────────────────────────────────
 function sRender() {
   const ctx = sCtx;
@@ -93,7 +158,25 @@ function sLoop(ts) {
   sAnimId = requestAnimationFrame(sLoop);
   const dt = Math.min((ts - sLastTime) / 1000, 0.05);
   sLastTime = ts;
+  if (sGameState === 'playing' || sGameState === 'wave-clear') sUpdatePlayer(dt);
   sRender();
+}
+
+// ── WAVE / GAME START ──────────────────────────────────────────────────────
+function sNextWave() {
+  sWave++;
+  sEnemies = [];
+  sGameState = 'playing';
+  if (sCanvas) sCanvas.requestPointerLock();
+}
+
+function sStartGame() {
+  sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
+  sWave = 0;
+  sEnemies = [];
+  sDamageFlash = 0;
+  sBossAnnounce = 0;
+  sNextWave();
 }
 
 // ── PUBLIC API ─────────────────────────────────────────────────────────────
@@ -104,6 +187,7 @@ function initShooter() {
   sCanvas.width = S_W;
   sCanvas.height = S_H;
   sCtx = sCanvas.getContext('2d');
+  sSetupInput();
   sAnimId = requestAnimationFrame(sLoop);
 }
 
