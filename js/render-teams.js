@@ -103,7 +103,7 @@ function renderTeamSchedule() {
                 </div>
               </div>
             </div>
-            <span class="match-group-badge">G${m.group}</span>${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
+            <span class="match-group-badge badge-mono">G${m.group}</span>${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
           </div>
           ${(() => {
             const key = `${m.team1}|${m.team2}|${m.date}`;
