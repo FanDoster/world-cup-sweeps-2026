@@ -185,7 +185,41 @@ function sShoot() {
   const now = performance.now();
   if (now - sLastFireTime < 300) return;
   sLastFireTime = now;
-  // Hit detection added in Task 6
+
+  const px = sPlayer.x, py = sPlayer.y, pa = sPlayer.angle;
+  const dirX = Math.cos(pa), dirY = Math.sin(pa);
+  const plX = -dirY * S_PLANE_LEN, plY = dirX * S_PLANE_LEN;
+  const invDet = 1 / (plX * dirY - dirX * plY);
+  const HIT_RANGE = 10;
+
+  let bestDist = Infinity, target = null;
+  for (const e of sEnemies) {
+    if (!e.alive) continue;
+    const sx = e.x - px, sy = e.y - py;
+    const transformY = invDet * (-plY * sx + plX * sy);
+    if (transformY <= 0 || transformY > HIT_RANGE) continue;
+    if (transformY >= sZBuffer[Math.round(S_W / 2)]) continue;
+    const transformX = invDet * (dirY * sx - dirX * sy);
+    const screenX = (S_W / 2) * (1 + transformX / transformY);
+    const sprW = Math.abs(S_H / transformY) * e.scale;
+    if (screenX < S_W / 2 - sprW / 2 || screenX > S_W / 2 + sprW / 2) continue;
+    if (transformY < bestDist) { bestDist = transformY; target = e; }
+  }
+
+  if (target) {
+    target.hp -= target.shotDmg;
+    if (target.hp <= 0) {
+      target.alive = false;
+      sPlayer.score += target.points;
+      sCheckWaveClear();
+    }
+  }
+}
+
+function sCheckWaveClear() {
+  if (sEnemies.some(e => e.alive)) return;
+  sGameState = 'wave-clear';
+  setTimeout(() => { if (sGameState === 'wave-clear') sNextWave(); }, 2000);
 }
 
 function sUpdatePlayer(dt) {
@@ -314,6 +348,12 @@ function sRender() {
     sZBuffer[x] = dist;
   }
   sRenderSprites();
+
+  if (sDamageFlash > 0) {
+    sCtx.fillStyle = `rgba(255,0,0,${(sDamageFlash / 8) * 0.4})`;
+    sCtx.fillRect(0, 0, S_W, S_H);
+    sDamageFlash--;
+  }
 }
 
 // ── GAME LOOP ──────────────────────────────────────────────────────────────
