@@ -5,8 +5,6 @@
 
   /* Header */
   header { padding: 20px 0 24px; }
-  header h1 { font-size: 1.35rem; }
-  header .subtitle { font-size: 0.82rem; }
 
   /* Tabs — equal width, emoji over label, two-line */
   .tab-bar {
