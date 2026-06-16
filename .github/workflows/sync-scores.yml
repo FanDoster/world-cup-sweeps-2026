@@ -1,0 +1,18 @@
+name: Sync FIFA Scores
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'   # every 30 minutes
+  workflow_dispatch:          # manual trigger from Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write Supabase key
+        run: echo "${{ secrets.SB_KEY }}" > /tmp/sb_key
+
+      - name: Run sync
+        run: python3 scripts/sync-scores.py
