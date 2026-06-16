@@ -185,6 +185,56 @@ function sRenderHud() {
   ctx.restore();
 }
 
+function sRenderOverlay() {
+  const ctx = sCtx;
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  if (sGameState === 'idle') {
+    ctx.fillStyle = 'rgba(0,0,0,0.78)';
+    ctx.fillRect(0, 0, S_W, S_H);
+    ctx.font = 'bold 50px monospace';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('⚽ FOOTSHOOTER', S_W / 2, S_H / 2 - 70);
+    ctx.font = 'bold 18px monospace';
+    ctx.fillStyle = '#aaa';
+    ctx.fillText('survive infinite waves of football legends', S_W / 2, S_H / 2 - 16);
+    ctx.fillText('WASD · mouse to aim · click/space to shoot', S_W / 2, S_H / 2 + 16);
+    ctx.font = 'bold 26px monospace';
+    ctx.fillStyle = '#ff0';
+    ctx.fillText('CLICK TO PLAY', S_W / 2, S_H / 2 + 76);
+  }
+
+  if (sGameState === 'dead') {
+    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.fillRect(0, 0, S_W, S_H);
+    ctx.font = 'bold 52px monospace';
+    ctx.fillStyle = '#f44';
+    ctx.fillText('GAME OVER', S_W / 2, S_H / 2 - 80);
+    ctx.font = 'bold 24px monospace';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(`Wave reached: ${sWave}`, S_W / 2, S_H / 2 - 16);
+    ctx.fillText(`Final score: ${sPlayer.score}`, S_W / 2, S_H / 2 + 20);
+    ctx.font = 'bold 22px monospace';
+    ctx.fillStyle = '#ff0';
+    ctx.fillText('CLICK TO PLAY AGAIN', S_W / 2, S_H / 2 + 80);
+  }
+
+  if (sGameState === 'paused') {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, S_W, S_H);
+    ctx.font = 'bold 40px monospace';
+    ctx.fillStyle = '#fff';
+    ctx.fillText('PAUSED', S_W / 2, S_H / 2 - 20);
+    ctx.font = '18px monospace';
+    ctx.fillStyle = '#aaa';
+    ctx.fillText('click to resume', S_W / 2, S_H / 2 + 20);
+  }
+
+  ctx.restore();
+}
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
 let sGameState = 'idle';   // idle | playing | wave-clear | dead | paused
@@ -428,6 +478,8 @@ function sRender() {
     sCtx.fillText(sWave % 10 === 0 ? '🇺🇸  TRUMP INCOMING  🇺🇸' : '⚠  BOSS WAVE  ⚠', S_W / 2, S_H / 4);
     sCtx.restore();
   }
+
+  sRenderOverlay();
 }
 
 // ── GAME LOOP ──────────────────────────────────────────────────────────────
