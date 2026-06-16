@@ -11,7 +11,7 @@ function switchTab(tab) {
   document.getElementById('sectionPredictions').classList.toggle('active', tab === 'predictions');
   document.getElementById('sectionMap').classList.toggle('active', tab === 'map');
   document.getElementById('sectionShooter').classList.toggle('active', tab === 'shooter');
-  if (tab === 'teams') renderTeamChips();
+  if (tab === 'teams') { renderTeamChips(); }
   if (tab === 'map') { initGlobe(); renderTerritoryStandings(); }
   if (tab !== 'map') stopAutoRotate();
   if (tab === 'leaderboard') renderLeaderboard();
