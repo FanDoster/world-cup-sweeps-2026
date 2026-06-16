@@ -33,6 +33,41 @@ const S_SPRITE_DEFS = {
   trump:          { src: 'sprites/trump.png',          bg: 'dark' },
 };
 
+// ── ENEMY TYPES ────────────────────────────────────────────────────────────
+const S_ENEMY_TYPES = {
+  rooney:         { sprite: 'rooney',        hp: 2,  speed: 2.0, scale: 1.0, damage: 10, behaviour: 'direct',   points: 10,  shotDmg: 1 },
+  gazza:          { sprite: 'gazza',         hp: 1,  speed: 3.0, scale: 1.0, damage: 10, behaviour: 'zigzag',   points: 10,  shotDmg: 1 },
+  sven:           { sprite: 'sven',          hp: 2,  speed: 1.5, scale: 1.0, damage: 10, behaviour: 'direct',   points: 10,  shotDmg: 1 },
+  starmer:        { sprite: 'starmer',       hp: 2,  speed: 2.0, scale: 1.0, damage: 10, behaviour: 'direct',   points: 10,  shotDmg: 1 },
+  maguire:        { sprite: 'maguire',       hp: 3,  speed: 1.2, scale: 1.0, damage: 10, behaviour: 'hesitate', points: 10,  shotDmg: 1 },
+  'gazza-trophy': { sprite: 'gazza-trophy',  hp: 5,  speed: 2.8, scale: 1.2, damage: 15, behaviour: 'zigzag',   points: 25,  shotDmg: 1 },
+  infantino:      { sprite: 'infantino',     hp: 10, speed: 3.5, scale: 1.5, damage: 20, behaviour: 'direct',   points: 50,  shotDmg: 2 },
+  trump:          { sprite: 'trump',         hp: 20, speed: 3.5, scale: 2.0, damage: 20, behaviour: 'direct',   points: 150, shotDmg: 2 },
+};
+
+function sSpawnEnemy(type, x, y) {
+  const def = S_ENEMY_TYPES[type];
+  return {
+    type, x, y,
+    sprite: def.sprite, hp: def.hp, maxHp: def.hp,
+    speed: def.speed, scale: def.scale, damage: def.damage,
+    behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
+    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0,
+  };
+}
+
+function sRandomSpawnPos() {
+  for (let i = 0; i < 200; i++) {
+    const x = 1 + Math.random() * (S_MAP[0].length - 2);
+    const y = 1 + Math.random() * (S_MAP.length - 2);
+    if (sIsWall(x, y)) continue;
+    const dx = x - sPlayer.x, dy = y - sPlayer.y;
+    if (dx * dx + dy * dy < 25) continue;  // ≥ 5 units from player
+    return { x, y };
+  }
+  return { x: 18.5, y: 11.5 };  // fallback: far corner
+}
+
 const sSprites = {};
 
 function sRemoveBg(img, bgType) {
@@ -209,6 +244,51 @@ function sSetupInput() {
   });
 }
 
+// ── ENEMY AI ───────────────────────────────────────────────────────────────
+function sUpdateEnemies(dt) {
+  for (const e of sEnemies) {
+    if (!e.alive) continue;
+    const dx = sPlayer.x - e.x, dy = sPlayer.y - e.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist < 0.7) {
+      e.attackCooldown -= dt;
+      if (e.attackCooldown <= 0) {
+        sPlayer.hp -= e.damage;
+        e.attackCooldown = 1.0;
+        sDamageFlash = 8;
+        if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameState = 'dead'; return; }
+      }
+      continue;
+    }
+
+    let moveX = 0, moveY = 0;
+    if (e.behaviour === 'direct') {
+      moveX = (dx / dist) * e.speed * dt;
+      moveY = (dy / dist) * e.speed * dt;
+    } else if (e.behaviour === 'zigzag') {
+      e.zigzagTimer -= dt;
+      if (e.zigzagTimer <= 0) { e.zigzagDir *= -1; e.zigzagTimer = 0.35 + Math.random() * 0.3; }
+      const base = Math.atan2(dy, dx);
+      moveX = Math.cos(base + e.zigzagDir * Math.PI / 4) * e.speed * dt;
+      moveY = Math.sin(base + e.zigzagDir * Math.PI / 4) * e.speed * dt;
+    } else if (e.behaviour === 'hesitate') {
+      if (dist < 5) {
+        e.hesitateTimer -= dt;
+        if (e.hesitateTimer > 0) continue;
+      } else {
+        e.hesitateTimer = 1.0;
+      }
+      moveX = (dx / dist) * e.speed * dt;
+      moveY = (dy / dist) * e.speed * dt;
+    }
+
+    const nx = e.x + moveX, ny = e.y + moveY;
+    if (!sIsWall(nx, e.y)) e.x = nx;
+    else if (!sIsWall(e.x, ny)) e.y = ny;
+  }
+}
+
 // ── RENDER ─────────────────────────────────────────────────────────────────
 function sRender() {
   const ctx = sCtx;
@@ -242,6 +322,7 @@ function sLoop(ts) {
   const dt = Math.min((ts - sLastTime) / 1000, 0.05);
   sLastTime = ts;
   if (sGameState === 'playing' || sGameState === 'wave-clear') sUpdatePlayer(dt);
+  if (sGameState === 'playing') sUpdateEnemies(dt);
   sRender();
 }
 
