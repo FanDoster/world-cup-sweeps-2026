@@ -23,6 +23,16 @@
   --radius-xs:     5px;
   --font:          -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
   --font-mono:     'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  /* ticker colour scale */
+  --ticker-dim:        rgba(255,255,255,0.3);
+  --ticker-mid:        rgba(255,255,255,0.55);
+  --ticker-full:       rgba(255,255,255,0.75);
+  /* semi-transparent borders used on dark surfaces */
+  --border-alpha:      rgba(255,255,255,0.08);
+  --border-alpha-mid:  rgba(255,255,255,0.12);
+  /* third-party brand colours */
+  --color-polymarket:  #2E5CFF;
+  --color-stats-green: #15803d;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
