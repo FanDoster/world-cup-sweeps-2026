@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A six-player sweepstakes tracker for the 2026 FIFA World Cup (live at world-cup-sweeps-2026.surge.sh). The app is **`index.html`** (CSS + HTML only) plus a `js/` directory of plain JS files loaded via `<script src>` tags — no build step, no package.json, no tests, no linter. All scripts run in global scope (no ES modules — required for `file://` compatibility). Backend is Supabase (Postgres + Auth) accessed directly from the browser via the supabase-js CDN bundle.
+A six-player sweepstakes tracker for the 2026 FIFA World Cup (live at world-cup-sweeps-2026.surge.sh). The app is **`index.html`** (HTML only — CSS lives in `css/` files) plus a `js/` directory of plain JS files loaded via `<script src>` tags — no build step, no package.json, no tests, no linter. All scripts run in global scope (no ES modules — required for `file://` compatibility). Backend is Supabase (Postgres + Auth) accessed directly from the browser via the supabase-js CDN bundle.
 
 `h2h-data.js` holds all-time records between every pair of the 48 qualified teams (record, draws, goals, World Cup meetings, first/last meeting, biggest win), crunched from the martj42/international_results dataset by `.claude/build-h2h.mjs` — re-run that script to refresh it; never hand-edit the data file.
 
@@ -29,6 +29,26 @@ Scripts load in dependency order (each file can call globals defined by earlier 
 | `js/globe.js` | D3 globe, territory fills/stripes, venue/territory panels |
 | `js/odds.js` | Broadcast clock, Polymarket odds ticker |
 | `js/main.js` | `switchTab`, init calls (`restoreSession`, `setInterval`) |
+
+### CSS file layout
+
+Stylesheets load in dependency order via `<link>` tags in `<head>` (tokens first, responsive last):
+
+| File | Responsibility |
+|------|---------------|
+| `css/tokens.css` | Design tokens (`:root` variables), reset, `body`, `.container`, utility classes (`.card-base`, `.badge-mono`, `.label-sm`) |
+| `css/layout.css` | Header, tab bar, section visibility, footer |
+| `css/matches.css` | Match grid, countdown strip, match body row, probability bar |
+| `css/groups.css` | People/player cards, group tables, owner tags, qualification scenarios |
+| `css/leaderboard.css` | Leaderboard table, stat badges, awards grid |
+| `css/teams.css` | Team chips, channel badges, win-probability badges |
+| `css/tickers.css` | All 4 ticker rows (sponsor, Polymarket odds, kickoff countdown, stats) + broadcast clock; shared base selectors reduce duplication |
+| `css/predictions.css` | Prediction cards, prediction history, match prediction dots |
+| `css/profile.css` | Player profile modal, match predictions panel, H2H block, your-prediction form, joker chip, comments |
+| `css/auth.css` | Auth bar, sign-in/sign-up modal |
+| `css/myteams.css` | My Teams tab grid |
+| `css/globe.css` | D3 globe, venue panel, territory standings |
+| `css/responsive.css` | `@media (max-width: 700px)` overrides for the main layout (auth and globe embed their own responsive rules inline) |
 
 ## Commands
 
