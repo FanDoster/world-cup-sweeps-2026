@@ -21,6 +21,88 @@ const S_MAP = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
 
+// ── SPRITES ────────────────────────────────────────────────────────────────
+const S_SPRITE_DEFS = {
+  rooney:         { src: 'sprites/rooney.png',        bg: 'transparent' },
+  gazza:          { src: 'sprites/gazza.png',          bg: 'white' },
+  'gazza-trophy': { src: 'sprites/gazza-trophy.png',  bg: 'transparent' },
+  sven:           { src: 'sprites/sven.png',           bg: 'transparent' },
+  starmer:        { src: 'sprites/starmer.png',        bg: 'transparent' },
+  maguire:        { src: 'sprites/maguire.png',        bg: 'transparent' },
+  infantino:      { src: 'sprites/infantino.png',      bg: 'dark' },
+  trump:          { src: 'sprites/trump.png',          bg: 'dark' },
+};
+
+const sSprites = {};
+
+function sRemoveBg(img, bgType) {
+  const ofc = document.createElement('canvas');
+  ofc.width = img.naturalWidth;
+  ofc.height = img.naturalHeight;
+  const octx = ofc.getContext('2d');
+  octx.drawImage(img, 0, 0);
+  if (bgType === 'transparent') return ofc;
+  const id = octx.getImageData(0, 0, ofc.width, ofc.height);
+  const d = id.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i], g = d[i+1], b = d[i+2];
+    if (bgType === 'white' && r > 230 && g > 230 && b > 230) d[i+3] = 0;
+    if (bgType === 'dark'  && r < 25  && g < 25  && b < 25)  d[i+3] = 0;
+  }
+  octx.putImageData(id, 0, 0);
+  return ofc;
+}
+
+function sLoadSprites() {
+  const keys = Object.keys(S_SPRITE_DEFS);
+  let loaded = 0;
+  keys.forEach(key => {
+    const img = new Image();
+    img.onload = () => {
+      sSprites[key] = sRemoveBg(img, S_SPRITE_DEFS[key].bg);
+      if (++loaded === keys.length) sSpriteReady = true;
+    };
+    img.src = S_SPRITE_DEFS[key].src;
+  });
+}
+
+function sRenderSprites() {
+  if (!sSpriteReady || !sEnemies.length) return;
+  const px = sPlayer.x, py = sPlayer.y, pa = sPlayer.angle;
+  const dirX = Math.cos(pa), dirY = Math.sin(pa);
+  const plX = -dirY * S_PLANE_LEN, plY = dirX * S_PLANE_LEN;
+  const invDet = 1 / (plX * dirY - dirX * plY);
+
+  const sorted = sEnemies
+    .filter(e => e.alive)
+    .map(e => ({ e, dist: (e.x - px) ** 2 + (e.y - py) ** 2 }))
+    .sort((a, b) => b.dist - a.dist);
+
+  for (const { e } of sorted) {
+    const sx = e.x - px, sy = e.y - py;
+    const transformX = invDet * (dirY * sx - dirX * sy);
+    const transformY = invDet * (-plY * sx + plX * sy);
+    if (transformY <= 0) continue;
+
+    const screenX = Math.round((S_W / 2) * (1 + transformX / transformY));
+    const sprH = Math.min(Math.abs(Math.round(S_H / transformY)) * e.scale, S_H * 2);
+    const sprW = sprH;
+    const drawX = screenX - sprW / 2;
+    const drawY = (S_H - sprH) / 2;
+
+    const img = sSprites[e.sprite];
+    if (!img) continue;
+
+    const x0 = Math.max(0, Math.floor(drawX));
+    const x1 = Math.min(S_W - 1, Math.floor(drawX + sprW));
+    for (let x = x0; x <= x1; x++) {
+      if (transformY >= sZBuffer[x]) continue;
+      const srcX = Math.floor((x - drawX) / sprW * img.width);
+      sCtx.drawImage(img, srcX, 0, 1, img.height, x, drawY, 1, sprH);
+    }
+  }
+}
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
 let sGameState = 'idle';   // idle | playing | wave-clear | dead | paused
@@ -151,6 +233,7 @@ function sRender() {
     ctx.fillRect(x, (S_H - wallH) / 2, 1, wallH);
     sZBuffer[x] = dist;
   }
+  sRenderSprites();
 }
 
 // ── GAME LOOP ──────────────────────────────────────────────────────────────
@@ -188,6 +271,7 @@ function initShooter() {
   sCanvas.height = S_H;
   sCtx = sCanvas.getContext('2d');
   sSetupInput();
+  if (!sSpriteReady) sLoadSprites();
   sAnimId = requestAnimationFrame(sLoop);
 }
 
