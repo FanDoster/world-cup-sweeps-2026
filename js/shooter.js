@@ -105,7 +105,7 @@ function sUpdatePlayer(dt) {
 function sSetupInput() {
   document.addEventListener('keydown', e => {
     sKeys[e.code] = true;
-    if (e.code === 'Space') { e.preventDefault(); sShoot(); }
+    if (e.code === 'Space' && sPointerLocked) { e.preventDefault(); sShoot(); }
   });
   document.addEventListener('keyup', e => { sKeys[e.code] = false; });
 
@@ -194,6 +194,7 @@ function initShooter() {
 function pauseShooter() {
   if (sAnimId) { cancelAnimationFrame(sAnimId); sAnimId = null; }
   if (document.pointerLockElement === sCanvas) document.exitPointerLock();
+  sKeys = {};
 }
 
 function resumeShooter() {
