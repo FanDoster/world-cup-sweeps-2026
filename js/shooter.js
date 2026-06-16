@@ -562,6 +562,7 @@ function pauseShooter() {
   if (sAnimId) { cancelAnimationFrame(sAnimId); sAnimId = null; }
   if (document.pointerLockElement === sCanvas) document.exitPointerLock();
   sKeys = {};
+  if (sGameState === 'playing' || sGameState === 'wave-clear') sGameState = 'paused';
 }
 
 function resumeShooter() {
