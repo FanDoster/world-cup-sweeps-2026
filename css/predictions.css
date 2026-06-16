@@ -1,0 +1,79 @@
+/* ── PREDICTIONS ── */
+.predictions-wrap { max-width: 780px; margin: 0 auto; }
+.pred-summary { display: flex; gap: 16px; margin-bottom: 28px; }
+.pred-stat { flex: 1; background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px; text-align: center; }
+.pred-stat .ps-num { font-size: 1.6rem; font-weight: 800; color: var(--text); line-height: 1; }
+.pred-stat .ps-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+.pred-stat.accent .ps-num { color: var(--accent); }
+.pred-stat.gold .ps-num { color: var(--gold); }
+.pred-section-title { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; margin-top: 28px; }
+.pred-section-title:first-child { margin-top: 0; }
+.pred-match-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0; margin-bottom: 6px; overflow: hidden; transition: border-color 0.15s; }
+.pred-match-card:hover { border-color: var(--border); }
+.pred-match-card .pmc-inner { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.pred-match-card .pmc-date { min-width: 110px; }
+.pred-match-card .pmc-date .pmc-day { font-size: 0.78rem; font-weight: 700; color: var(--text-secondary); }
+.pred-match-card .pmc-date .pmc-time { font-size: 0.68rem; color: var(--text-muted); }
+.pred-match-card .pmc-date .pmc-lock { font-size: 0.64rem; color: var(--accent); margin-top: 2px; font-weight: 600; }
+.pred-match-card .pmc-date .pmc-lock.locked-out { color: var(--text-muted); }
+.pred-match-card .pmc-teams { flex: 1; font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 8px; }
+.pred-match-card .pmc-group { font-size: 0.66rem; color: var(--text-muted); background: var(--surface); padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-weight: 700; }
+.pred-match-card .pmc-score { display: flex; align-items: center; gap: 6px; }
+.pred-match-card .pmc-score-wrap { display: flex; flex-direction: column; align-items: center; }
+.pred-match-card .pmc-score input { 
+  width: 52px; height: 44px; text-align: center; 
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px; 
+  color: var(--text); font-family: var(--font-mono); font-size: 1.25rem; font-weight: 700;
+  -moz-appearance: textfield; appearance: textfield; padding: 0;
+  caret-color: var(--accent); transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pred-match-card .pmc-score input::-webkit-inner-spin-button,
+.pred-match-card .pmc-score input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.pred-match-card .pmc-score input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.pred-match-card .pmc-score .pmc-step { 
+  width: 36px; height: 24px; display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border: 1px solid var(--border); cursor: pointer;
+  font-size: 0.8rem; color: var(--text-muted); user-select: none;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pred-match-card .pmc-score .pmc-step:first-of-type { border-radius: 5px 5px 0 0; border-bottom: none; }
+.pred-match-card .pmc-score .pmc-step:last-of-type { border-radius: 0 0 5px 5px; }
+.pred-match-card .pmc-score .pmc-step:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
+.pred-match-card .pmc-score .pmc-step:active { background: var(--accent-dim); color: #000; }
+.pred-match-card .pmc-score .pmc-dash { color: var(--text-muted); font-weight: 700; font-size: 1rem; }
+/* mobile: ensure tap targets */
+@media (max-width: 600px) {
+  .pred-match-card .pmc-score input { width: 48px; height: 42px; font-size: 1.15rem; }
+  .pred-match-card .pmc-score .pmc-step { width: 34px; height: 22px; font-size: 0.75rem; }
+}
+.pred-match-card .pmc-status { font-size: 0.75rem; font-weight: 700; padding: 5px 12px; border-radius: 5px; white-space: nowrap; }
+.pmc-status.predicted { background: rgba(16,185,129,0.12); color: var(--accent); }
+.pmc-status.locked { background: rgba(75,91,110,0.15); color: var(--text-muted); }
+.pmc-status.open { color: var(--text-secondary); }
+.pred-match-card .pmc-btn { padding: 6px 14px; border-radius: 5px; border: none; cursor: pointer; font-family: var(--font); font-weight: 700; font-size: 0.78rem; transition: all 0.15s; white-space: nowrap; }
+.pmc-btn.predict { background: var(--accent); color: #000; }
+.pmc-btn.predict:hover { background: var(--accent-dim); }
+.pmc-btn.edit { background: transparent; color: var(--accent); border: 1px solid var(--accent-dim); }
+.pmc-btn.edit:hover { background: var(--accent-glow); }
+.pmc-btn.save { background: var(--accent); color: #000; }
+/* ── HISTORY ── */
+.pred-history-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 6px; display: flex; align-items: center; gap: 14px; }
+.pred-history-card .phc-result { min-width: 52px; text-align: center; }
+.pred-history-card .phc-icon { font-size: 1.3rem; }
+.pred-history-card .phc-match { flex: 1; }
+.pred-history-card .phc-teams { font-weight: 700; font-size: 0.88rem; }
+.pred-history-card .phc-scores { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+.pred-history-card .phc-scores span { font-weight: 700; }
+.phc-scores .actual { color: var(--text); }
+.phc-scores .pred { color: var(--text-muted); }
+.phc-scores .hit-marker { color: var(--accent); }
+.phc-scores .miss-marker { color: var(--live); }
+.phc-scores .exact-marker { color: var(--gold); }
+.pred-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+.pred-empty .pe-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+/* ── MATCH PREDICTION DOTS ── */
+.match-pred-dots { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+.pred-dot { font-size: 0.62rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-family: var(--font); letter-spacing: 0.02em; white-space: nowrap; }
+.pred-dot.has-pred { background: rgba(16,185,129,0.12); color: var(--accent); }
+.pred-dot.no-pred { background: rgba(75,91,110,0.1); color: var(--text-muted); }
