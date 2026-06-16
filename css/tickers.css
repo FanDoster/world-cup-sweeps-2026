@@ -1,9 +1,10 @@
 /* ── TICKERS ── */
+
 .tickers-container {
   display: flex;
   align-items: stretch;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-top: 1px solid var(--border-alpha);
+  border-bottom: 1px solid var(--border-alpha);
 }
 .tickers-rows {
   flex: 1;
@@ -13,21 +14,97 @@
 }
 .tickers-rows .ticker-outer { border-bottom: 1px solid rgba(255,255,255,0.06); }
 
-.ticker-outer {
-  display: flex;
-  align-items: stretch;
-  background: rgba(0,0,0,0.2);
-}
-.ticker-label {
+/* ── SHARED ROW BASES ── */
+.ticker-outer,
+.odds-outer,
+.kickoff-outer,
+.stats-outer { display: flex; align-items: stretch; }
+
+.ticker-label,
+.odds-label,
+.kickoff-label,
+.stats-label {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.odds-label,
+.kickoff-label,
+.stats-label {
+  padding: 5px 12px;
+  gap: 1px;
+  border-right: 1px solid var(--border-alpha-mid);
+}
+
+.odds-wrap,
+.kickoff-wrap,
+.stats-wrap {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+
+.odds-track,
+.kickoff-track,
+.stats-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.odds-item,
+.kickoff-item {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ticker-full);
+}
+
+.ticker-divider,
+.odds-divider,
+.kickoff-divider,
+.stats-divider { font-size: 1rem; padding: 0 2px; }
+
+.odds-loading,
+.kickoff-loading,
+.stats-loading {
+  font-size: 0.7rem;
+  color: var(--ticker-dim);
+  letter-spacing: 0.1em;
+  padding: 0 20px;
+}
+
+.odds-track.scrolling    { animation: odds-scroll    30s linear infinite; }
+.kickoff-track.scrolling { animation: kickoff-scroll 20s linear infinite; }
+.stats-track             { transition: opacity 0.35s ease; }
+
+@keyframes ticker-scroll  { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes odds-scroll    { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes kickoff-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes stats-scroll   { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+.ticker-outer:hover .ticker-track             { animation-play-state: paused; }
+.odds-outer:hover .odds-track.scrolling       { animation-play-state: paused; }
+.kickoff-outer:hover .kickoff-track.scrolling { animation-play-state: paused; }
+.stats-outer:hover .stats-track               { animation-play-state: paused; }
+
+/* ── SPONSOR TICKER (Infantino quotes) ── */
+.ticker-outer { background: rgba(0,0,0,0.2); }
+.ticker-label {
   padding: 6px 12px;
-  background: #000;
   gap: 3px;
-  border-right: 1px solid rgba(255,255,255,0.12);
+  background: #000;
+  border-right: 1px solid var(--border-alpha-mid);
 }
 .ticker-label img { height: 26px; width: auto; display: block; }
 .ticker-label .tl-partners {
@@ -35,7 +112,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.6);
+  color: var(--ticker-mid);
   white-space: nowrap;
 }
 .ticker-wrap {
@@ -50,10 +127,6 @@
   align-items: center;
   width: max-content;
   animation: ticker-scroll 22s linear infinite;
-}
-@keyframes ticker-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
 }
 .sponsor {
   display: flex;
@@ -74,253 +147,83 @@
 .sponsor img.gs     { filter: brightness(100%) grayscale(1) opacity(0.75); }
 .ticker-track .sponsor-tag {
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.55);
+  color: var(--ticker-mid);
   letter-spacing: 0.06em;
   white-space: nowrap;
   text-transform: uppercase;
 }
-.ticker-outer:hover .ticker-track             { animation-play-state: paused; }
-.odds-outer:hover .odds-track.scrolling       { animation-play-state: paused; }
-.kickoff-outer:hover .kickoff-track.scrolling { animation-play-state: paused; }
-.stats-outer:hover .stats-track               { animation-play-state: paused; }
+.ticker-divider { color: rgba(255,255,255,0.15); }
 
-.ticker-divider {
-  color: rgba(255,255,255,0.15);
-  font-size: 1rem;
-  padding: 0 4px;
-  flex-shrink: 0;
-  align-self: center;
-}
-
-/* Polymarket odds ticker */
-.odds-outer {
-  display: flex;
-  align-items: stretch;
-  background: rgba(0,0,0,0.35);
-}
-.odds-label {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 12px;
-  background: #2E5CFF;
-  gap: 1px;
-  border-right: 1px solid rgba(255,255,255,0.15);
-}
+/* ── POLYMARKET ODDS TICKER ── */
+.odds-outer { background: rgba(0,0,0,0.35); }
+.odds-label { background: var(--color-polymarket); }
 .odds-label .ol-top {
-  font-size: 0.5rem;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.8);
-  text-transform: uppercase;
+  font-size: 0.5rem; font-weight: 900; letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.8); text-transform: uppercase;
 }
 .odds-label .ol-brand {
-  font-size: 0.7rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  color: #fff;
-  text-transform: uppercase;
-  white-space: nowrap;
+  font-size: 0.7rem; font-weight: 900; letter-spacing: 0.08em;
+  color: #fff; text-transform: uppercase; white-space: nowrap;
 }
 .odds-label .ol-sub {
-  font-size: 0.38rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.6);
-  text-transform: uppercase;
-  white-space: nowrap;
+  font-size: 0.38rem; font-weight: 700; letter-spacing: 0.12em;
+  color: var(--ticker-mid); text-transform: uppercase; white-space: nowrap;
 }
-.odds-wrap {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-}
-.odds-track {
-  display: flex;
-  align-items: center;
-  width: max-content;
-  white-space: nowrap;
-  will-change: transform;
-}
-.odds-track.scrolling { animation: odds-scroll 30s linear infinite; }
-@keyframes odds-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.odds-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 28px;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
-  color: rgba(255,255,255,0.75);
-  text-transform: uppercase;
-}
+.odds-item { gap: 6px; padding: 0 28px; }
 .odds-item .oi-match { color: #fff; font-weight: 700; }
 .odds-item .oi-prob  { color: #f90; font-weight: 700; }
-.odds-item .oi-vol   { color: rgba(255,255,255,0.75); font-size: 0.8rem; }
-.odds-divider { color: #2E5CFF; font-size: 1rem; opacity: 0.6; padding: 0 2px; }
-.odds-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
+.odds-item .oi-vol   { color: var(--ticker-full); font-size: 0.8rem; }
+.odds-divider { color: var(--color-polymarket); opacity: 0.6; }
 
-/* Kickoff countdown ticker */
-.kickoff-outer {
-  display: flex;
-  align-items: stretch;
-  background: rgba(0,0,0,0.25);
-}
-.kickoff-label {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 12px;
-  background: #000;
-  gap: 1px;
-  border-right: 1px solid rgba(255,255,255,0.12);
-}
+/* ── KICKOFF COUNTDOWN TICKER ── */
+.kickoff-outer { background: rgba(0,0,0,0.25); }
+.kickoff-label { background: #000; }
 .kickoff-label .kl-top {
-  font-size: 0.5rem;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.8);
-  text-transform: uppercase;
+  font-size: 0.5rem; font-weight: 900; letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.8); text-transform: uppercase;
 }
 .kickoff-label .kl-brand {
-  font-size: 0.7rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  color: #fff;
-  text-transform: uppercase;
-  white-space: nowrap;
+  font-size: 0.7rem; font-weight: 900; letter-spacing: 0.08em;
+  color: #fff; text-transform: uppercase; white-space: nowrap;
 }
-.kickoff-wrap {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-}
-.kickoff-track {
-  display: flex;
-  align-items: center;
-  width: max-content;
-  white-space: nowrap;
-  will-change: transform;
-}
-.kickoff-track.scrolling { animation: kickoff-scroll 20s linear infinite; }
-@keyframes kickoff-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-.kickoff-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 28px;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.75);
-}
+.kickoff-item { gap: 8px; padding: 0 28px; }
 .ki-flag { height: 18px; width: auto; }
 .ki-team { color: #fff; font-weight: 700; }
 .ki-vs   { color: rgba(255,255,255,0.4); font-size: 0.75rem; }
 .ki-sep  { color: rgba(255,255,255,0.3); }
 .ki-cd   { color: #f90; font-weight: 700; }
 .ki-live { color: #4ade80; font-weight: 700; }
-.kickoff-divider { color: rgba(255,255,255,0.2); font-size: 1rem; padding: 0 2px; }
-.kickoff-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
+.kickoff-divider { color: rgba(255,255,255,0.2); }
 
-/* Tournament stats ticker */
-.stats-outer {
-  display: flex;
-  align-items: stretch;
-  background: rgba(0,0,0,0.3);
-}
-.stats-label {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 12px;
-  background: #15803d;
-  gap: 1px;
-  border-right: 1px solid rgba(255,255,255,0.15);
-}
+/* ── TOURNAMENT STATS TICKER ── */
+.stats-outer { background: rgba(0,0,0,0.3); }
+.stats-label { background: var(--color-stats-green); }
 .stats-label .sl-top {
-  font-size: 0.5rem;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.8);
-  text-transform: uppercase;
+  font-size: 0.5rem; font-weight: 900; letter-spacing: 0.18em;
+  color: rgba(255,255,255,0.8); text-transform: uppercase;
 }
 .stats-label .sl-brand {
-  font-size: 0.65rem;
-  font-weight: 900;
-  letter-spacing: 0.05em;
-  color: #fff;
-  text-transform: uppercase;
-  white-space: nowrap;
-  min-width: 4ch;
-  text-align: center;
-  transition: opacity 0.35s ease;
+  font-size: 0.65rem; font-weight: 900; letter-spacing: 0.05em;
+  color: #fff; text-transform: uppercase; white-space: nowrap;
+  min-width: 4ch; text-align: center; transition: opacity 0.35s ease;
 }
 .stats-label .sl-sub {
-  font-size: 0.38rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.6);
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.stats-wrap {
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-}
-.stats-track {
-  display: flex;
-  align-items: center;
-  width: max-content;
-  white-space: nowrap;
-  will-change: transform;
-  transition: opacity 0.35s ease;
-}
-/* animation set inline by JS — @keyframes only needed here */
-@keyframes stats-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  font-size: 0.38rem; font-weight: 700; letter-spacing: 0.12em;
+  color: var(--ticker-mid); text-transform: uppercase; white-space: nowrap;
 }
 .st-cat { font-size: 0; }
 .st-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 0.9rem; letter-spacing: 0.04em;
+  text-transform: uppercase; white-space: nowrap;
 }
 .st-item .si-flag { width: 17px; height: 12px; object-fit: cover; border-radius: 1px; flex-shrink: 0; }
 .st-item .si-rank { color: rgba(255,255,255,0.45); font-size: 0.7rem; font-weight: 700; min-width: 1ch; }
 .st-item .si-name { color: #fff; font-weight: 700; }
 .st-item .si-stat { color: #f90; font-weight: 700; padding-left: 2px; }
 .st-divider { color: rgba(255,255,255,0.45); font-size: 1rem; padding: 0 8px; }
-.stats-loading { font-size: 0.7rem; color: rgba(255,255,255,0.3); letter-spacing: 0.1em; padding: 0 20px; }
 
-/* Broadcast clock */
+/* ── BROADCAST CLOCK ── */
 .ticker-clock {
   flex-shrink: 0;
   display: flex;
@@ -332,7 +235,7 @@
   gap: 3px;
   border-left: 1px solid rgba(255,255,255,0.1);
   min-width: 88px;
-  box-shadow: inset 4px 0 0 #2E5CFF;
+  box-shadow: inset 4px 0 0 var(--color-polymarket);
 }
 .ticker-clock .tc-time {
   font-family: 'Share Tech Mono', monospace;
@@ -355,7 +258,6 @@
   font-size: 0.5rem;
   font-weight: 700;
   letter-spacing: 0.15em;
-  color: #2E5CFF;
+  color: var(--color-polymarket);
   text-transform: uppercase;
 }
-
