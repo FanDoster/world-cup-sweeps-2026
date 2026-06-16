@@ -402,6 +402,32 @@ function sRender() {
     sDamageFlash--;
   }
   if (sGameState === 'playing' || sGameState === 'wave-clear') sRenderHud();
+
+  if (sGameState === 'wave-clear') {
+    sCtx.save();
+    sCtx.fillStyle = 'rgba(0,0,0,0.45)';
+    sCtx.fillRect(0, 0, S_W, S_H);
+    sCtx.textAlign = 'center';
+    sCtx.textBaseline = 'middle';
+    sCtx.font = 'bold 48px monospace';
+    sCtx.fillStyle = '#0f0';
+    sCtx.fillText('WAVE CLEAR', S_W / 2, S_H / 2);
+    sCtx.font = 'bold 18px monospace';
+    sCtx.fillStyle = '#aaa';
+    sCtx.fillText(`preparing wave ${sWave + 1}…`, S_W / 2, S_H / 2 + 52);
+    sCtx.restore();
+  }
+
+  if (sGameState === 'playing' && sBossAnnounce > 0) {
+    sBossAnnounce--;
+    sCtx.save();
+    sCtx.font = 'bold 32px monospace';
+    sCtx.textAlign = 'center';
+    sCtx.textBaseline = 'middle';
+    sCtx.fillStyle = `rgba(255,50,50,${sBossAnnounce / 120})`;
+    sCtx.fillText(sWave % 10 === 0 ? '🇺🇸  TRUMP INCOMING  🇺🇸' : '⚠  BOSS WAVE  ⚠', S_W / 2, S_H / 4);
+    sCtx.restore();
+  }
 }
 
 // ── GAME LOOP ──────────────────────────────────────────────────────────────
@@ -415,11 +441,47 @@ function sLoop(ts) {
 }
 
 // ── WAVE / GAME START ──────────────────────────────────────────────────────
+function sWaveEnemyList(wave) {
+  if (wave % 10 === 0) return [{ type: 'trump',     count: 1 }];
+  if (wave % 5 === 0)  return [{ type: 'infantino', count: 1 }];
+
+  const isMini = wave % 3 === 0;
+  const list = [];
+
+  if (wave === 1) {
+    list.push({ type: 'rooney', count: 3 });
+  } else if (wave === 2) {
+    list.push({ type: 'rooney', count: 3 }, { type: 'gazza', count: 2 });
+  } else if (wave === 3) {
+    list.push({ type: 'rooney', count: 2 }, { type: 'gazza', count: 2 });
+  } else if (wave === 4) {
+    list.push({ type: 'rooney', count: 2 }, { type: 'gazza', count: 2 },
+               { type: 'sven', count: 1 }, { type: 'starmer', count: 1 }, { type: 'maguire', count: 1 });
+  } else {
+    const pool = ['rooney', 'gazza', 'sven', 'starmer', 'maguire'];
+    const total = 6 + (wave - 4) * 2;
+    for (let i = 0; i < total; i++) {
+      list.push({ type: pool[Math.floor(Math.random() * pool.length)], count: 1 });
+    }
+  }
+
+  if (isMini) list.push({ type: 'gazza-trophy', count: 1 });
+  return list;
+}
+
 function sNextWave() {
   sWave++;
   sEnemies = [];
   sGameState = 'playing';
-  if (sCanvas) sCanvas.requestPointerLock();
+  if (sWave % 5 === 0) sBossAnnounce = 120;
+  const entries = sWaveEnemyList(sWave);
+  for (const entry of entries) {
+    for (let i = 0; i < entry.count; i++) {
+      const pos = sRandomSpawnPos();
+      sEnemies.push(sSpawnEnemy(entry.type, pos.x, pos.y));
+    }
+  }
+  if (sCanvas && sGameState === 'playing') sCanvas.requestPointerLock();
 }
 
 function sStartGame() {
