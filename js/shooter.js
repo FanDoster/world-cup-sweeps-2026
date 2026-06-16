@@ -72,7 +72,7 @@ function sShoot() {
 }
 
 function sUpdatePlayer(dt) {
-  if (sGameState !== 'playing') return;
+  if (sGameState !== 'playing' && sGameState !== 'wave-clear') return;
   const p = sPlayer;
   const cos = Math.cos(p.angle), sin = Math.sin(p.angle);
   const spd = S_MOVE_SPEED * dt;
