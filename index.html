@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="css/myteams.css">
   <link rel="stylesheet" href="css/globe.css">
   <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/shooter.css">
 </head>
 <body>
   <div class="container">
@@ -186,6 +187,7 @@
       <button type="button" class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')"><span class="emoji">🏅</span><span class="tab-label"> Leaderboard</span></button>
       <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span><span class="tab-label"> Teams</span></button>
       <button type="button" class="tab-btn" data-tab="map" onclick="switchTab('map')"><span class="emoji">🌐</span><span class="tab-label"> Battle Map</span></button>
+      <button type="button" class="tab-btn" data-tab="shooter" onclick="switchTab('shooter')"><span class="emoji">🔫</span><span class="tab-label"> Shooter</span></button>
     </div>
 
     <div class="section-players" id="sectionPlayers">
@@ -258,6 +260,10 @@
         <div class="ts-scores" id="tsScores"></div>
         <div class="ts-grid" id="tsGrid"></div>
       </div>
+    </div>
+
+    <div class="section-shooter" id="sectionShooter">
+      <canvas id="shooter-canvas"></canvas>
     </div>
 
     <div class="section-myteams" id="sectionMyTeams">
@@ -351,6 +357,7 @@
   <script src="js/render-myteams.js"></script>
   <script src="js/render-profile.js"></script>
   <script src="js/globe.js"></script>
+  <script src="js/shooter.js"></script>
   <script src="js/odds.js"></script>
   <script src="js/main.js"></script>
 </body>

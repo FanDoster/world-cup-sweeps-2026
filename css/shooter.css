@@ -1,0 +1,22 @@
+.section-shooter {
+  display: none;
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 120px);
+  background: #000;
+  overflow: hidden;
+}
+
+.section-shooter.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#shooter-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  image-rendering: pixelated;
+  cursor: none;
+}

@@ -10,12 +10,15 @@ function switchTab(tab) {
   document.getElementById('sectionMyTeams').classList.toggle('active', tab === 'myteams');
   document.getElementById('sectionPredictions').classList.toggle('active', tab === 'predictions');
   document.getElementById('sectionMap').classList.toggle('active', tab === 'map');
-  if (tab === 'teams') { renderTeamChips(); }
+  document.getElementById('sectionShooter').classList.toggle('active', tab === 'shooter');
+  if (tab === 'teams') renderTeamChips();
   if (tab === 'map') { initGlobe(); renderTerritoryStandings(); }
   if (tab !== 'map') stopAutoRotate();
   if (tab === 'leaderboard') renderLeaderboard();
   if (tab === 'myteams') renderMyTeams();
   if (tab === 'predictions') renderPredictions();
+  if (tab === 'shooter') initShooter();
+  if (tab !== 'shooter') pauseShooter();
 }
 
 // ── INIT ──
