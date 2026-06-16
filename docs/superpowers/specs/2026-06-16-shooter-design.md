@@ -17,10 +17,14 @@ A standalone Wolfenstein/Doom-style ray-cast first-person shooter embedded as a 
 |------|---------|
 | `js/shooter.js` | Ray-caster engine + game logic (entire game lives here) |
 | `css/shooter.css` | Canvas container, overlay screens, game-over panel |
-| `sprites/rooney.png` | Wayne Rooney sprite (transparent background) |
-| `sprites/gazza.png` | Paul Gascoigne sprite (white background — handled via canvas multiply) |
-| `sprites/southgate.png` | Gareth Southgate sprite (to be added) |
-| `sprites/infantino.png` | Gianni Infantino boss sprite (to be added) |
+| `sprites/rooney.png` | Wayne Rooney — regular enemy (transparent bg) |
+| `sprites/gazza.png` | Paul Gascoigne, Spurs kit — regular enemy (white bg, multiply composite) |
+| `sprites/gazza-trophy.png` | Gazza holding World Cup — mini-boss (transparent bg) |
+| `sprites/sven.png` | Sven-Göran Eriksson — regular enemy (transparent bg) |
+| `sprites/starmer.png` | Keir Starmer in England shirt — regular enemy (transparent bg) |
+| `sprites/maguire.png` | Harry Maguire hands-up — regular enemy (transparent bg) |
+| `sprites/infantino.png` | Gianni Infantino holding trophy — boss (black bg, screen composite) |
+| `sprites/trump.png` | Donald Trump holding World Cup — final boss (dark bg, screen composite) |
 
 Existing files modified: `index.html` (new tab button + canvas container), `js/main.js` (tab switch wires up pointer lock release).
 
@@ -96,14 +100,30 @@ Mouse look via the Pointer Lock API (`canvas.requestPointerLock()`). Click the c
 |-------|--------|-------|----|-----------|
 | Rooney | `rooney.png` | Medium | 2 | Walks directly toward player |
 | Gazza | `gazza.png` | Fast | 1 | Erratic — zigzags toward player |
-| Southgate | `southgate.png` | Slow | 3 | Hesitates, then cautiously advances |
+| Sven | `sven.png` | Slow | 2 | Calm, methodical advance |
+| Starmer | `starmer.png` | Medium | 2 | Walks directly toward player |
+| Maguire | `maguire.png` | Slow | 3 | Hands up, hesitates, then charges |
 
-### Boss — Infantino
+### Mini-boss — Gazza-Trophy (waves 3, 6, 9…)
+
+- Spawns alone among regular enemies at every 3rd non-boss wave
+- `gazza-trophy.png` rendered at 1.2× scale
+- 5 HP, erratic zigzag movement
+- Worth 25 pts
+
+### Boss — Infantino (waves 5, 10, 15…)
 
 - Spawns alone at wave 5, 10, 15, …
-- `infantino.png` sprite rendered at 1.5× normal enemy scale
+- `infantino.png` sprite rendered at 1.5× normal enemy scale, black bg composited with `screen`
 - 10 HP, moves in a direct beeline at full speed
-- Worth 50 pts (vs 10 pts for regular enemies)
+- Worth 50 pts
+
+### Mega-boss — Trump (waves 10, 20, 30…)
+
+- Spawns alone every 10 waves, replaces Infantino on those waves
+- `trump.png` sprite rendered at 2× scale, dark bg composited with `screen`
+- 20 HP, full speed beeline, contact damage 20 (double normal)
+- Worth 150 pts
 
 ### Pathfinding
 
@@ -119,9 +139,12 @@ On contact (distance < 0.6 units): deal 10 damage to player, knock enemy back 0.
 
 - Wave 1: 3 Rooneys
 - Wave 2: 3 Rooneys + 2 Gazzas
-- Wave 3: 2 Rooneys + 2 Gazzas + 2 Southgates
-- Wave 4+: random mix, count = `6 + (wave - 4) * 2`
-- Wave 5, 10, 15, …: Infantino boss (alone; next wave starts after defeat)
+- Wave 3: 2 Rooneys + 2 Gazzas + 1 Gazza-Trophy (mini-boss)
+- Wave 4: random mix from regular pool, count = 7
+- Wave 5: Infantino (alone)
+- Wave 6+: random mix from regular pool, count = `6 + (wave - 4) * 2`, mini-boss every 3rd non-boss wave
+- Wave 10, 20, 30…: Trump mega-boss (alone, replaces Infantino on those waves)
+- Wave 5, 15, 25…: Infantino boss (alone)
 - Enemies spawn at random open cells at least 5 units from the player
 - Next wave begins 2 seconds after last enemy dies (brief "WAVE CLEAR" text)
 
