@@ -114,14 +114,14 @@ function renderMatches() {
                 </div>
               </div>
               <div class="match-meta-row">
-                <span class="match-group-badge">G${m.group}</span>
+                <span class="match-group-badge badge-mono">G${m.group}</span>
                 ${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
               </div>
             </div>
           </div>
           <div class="match-meta-mobile" style="display:none">
             <span>${dateLabel} ${localTime}</span>
-            <span class="match-group-badge" style="margin:0">G${m.group}</span>
+            <span class="match-group-badge badge-mono" style="margin:0">G${m.group}</span>
             ${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
           </div>
           ${hasProbs ? `<div class="match-prob-bar"><span class="prob-seg prob-h" style="width:${m.prob1}%" title="${m.team1} win ${m.prob1}%">${m.prob1}%</span><span class="prob-seg prob-d" style="width:${m.probD}%" title="Draw ${m.probD}%">${m.probD}%</span><span class="prob-seg prob-a" style="width:${m.prob2}%" title="${m.team2} win ${m.prob2}%">${m.prob2}%</span></div>` : ''}

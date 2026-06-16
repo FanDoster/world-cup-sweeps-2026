@@ -5,9 +5,6 @@
   gap: 16px;
 }
 .person-card {
-  background: var(--card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius);
   padding: 20px 22px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -73,12 +70,8 @@
 .team-name { flex: 1; font-size: 0.92rem; color: var(--text); }
 .team-group {
   font-size: 0.72rem;
-  color: var(--text-muted);
-  background: var(--surface);
   padding: 3px 8px;
-  border-radius: 4px;
   font-weight: 700;
-  font-family: var(--font-mono);
   letter-spacing: 0.02em;
   flex-shrink: 0;
 }
@@ -90,9 +83,6 @@
   gap: 14px;
 }
 .group-card {
-  background: var(--card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius);
   padding: 18px 20px;
   transition: border-color 0.2s;
   overflow-x: auto;

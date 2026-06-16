@@ -67,7 +67,7 @@ function renderAwards(standings) {
     awards.push(['🥄', 'Wooden Spoon', bottom.name, `${bottom.total} total pts… so far`]);
   }
 
-  el.innerHTML = awards.length ? `<div class="awards-title">🏆 Tournament Awards</div><div class="awards-grid">${awards.map(([icon, name, holder, detail]) => `
+  el.innerHTML = awards.length ? `<div class="awards-title label-sm">🏆 Tournament Awards</div><div class="awards-grid">${awards.map(([icon, name, holder, detail]) => `
     <div class="award-card"><span class="aw-icon">${icon}</span><div><div class="aw-name">${name}</div><div class="aw-holder">${holder === 'Laurie' ? playerDisplayName('Laurie') : holder}</div><div class="aw-detail">${detail}</div></div></div>`).join('')}</div>` : '';
 }
 

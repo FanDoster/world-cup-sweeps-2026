@@ -350,12 +350,8 @@
 
 .match-group-badge {
   font-size: 0.62rem;
-  color: var(--text-muted);
-  background: var(--surface);
   padding: 3px 8px;
-  border-radius: 4px;
   font-weight: 800;
-  font-family: var(--font-mono);
   letter-spacing: 0.04em;
   flex-shrink: 0;
 }

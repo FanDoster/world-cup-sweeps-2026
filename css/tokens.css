@@ -52,3 +52,23 @@ body {
   padding: 0 24px 48px;
 }
 
+/* ── UTILITY CLASSES ── */
+.card-base {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+}
+.badge-mono {
+  font-family: var(--font-mono);
+  background: var(--surface);
+  border-radius: 4px;
+  color: var(--text-muted);
+}
+.label-sm {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+

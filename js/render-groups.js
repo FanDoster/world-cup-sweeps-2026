@@ -6,7 +6,7 @@ function renderPeople() {
   standings.forEach(s => { matchPts[s.name] = s.pts; });
   for (const [name, teams] of Object.entries(people)) {
     const card = document.createElement("div");
-    card.className = "person-card";
+    card.className = "person-card card-base";
     card.style.cursor = 'pointer';
     card.onclick = () => showProfile(name);
     const badges = [];
@@ -20,7 +20,7 @@ function renderPeople() {
           <li class="team-item" onclick="selectTeam('${t.team}')" title="View ${t.team} schedule">
             <img class="team-flag" src="${flagUrl(t.iso)}" alt="" loading="lazy" onerror="this.style.display='none'">
             <span class="team-name">${t.team}</span>
-            <span class="team-group">Group ${t.group}</span>
+            <span class="team-group badge-mono">Group ${t.group}</span>
           </li>
         `).join("")}
       </ul>
@@ -101,7 +101,7 @@ function renderGroups() {
     }).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team));
 
     const card = document.createElement("div");
-    card.className = "group-card";
+    card.className = "group-card card-base";
 
     const rowsHtml = rows.map((r, i) => `
       <tr class="${i < 2 ? 'qual' : i === 2 ? 'third' : ''}">
@@ -149,7 +149,7 @@ function renderGroups() {
   // Best third-placed teams — top 8 of 12 advance in the 48-team format
   thirds.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.team.localeCompare(b.team));
   const thirdsCard = document.createElement("div");
-  thirdsCard.className = "group-card";
+  thirdsCard.className = "group-card card-base";
   thirdsCard.innerHTML = `
     <div class="group-title">Best 3rd-Placed Teams <span class="thirds-note">top 8 advance</span></div>
     <table class="group-table">

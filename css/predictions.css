@@ -6,7 +6,7 @@
 .pred-stat .ps-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
 .pred-stat.accent .ps-num { color: var(--accent); }
 .pred-stat.gold .ps-num { color: var(--gold); }
-.pred-section-title { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; margin-top: 28px; }
+.pred-section-title { margin-bottom: 10px; margin-top: 28px; }
 .pred-section-title:first-child { margin-top: 0; }
 .pred-match-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 0; margin-bottom: 6px; overflow: hidden; transition: border-color 0.15s; }
 .pred-match-card:hover { border-color: var(--border); }
@@ -17,7 +17,7 @@
 .pred-match-card .pmc-date .pmc-lock { font-size: 0.64rem; color: var(--accent); margin-top: 2px; font-weight: 600; }
 .pred-match-card .pmc-date .pmc-lock.locked-out { color: var(--text-muted); }
 .pred-match-card .pmc-teams { flex: 1; font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 8px; }
-.pred-match-card .pmc-group { font-size: 0.66rem; color: var(--text-muted); background: var(--surface); padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-weight: 700; }
+.pred-match-card .pmc-group { font-size: 0.66rem; padding: 2px 7px; font-weight: 700; }
 .pred-match-card .pmc-score { display: flex; align-items: center; gap: 6px; }
 .pred-match-card .pmc-score-wrap { display: flex; flex-direction: column; align-items: center; }
 .pred-match-card .pmc-score input { 

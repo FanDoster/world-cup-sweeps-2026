@@ -34,7 +34,7 @@ async function renderPredictions() {
     <div class="pred-stat"><div class="ps-num">${locked}</div><div class="ps-label">Locked</div></div>
   </div>`;
 
-  html += '<div class="pred-section-title">Upcoming Matches</div>';
+  html += '<div class="pred-section-title label-sm">Upcoming Matches</div>';
   let hasOpen = false;
   for (const m of upcoming) {
     const key = `${m.team1}|${m.team2}|${m.date}`;
@@ -46,7 +46,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
           <span class="pmc-status locked">🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}${ep.is_joker ? ' <span class="joker-mini" title="Joker — points doubled">🃏2×</span>' : ''}</span>
         </div></div>`;
     } else if (ep) {
@@ -56,7 +56,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
           <span class="pmc-status predicted" id="pred-display-${mid}">${ep.predicted_home_score}–${ep.predicted_away_score}</span>
           ${jokersEnabled ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
           <div class="pmc-score" id="pred-edit-${mid}" style="display:none">
@@ -79,7 +79,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
           <span class="pmc-status locked">Locked</span>
         </div></div>`;
     } else {
@@ -89,7 +89,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group">G${m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
           <div class="pmc-score">
             <div class="pmc-score-wrap">
               <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
@@ -142,7 +142,7 @@ async function renderPredictions() {
         <div class="pred-stat accent"><div class="ps-num">${correctCount}</div><div class="ps-label">Scored</div></div>
       </div>`;
     }
-    html += `<div class="pred-section-title">Your History</div>${statsHtml}${historyHtml}`;
+    html += `<div class="pred-section-title label-sm">Your History</div>${statsHtml}${historyHtml}`;
   }
 
   el.innerHTML = html;
