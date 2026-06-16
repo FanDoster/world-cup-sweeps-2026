@@ -174,7 +174,18 @@ Utility classes live in `css/tokens.css` (they are global primitives, not compon
 
 ---
 
-## 7. Out of Scope
+## 7. CLAUDE.md Update
+
+After migration, update `CLAUDE.md` to:
+
+1. Change the description from "index.html (CSS + HTML only)" to reflect that CSS now lives in `css/` files loaded via `<link>` tags.
+2. Add a CSS file layout table (mirroring the existing JS file layout table) documenting each file and its responsibility.
+
+The table should follow the same format as the JS table and list all 13 files with a one-line description of what each covers.
+
+---
+
+## 8. Out of Scope
 
 - CSS variables for every value (only repeated magic numbers get tokenised)
 - CSS nesting or any modern syntax that changes browser support
