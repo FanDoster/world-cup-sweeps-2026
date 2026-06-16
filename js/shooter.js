@@ -138,6 +138,53 @@ function sRenderSprites() {
   }
 }
 
+function sRenderHud() {
+  const ctx = sCtx;
+  ctx.save();
+
+  // Crosshair
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+  ctx.lineWidth = 1.5;
+  const cx = S_W / 2, cy = S_H / 2;
+  ctx.beginPath(); ctx.moveTo(cx - 9, cy); ctx.lineTo(cx + 9, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy - 9); ctx.lineTo(cx, cy + 9); ctx.stroke();
+
+  // Wave + enemies remaining (top-left)
+  const alive = sEnemies.filter(e => e.alive).length;
+  ctx.font = 'bold 14px monospace';
+  ctx.textBaseline = 'top';
+  const waveText = `WAVE ${sWave}  ·  ${alive} LEFT`;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(6, 6, ctx.measureText(waveText).width + 12, 24);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(waveText, 12, 10);
+
+  // Score (top-right)
+  const scoreText = `SCORE: ${sPlayer.score}`;
+  const sw = ctx.measureText(scoreText).width;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(S_W - sw - 18, 6, sw + 12, 24);
+  ctx.fillStyle = '#ff0';
+  ctx.fillText(scoreText, S_W - sw - 12, 10);
+
+  // Health bar (bottom-left)
+  const hpFrac = Math.max(0, sPlayer.hp / 100);
+  const bx = 12, by = S_H - 30, bw = 150, bh = 14;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(bx - 2, by - 2, bw + 4, bh + 4);
+  ctx.fillStyle = hpFrac > 0.5 ? '#0f0' : hpFrac > 0.25 ? '#ff0' : '#f44';
+  ctx.fillRect(bx, by, bw * hpFrac, bh);
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(bx, by, bw, bh);
+  ctx.font = 'bold 10px monospace';
+  ctx.fillStyle = '#fff';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(`HP: ${sPlayer.hp}`, bx + bw + 6, by + bh / 2);
+
+  ctx.restore();
+}
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
 let sGameState = 'idle';   // idle | playing | wave-clear | dead | paused
@@ -354,6 +401,7 @@ function sRender() {
     sCtx.fillRect(0, 0, S_W, S_H);
     sDamageFlash--;
   }
+  if (sGameState === 'playing' || sGameState === 'wave-clear') sRenderHud();
 }
 
 // ── GAME LOOP ──────────────────────────────────────────────────────────────
