@@ -10,3 +10,4 @@ update-scores.py
 
 # Git worktrees
 .worktrees/
+.superpowers/
