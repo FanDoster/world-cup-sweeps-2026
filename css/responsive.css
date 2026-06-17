@@ -105,6 +105,9 @@
   .pred-stat { padding: 10px 12px; }
   .pred-stat .ps-num { font-size: 1.3rem; }
 
+  /* Hide shooter tab on mobile — not playable without mouse/keyboard */
+  .shooter-tab { display: none; }
+
   /* Tickers on mobile */
   .ticker-clock { display: none; }
   .ticker-label img { height: 22px; }
