@@ -300,6 +300,9 @@ let sRooneyLastPlayed = 0;
 const sStarmerSound = new Audio('sounds/starmer.mp3');
 sStarmerSound.preload = 'auto';
 let sStarmerLastPlayed = 0;
+const sGazzaSound = new Audio('sounds/gazza.mp3');
+sGazzaSound.preload = 'auto';
+let sGazzaLastPlayed = 0;
 function sPlayHit(type) {
   if (type === 'rooney') {
     const now = performance.now();
@@ -315,6 +318,14 @@ function sPlayHit(type) {
     sStarmerLastPlayed = now;
     sStarmerSound.currentTime = 0;
     sStarmerSound.play().catch(() => {});
+    return;
+  }
+  if (type === 'gazza') {
+    const now = performance.now();
+    if (!sGazzaSound.paused || now - sGazzaLastPlayed < 4000) return;
+    sGazzaLastPlayed = now;
+    sGazzaSound.currentTime = 0;
+    sGazzaSound.play().catch(() => {});
     return;
   }
   sHitSound.currentTime = 0; sHitSound.play().catch(() => {});
