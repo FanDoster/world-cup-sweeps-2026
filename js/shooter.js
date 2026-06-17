@@ -38,7 +38,7 @@ const S_SPRITE_DEFS = {
 const S_ENEMY_TYPES = {
   rooney:         { sprite: 'rooney',        hp: 2,  speed: 2.0, scale: 1.0, damage: 10, behaviour: 'direct',   points: 10,  shotDmg: 1 },
   gazza:          { sprite: 'gazza',         hp: 1,  speed: 3.0, scale: 1.0, damage: 10, behaviour: 'zigzag',   points: 10,  shotDmg: 1 },
-  sven:           { sprite: 'sven',          hp: 2,  speed: 1.5, scale: 1.0, damage: 10, behaviour: 'direct',   points: 10,  shotDmg: 1 },
+  sven:           { sprite: 'sven',          hp: 5,  speed: 1.5, scale: 1.0, damage: 10, behaviour: 'direct',   points: 10,  shotDmg: 1 },
   starmer:        { sprite: 'starmer',       hp: 2,  speed: 2.0, scale: 1.0, damage: 10, behaviour: 'direct',   points: 10,  shotDmg: 1 },
   maguire:        { sprite: 'maguire',       hp: 3,  speed: 1.2, scale: 1.0, damage: 10, behaviour: 'hesitate', points: 10,  shotDmg: 1 },
   'gazza-trophy': { sprite: 'gazza-trophy',  hp: 5,  speed: 2.8, scale: 1.2, damage: 15, behaviour: 'zigzag',   points: 25,  shotDmg: 1 },
@@ -53,7 +53,7 @@ function sSpawnEnemy(type, x, y) {
     sprite: def.sprite, hp: def.hp, maxHp: def.hp,
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
-    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, shootTimer: 2,
+    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, shootTimer: type === 'sven' ? 1 : 2,
   };
 }
 
@@ -378,9 +378,11 @@ function sIsWall(x, y) {
 }
 
 function sEnemyBlocked(x, y) {
-  const r = 0.3;
+  const r = 0.3, d = r * 0.707;
   return sIsWall(x + r, y) || sIsWall(x - r, y) ||
-         sIsWall(x, y + r) || sIsWall(x, y - r);
+         sIsWall(x, y + r) || sIsWall(x, y - r) ||
+         sIsWall(x + d, y + d) || sIsWall(x - d, y + d) ||
+         sIsWall(x + d, y - d) || sIsWall(x - d, y - d);
 }
 
 function sPlayerBlocked(x, y) {
@@ -627,7 +629,7 @@ function sUpdateEnemies(dt) {
     if (e.type === 'sven' && dist > 2 && e.fleeTimer <= 0) {
       e.shootTimer -= dt;
       if (e.shootTimer <= 0) {
-        e.shootTimer = 3 + Math.random() * 2;
+        e.shootTimer = 1 + Math.random() * 1;
         sSvenProjectiles.push({ x: e.x, y: e.y, dx: (dx / dist) * 7, dy: (dy / dist) * 7 });
       }
     }
@@ -666,6 +668,13 @@ function sUpdateEnemies(dt) {
         if (!sEnemyBlocked(e.x, ay)) { e.y = ay; break; }
       }
     }
+
+    // Safety clamp — if enemy somehow escaped the outer walls, pull back in
+    const MARGIN = 1.3;
+    e.x = Math.max(MARGIN, Math.min(S_MAP[0].length - MARGIN, e.x));
+    e.y = Math.max(MARGIN, Math.min(S_MAP.length - MARGIN, e.y));
+    // If still inside a wall after clamping (shouldn't happen normally), kill and score 0
+    if (sIsWall(e.x, e.y)) { e.alive = false; sCheckWaveClear(); }
   }
 }
 
@@ -930,6 +939,16 @@ function sStartGame() {
   sNextWave();
 }
 
+function sPreloadVideos() {
+  sWaveClearGifs.forEach(({ src }) => {
+    const v = document.createElement('video');
+    v.src = src;
+    v.preload = 'auto';
+    v.muted = true;
+    v.load();
+  });
+}
+
 // ── PUBLIC API ─────────────────────────────────────────────────────────────
 function initShooter() {
   if (sShooterInited) { resumeShooter(); return; }
@@ -941,6 +960,7 @@ function initShooter() {
   sGenTextures();
   sSetupInput();
   if (!sSpriteReady) sLoadSprites();
+  sPreloadVideos();
   sAnimId = requestAnimationFrame(sLoop);
 }
 

@@ -47,7 +47,7 @@
 
 #wave-clear-top {
   top: 16px;
-  font-size: clamp(24px, 5vw, 40px);
+  font-size: clamp(48px, 10vw, 80px);
   color: #00ff44;
   text-shadow: -2px 0 #004400, 2px 0 #004400, 0 -2px #004400, 0 2px #004400,
                -3px -3px #004400, 3px -3px #004400, -3px 3px #004400, 3px 3px #004400;
@@ -55,7 +55,7 @@
 
 #wave-clear-bottom {
   bottom: 16px;
-  font-size: clamp(16px, 3vw, 24px);
+  font-size: clamp(32px, 6vw, 48px);
   color: #aaaaaa;
   text-shadow: -2px 0 #222, 2px 0 #222, 0 -2px #222, 0 2px #222,
                -2px -2px #222, 2px -2px #222, -2px 2px #222, 2px 2px #222;
