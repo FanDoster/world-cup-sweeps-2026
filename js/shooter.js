@@ -52,7 +52,7 @@ function sSpawnEnemy(type, x, y) {
     sprite: def.sprite, hp: def.hp, maxHp: def.hp,
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
-    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0,
+    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0,
   };
 }
 
@@ -134,7 +134,12 @@ function sRenderSprites() {
       if (transformY >= sZBuffer[x]) continue;
       const srcX = Math.floor((x - drawX) / sprW * img.width);
       sCtx.drawImage(img, srcX, 0, 1, img.height, x, drawY, 1, sprH);
+      if (e.hitFlash > 0) {
+        sCtx.fillStyle = `rgba(255,255,255,${(e.hitFlash / 8) * 0.7})`;
+        sCtx.fillRect(x, drawY, 1, sprH);
+      }
     }
+    if (e.hitFlash > 0) e.hitFlash--;
   }
 }
 
@@ -305,6 +310,7 @@ function sShoot() {
 
   if (target) {
     target.hp -= target.shotDmg;
+    target.hitFlash = 8;
     if (target.hp <= 0) {
       target.alive = false;
       sPlayer.score += target.points;
