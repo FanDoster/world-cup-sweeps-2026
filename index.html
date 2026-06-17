@@ -332,6 +332,20 @@
       </div>
     </div>
 
+    <!-- Team Result Notification -->
+    <div class="auth-modal-overlay" id="teamResultModal">
+      <div class="auth-modal" style="text-align:center">
+        <canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:200"></canvas>
+        <div class="result-emoji" id="resultEmoji" style="font-size:3.5rem;line-height:1;margin-bottom:8px"></div>
+        <h2 style="text-align:center;margin-bottom:4px" id="resultTitle"></h2>
+        <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:4px" id="resultSubtitle"></p>
+        <div id="resultDetails" style="margin-bottom:18px;font-size:0.88rem;color:var(--text-secondary);line-height:1.6"></div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="dismissTeamResults()">Got it</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Player Profile Modal -->
     <div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
       <div class="profile-card" id="profileCard"></div>
@@ -364,6 +378,7 @@
   <script src="js/globe.js"></script>
   <script src="js/shooter.js"></script>
   <script src="js/odds.js"></script>
+  <script src="js/team-results.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>
