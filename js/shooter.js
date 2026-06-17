@@ -181,7 +181,7 @@ function sRenderHud() {
   const enemyLabel = `${alive} REMAIN`;
   const wavesUntilBoss = 5 - (sWave % 5);
   const isBossWave = sWave % 5 === 0;
-  const bossText = isBossWave ? 'BOSS WAVE!' : `${wavesUntilBoss} UNTIL BOSS`;
+  const bossText = isBossWave ? 'BOSS WAVE!' : `${wavesUntilBoss} ${wavesUntilBoss === 1 ? 'WAVE' : 'WAVES'} UNTIL BOSS`;
   const bossColor = isBossWave ? '#f44' : wavesUntilBoss === 1 ? '#ff0' : '#aaa';
   const bossOutline = isBossWave ? '#600' : wavesUntilBoss === 1 ? '#440' : '#333';
   const bossFontSize = isBossWave ? 20 : 8 + (4 - Math.min(3, wavesUntilBoss - 1)) * 3;
