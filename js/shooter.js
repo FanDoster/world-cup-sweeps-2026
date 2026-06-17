@@ -5,18 +5,19 @@ const S_PLANE_LEN = Math.tan(S_FOV / 2);   // camera plane half-width ≈ 0.577
 const S_MOVE_SPEED = 3.0;                   // map units/second
 const S_ROT_SPEED = 0.002;                  // radians per pixel of mouse movement
 
+// Wall types: 1=concrete, 2=goal net, 3=hoarding
 const S_MAP = [
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-  [1,0,0,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,1],
-  [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
-  [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
-  [1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1],
-  [1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,1],
-  [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
-  [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1],
-  [1,0,0,1,1,1,0,0,0,0,0,0,0,1,1,1,0,0,0,1],
+  [1,0,0,2,2,2,0,0,0,0,0,0,0,3,3,3,0,0,0,1],
+  [1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1],
+  [1,0,0,2,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,1],
+  [1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,1],
+  [1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,0,0,0,0,1],
+  [1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1],
+  [1,0,0,3,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,1],
+  [1,0,0,3,3,3,0,0,0,0,0,0,0,2,2,2,0,0,0,1],
   [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
 ];
@@ -361,7 +362,7 @@ let sKeys = {}, sMouseDX = 0;
 function sIsWall(x, y) {
   const mx = Math.floor(x), my = Math.floor(y);
   if (my < 0 || my >= S_MAP.length || mx < 0 || mx >= S_MAP[0].length) return true;
-  return S_MAP[my][mx] === 1;
+  return S_MAP[my][mx] > 0;
 }
 
 function sEnemyBlocked(x, y) {
@@ -384,9 +385,13 @@ function sCastRay(px, py, rdx, rdy) {
   for (let i = 0; i < 64; i++) {
     if (sdx < sdy) { sdx += ddx; mx += stepX; side = 0; }
     else           { sdy += ddy; my += stepY; side = 1; }
-    if (S_MAP[my] && S_MAP[my][mx] === 1) break;
+    if (S_MAP[my] && S_MAP[my][mx] > 0) break;
   }
-  return { dist: Math.max(side === 0 ? sdx - ddx : sdy - ddy, 0.01), side };
+  const dist = Math.max(side === 0 ? sdx - ddx : sdy - ddy, 0.01);
+  const wallType = (S_MAP[my] && S_MAP[my][mx]) || 1;
+  let wallX = side === 0 ? py + dist * rdy : px + dist * rdx;
+  wallX -= Math.floor(wallX);
+  return { dist, side, wallX, wallType };
 }
 
 // ── PLAYER CONTROLS ────────────────────────────────────────────────────────
@@ -566,6 +571,49 @@ function sUpdateEnemies(dt) {
 }
 
 // ── RENDER ─────────────────────────────────────────────────────────────────
+// ── WALL TEXTURES ───────────────────────────────────────────────────────────
+const sTextures = {};
+function sGenTextures() {
+  // 1: Stadium concrete — grey brick with red/white FIFA trim
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#556655'; ctx.fillRect(0, 0, 64, 64);
+    for (let row = 0; row < 8; row++) {
+      const y = row * 8, offset = (row % 2) * 16;
+      ctx.fillStyle = '#3a4a3a'; ctx.fillRect(0, y, 64, 1);
+      for (let col = 0; col < 5; col++) ctx.fillRect((col * 16 + offset) % 64, y, 1, 8);
+    }
+    ctx.fillStyle = '#bb0022'; ctx.fillRect(0, 0, 64, 6); ctx.fillRect(0, 58, 64, 6);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 6, 64, 1); ctx.fillRect(0, 57, 64, 1);
+    sTextures[1] = c;
+  }
+  // 2: Goal net — dark background with white grid
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#080818'; ctx.fillRect(0, 0, 64, 64);
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    for (let i = 0; i < 64; i += 8) { ctx.fillRect(i, 0, 1, 64); ctx.fillRect(0, i, 64, 1); }
+    sTextures[2] = c;
+  }
+  // 3: Pitch-side hoarding — green turf over red/white ad board
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#1d6b1d'; ctx.fillRect(0, 0, 64, 42);
+    ctx.fillStyle = '#228b22';
+    for (let i = 0; i < 4; i++) ctx.fillRect(i * 16, 0, 8, 42);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 40, 64, 2);
+    ctx.fillStyle = '#dd0022'; ctx.fillRect(0, 42, 64, 22);
+    ctx.fillStyle = '#ffffff';
+    for (let i = 0; i < 4; i++) ctx.fillRect(i * 16, 42, 8, 22);
+    ctx.fillStyle = '#dd0022';
+    for (let i = 0; i < 4; i++) ctx.fillRect(i * 16 + 2, 46, 4, 14);
+    sTextures[3] = c;
+  }
+}
+
 function sRender() {
   const ctx = sCtx;
   const px = sPlayer.x, py = sPlayer.y, pa = sPlayer.angle;
@@ -583,10 +631,13 @@ function sRender() {
   for (let x = 0; x < S_W; x++) {
     const camX = 2 * x / S_W - 1;
     const rdx = dirX + plX * camX, rdy = dirY + plY * camX;
-    const { dist, side } = sCastRay(px, py, rdx, rdy);
+    const { dist, side, wallX, wallType } = sCastRay(px, py, rdx, rdy);
     const wallH = Math.min(S_H / dist, S_H);
-    ctx.fillStyle = side === 0 ? '#5a5a5a' : '#3a3a3a';
-    ctx.fillRect(x, (S_H - wallH) / 2, 1, wallH);
+    const wallTop = (S_H - wallH) / 2;
+    const tex = sTextures[wallType] || sTextures[1];
+    const texX = Math.floor(wallX * 64);
+    ctx.drawImage(tex, texX, 0, 1, 64, x, wallTop, 1, wallH);
+    if (side === 1) { ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(x, wallTop, 1, wallH); }
     sZBuffer[x] = dist;
   }
   sRenderSprites();
@@ -724,6 +775,7 @@ function initShooter() {
   sCanvas.width = S_W;
   sCanvas.height = S_H;
   sCtx = sCanvas.getContext('2d');
+  sGenTextures();
   sSetupInput();
   if (!sSpriteReady) sLoadSprites();
   sAnimId = requestAnimationFrame(sLoop);
