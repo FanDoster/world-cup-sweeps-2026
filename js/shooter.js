@@ -54,6 +54,7 @@ function sSpawnEnemy(type, x, y) {
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
     alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, hideTarget: null, shootTimer: type === 'sven' ? 1 : 2,
+    strafeTimer: 2, strafeDir: 1, chargeTimer: 3, chargeMode: false,
   };
 }
 
@@ -521,7 +522,7 @@ function sShoot() {
     target.hitFlash = 8;
     if (target.type === 'trump') {
       target.hitsReceived++;
-      if (target.hitsReceived % 4 === 0) { target.fleeTimer = 2 + Math.random() * 1; target.hideTarget = null; }
+      if (target.hitsReceived % 3 === 0) { target.fleeTimer = 3 + Math.random() * 2; target.hideTarget = null; }
     }
     if (target.hp <= 0) {
       target.alive = false;
@@ -738,7 +739,29 @@ function sUpdateEnemies(dt) {
     }
 
     let moveX = 0, moveY = 0;
-    if (e.behaviour === 'direct') {
+    if (e.type === 'trump') {
+      // Strafe direction toggles every 1.5-3.5s
+      e.strafeTimer -= dt;
+      if (e.strafeTimer <= 0) { e.strafeDir *= -1; e.strafeTimer = 1.5 + Math.random() * 2; }
+      // Charge mode: sprint at player for ~0.7s, then orbit for 3-5s
+      e.chargeTimer -= dt;
+      if (e.chargeTimer <= 0) {
+        e.chargeMode = !e.chargeMode;
+        e.chargeTimer = e.chargeMode ? (0.5 + Math.random() * 0.5) : (3 + Math.random() * 2);
+      }
+      if (e.chargeMode || dist > 9) {
+        // Sprint straight at player
+        moveX = (dx / dist) * e.speed * 2.0 * dt;
+        moveY = (dy / dist) * e.speed * 2.0 * dt;
+      } else {
+        // Orbit: strafe perpendicular + maintain ~5 unit radius
+        const perpX = -(dy / dist) * e.strafeDir;
+        const perpY =  (dx / dist) * e.strafeDir;
+        const radial = (dist - 5) * 0.5;  // pull toward preferred radius
+        moveX = (perpX * e.speed + (dx / dist) * radial) * dt;
+        moveY = (perpY * e.speed + (dy / dist) * radial) * dt;
+      }
+    } else if (e.behaviour === 'direct') {
       moveX = (dx / dist) * e.speed * dt;
       moveY = (dy / dist) * e.speed * dt;
     } else if (e.behaviour === 'zigzag') {
@@ -840,12 +863,18 @@ function sFireMultiball() {
   if (target) {
     target.hp -= 1;
     target.hitFlash = 3;
+    if (target.type === 'trump') {
+      target.hitsReceived++;
+      if (target.hitsReceived % 3 === 0) { target.fleeTimer = 3 + Math.random() * 2; target.hideTarget = null; }
+    }
     if (target.hp <= 0) {
       target.alive = false;
       sPlayer.score += target.points;
       sPlayHit(target.type);
       sPlayDeath();
       sCheckWaveClear();
+    } else {
+      sPlayHit(target.type);
     }
   }
 }
