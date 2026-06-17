@@ -240,6 +240,18 @@ function sRenderOverlay() {
   ctx.restore();
 }
 
+// ── AUDIO ──────────────────────────────────────────────────────────────────
+const sKickSounds = ['sounds/kick1.wav', 'sounds/kick2.wav', 'sounds/kick3.wav'].map(src => {
+  const a = new Audio(src); a.preload = 'auto'; return a;
+});
+let sKickIdx = 0;
+function sPlayKick() {
+  const a = sKickSounds[sKickIdx % sKickSounds.length];
+  sKickIdx++;
+  a.currentTime = 0;
+  a.play().catch(() => {});
+}
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
 let sGameState = 'idle';   // idle | playing | wave-clear | dead | paused
@@ -287,6 +299,7 @@ function sShoot() {
   const now = performance.now();
   if (now - sLastFireTime < 300) return;
   sLastFireTime = now;
+  sPlayKick();
 
   const px = sPlayer.x, py = sPlayer.y, pa = sPlayer.angle;
   const dirX = Math.cos(pa), dirY = Math.sin(pa);
