@@ -383,6 +383,12 @@ function sEnemyBlocked(x, y) {
          sIsWall(x, y + r) || sIsWall(x, y - r);
 }
 
+function sPlayerBlocked(x, y) {
+  const r = 0.25;
+  return sIsWall(x + r, y) || sIsWall(x - r, y) ||
+         sIsWall(x, y + r) || sIsWall(x, y - r);
+}
+
 // ── DDA RAY-CASTER ─────────────────────────────────────────────────────────
 function sCastRay(px, py, rdx, rdy) {
   // rdx and rdy are already the ray direction — no cos/sin needed
@@ -515,23 +521,23 @@ function sUpdatePlayer(dt) {
 
   if (sKeys['KeyW'] || sKeys['ArrowUp']) {
     const nx = p.x + cos * spd, ny = p.y + sin * spd;
-    if (!sIsWall(nx, p.y)) p.x = nx;
-    if (!sIsWall(p.x, ny)) p.y = ny;
+    if (!sPlayerBlocked(nx, p.y)) p.x = nx;
+    if (!sPlayerBlocked(p.x, ny)) p.y = ny;
   }
   if (sKeys['KeyS'] || sKeys['ArrowDown']) {
     const nx = p.x - cos * spd, ny = p.y - sin * spd;
-    if (!sIsWall(nx, p.y)) p.x = nx;
-    if (!sIsWall(p.x, ny)) p.y = ny;
+    if (!sPlayerBlocked(nx, p.y)) p.x = nx;
+    if (!sPlayerBlocked(p.x, ny)) p.y = ny;
   }
   if (sKeys['KeyA']) {
     const nx = p.x + sin * spd, ny = p.y - cos * spd;
-    if (!sIsWall(nx, p.y)) p.x = nx;
-    if (!sIsWall(p.x, ny)) p.y = ny;
+    if (!sPlayerBlocked(nx, p.y)) p.x = nx;
+    if (!sPlayerBlocked(p.x, ny)) p.y = ny;
   }
   if (sKeys['KeyD']) {
     const nx = p.x - sin * spd, ny = p.y + cos * spd;
-    if (!sIsWall(nx, p.y)) p.x = nx;
-    if (!sIsWall(p.x, ny)) p.y = ny;
+    if (!sPlayerBlocked(nx, p.y)) p.x = nx;
+    if (!sPlayerBlocked(p.x, ny)) p.y = ny;
   }
 }
 
@@ -650,6 +656,16 @@ function sUpdateEnemies(dt) {
     const nx = e.x + moveX, ny = e.y + moveY;
     if (!sEnemyBlocked(nx, e.y)) e.x = nx;
     else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
+    else {
+      // both axis blocked — try angled slides to escape a corner
+      const baseAngle = Math.atan2(dy, dx);
+      for (const da of [0.4, -0.4, 0.8, -0.8, 1.2, -1.2]) {
+        const ax = e.x + Math.cos(baseAngle + da) * e.speed * dt;
+        const ay = e.y + Math.sin(baseAngle + da) * e.speed * dt;
+        if (!sEnemyBlocked(ax, e.y)) { e.x = ax; break; }
+        if (!sEnemyBlocked(e.x, ay)) { e.y = ay; break; }
+      }
+    }
   }
 }
 
