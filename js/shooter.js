@@ -989,27 +989,68 @@ function sGenTextures() {
     for (let i = 0; i < 4; i++) ctx.fillRect(i * 16 + 2, 46, 4, 14);
     sTextures[3] = c;
   }
-  // Crate — bright yellow/brown wooden box with MULTIBALL label
+  // Crate — fake-3D box: top face (light), front face (mid), right side (dark)
   {
     const c = document.createElement('canvas'); c.width = c.height = 64;
     const ctx = c.getContext('2d');
-    ctx.fillStyle = '#c8820a'; ctx.fillRect(0, 0, 64, 64);
-    // Wood planks
+    const T = 11, R = 12;                    // top face height, right side width
+    const FW = 64 - R, FH = 64 - T;         // front face dimensions
+
+    // Right side face (darkest — in shadow)
+    ctx.fillStyle = '#5c3200';
+    ctx.fillRect(FW, T, R, FH);
+    // Edge catch-light on left edge of right side
+    const rg = ctx.createLinearGradient(FW, 0, 64, 0);
+    rg.addColorStop(0, 'rgba(255,160,40,0.18)'); rg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rg; ctx.fillRect(FW, T, R, FH);
+    // Right side plank lines
+    ctx.strokeStyle = '#3d2000'; ctx.lineWidth = 1;
+    for (let y = T + 14; y < 64; y += 14) { ctx.beginPath(); ctx.moveTo(FW, y); ctx.lineTo(64, y); ctx.stroke(); }
+
+    // Top face (lightest — lit from above)
+    ctx.fillStyle = '#e8a030';
+    ctx.fillRect(0, 0, FW, T);
+    // Top face plank lines
+    ctx.strokeStyle = '#b87820'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, Math.round(T * 0.5)); ctx.lineTo(FW, Math.round(T * 0.5)); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(FW / 2, 0); ctx.lineTo(FW / 2, T); ctx.stroke();
+
+    // Front face
+    ctx.fillStyle = '#c8820a';
+    ctx.fillRect(0, T, FW, FH);
+    // Front face wood planks
     ctx.strokeStyle = '#8b5a00'; ctx.lineWidth = 1.5;
-    for (let v = 0; v <= 64; v += 32) { ctx.beginPath(); ctx.moveTo(0, v); ctx.lineTo(64, v); ctx.stroke(); }
-    for (let h = 0; h <= 64; h += 32) { ctx.beginPath(); ctx.moveTo(h, 0); ctx.lineTo(h, 64); ctx.stroke(); }
-    // Metal corner brackets
-    ctx.fillStyle = '#555';
-    for (const [bx, by] of [[0,0],[57,0],[0,57],[57,57]]) ctx.fillRect(bx, by, 7, 7);
-    // Bright border to stand out in the dark arena
+    ctx.beginPath(); ctx.moveTo(0, T + FH / 3); ctx.lineTo(FW, T + FH / 3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, T + 2 * FH / 3); ctx.lineTo(FW, T + 2 * FH / 3); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(FW / 2, T); ctx.lineTo(FW / 2, 64); ctx.stroke();
+
+    // Metal corner brackets on front face
+    ctx.fillStyle = '#444';
+    [[0,T],[FW-7,T],[0,57],[FW-7,57]].forEach(([bx,by]) => ctx.fillRect(bx,by,7,7));
+
+    // Edge highlights
+    ctx.strokeStyle = '#ffcc44'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, T); ctx.lineTo(FW, T); ctx.stroke();    // top-front edge
+    ctx.beginPath(); ctx.moveTo(FW, T); ctx.lineTo(FW, 64); ctx.stroke();  // front-right edge
+    ctx.beginPath(); ctx.moveTo(FW, 0); ctx.lineTo(64, 0); ctx.stroke();   // top-right back edge
+
+    // Yellow outline on front face
     ctx.strokeStyle = '#ffe000'; ctx.lineWidth = 2;
-    ctx.strokeRect(1, 1, 62, 62);
-    // MULTIBALL text
-    ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#000'; // shadow
-    ctx.fillText('MULTI', 33, 25); ctx.fillText('BALL', 33, 40);
+    ctx.strokeRect(1, T + 1, FW - 2, FH - 2);
+
+    // MULTIBALL text on front face
+    const cx = FW / 2, cy = T + FH / 2;
+    ctx.font = 'bold 8px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#000';
+    ctx.fillText('MULTI', cx + 1, cy - 6); ctx.fillText('BALL', cx + 1, cy + 7);
     ctx.fillStyle = '#ffe000';
-    ctx.fillText('MULTI', 32, 24); ctx.fillText('BALL', 32, 39);
+    ctx.fillText('MULTI', cx, cy - 7); ctx.fillText('BALL', cx, cy + 6);
+
+    // Bottom grounding shadow on front face
+    const sg = ctx.createLinearGradient(0, 54, 0, 64);
+    sg.addColorStop(0, 'rgba(0,0,0,0)'); sg.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = sg; ctx.fillRect(0, 54, FW, 10);
+
     sTextures.crate = c;
   }
 }
