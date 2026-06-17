@@ -52,7 +52,7 @@ function sSpawnEnemy(type, x, y) {
     sprite: def.sprite, hp: def.hp, maxHp: def.hp,
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
-    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0,
+    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3,
   };
 }
 
@@ -267,6 +267,19 @@ const sBossSound = new Audio('sounds/boss.wav');
 sBossSound.preload = 'auto';
 function sPlayBoss() { sBossSound.currentTime = 0; sBossSound.play().catch(() => {}); }
 
+const sTrumpClips = [
+  'sounds/trump-maga.mp3', 'sounds/trump-fakenews.mp3', 'sounds/trump-indicted.mp3',
+  'sounds/trump-dogs.mp3', 'sounds/trump-5.mp3', 'sounds/trump-6.mp3',
+  'sounds/trump-7.mp3', 'sounds/trump-8.mp3',
+].map(src => { const a = new Audio(src); a.preload = 'auto'; return a; });
+let sTrumpClipIdx = 0;
+function sPlayTrumpClip() {
+  const a = sTrumpClips[sTrumpClipIdx % sTrumpClips.length];
+  sTrumpClipIdx++;
+  a.currentTime = 0;
+  a.play().catch(() => {});
+}
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
 let sGameState = 'idle';   // idle | playing | wave-clear | dead | paused
@@ -418,6 +431,13 @@ function sSetupInput() {
 function sUpdateEnemies(dt) {
   for (const e of sEnemies) {
     if (!e.alive) continue;
+    if (e.type === 'trump') {
+      e.voiceTimer -= dt;
+      if (e.voiceTimer <= 0) {
+        sPlayTrumpClip();
+        e.voiceTimer = 5 + Math.random() * 5;
+      }
+    }
     const dx = sPlayer.x - e.x, dy = sPlayer.y - e.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
@@ -574,7 +594,7 @@ function sNextWave() {
   sWave++;
   sEnemies = [];
   sGameState = 'playing';
-  if (sWave % 5 === 0) { sBossAnnounce = 180; sPlayBoss(); }
+  if (sWave % 5 === 0) { sBossAnnounce = 180; sPlayBoss(); if (sWave % 10 === 0) sPlayTrumpClip(); }
   const entries = sWaveEnemyList(sWave);
   for (const entry of entries) {
     for (let i = 0; i < entry.count; i++) {
