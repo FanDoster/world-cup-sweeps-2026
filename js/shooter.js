@@ -252,6 +252,13 @@ function sPlayKick() {
   a.play().catch(() => {});
 }
 
+const sHitSound = new Audio('sounds/hit.wav');
+sHitSound.preload = 'auto';
+const sDeathSound = new Audio('sounds/death.wav');
+sDeathSound.preload = 'auto';
+function sPlayHit()   { sHitSound.currentTime = 0;   sHitSound.play().catch(() => {}); }
+function sPlayDeath() { sDeathSound.currentTime = 0; sDeathSound.play().catch(() => {}); }
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
 let sGameState = 'idle';   // idle | playing | wave-clear | dead | paused
@@ -327,7 +334,10 @@ function sShoot() {
     if (target.hp <= 0) {
       target.alive = false;
       sPlayer.score += target.points;
+      sPlayDeath();
       sCheckWaveClear();
+    } else {
+      sPlayHit();
     }
   }
 }
