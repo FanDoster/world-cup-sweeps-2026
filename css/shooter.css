@@ -21,6 +21,18 @@
   cursor: none;
 }
 
+#wave-clear-gif {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: min(100%, calc(100vh - 120px));
+  width: auto;
+  z-index: 10;
+  pointer-events: none;
+}
+
 .shooter-tab .tab-label {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.6rem;

@@ -446,11 +446,19 @@ function sShoot() {
   }
 }
 
+function sShowWaveClearGif(show) {
+  const gif = document.getElementById('wave-clear-gif');
+  if (!gif) return;
+  if (show) { gif.src = 'sprites/waveclear.gif'; gif.style.display = 'block'; }
+  else gif.style.display = 'none';
+}
+
 function sCheckWaveClear() {
   if (sEnemies.some(e => e.alive)) return;
   sGameState = 'wave-clear';
   sPlayWaveClear();
-  setTimeout(() => { if (sGameState === 'wave-clear') sNextWave(); }, 2000);
+  sShowWaveClearGif(true);
+  setTimeout(() => { if (sGameState === 'wave-clear') sNextWave(); }, 5000);
 }
 
 function sUpdatePlayer(dt) {
@@ -726,13 +734,8 @@ function sRender() {
   if (sGameState === 'playing' || sGameState === 'wave-clear') sRenderHud();
 
   if (sGameState === 'wave-clear') {
-    sCtx.save();
-    sCtx.fillStyle = 'rgba(0,0,0,0.45)';
+    sCtx.fillStyle = 'rgba(0,0,0,0.6)';
     sCtx.fillRect(0, 0, S_W, S_H);
-    sCtx.textBaseline = 'middle';
-    sDrawText(sCtx, 'WAVE CLEAR', S_W / 2, S_H / 2, 28, '#0f0', '#040', 'center');
-    sDrawText(sCtx, `preparing wave ${sWave + 1}...`, S_W / 2, S_H / 2 + 50, 9, '#aaa', '#222', 'center');
-    sCtx.restore();
   }
 
   if (sGameState === 'playing' && sBossAnnounce > 0) {
@@ -794,6 +797,7 @@ function sWaveEnemyList(wave) {
 }
 
 function sNextWave() {
+  sShowWaveClearGif(false);
   sWave++;
   sEnemies = [];
   sGameState = 'playing';
@@ -836,6 +840,7 @@ function pauseShooter() {
   if (sAnimId) { cancelAnimationFrame(sAnimId); sAnimId = null; }
   if (document.pointerLockElement === sCanvas) document.exitPointerLock();
   sKeys = {};
+  sShowWaveClearGif(false);
   if (sGameState === 'playing' || sGameState === 'wave-clear') sGameState = 'paused';
 }
 
