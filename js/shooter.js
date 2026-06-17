@@ -296,6 +296,9 @@ sDeathSound.preload = 'auto';
 const sRooneySound = new Audio('sounds/rooney.mp3');
 sRooneySound.preload = 'auto';
 let sRooneyLastPlayed = 0;
+const sStarmerSound = new Audio('sounds/starmer.mp3');
+sStarmerSound.preload = 'auto';
+let sStarmerLastPlayed = 0;
 function sPlayHit(type) {
   if (type === 'rooney') {
     const now = performance.now();
@@ -303,6 +306,14 @@ function sPlayHit(type) {
     sRooneyLastPlayed = now;
     sRooneySound.currentTime = 0;
     sRooneySound.play().catch(() => {});
+    return;
+  }
+  if (type === 'starmer') {
+    const now = performance.now();
+    if (!sStarmerSound.paused || now - sStarmerLastPlayed < 4000) return;
+    sStarmerLastPlayed = now;
+    sStarmerSound.currentTime = 0;
+    sStarmerSound.play().catch(() => {});
     return;
   }
   sHitSound.currentTime = 0; sHitSound.play().catch(() => {});
