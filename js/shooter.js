@@ -52,7 +52,7 @@ function sSpawnEnemy(type, x, y) {
     sprite: def.sprite, hp: def.hp, maxHp: def.hp,
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
-    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3,
+    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0,
   };
 }
 
@@ -192,6 +192,29 @@ function sRenderHud() {
   ctx.fillStyle = '#fff';
   ctx.textBaseline = 'middle';
   ctx.fillText(`HP: ${sPlayer.hp}`, bx + bw + 6, by + bh / 2);
+
+  // Boss health bar (full width, top of screen)
+  const boss = sEnemies.find(e => e.alive && (e.type === 'trump' || e.type === 'infantino'));
+  if (boss) {
+    const frac = Math.max(0, boss.hp / boss.maxHp);
+    const margin = 12, barH = 18;
+    const barW = S_W - margin * 2;
+    const barY = 54;
+    const isTrump = boss.type === 'trump';
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(margin - 2, barY - 2, barW + 4, barH + 4);
+    ctx.fillStyle = isTrump ? '#e22' : '#a0f';
+    ctx.fillRect(margin, barY, barW * frac, barH);
+    ctx.strokeStyle = isTrump ? '#f55' : '#c4f';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(margin, barY, barW, barH);
+    ctx.font = 'bold 11px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#fff';
+    ctx.fillText(isTrump ? `🇺🇸 TRUMP  ${boss.hp} / ${boss.maxHp}` : `INFANTINO  ${boss.hp} / ${boss.maxHp}`, S_W / 2, barY + barH / 2);
+    ctx.textAlign = 'left';
+  }
 
   ctx.restore();
 }
@@ -360,6 +383,10 @@ function sShoot() {
   if (target) {
     target.hp -= target.shotDmg;
     target.hitFlash = 8;
+    if (target.type === 'trump') {
+      target.hitsReceived++;
+      if (target.hitsReceived % 2 === 0) target.fleeTimer = 4 + Math.random() * 2;
+    }
     if (target.hp <= 0) {
       target.alive = false;
       sPlayer.score += target.points;
@@ -457,6 +484,15 @@ function sUpdateEnemies(dt) {
         sDamageFlash = 8;
         if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameState = 'dead'; return; }
       }
+      continue;
+    }
+
+    if (e.fleeTimer > 0) {
+      e.fleeTimer -= dt;
+      const nx = e.x - (dx / dist) * e.speed * dt;
+      const ny = e.y - (dy / dist) * e.speed * dt;
+      if (!sIsWall(nx, e.y)) e.x = nx;
+      else if (!sIsWall(e.x, ny)) e.y = ny;
       continue;
     }
 
