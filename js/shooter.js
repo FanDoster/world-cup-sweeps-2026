@@ -259,6 +259,10 @@ sDeathSound.preload = 'auto';
 function sPlayHit()   { sHitSound.currentTime = 0;   sHitSound.play().catch(() => {}); }
 function sPlayDeath() { sDeathSound.currentTime = 0; sDeathSound.play().catch(() => {}); }
 
+const sWaveClearSound = new Audio('sounds/waveclear.wav');
+sWaveClearSound.preload = 'auto';
+function sPlayWaveClear() { sWaveClearSound.currentTime = 0; sWaveClearSound.play().catch(() => {}); }
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
 let sGameState = 'idle';   // idle | playing | wave-clear | dead | paused
@@ -345,6 +349,7 @@ function sShoot() {
 function sCheckWaveClear() {
   if (sEnemies.some(e => e.alive)) return;
   sGameState = 'wave-clear';
+  sPlayWaveClear();
   setTimeout(() => { if (sGameState === 'wave-clear') sNextWave(); }, 2000);
 }
 
