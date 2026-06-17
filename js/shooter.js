@@ -53,7 +53,8 @@ function sSpawnEnemy(type, x, y) {
     sprite: def.sprite, hp: def.hp, maxHp: def.hp,
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
-    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, hideTarget: null, shootTimer: type === 'sven' ? 1 : type === 'trump' ? 0.5 : 2,
+    alive: true, dying: false, deathTimer: 0,
+    zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, hideTarget: null, shootTimer: type === 'sven' ? 1 : type === 'trump' ? 0.5 : 2,
     strafeTimer: 2, strafeDir: 1, chargeTimer: 3, chargeMode: false,
   };
 }
@@ -125,7 +126,7 @@ function sRenderSprites() {
   const invDet = 1 / (plX * dirY - dirX * plY);
 
   const sorted = sEnemies
-    .filter(e => e.alive)
+    .filter(e => e.alive || e.deathTimer > 0)
     .map(e => ({ e, dist: (e.x - px) ** 2 + (e.y - py) ** 2 }))
     .sort((a, b) => b.dist - a.dist);
 
@@ -144,6 +145,33 @@ function sRenderSprites() {
     const img = sSprites[e.sprite];
     if (!img) continue;
 
+    const x0 = Math.max(0, Math.floor(drawX));
+    const x1 = Math.min(S_W - 1, Math.floor(drawX + sprW));
+    const centerCol = Math.max(0, Math.min(S_W - 1, screenX));
+    if (transformY >= sZBuffer[centerCol]) continue;
+
+    // Death animation — collapse toward floor and fade
+    if (!e.alive && e.deathTimer > 0) {
+      const p = 1 - e.deathTimer / 0.5;          // 0→1 as timer counts down
+      const dieH = Math.round(sprH * (1 - p));    // shrinks to 0
+      if (dieH <= 0) continue;
+      const dieDrawY = Math.round(drawY + sprH - dieH); // bottom-anchored
+      let dY = dieDrawY, dH = dieH;
+      if (dY < 0) { dH += dY; dY = 0; }
+      if (dY + dH > S_H) dH = S_H - dY;
+      if (dH <= 0) continue;
+      const srcH = (dH / dieH) * img.height;
+      const srcY0 = ((dY - dieDrawY) / dieH) * img.height;
+      sCtx.save();
+      sCtx.globalAlpha = 1 - p;
+      for (let x = x0; x <= x1; x++) {
+        const srcX = Math.floor((x - drawX) / sprW * img.width);
+        sCtx.drawImage(img, srcX, srcY0, 1, srcH, x, dY, 1, dH);
+      }
+      sCtx.restore();
+      continue;
+    }
+
     // Clip sprite vertically to canvas bounds, adjusting source coords to match
     let destY = drawY, destH = sprH;
     let srcY0 = 0;
@@ -152,10 +180,6 @@ function sRenderSprites() {
     if (destH <= 0) continue;
     const srcHVisible = (destH / sprH) * img.height;
 
-    const x0 = Math.max(0, Math.floor(drawX));
-    const x1 = Math.min(S_W - 1, Math.floor(drawX + sprW));
-    const centerCol = Math.max(0, Math.min(S_W - 1, screenX));
-    if (transformY >= sZBuffer[centerCol]) continue;
     for (let x = x0; x <= x1; x++) {
       const srcX = Math.floor((x - drawX) / sprW * img.width);
       sCtx.drawImage(img, srcX, srcY0, 1, srcHVisible, x, destY, 1, destH);
@@ -519,7 +543,7 @@ function sShoot() {
       if (target.hitsReceived % 5 === 0) { target.fleeTimer = 3 + Math.random() * 1; target.hideTarget = null; }
     }
     if (target.hp <= 0) {
-      target.alive = false;
+      target.alive = false; target.deathTimer = 0.5;
       sPlayer.score += target.points;
       sPlayHit(target.type);
       sPlayDeath();
@@ -663,7 +687,7 @@ function sSetupInput() {
 // ── ENEMY AI ───────────────────────────────────────────────────────────────
 function sUpdateEnemies(dt) {
   for (const e of sEnemies) {
-    if (!e.alive) continue;
+    if (!e.alive) { if (e.deathTimer > 0) e.deathTimer -= dt; continue; }
     if (e.type === 'trump') {
       e.voiceTimer -= dt;
       if (e.voiceTimer <= 0) {
@@ -851,7 +875,7 @@ function sFireMultiball() {
       if (target.hitsReceived % 5 === 0) { target.fleeTimer = 3 + Math.random() * 1; target.hideTarget = null; }
     }
     if (target.hp <= 0) {
-      target.alive = false;
+      target.alive = false; target.deathTimer = 0.5;
       sPlayer.score += target.points;
       sPlayHit(target.type);
       sPlayDeath();
