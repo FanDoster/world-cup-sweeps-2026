@@ -152,6 +152,16 @@ function sRenderSprites() {
   }
 }
 
+function sDrawText(ctx, text, x, y, size, color, outline = '#000', align = 'left') {
+  ctx.font = `${size}px 'Press Start 2P', monospace`;
+  ctx.textAlign = align;
+  ctx.fillStyle = outline;
+  for (const [ox, oy] of [[-2,0],[2,0],[0,-2],[0,2],[-2,-2],[2,2],[-2,2],[2,-2]])
+    ctx.fillText(text, x + ox, y + oy);
+  ctx.fillStyle = color;
+  ctx.fillText(text, x, y);
+}
+
 function sRenderHud() {
   const ctx = sCtx;
   ctx.save();
@@ -166,32 +176,30 @@ function sRenderHud() {
   // Wave + enemies remaining (top-left)
   const alive = sEnemies.filter(e => e.alive).length;
   ctx.textBaseline = 'top';
-  const waveText = `WAVE ${sWave}  ·  ${alive} LEFT`;
+  const waveText = `WAVE ${sWave} / ${alive} LEFT`;
   const wavesUntilBoss = 5 - (sWave % 5);
   const isBossWave = sWave % 5 === 0;
-  const bossText = isBossWave ? '⚠ BOSS WAVE' : `${wavesUntilBoss} WAVE${wavesUntilBoss === 1 ? '' : 'S'} UNTIL BOSS`;
+  const bossText = isBossWave ? 'BOSS WAVE!' : `${wavesUntilBoss} UNTIL BOSS`;
   const bossColor = isBossWave ? '#f44' : wavesUntilBoss === 1 ? '#ff0' : '#aaa';
-  const bossFontSize = isBossWave ? 20 : 11 + (5 - wavesUntilBoss) * 2;
-  ctx.font = `bold ${bossFontSize}px monospace`;
+  const bossOutline = isBossWave ? '#600' : wavesUntilBoss === 1 ? '#440' : '#333';
+  const bossFontSize = isBossWave ? 14 : 8 + (5 - wavesUntilBoss) * 2;
+  ctx.font = `${bossFontSize}px 'Press Start 2P', monospace`;
   const bossW = ctx.measureText(bossText).width;
-  ctx.font = 'bold 14px monospace';
-  const topW = Math.max(ctx.measureText(waveText).width, bossW) + 12;
-  const boxH = 28 + bossFontSize + 6;
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.font = `10px 'Press Start 2P', monospace`;
+  const topW = Math.max(ctx.measureText(waveText).width, bossW) + 16;
+  const boxH = 14 + bossFontSize + 18;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
   ctx.fillRect(6, 6, topW, boxH);
-  ctx.fillStyle = '#fff';
-  ctx.fillText(waveText, 12, 10);
-  ctx.font = `bold ${bossFontSize}px monospace`;
-  ctx.fillStyle = bossColor;
-  ctx.fillText(bossText, 12, 28);
+  sDrawText(ctx, waveText, 12, 10, 10, '#fff', '#333');
+  sDrawText(ctx, bossText, 12, 30, bossFontSize, bossColor, bossOutline);
 
   // Score (top-right)
-  const scoreText = `SCORE: ${sPlayer.score}`;
+  const scoreText = `SCORE:${sPlayer.score}`;
+  ctx.font = `10px 'Press Start 2P', monospace`;
   const sw = ctx.measureText(scoreText).width;
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(S_W - sw - 18, 6, sw + 12, 24);
-  ctx.fillStyle = '#ff0';
-  ctx.fillText(scoreText, S_W - sw - 12, 10);
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(S_W - sw - 20, 6, sw + 14, 26);
+  sDrawText(ctx, scoreText, S_W - sw - 13, 10, 10, '#ff0', '#440');
 
   // Health bar (bottom-left)
   const hpFrac = Math.max(0, sPlayer.hp / 100);
@@ -203,16 +211,14 @@ function sRenderHud() {
   ctx.strokeStyle = '#fff';
   ctx.lineWidth = 1;
   ctx.strokeRect(bx, by, bw, bh);
-  ctx.font = 'bold 10px monospace';
-  ctx.fillStyle = '#fff';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`HP: ${sPlayer.hp}`, bx + bw + 6, by + bh / 2);
+  sDrawText(ctx, `HP:${sPlayer.hp}`, bx + bw + 8, by + bh / 2, 8, '#fff', '#333');
 
-  // Boss health bar (full width, top of screen)
+  // Boss health bar (full width)
   const boss = sEnemies.find(e => e.alive && (e.type === 'trump' || e.type === 'infantino'));
   if (boss) {
     const frac = Math.max(0, boss.hp / boss.maxHp);
-    const margin = 12, barH = 18;
+    const margin = 12, barH = 20;
     const barW = S_W - margin * 2;
     const barY = 54;
     const isTrump = boss.type === 'trump';
@@ -223,12 +229,9 @@ function sRenderHud() {
     ctx.strokeStyle = isTrump ? '#f55' : '#c4f';
     ctx.lineWidth = 1.5;
     ctx.strokeRect(margin, barY, barW, barH);
-    ctx.font = 'bold 11px monospace';
-    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(isTrump ? `🇺🇸 TRUMP  ${boss.hp} / ${boss.maxHp}` : `INFANTINO  ${boss.hp} / ${boss.maxHp}`, S_W / 2, barY + barH / 2);
-    ctx.textAlign = 'left';
+    const bossLabel = isTrump ? `TRUMP  ${boss.hp}/${boss.maxHp}` : `INFANTINO  ${boss.hp}/${boss.maxHp}`;
+    sDrawText(ctx, bossLabel, S_W / 2, barY + barH / 2, 8, '#fff', isTrump ? '#600' : '#408', 'center');
   }
 
   ctx.restore();
@@ -237,48 +240,32 @@ function sRenderHud() {
 function sRenderOverlay() {
   const ctx = sCtx;
   ctx.save();
-  ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
   if (sGameState === 'idle') {
     ctx.fillStyle = 'rgba(0,0,0,0.78)';
     ctx.fillRect(0, 0, S_W, S_H);
-    ctx.font = 'bold 50px monospace';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('⚽ FOOTSHOOTER', S_W / 2, S_H / 2 - 70);
-    ctx.font = 'bold 18px monospace';
-    ctx.fillStyle = '#aaa';
-    ctx.fillText('survive infinite waves of football legends', S_W / 2, S_H / 2 - 16);
-    ctx.fillText('WASD · mouse to aim · click/space to shoot', S_W / 2, S_H / 2 + 16);
-    ctx.font = 'bold 26px monospace';
-    ctx.fillStyle = '#ff0';
-    ctx.fillText('CLICK TO PLAY', S_W / 2, S_H / 2 + 76);
+    sDrawText(ctx, '⚽ FOOTSHOOTER', S_W / 2, S_H / 2 - 70, 26, '#fff', '#333', 'center');
+    sDrawText(ctx, 'survive infinite waves', S_W / 2, S_H / 2 - 10, 9, '#aaa', '#222', 'center');
+    sDrawText(ctx, 'of football legends', S_W / 2, S_H / 2 + 10, 9, '#aaa', '#222', 'center');
+    sDrawText(ctx, 'WASD / MOUSE / CLICK', S_W / 2, S_H / 2 + 32, 8, '#888', '#111', 'center');
+    sDrawText(ctx, 'CLICK TO PLAY', S_W / 2, S_H / 2 + 76, 14, '#ff0', '#440', 'center');
   }
 
   if (sGameState === 'dead') {
     ctx.fillStyle = 'rgba(0,0,0,0.82)';
     ctx.fillRect(0, 0, S_W, S_H);
-    ctx.font = 'bold 52px monospace';
-    ctx.fillStyle = '#f44';
-    ctx.fillText('GAME OVER', S_W / 2, S_H / 2 - 80);
-    ctx.font = 'bold 24px monospace';
-    ctx.fillStyle = '#fff';
-    ctx.fillText(`Wave reached: ${sWave}`, S_W / 2, S_H / 2 - 16);
-    ctx.fillText(`Final score: ${sPlayer.score}`, S_W / 2, S_H / 2 + 20);
-    ctx.font = 'bold 22px monospace';
-    ctx.fillStyle = '#ff0';
-    ctx.fillText('CLICK TO PLAY AGAIN', S_W / 2, S_H / 2 + 80);
+    sDrawText(ctx, 'GAME OVER', S_W / 2, S_H / 2 - 80, 30, '#f44', '#600', 'center');
+    sDrawText(ctx, `WAVE: ${sWave}`, S_W / 2, S_H / 2 - 14, 12, '#fff', '#333', 'center');
+    sDrawText(ctx, `SCORE: ${sPlayer.score}`, S_W / 2, S_H / 2 + 14, 12, '#fff', '#333', 'center');
+    sDrawText(ctx, 'CLICK TO PLAY AGAIN', S_W / 2, S_H / 2 + 76, 10, '#ff0', '#440', 'center');
   }
 
   if (sGameState === 'paused') {
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(0, 0, S_W, S_H);
-    ctx.font = 'bold 40px monospace';
-    ctx.fillStyle = '#fff';
-    ctx.fillText('PAUSED', S_W / 2, S_H / 2 - 20);
-    ctx.font = '18px monospace';
-    ctx.fillStyle = '#aaa';
-    ctx.fillText('click to resume', S_W / 2, S_H / 2 + 20);
+    sDrawText(ctx, 'PAUSED', S_W / 2, S_H / 2 - 20, 28, '#fff', '#333', 'center');
+    sDrawText(ctx, 'click to resume', S_W / 2, S_H / 2 + 24, 10, '#aaa', '#222', 'center');
   }
 
   ctx.restore();
@@ -686,34 +673,24 @@ function sRender() {
     sCtx.save();
     sCtx.fillStyle = 'rgba(0,0,0,0.45)';
     sCtx.fillRect(0, 0, S_W, S_H);
-    sCtx.textAlign = 'center';
     sCtx.textBaseline = 'middle';
-    sCtx.font = 'bold 48px monospace';
-    sCtx.fillStyle = '#0f0';
-    sCtx.fillText('WAVE CLEAR', S_W / 2, S_H / 2);
-    sCtx.font = 'bold 18px monospace';
-    sCtx.fillStyle = '#aaa';
-    sCtx.fillText(`preparing wave ${sWave + 1}…`, S_W / 2, S_H / 2 + 52);
+    sDrawText(sCtx, 'WAVE CLEAR', S_W / 2, S_H / 2, 28, '#0f0', '#040', 'center');
+    sDrawText(sCtx, `preparing wave ${sWave + 1}...`, S_W / 2, S_H / 2 + 50, 9, '#aaa', '#222', 'center');
     sCtx.restore();
   }
 
   if (sGameState === 'playing' && sBossAnnounce > 0) {
     sBossAnnounce--;
     const isTrump = sWave % 5 === 0 && sWave % 10 !== 0;
-    // first 60 frames: slam in at full opacity; last 120 frames: fade out
     const alpha = sBossAnnounce > 120 ? 1 : sBossAnnounce / 120;
     const scale = sBossAnnounce > 120 ? 1 + (sBossAnnounce - 120) / 60 * 0.4 : 1;
     sCtx.save();
-    sCtx.textAlign = 'center';
     sCtx.textBaseline = 'middle';
     sCtx.translate(S_W / 2, S_H / 3);
     sCtx.scale(scale, scale);
-    sCtx.font = `bold 42px monospace`;
-    sCtx.fillStyle = `rgba(255,30,30,${alpha})`;
-    sCtx.fillText(isTrump ? '🇺🇸  TRUMP INCOMING  🇺🇸' : '⚠  BOSS WAVE  ⚠', 0, 0);
-    sCtx.font = `bold 20px monospace`;
-    sCtx.fillStyle = `rgba(255,200,200,${alpha})`;
-    sCtx.fillText(isTrump ? 'the mega-boss has arrived' : 'eliminate the boss to advance', 0, 48);
+    sCtx.globalAlpha = alpha;
+    sDrawText(sCtx, isTrump ? 'TRUMP INCOMING' : 'BOSS WAVE', 0, 0, 22, '#f22', '#600', 'center');
+    sDrawText(sCtx, isTrump ? 'the mega-boss has arrived' : 'eliminate the boss to advance', 0, 44, 9, '#fcc', '#400', 'center');
     sCtx.restore();
   }
 
