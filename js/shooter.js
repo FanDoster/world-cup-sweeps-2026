@@ -447,26 +447,34 @@ function sShoot() {
 }
 
 const sWaveClearGifs = [
-  'sprites/waveclear.gif', 'sprites/waveclear2.gif', 'sprites/waveclear3.gif',
-  'sprites/waveclear4.gif', 'sprites/waveclear5.gif', 'sprites/waveclear6.gif',
+  { src: 'sprites/waveclear.gif',  duration: 4800 },
+  { src: 'sprites/waveclear2.gif', duration: 4000 },
+  { src: 'sprites/waveclear3.gif', duration: 5460 },
+  { src: 'sprites/waveclear4.gif', duration: 4000 },
+  { src: 'sprites/waveclear5.gif', duration: 4000 },
+  { src: 'sprites/waveclear6.gif', duration: 4000 },
 ];
 let sWaveClearGifIdx = 0;
 function sShowWaveClearGif(show) {
   const gif = document.getElementById('wave-clear-gif');
-  if (!gif) return;
+  if (!gif) return 4000;
   if (show) {
-    gif.src = sWaveClearGifs[sWaveClearGifIdx % sWaveClearGifs.length];
+    const entry = sWaveClearGifs[sWaveClearGifIdx % sWaveClearGifs.length];
     sWaveClearGifIdx++;
+    gif.src = entry.src;
     gif.style.display = 'block';
-  } else gif.style.display = 'none';
+    return entry.duration;
+  }
+  gif.style.display = 'none';
+  return 0;
 }
 
 function sCheckWaveClear() {
   if (sEnemies.some(e => e.alive)) return;
   sGameState = 'wave-clear';
   sPlayWaveClear();
-  sShowWaveClearGif(true);
-  setTimeout(() => { if (sGameState === 'wave-clear') sNextWave(); }, 5000);
+  const gifDuration = sShowWaveClearGif(true);
+  setTimeout(() => { if (sGameState === 'wave-clear') sNextWave(); }, gifDuration);
 }
 
 function sUpdatePlayer(dt) {
@@ -744,6 +752,9 @@ function sRender() {
   if (sGameState === 'wave-clear') {
     sCtx.fillStyle = 'rgba(0,0,0,0.6)';
     sCtx.fillRect(0, 0, S_W, S_H);
+    sCtx.textBaseline = 'middle';
+    sDrawText(sCtx, 'WAVE CLEAR', S_W / 2, 22, 16, '#0f0', '#040', 'center');
+    sDrawText(sCtx, `preparing wave ${sWave + 1}...`, S_W / 2, S_H - 22, 9, '#aaa', '#222', 'center');
   }
 
   if (sGameState === 'playing' && sBossAnnounce > 0) {
