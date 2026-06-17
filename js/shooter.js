@@ -851,7 +851,7 @@ function sUpdateMultiball(dt) {
   if (sKeys['Space']) {
     sMultiballFireTimer -= dt;
     if (sMultiballFireTimer <= 0) {
-      sMultiballFireTimer = 1 / 5;  // 5 rounds/sec
+      sMultiballFireTimer = 1 / 10;  // 10 rounds/sec
       sFireMultiball();
     }
   } else {
@@ -1007,7 +1007,7 @@ function sRender() {
       const cH = Math.min(Math.abs(Math.round(S_H / ctY * 0.75)), S_H);
       const cW = cH;
       const cDrawX = cScrX - cW / 2;
-      const cDrawY = S_H / 2 - cH;  // sits on floor line
+      const cDrawY = S_H / 2 - cH * 0.6;  // sits on floor line
       const cCenterCol = Math.max(0, Math.min(S_W - 1, cScrX));
       if (ctY < sZBuffer[cCenterCol]) {
         const img = sTextures.crate;
@@ -1042,12 +1042,19 @@ function sRender() {
     const maxAge = p.small ? 6 : 9;
     const t = p.age / maxAge;
     const size = p.small ? (28 - t * 16) : (66 - t * 52);
+    const bx = S_W / 2;
+    const by = S_H * 0.75 - t * (S_H * 0.75 - S_H / 2);
+    const r = size * 0.48;
     sCtx.save();
     sCtx.globalAlpha = 1;
+    sCtx.beginPath();
+    sCtx.arc(bx, by, r, 0, Math.PI * 2);
+    sCtx.fillStyle = '#fff';
+    sCtx.fill();
     sCtx.font = `${Math.round(size)}px serif`;
     sCtx.textAlign = 'center';
     sCtx.textBaseline = 'middle';
-    sCtx.fillText('⚽', S_W / 2, S_H * 0.75 - t * (S_H * 0.75 - S_H / 2));
+    sCtx.fillText('⚽', bx, by);
     sCtx.restore();
     if (p.age >= maxAge) sProjectiles.splice(i, 1);
   }
@@ -1091,7 +1098,7 @@ function sLoop(ts) {
   if (sGameState === 'playing') { sUpdateEnemies(dt); sUpdateTrumpProjectiles(dt); sUpdateSvenProjectiles(dt); sUpdateMultiball(dt); }
   if (sGameState === 'playing' && sCrate) {
     const cdx = sCrate.x - sPlayer.x, cdy = sCrate.y - sPlayer.y;
-    if (cdx * cdx + cdy * cdy < 0.64) { sCrate = null; sMultiballAmmo = 100; sMultiballFireTimer = 0; }
+    if (cdx * cdx + cdy * cdy < 0.64) { sCrate = null; sMultiballAmmo = 120; sMultiballFireTimer = 0; }
   }
   if (sGameState === 'playing' && sWave > 0 && !sEnemies.some(e => e.alive)) sCheckWaveClear();
   sRender();
