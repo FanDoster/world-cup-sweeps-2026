@@ -447,12 +447,12 @@ function sShoot() {
 }
 
 const sWaveClearGifs = [
-  { src: 'sprites/waveclear.gif',  duration: 4800 },
-  { src: 'sprites/waveclear2.gif', duration: 4000 },
-  { src: 'sprites/waveclear3.gif', duration: 5460 },
-  { src: 'sprites/waveclear4.gif', duration: 4000 },
-  { src: 'sprites/waveclear5.gif', duration: 4000 },
-  { src: 'sprites/waveclear6.gif', duration: 4000 },
+  { src: 'sprites/waveclear.mp4',  duration: 4800 },
+  { src: 'sprites/waveclear2.mp4', duration: 4000 },
+  { src: 'sprites/waveclear3.mp4', duration: 5460 },
+  { src: 'sprites/waveclear4.mp4', duration: 4000 },
+  { src: 'sprites/waveclear5.mp4', duration: 4000 },
+  { src: 'sprites/waveclear6.mp4', duration: 4000 },
 ];
 let sWaveClearGifIdx = 0;
 function sShowWaveClearGif(show) {
@@ -462,9 +462,12 @@ function sShowWaveClearGif(show) {
     const entry = sWaveClearGifs[sWaveClearGifIdx % sWaveClearGifs.length];
     sWaveClearGifIdx++;
     gif.src = entry.src;
+    gif.load();
+    gif.play().catch(() => {});
     gif.style.display = 'block';
     return entry.duration;
   }
+  gif.pause();
   gif.style.display = 'none';
   return 0;
 }
