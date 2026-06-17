@@ -135,7 +135,7 @@ function sRenderSprites() {
       const srcX = Math.floor((x - drawX) / sprW * img.width);
       sCtx.drawImage(img, srcX, 0, 1, img.height, x, drawY, 1, sprH);
       if (e.hitFlash > 0) {
-        sCtx.fillStyle = `rgba(255,255,255,${(e.hitFlash / 8) * 0.7})`;
+        sCtx.fillStyle = `rgba(255,0,0,${(e.hitFlash / 8) * 0.7})`;
         sCtx.fillRect(x, drawY, 1, sprH);
       }
     }
