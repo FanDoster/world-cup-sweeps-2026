@@ -53,7 +53,7 @@ function sSpawnEnemy(type, x, y) {
     sprite: def.sprite, hp: def.hp, maxHp: def.hp,
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
-    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, shootTimer: type === 'sven' ? 1 : 2,
+    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, hideTarget: null, shootTimer: type === 'sven' ? 1 : 2,
   };
 }
 
@@ -391,6 +391,31 @@ function sPlayerBlocked(x, y) {
          sIsWall(x, y + r) || sIsWall(x, y - r);
 }
 
+function sHasLos(x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const steps = Math.max(4, Math.ceil(Math.sqrt(dx * dx + dy * dy) * 4));
+  for (let i = 1; i < steps; i++) {
+    const t = i / steps;
+    if (sIsWall(x1 + dx * t, y1 + dy * t)) return false;
+  }
+  return true;
+}
+
+function sFindHideSpot(ex, ey, px, py) {
+  // Scan all open tiles; return the nearest one with no LOS to the player
+  let best = null, bestDist = Infinity;
+  for (let my = 1; my < S_MAP.length - 1; my++) {
+    for (let mx = 1; mx < S_MAP[0].length - 1; mx++) {
+      if (S_MAP[my][mx] !== 0) continue;
+      const cx = mx + 0.5, cy = my + 0.5;
+      if (sHasLos(cx, cy, px, py)) continue;       // player can see this tile
+      const d = (cx - ex) ** 2 + (cy - ey) ** 2;
+      if (d < bestDist) { bestDist = d; best = { x: cx, y: cy }; }
+    }
+  }
+  return best; // null if every open tile has LOS to player (open arena)
+}
+
 // ── DDA RAY-CASTER ─────────────────────────────────────────────────────────
 function sCastRay(px, py, rdx, rdy) {
   // rdx and rdy are already the ray direction — no cos/sin needed
@@ -448,7 +473,7 @@ function sShoot() {
     target.hitFlash = 8;
     if (target.type === 'trump') {
       target.hitsReceived++;
-      if (target.hitsReceived % 4 === 0) target.fleeTimer = 2 + Math.random() * 1;
+      if (target.hitsReceived % 4 === 0) { target.fleeTimer = 2 + Math.random() * 1; target.hideTarget = null; }
     }
     if (target.hp <= 0) {
       target.alive = false;
@@ -596,22 +621,50 @@ function sUpdateEnemies(dt) {
 
     if (e.fleeTimer > 0) {
       e.fleeTimer -= dt;
-      e.zigzagTimer -= dt;
-      if (e.zigzagTimer <= 0) { e.zigzagDir *= -1; e.zigzagTimer = 0.15 + Math.random() * 0.15; }
-      const fleeAngle = Math.atan2(-dy, -dx) + e.zigzagDir * Math.PI / 5;
-      const fleeSpd = e.speed * 2.2 * dt;
-      const nx = e.x + Math.cos(fleeAngle) * fleeSpd;
-      const ny = e.y + Math.sin(fleeAngle) * fleeSpd;
-      if (!sEnemyBlocked(nx, e.y)) e.x = nx;
-      else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
-      else {
-        // cornered — try pure away direction without zigzag
-        const pureAngle = Math.atan2(-dy, -dx);
-        const px2 = e.x + Math.cos(pureAngle) * fleeSpd;
-        const py2 = e.y + Math.sin(pureAngle) * fleeSpd;
-        if (!sEnemyBlocked(px2, e.y)) e.x = px2;
-        else if (!sEnemyBlocked(e.x, py2)) e.y = py2;
-        else e.fleeTimer = 0; // truly stuck — abort flee so normal AI resumes
+
+      // Find a hiding spot once per flee episode
+      if (!e.hideTarget) {
+        e.hideTarget = sFindHideSpot(e.x, e.y, sPlayer.x, sPlayer.y);
+      }
+
+      // Already out of line-of-sight — crouch and wait
+      if (!sHasLos(e.x, e.y, sPlayer.x, sPlayer.y)) {
+        continue;
+      }
+
+      if (e.hideTarget) {
+        // Navigate toward the hiding tile
+        const hdx = e.hideTarget.x - e.x, hdy = e.hideTarget.y - e.y;
+        const hdist = Math.sqrt(hdx * hdx + hdy * hdy);
+        if (hdist < 0.4) {
+          // Reached spot but still visible — player must have moved; find a new one
+          e.hideTarget = sFindHideSpot(e.x, e.y, sPlayer.x, sPlayer.y);
+          continue;
+        }
+        const fleeSpd = e.speed * 2.0 * dt;
+        const nx = e.x + (hdx / hdist) * fleeSpd;
+        const ny = e.y + (hdy / hdist) * fleeSpd;
+        if (!sEnemyBlocked(nx, e.y)) e.x = nx;
+        else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
+        else {
+          // Obstacle on the direct path — try angled slides
+          const ang = Math.atan2(hdy, hdx);
+          for (const da of [0.4, -0.4, 0.8, -0.8]) {
+            const ax = e.x + Math.cos(ang + da) * fleeSpd;
+            const ay = e.y + Math.sin(ang + da) * fleeSpd;
+            if (!sEnemyBlocked(ax, e.y)) { e.x = ax; break; }
+            if (!sEnemyBlocked(e.x, ay)) { e.y = ay; break; }
+          }
+        }
+      } else {
+        // No hiding spot exists (open arena) — just run directly away
+        const fleeAngle = Math.atan2(-dy, -dx);
+        const fleeSpd = e.speed * 2.2 * dt;
+        const nx = e.x + Math.cos(fleeAngle) * fleeSpd;
+        const ny = e.y + Math.sin(fleeAngle) * fleeSpd;
+        if (!sEnemyBlocked(nx, e.y)) e.x = nx;
+        else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
+        else e.fleeTimer = 0;
       }
       continue;
     }
