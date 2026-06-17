@@ -165,18 +165,24 @@ function sRenderHud() {
 
   // Wave + enemies remaining (top-left)
   const alive = sEnemies.filter(e => e.alive).length;
-  ctx.font = 'bold 14px monospace';
   ctx.textBaseline = 'top';
   const waveText = `WAVE ${sWave}  ·  ${alive} LEFT`;
   const wavesUntilBoss = 5 - (sWave % 5);
-  const bossText = sWave % 5 === 0 ? '⚠ BOSS WAVE' : `${wavesUntilBoss} WAVE${wavesUntilBoss === 1 ? '' : 'S'} UNTIL BOSS`;
-  const topW = Math.max(ctx.measureText(waveText).width, ctx.measureText(bossText).width) + 12;
+  const isBossWave = sWave % 5 === 0;
+  const bossText = isBossWave ? '⚠ BOSS WAVE' : `${wavesUntilBoss} WAVE${wavesUntilBoss === 1 ? '' : 'S'} UNTIL BOSS`;
+  const bossColor = isBossWave ? '#f44' : wavesUntilBoss === 1 ? '#ff0' : '#aaa';
+  const bossFontSize = isBossWave ? 20 : 11 + (5 - wavesUntilBoss) * 2;
+  ctx.font = `bold ${bossFontSize}px monospace`;
+  const bossW = ctx.measureText(bossText).width;
+  ctx.font = 'bold 14px monospace';
+  const topW = Math.max(ctx.measureText(waveText).width, bossW) + 12;
+  const boxH = 28 + bossFontSize + 6;
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(6, 6, topW, 44);
+  ctx.fillRect(6, 6, topW, boxH);
   ctx.fillStyle = '#fff';
   ctx.fillText(waveText, 12, 10);
-  ctx.font = 'bold 11px monospace';
-  ctx.fillStyle = sWave % 5 === 0 ? '#f44' : wavesUntilBoss === 1 ? '#ff0' : '#aaa';
+  ctx.font = `bold ${bossFontSize}px monospace`;
+  ctx.fillStyle = bossColor;
   ctx.fillText(bossText, 12, 28);
 
   // Score (top-right)
