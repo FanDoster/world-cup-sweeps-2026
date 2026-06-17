@@ -901,7 +901,7 @@ function sRender() {
     const t = p.age / 9;
     const size = 66 - t * 52;
     sCtx.save();
-    sCtx.globalAlpha = Math.max(0.8, 1 - t * 0.1);
+    sCtx.globalAlpha = 1;
     sCtx.font = `${Math.round(size)}px serif`;
     sCtx.textAlign = 'center';
     sCtx.textBaseline = 'middle';
