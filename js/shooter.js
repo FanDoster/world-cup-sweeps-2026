@@ -396,6 +396,32 @@ const sMultiballPickupSound = new Audio('sounds/multiball-pickup.mp3');
 sMultiballPickupSound.preload = 'auto';
 sMultiballPickupSound.volume = 1.0;
 
+let sAudioCtx = null;
+function sGetAudioCtx() {
+  if (!sAudioCtx) sAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return sAudioCtx;
+}
+function sPlayFootstep() {
+  try {
+    const ac = sGetAudioCtx();
+    const now = ac.currentTime;
+    const bufLen = Math.floor(ac.sampleRate * 0.07);
+    const buf = ac.createBuffer(1, bufLen, ac.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < bufLen; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufLen * 0.25));
+    const src = ac.createBufferSource();
+    src.buffer = buf;
+    const lp = ac.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 180;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.55, now);
+    g.gain.exponentialRampToValueAtTime(0.01, now + 0.07);
+    src.connect(lp); lp.connect(g); g.connect(ac.destination);
+    src.start(now);
+  } catch (_) {}
+}
+let sFootstepTimer = 0;
+
 const sBgm = new Audio('sounds/bgm.mp3');
 sBgm.loop = true;
 sBgm.volume = 0.5;
@@ -639,9 +665,12 @@ function sUpdatePlayer(dt) {
   if (isMoving && sGameState === 'playing') {
     sBobPhase += dt * Math.PI * 4.5;
     sBobOffset = Math.sin(sBobPhase) * 4;
+    sFootstepTimer -= dt;
+    if (sFootstepTimer <= 0) { sPlayFootstep(); sFootstepTimer = 0.38; }
   } else {
     sBobOffset *= 0.82;
     if (Math.abs(sBobOffset) < 0.05) { sBobOffset = 0; sBobPhase = 0; }
+    sFootstepTimer = 0;
   }
 
   if (sKeys['KeyW'] || sKeys['ArrowUp']) {
@@ -1237,6 +1266,7 @@ function sStartGame() {
   sMouseFire = false;
   sBobPhase = 0;
   sBobOffset = 0;
+  sFootstepTimer = 0;
   const goGif = document.getElementById('game-over-gif');
   if (goGif) { goGif.pause(); goGif.style.display = 'none'; }
   const goOv = document.getElementById('game-over-overlay');
