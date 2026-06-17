@@ -184,7 +184,7 @@ function sRenderHud() {
   const bossText = isBossWave ? 'BOSS WAVE!' : `${wavesUntilBoss} ${wavesUntilBoss === 1 ? 'WAVE' : 'WAVES'} UNTIL BOSS`;
   const bossColor = isBossWave ? '#f44' : wavesUntilBoss === 1 ? '#ff0' : '#aaa';
   const bossOutline = isBossWave ? '#600' : wavesUntilBoss === 1 ? '#440' : '#333';
-  const bossFontSize = isBossWave ? 20 : 8 + (4 - Math.min(3, wavesUntilBoss - 1)) * 3;
+  const bossFontSize = isBossWave ? 20 : wavesUntilBoss <= 2 ? 20 : 8 + (4 - Math.min(3, wavesUntilBoss - 1)) * 3;
   ctx.font = `${bossFontSize}px 'Press Start 2P', monospace`;
   const bossW = ctx.measureText(bossText).width;
   ctx.font = `10px 'Press Start 2P', monospace`;
