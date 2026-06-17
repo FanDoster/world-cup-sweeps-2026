@@ -315,7 +315,7 @@ function sPlayHit(type) {
   }
   if (type === 'gazza') {
     const now = performance.now();
-    if (!sGazzaSound.paused || now - sGazzaLastPlayed < 4000) return;
+    if (now - sGazzaLastPlayed < 2000) return;
     sGazzaLastPlayed = now;
     sGazzaSound.currentTime = 0;
     sGazzaSound.play().catch(() => {});
@@ -545,6 +545,15 @@ function sUpdateEnemies(dt) {
       const ny = e.y + Math.sin(fleeAngle) * fleeSpd;
       if (!sEnemyBlocked(nx, e.y)) e.x = nx;
       else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
+      else {
+        // cornered — try pure away direction without zigzag
+        const pureAngle = Math.atan2(-dy, -dx);
+        const px2 = e.x + Math.cos(pureAngle) * fleeSpd;
+        const py2 = e.y + Math.sin(pureAngle) * fleeSpd;
+        if (!sEnemyBlocked(px2, e.y)) e.x = px2;
+        else if (!sEnemyBlocked(e.x, py2)) e.y = py2;
+        else e.fleeTimer = 0; // truly stuck — abort flee so normal AI resumes
+      }
       continue;
     }
 
@@ -553,7 +562,7 @@ function sUpdateEnemies(dt) {
       e.shootTimer -= dt;
       if (e.shootTimer <= 0) {
         e.shootTimer = 2.5 + Math.random() * 1.5;
-        sTrumpProjectiles.push({ x: e.x, y: e.y, dx: (dx / dist) * 6, dy: (dy / dist) * 6 });
+        sTrumpProjectiles.push({ x: e.x, y: e.y, dx: (dx / dist) * 10, dy: (dy / dist) * 10 });
       }
     }
 
@@ -700,7 +709,7 @@ function sRender() {
     const t = p.age / 9;
     const size = 66 - t * 52;
     sCtx.save();
-    sCtx.globalAlpha = Math.max(0, 1 - t * 0.8);
+    sCtx.globalAlpha = Math.max(0.15, 1 - t * 0.4);
     sCtx.font = `${Math.round(size)}px serif`;
     sCtx.textAlign = 'center';
     sCtx.textBaseline = 'middle';
