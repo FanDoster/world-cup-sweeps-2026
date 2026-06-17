@@ -88,11 +88,12 @@ function showTeamResultPopup(results) {
     const resultStr = r.won ? 'W' : r.drew ? 'D' : 'L';
     const color = r.won ? 'var(--accent)' : r.drew ? 'var(--gold)' : 'var(--live)';
     const dateStr = new Date(r.date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-    return `<div style="margin-bottom:6px">
-      <span style="display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;background:${color};color:#000;font-weight:800;font-size:0.72rem;text-align:center;margin-right:8px">${resultStr}</span>
-      <strong style="color:var(--text)">${r.team}</strong>
-      <span style="color:var(--text-secondary)"> ${r.userScore}–${r.oppScore} ${r.oppTeam}</span>
-      <span style="color:var(--text-muted);font-size:0.72rem;margin-left:6px">${dateStr}</span>
+    return `<div style="margin-bottom:12px;padding-left:2px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:${color};color:#000;font-weight:800;font-size:0.72rem;flex-shrink:0">${resultStr}</span>
+        <span><strong style="color:var(--text)">${r.team}</strong> <span style="color:var(--text-secondary)">${r.userScore}–${r.oppScore} ${r.oppTeam}</span></span>
+      </div>
+      <div style="color:var(--text-muted);font-size:0.72rem;margin-left:32px">${dateStr}</div>
     </div>`;
   }).join('');
 
