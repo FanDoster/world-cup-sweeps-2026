@@ -282,7 +282,7 @@ function sRenderHud() {
   // Multiball ammo (bottom-centre)
   if (sMultiballAmmo > 0) {
     ctx.textBaseline = 'middle';
-    const ammoText = `MULTIBALL  x${String(sMultiballAmmo).padStart(3, '0')}`;
+    const ammoText = `MULTIBALL ACTIVATED  x${String(sMultiballAmmo).padStart(3, '0')}`;
     ctx.font = `10px 'Press Start 2P', monospace`;
     const aw = ctx.measureText(ammoText).width;
     ctx.fillStyle = 'rgba(0,0,0,0.65)';
