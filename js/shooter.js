@@ -446,11 +446,19 @@ function sShoot() {
   }
 }
 
+const sWaveClearGifs = [
+  'sprites/waveclear.gif', 'sprites/waveclear2.gif', 'sprites/waveclear3.gif',
+  'sprites/waveclear4.gif', 'sprites/waveclear5.gif', 'sprites/waveclear6.gif',
+];
+let sWaveClearGifIdx = 0;
 function sShowWaveClearGif(show) {
   const gif = document.getElementById('wave-clear-gif');
   if (!gif) return;
-  if (show) { gif.src = 'sprites/waveclear.gif'; gif.style.display = 'block'; }
-  else gif.style.display = 'none';
+  if (show) {
+    gif.src = sWaveClearGifs[sWaveClearGifIdx % sWaveClearGifs.length];
+    sWaveClearGifIdx++;
+    gif.style.display = 'block';
+  } else gif.style.display = 'none';
 }
 
 function sCheckWaveClear() {
