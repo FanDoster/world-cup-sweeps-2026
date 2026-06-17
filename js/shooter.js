@@ -689,7 +689,7 @@ function sRender() {
     sCtx.translate(S_W / 2, S_H / 3);
     sCtx.scale(scale, scale);
     sCtx.globalAlpha = alpha;
-    sDrawText(sCtx, isTrump ? 'TRUMP INCOMING' : 'BOSS WAVE', 0, 0, 22, '#f22', '#600', 'center');
+    sDrawText(sCtx, isTrump ? '🇺🇸 TRUMP INCOMING 🇺🇸' : 'BOSS WAVE', 0, 0, 22, '#f22', '#600', 'center');
     sDrawText(sCtx, isTrump ? 'the mega-boss has arrived' : 'eliminate the boss to advance', 0, 44, 9, '#fcc', '#400', 'center');
     sCtx.restore();
   }
