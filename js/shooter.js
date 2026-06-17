@@ -303,9 +303,10 @@ function sRenderOverlay() {
   if (sGameState === 'idle') {
     ctx.fillStyle = 'rgba(0,0,0,0.78)';
     ctx.fillRect(0, 0, S_W, S_H);
-    sDrawText(ctx, '⚽ FOOTSHOOTER', S_W / 2, S_H / 2 - 70, 26, '#fff', '#333', 'center');
-    sDrawText(ctx, 'procedurally generated football fun', S_W / 2, S_H / 2 - 22, 21, '#666', '#111', 'center');
-    sDrawText(ctx, 'WASD / MOUSE / CLICK', S_W / 2, S_H / 2 + 10, 14, '#888', '#111', 'center');
+    sDrawText(ctx, '⚽ FOOTSHOOTER', S_W / 2, S_H / 2 - 80, 26, '#fff', '#333', 'center');
+    sDrawText(ctx, 'procedurally generated', S_W / 2, S_H / 2 - 38, 21, '#666', '#111', 'center');
+    sDrawText(ctx, 'football fun', S_W / 2, S_H / 2 - 12, 21, '#666', '#111', 'center');
+    sDrawText(ctx, 'WASD / MOUSE / CLICK', S_W / 2, S_H / 2 + 20, 14, '#888', '#111', 'center');
     sDrawText(ctx, 'CLICK TO PLAY', S_W / 2, S_H / 2 + 76, 14, '#ff0', '#440', 'center');
   }
 
