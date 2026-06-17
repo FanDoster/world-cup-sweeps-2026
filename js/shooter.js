@@ -128,15 +128,23 @@ function sRenderSprites() {
     const img = sSprites[e.sprite];
     if (!img) continue;
 
+    // Clip sprite vertically to canvas bounds, adjusting source coords to match
+    let destY = drawY, destH = sprH;
+    let srcY0 = 0;
+    if (destY < 0) { srcY0 = (-destY / sprH) * img.height; destH += destY; destY = 0; }
+    if (destY + destH > S_H) destH = S_H - destY;
+    if (destH <= 0) continue;
+    const srcHVisible = (destH / sprH) * img.height;
+
     const x0 = Math.max(0, Math.floor(drawX));
     const x1 = Math.min(S_W - 1, Math.floor(drawX + sprW));
     for (let x = x0; x <= x1; x++) {
       if (transformY >= sZBuffer[x]) continue;
       const srcX = Math.floor((x - drawX) / sprW * img.width);
-      sCtx.drawImage(img, srcX, 0, 1, img.height, x, drawY, 1, sprH);
+      sCtx.drawImage(img, srcX, srcY0, 1, srcHVisible, x, destY, 1, destH);
       if (e.hitFlash > 0) {
         sCtx.fillStyle = `rgba(255,0,0,${(e.hitFlash / 8) * 0.7})`;
-        sCtx.fillRect(x, drawY, 1, sprH);
+        sCtx.fillRect(x, destY, 1, destH);
       }
     }
     if (e.hitFlash > 0) e.hitFlash--;
@@ -495,8 +503,12 @@ function sUpdateEnemies(dt) {
 
     if (e.fleeTimer > 0) {
       e.fleeTimer -= dt;
-      const nx = e.x - (dx / dist) * e.speed * dt;
-      const ny = e.y - (dy / dist) * e.speed * dt;
+      e.zigzagTimer -= dt;
+      if (e.zigzagTimer <= 0) { e.zigzagDir *= -1; e.zigzagTimer = 0.15 + Math.random() * 0.15; }
+      const fleeAngle = Math.atan2(-dy, -dx) + e.zigzagDir * Math.PI / 5;
+      const fleeSpd = e.speed * 2.2 * dt;
+      const nx = e.x + Math.cos(fleeAngle) * fleeSpd;
+      const ny = e.y + Math.sin(fleeAngle) * fleeSpd;
       if (!sEnemyBlocked(nx, e.y)) e.x = nx;
       else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
       continue;
