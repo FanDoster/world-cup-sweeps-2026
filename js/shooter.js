@@ -718,6 +718,14 @@ function sUpdateEnemies(dt) {
 
     if (e.fleeTimer > 0) {
       e.fleeTimer -= dt;
+      // Still fires while fleeing
+      if (e.type === 'trump' && dist > 2) {
+        e.shootTimer -= dt;
+        if (e.shootTimer <= 0) {
+          e.shootTimer = 1 + Math.random() * 1;
+          sTrumpProjectiles.push({ x: e.x, y: e.y, dx: (dx / dist) * 10, dy: (dy / dist) * 10 });
+        }
+      }
       // Sprint directly away from player at 5× speed
       const fleeSpd = e.speed * 5.0 * dt;
       const tdx = -dx / dist, tdy = -dy / dist;
