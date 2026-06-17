@@ -263,6 +263,10 @@ const sWaveClearSound = new Audio('sounds/waveclear.wav');
 sWaveClearSound.preload = 'auto';
 function sPlayWaveClear() { sWaveClearSound.currentTime = 0; sWaveClearSound.play().catch(() => {}); }
 
+const sBossSound = new Audio('sounds/boss.wav');
+sBossSound.preload = 'auto';
+function sPlayBoss() { sBossSound.currentTime = 0; sBossSound.play().catch(() => {}); }
+
 // ── STATE ──────────────────────────────────────────────────────────────────
 let sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
 let sGameState = 'idle';   // idle | playing | wave-clear | dead | paused
@@ -505,12 +509,21 @@ function sRender() {
 
   if (sGameState === 'playing' && sBossAnnounce > 0) {
     sBossAnnounce--;
+    const isTrump = sWave % 10 === 0;
+    // first 60 frames: slam in at full opacity; last 120 frames: fade out
+    const alpha = sBossAnnounce > 120 ? 1 : sBossAnnounce / 120;
+    const scale = sBossAnnounce > 120 ? 1 + (sBossAnnounce - 120) / 60 * 0.4 : 1;
     sCtx.save();
-    sCtx.font = 'bold 32px monospace';
     sCtx.textAlign = 'center';
     sCtx.textBaseline = 'middle';
-    sCtx.fillStyle = `rgba(255,50,50,${sBossAnnounce / 120})`;
-    sCtx.fillText(sWave % 10 === 0 ? '🇺🇸  TRUMP INCOMING  🇺🇸' : '⚠  BOSS WAVE  ⚠', S_W / 2, S_H / 4);
+    sCtx.translate(S_W / 2, S_H / 3);
+    sCtx.scale(scale, scale);
+    sCtx.font = `bold 42px monospace`;
+    sCtx.fillStyle = `rgba(255,30,30,${alpha})`;
+    sCtx.fillText(isTrump ? '🇺🇸  TRUMP INCOMING  🇺🇸' : '⚠  BOSS WAVE  ⚠', 0, 0);
+    sCtx.font = `bold 20px monospace`;
+    sCtx.fillStyle = `rgba(255,200,200,${alpha})`;
+    sCtx.fillText(isTrump ? 'the mega-boss has arrived' : 'eliminate the boss to advance', 0, 48);
     sCtx.restore();
   }
 
@@ -561,7 +574,7 @@ function sNextWave() {
   sWave++;
   sEnemies = [];
   sGameState = 'playing';
-  if (sWave % 5 === 0) sBossAnnounce = 120;
+  if (sWave % 5 === 0) { sBossAnnounce = 180; sPlayBoss(); }
   const entries = sWaveEnemyList(sWave);
   for (const entry of entries) {
     for (let i = 0; i < entry.count; i++) {
