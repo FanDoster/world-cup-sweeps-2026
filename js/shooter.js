@@ -293,6 +293,7 @@ let sWave = 0;
 let sEnemies = [];
 let sZBuffer = new Array(S_W);
 let sDamageFlash = 0;
+let sProjectiles = [];
 let sBossAnnounce = 0;
 let sSpriteReady = false;
 let sShooterInited = false;
@@ -334,6 +335,7 @@ function sShoot() {
   if (now - sLastFireTime < 300) return;
   sLastFireTime = now;
   sPlayKick();
+  sProjectiles.push({ age: 0 });
 
   const px = sPlayer.x, py = sPlayer.y, pa = sPlayer.angle;
   const dirX = Math.cos(pa), dirY = Math.sin(pa);
@@ -510,6 +512,22 @@ function sRender() {
     sZBuffer[x] = dist;
   }
   sRenderSprites();
+
+  // Soccer ball projectiles
+  for (let i = sProjectiles.length - 1; i >= 0; i--) {
+    const p = sProjectiles[i];
+    p.age++;
+    const t = p.age / 18;
+    const size = 14 + t * 52;
+    sCtx.save();
+    sCtx.globalAlpha = Math.max(0, 1 - t);
+    sCtx.font = `${Math.round(size)}px serif`;
+    sCtx.textAlign = 'center';
+    sCtx.textBaseline = 'middle';
+    sCtx.fillText('⚽', S_W / 2, S_H / 2 - t * 40);
+    sCtx.restore();
+    if (p.age >= 18) sProjectiles.splice(i, 1);
+  }
 
   if (sDamageFlash > 0) {
     sCtx.fillStyle = `rgba(255,0,0,${(sDamageFlash / 8) * 0.4})`;
