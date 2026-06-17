@@ -293,7 +293,12 @@ const sHitSound = new Audio('sounds/hit.wav');
 sHitSound.preload = 'auto';
 const sDeathSound = new Audio('sounds/death.wav');
 sDeathSound.preload = 'auto';
-function sPlayHit()   { sHitSound.currentTime = 0;   sHitSound.play().catch(() => {}); }
+const sRooneySound = new Audio('sounds/rooney.mp3');
+sRooneySound.preload = 'auto';
+function sPlayHit(type) {
+  if (type === 'rooney') { sRooneySound.currentTime = 0; sRooneySound.play().catch(() => {}); return; }
+  sHitSound.currentTime = 0; sHitSound.play().catch(() => {});
+}
 function sPlayDeath() { sDeathSound.currentTime = 0; sDeathSound.play().catch(() => {}); }
 
 const sWaveClearSound = new Audio('sounds/waveclear.wav');
@@ -407,7 +412,7 @@ function sShoot() {
       sPlayDeath();
       sCheckWaveClear();
     } else {
-      sPlayHit();
+      sPlayHit(target.type);
     }
   }
 }
