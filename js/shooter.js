@@ -392,6 +392,10 @@ const sBossSound = new Audio('sounds/boss.mp3');
 sBossSound.preload = 'auto';
 function sPlayBoss() { sBossSound.currentTime = 0; sBossSound.play().catch(() => {}); }
 
+const sMultiballPickupSound = new Audio('sounds/multiball-pickup.mp3');
+sMultiballPickupSound.preload = 'auto';
+sMultiballPickupSound.volume = 1.0;
+
 const sBgm = new Audio('sounds/bgm.mp3');
 sBgm.loop = true;
 sBgm.volume = 0.5;
@@ -1158,7 +1162,12 @@ function sLoop(ts) {
   if (sGameState === 'playing') { sUpdateEnemies(dt); sUpdateTrumpProjectiles(dt); sUpdateSvenProjectiles(dt); sUpdateMultiball(dt); }
   if (sGameState === 'playing' && sCrate) {
     const cdx = sCrate.x - sPlayer.x, cdy = sCrate.y - sPlayer.y;
-    if (cdx * cdx + cdy * cdy < 0.64) { sCrate = null; sMultiballAmmo = 120; sMultiballFireTimer = 0; }
+    if (cdx * cdx + cdy * cdy < 0.64) {
+      sCrate = null; sMultiballAmmo = 120; sMultiballFireTimer = 0;
+      sMultiballPickupSound.currentTime = 0; sMultiballPickupSound.play().catch(() => {});
+      sBgm.volume = 0.15;
+      setTimeout(() => { if (!sBgm.paused) sBgm.volume = 0.5; }, 1200);
+    }
   }
   if (sGameState === 'playing' && sWave > 0 && !sEnemies.some(e => e.alive)) sCheckWaveClear();
   sRender();
