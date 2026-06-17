@@ -159,10 +159,16 @@ function sRenderHud() {
   ctx.font = 'bold 14px monospace';
   ctx.textBaseline = 'top';
   const waveText = `WAVE ${sWave}  ·  ${alive} LEFT`;
+  const wavesUntilBoss = 5 - (sWave % 5);
+  const bossText = sWave % 5 === 0 ? '⚠ BOSS WAVE' : `${wavesUntilBoss} WAVE${wavesUntilBoss === 1 ? '' : 'S'} UNTIL BOSS`;
+  const topW = Math.max(ctx.measureText(waveText).width, ctx.measureText(bossText).width) + 12;
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.fillRect(6, 6, ctx.measureText(waveText).width + 12, 24);
+  ctx.fillRect(6, 6, topW, 44);
   ctx.fillStyle = '#fff';
   ctx.fillText(waveText, 12, 10);
+  ctx.font = 'bold 11px monospace';
+  ctx.fillStyle = sWave % 5 === 0 ? '#f44' : wavesUntilBoss === 1 ? '#ff0' : '#aaa';
+  ctx.fillText(bossText, 12, 28);
 
   // Score (top-right)
   const scoreText = `SCORE: ${sPlayer.score}`;
@@ -529,7 +535,7 @@ function sRender() {
 
   if (sGameState === 'playing' && sBossAnnounce > 0) {
     sBossAnnounce--;
-    const isTrump = sWave % 10 === 0;
+    const isTrump = sWave % 5 === 0 && sWave % 10 !== 0;
     // first 60 frames: slam in at full opacity; last 120 frames: fade out
     const alpha = sBossAnnounce > 120 ? 1 : sBossAnnounce / 120;
     const scale = sBossAnnounce > 120 ? 1 + (sBossAnnounce - 120) / 60 * 0.4 : 1;
@@ -563,8 +569,8 @@ function sLoop(ts) {
 
 // ── WAVE / GAME START ──────────────────────────────────────────────────────
 function sWaveEnemyList(wave) {
-  if (wave % 10 === 0) return [{ type: 'trump',     count: 1 }];
-  if (wave % 5 === 0)  return [{ type: 'infantino', count: 1 }];
+  if (wave % 10 === 0) return [{ type: 'infantino', count: 1 }];
+  if (wave % 5 === 0)  return [{ type: 'trump',     count: 1 }];
 
   const isMini = wave % 3 === 0;
   const list = [];
@@ -594,7 +600,7 @@ function sNextWave() {
   sWave++;
   sEnemies = [];
   sGameState = 'playing';
-  if (sWave % 5 === 0) { sBossAnnounce = 180; sPlayBoss(); if (sWave % 10 === 0) sPlayTrumpClip(); }
+  if (sWave % 5 === 0) { sBossAnnounce = 180; sPlayBoss(); if (sWave % 10 !== 0) sPlayTrumpClip(); }
   const entries = sWaveEnemyList(sWave);
   for (const entry of entries) {
     for (let i = 0; i < entry.count; i++) {
