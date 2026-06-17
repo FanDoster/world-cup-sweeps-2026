@@ -33,6 +33,34 @@
   pointer-events: none;
 }
 
+.wave-clear-text {
+  display: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  font-family: 'Press Start 2P', monospace;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+#wave-clear-top {
+  top: 16px;
+  font-size: clamp(12px, 2.5vw, 20px);
+  color: #00ff44;
+  text-shadow: -2px 0 #004400, 2px 0 #004400, 0 -2px #004400, 0 2px #004400,
+               -3px -3px #004400, 3px -3px #004400, -3px 3px #004400, 3px 3px #004400;
+}
+
+#wave-clear-bottom {
+  bottom: 16px;
+  font-size: clamp(8px, 1.5vw, 12px);
+  color: #aaaaaa;
+  text-shadow: -2px 0 #222, 2px 0 #222, 0 -2px #222, 0 2px #222,
+               -2px -2px #222, 2px -2px #222, -2px 2px #222, 2px 2px #222;
+}
+
 .shooter-tab .tab-label {
   font-family: 'Press Start 2P', monospace;
   font-size: 0.6rem;

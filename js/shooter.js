@@ -139,8 +139,9 @@ function sRenderSprites() {
 
     const x0 = Math.max(0, Math.floor(drawX));
     const x1 = Math.min(S_W - 1, Math.floor(drawX + sprW));
+    const centerCol = Math.max(0, Math.min(S_W - 1, screenX));
+    if (transformY >= sZBuffer[centerCol]) continue;
     for (let x = x0; x <= x1; x++) {
-      if (transformY >= sZBuffer[x]) continue;
       const srcX = Math.floor((x - drawX) / sprW * img.width);
       sCtx.drawImage(img, srcX, srcY0, 1, srcHVisible, x, destY, 1, destH);
       if (e.hitFlash > 0) {
@@ -176,22 +177,27 @@ function sRenderHud() {
   // Wave + enemies remaining (top-left)
   const alive = sEnemies.filter(e => e.alive).length;
   ctx.textBaseline = 'top';
-  const waveText = `WAVE ${sWave} / ${alive} LEFT`;
+  const waveLabel = `WAVE ${sWave}`;
+  const enemyLabel = `${alive} REMAIN`;
   const wavesUntilBoss = 5 - (sWave % 5);
   const isBossWave = sWave % 5 === 0;
   const bossText = isBossWave ? 'BOSS WAVE!' : `${wavesUntilBoss} UNTIL BOSS`;
   const bossColor = isBossWave ? '#f44' : wavesUntilBoss === 1 ? '#ff0' : '#aaa';
   const bossOutline = isBossWave ? '#600' : wavesUntilBoss === 1 ? '#440' : '#333';
-  const bossFontSize = isBossWave ? 14 : 8 + (5 - wavesUntilBoss) * 2;
+  const bossFontSize = isBossWave ? 20 : 8 + (4 - Math.min(3, wavesUntilBoss - 1)) * 3;
   ctx.font = `${bossFontSize}px 'Press Start 2P', monospace`;
   const bossW = ctx.measureText(bossText).width;
   ctx.font = `10px 'Press Start 2P', monospace`;
-  const topW = Math.max(ctx.measureText(waveText).width, bossW) + 16;
-  const boxH = 14 + bossFontSize + 18;
+  const waveW = ctx.measureText(waveLabel).width;
+  ctx.font = `9px 'Press Start 2P', monospace`;
+  const enemyW = ctx.measureText(enemyLabel).width;
+  const topW = Math.max(waveW, enemyW, bossW) + 16;
+  const boxH = bossFontSize + 52;
   ctx.fillStyle = 'rgba(0,0,0,0.6)';
   ctx.fillRect(6, 6, topW, boxH);
-  sDrawText(ctx, waveText, 12, 10, 10, '#fff', '#333');
-  sDrawText(ctx, bossText, 12, 30, bossFontSize, bossColor, bossOutline);
+  sDrawText(ctx, waveLabel, 12, 10, 10, '#ff0', '#440');
+  sDrawText(ctx, enemyLabel, 12, 28, 9, '#f80', '#420');
+  sDrawText(ctx, bossText, 12, 46, bossFontSize, bossColor, bossOutline);
 
   // Score (top-right)
   const scoreText = `SCORE:${sPlayer.score}`;
@@ -355,6 +361,7 @@ let sZBuffer = new Array(S_W);
 let sDamageFlash = 0;
 let sProjectiles = [];
 let sTrumpProjectiles = [];
+let sSvenProjectiles = [];
 let sBossAnnounce = 0;
 let sSpriteReady = false;
 let sShooterInited = false;
@@ -438,6 +445,7 @@ function sShoot() {
     if (target.hp <= 0) {
       target.alive = false;
       sPlayer.score += target.points;
+      sPlayHit(target.type);
       sPlayDeath();
       sCheckWaveClear();
     } else {
@@ -472,10 +480,26 @@ function sShowWaveClearGif(show) {
   return 0;
 }
 
+function sSetWaveClearText(show, nextWave) {
+  const top = document.getElementById('wave-clear-top');
+  const bot = document.getElementById('wave-clear-bottom');
+  if (!top || !bot) return;
+  if (show) {
+    top.textContent = 'WAVE CLEAR';
+    bot.textContent = `preparing wave ${nextWave}...`;
+    top.style.display = 'block';
+    bot.style.display = 'block';
+  } else {
+    top.style.display = 'none';
+    bot.style.display = 'none';
+  }
+}
+
 function sCheckWaveClear() {
   if (sEnemies.some(e => e.alive)) return;
   sGameState = 'wave-clear';
   sPlayWaveClear();
+  sSetWaveClearText(true, sWave + 1);
   const gifDuration = sShowWaveClearGif(true);
   setTimeout(() => { if (sGameState === 'wave-clear') sNextWave(); }, gifDuration);
 }
@@ -593,6 +617,15 @@ function sUpdateEnemies(dt) {
       }
     }
 
+    // Sven fires Sweden balls at the player
+    if (e.type === 'sven' && dist > 2 && e.fleeTimer <= 0) {
+      e.shootTimer -= dt;
+      if (e.shootTimer <= 0) {
+        e.shootTimer = 3 + Math.random() * 2;
+        sSvenProjectiles.push({ x: e.x, y: e.y, dx: (dx / dist) * 7, dy: (dy / dist) * 7 });
+      }
+    }
+
     let moveX = 0, moveY = 0;
     if (e.behaviour === 'direct') {
       moveX = (dx / dist) * e.speed * dt;
@@ -631,6 +664,22 @@ function sUpdateTrumpProjectiles(dt) {
       sPlayer.hp -= 15;
       sDamageFlash = 10;
       sTrumpProjectiles.splice(i, 1);
+      if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameState = 'dead'; }
+    }
+  }
+}
+
+function sUpdateSvenProjectiles(dt) {
+  for (let i = sSvenProjectiles.length - 1; i >= 0; i--) {
+    const p = sSvenProjectiles[i];
+    p.x += p.dx * dt;
+    p.y += p.dy * dt;
+    if (sIsWall(p.x, p.y)) { sSvenProjectiles.splice(i, 1); continue; }
+    const pdx = sPlayer.x - p.x, pdy = sPlayer.y - p.y;
+    if (pdx * pdx + pdy * pdy < 0.25) {
+      sPlayer.hp -= 10;
+      sDamageFlash = 8;
+      sSvenProjectiles.splice(i, 1);
       if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameState = 'dead'; }
     }
   }
@@ -729,6 +778,28 @@ function sRender() {
     ctx.restore();
   }
 
+  // Sven projectiles (Sweden-coloured balls)
+  for (const p of sSvenProjectiles) {
+    const sx = p.x - px, sy = p.y - py;
+    const tX = invDet * (dirY * sx - dirX * sy);
+    const tY = invDet * (-plY * sx + plX * sy);
+    if (tY <= 0.1) continue;
+    const screenX2 = Math.round(S_W / 2 * (1 + tX / tY));
+    if (screenX2 < 0 || screenX2 >= S_W || tY >= sZBuffer[screenX2]) continue;
+    const r = Math.max(3, Math.round(S_H / tY / 14));
+    const sY2 = S_H / 2;
+    ctx.save();
+    // Blue circle
+    ctx.beginPath(); ctx.arc(screenX2, sY2, r, 0, Math.PI * 2);
+    ctx.fillStyle = '#006AA7'; ctx.shadowColor = '#FECC02'; ctx.shadowBlur = r * 2; ctx.fill();
+    // Yellow cross
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#FECC02';
+    ctx.fillRect(screenX2 - r, sY2 - Math.round(r * 0.28), r * 2, Math.round(r * 0.56));
+    ctx.fillRect(screenX2 - Math.round(r * 0.28), sY2 - r, Math.round(r * 0.56), r * 2);
+    ctx.restore();
+  }
+
   // Soccer ball projectiles
   for (let i = sProjectiles.length - 1; i >= 0; i--) {
     const p = sProjectiles[i];
@@ -736,7 +807,7 @@ function sRender() {
     const t = p.age / 9;
     const size = 66 - t * 52;
     sCtx.save();
-    sCtx.globalAlpha = Math.max(0.15, 1 - t * 0.4);
+    sCtx.globalAlpha = Math.max(0.8, 1 - t * 0.1);
     sCtx.font = `${Math.round(size)}px serif`;
     sCtx.textAlign = 'center';
     sCtx.textBaseline = 'middle';
@@ -755,9 +826,6 @@ function sRender() {
   if (sGameState === 'wave-clear') {
     sCtx.fillStyle = 'rgba(0,0,0,0.6)';
     sCtx.fillRect(0, 0, S_W, S_H);
-    sCtx.textBaseline = 'middle';
-    sDrawText(sCtx, 'WAVE CLEAR', S_W / 2, 22, 16, '#0f0', '#040', 'center');
-    sDrawText(sCtx, `preparing wave ${sWave + 1}...`, S_W / 2, S_H - 22, 9, '#aaa', '#222', 'center');
   }
 
   if (sGameState === 'playing' && sBossAnnounce > 0) {
@@ -784,7 +852,7 @@ function sLoop(ts) {
   const dt = Math.min((ts - sLastTime) / 1000, 0.05);
   sLastTime = ts;
   if (sGameState === 'playing' || sGameState === 'wave-clear') sUpdatePlayer(dt);
-  if (sGameState === 'playing') { sUpdateEnemies(dt); sUpdateTrumpProjectiles(dt); }
+  if (sGameState === 'playing') { sUpdateEnemies(dt); sUpdateTrumpProjectiles(dt); sUpdateSvenProjectiles(dt); }
   if (sGameState === 'playing' && sWave > 0 && !sEnemies.some(e => e.alive)) sCheckWaveClear();
   sRender();
 }
@@ -819,6 +887,7 @@ function sWaveEnemyList(wave) {
 }
 
 function sNextWave() {
+  sSetWaveClearText(false);
   sShowWaveClearGif(false);
   sWave++;
   sEnemies = [];
@@ -841,6 +910,7 @@ function sStartGame() {
   sDamageFlash = 0;
   sBossAnnounce = 0;
   sTrumpProjectiles = [];
+  sSvenProjectiles = [];
   sNextWave();
 }
 
@@ -862,6 +932,7 @@ function pauseShooter() {
   if (sAnimId) { cancelAnimationFrame(sAnimId); sAnimId = null; }
   if (document.pointerLockElement === sCanvas) document.exitPointerLock();
   sKeys = {};
+  sSetWaveClearText(false);
   sShowWaveClearGif(false);
   if (sGameState === 'playing' || sGameState === 'wave-clear') sGameState = 'paused';
 }
