@@ -332,6 +332,12 @@ function sIsWall(x, y) {
   return S_MAP[my][mx] === 1;
 }
 
+function sEnemyBlocked(x, y) {
+  const r = 0.3;
+  return sIsWall(x + r, y) || sIsWall(x - r, y) ||
+         sIsWall(x, y + r) || sIsWall(x, y - r);
+}
+
 // ── DDA RAY-CASTER ─────────────────────────────────────────────────────────
 function sCastRay(px, py, rdx, rdy) {
   // rdx and rdy are already the ray direction — no cos/sin needed
@@ -491,8 +497,8 @@ function sUpdateEnemies(dt) {
       e.fleeTimer -= dt;
       const nx = e.x - (dx / dist) * e.speed * dt;
       const ny = e.y - (dy / dist) * e.speed * dt;
-      if (!sIsWall(nx, e.y)) e.x = nx;
-      else if (!sIsWall(e.x, ny)) e.y = ny;
+      if (!sEnemyBlocked(nx, e.y)) e.x = nx;
+      else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
       continue;
     }
 
@@ -518,8 +524,8 @@ function sUpdateEnemies(dt) {
     }
 
     const nx = e.x + moveX, ny = e.y + moveY;
-    if (!sIsWall(nx, e.y)) e.x = nx;
-    else if (!sIsWall(e.x, ny)) e.y = ny;
+    if (!sEnemyBlocked(nx, e.y)) e.x = nx;
+    else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
   }
 }
 
