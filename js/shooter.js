@@ -295,8 +295,16 @@ const sDeathSound = new Audio('sounds/death.wav');
 sDeathSound.preload = 'auto';
 const sRooneySound = new Audio('sounds/rooney.mp3');
 sRooneySound.preload = 'auto';
+let sRooneyLastPlayed = 0;
 function sPlayHit(type) {
-  if (type === 'rooney') { sRooneySound.currentTime = 0; sRooneySound.play().catch(() => {}); return; }
+  if (type === 'rooney') {
+    const now = performance.now();
+    if (!sRooneySound.paused || now - sRooneyLastPlayed < 4000) return;
+    sRooneyLastPlayed = now;
+    sRooneySound.currentTime = 0;
+    sRooneySound.play().catch(() => {});
+    return;
+  }
   sHitSound.currentTime = 0; sHitSound.play().catch(() => {});
 }
 function sPlayDeath() { sDeathSound.currentTime = 0; sDeathSound.play().catch(() => {}); }
