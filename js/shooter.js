@@ -53,7 +53,7 @@ function sSpawnEnemy(type, x, y) {
     sprite: def.sprite, hp: def.hp, maxHp: def.hp,
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
-    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0,
+    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, shootTimer: 2,
   };
 }
 
@@ -354,6 +354,7 @@ let sEnemies = [];
 let sZBuffer = new Array(S_W);
 let sDamageFlash = 0;
 let sProjectiles = [];
+let sTrumpProjectiles = [];
 let sBossAnnounce = 0;
 let sSpriteReady = false;
 let sShooterInited = false;
@@ -547,6 +548,15 @@ function sUpdateEnemies(dt) {
       continue;
     }
 
+    // Trump fires projectiles at the player
+    if (e.type === 'trump' && dist > 2) {
+      e.shootTimer -= dt;
+      if (e.shootTimer <= 0) {
+        e.shootTimer = 2.5 + Math.random() * 1.5;
+        sTrumpProjectiles.push({ x: e.x, y: e.y, dx: (dx / dist) * 6, dy: (dy / dist) * 6 });
+      }
+    }
+
     let moveX = 0, moveY = 0;
     if (e.behaviour === 'direct') {
       moveX = (dx / dist) * e.speed * dt;
@@ -571,6 +581,22 @@ function sUpdateEnemies(dt) {
     const nx = e.x + moveX, ny = e.y + moveY;
     if (!sEnemyBlocked(nx, e.y)) e.x = nx;
     else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
+  }
+}
+
+function sUpdateTrumpProjectiles(dt) {
+  for (let i = sTrumpProjectiles.length - 1; i >= 0; i--) {
+    const p = sTrumpProjectiles[i];
+    p.x += p.dx * dt;
+    p.y += p.dy * dt;
+    if (sIsWall(p.x, p.y)) { sTrumpProjectiles.splice(i, 1); continue; }
+    const pdx = sPlayer.x - p.x, pdy = sPlayer.y - p.y;
+    if (pdx * pdx + pdy * pdy < 0.25) {
+      sPlayer.hp -= 15;
+      sDamageFlash = 10;
+      sTrumpProjectiles.splice(i, 1);
+      if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameState = 'dead'; }
+    }
   }
 }
 
@@ -646,6 +672,27 @@ function sRender() {
   }
   sRenderSprites();
 
+  // Trump projectiles (world-space billboard)
+  const invDet = 1 / (plX * dirY - dirX * plY);
+  for (const p of sTrumpProjectiles) {
+    const sx = p.x - px, sy = p.y - py;
+    const tX = invDet * (dirY * sx - dirX * sy);
+    const tY = invDet * (-plY * sx + plX * sy);
+    if (tY <= 0.1) continue;
+    const screenX = Math.round(S_W / 2 * (1 + tX / tY));
+    if (screenX < 0 || screenX >= S_W || tY >= sZBuffer[screenX]) continue;
+    const r = Math.max(3, Math.round(S_H / tY / 12));
+    const sY = S_H / 2;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(screenX, sY, r, 0, Math.PI * 2);
+    ctx.fillStyle = '#ff4400';
+    ctx.shadowColor = '#ff8800';
+    ctx.shadowBlur = r * 3;
+    ctx.fill();
+    ctx.restore();
+  }
+
   // Soccer ball projectiles
   for (let i = sProjectiles.length - 1; i >= 0; i--) {
     const p = sProjectiles[i];
@@ -703,7 +750,7 @@ function sLoop(ts) {
   const dt = Math.min((ts - sLastTime) / 1000, 0.05);
   sLastTime = ts;
   if (sGameState === 'playing' || sGameState === 'wave-clear') sUpdatePlayer(dt);
-  if (sGameState === 'playing') sUpdateEnemies(dt);
+  if (sGameState === 'playing') { sUpdateEnemies(dt); sUpdateTrumpProjectiles(dt); }
   if (sGameState === 'playing' && sWave > 0 && !sEnemies.some(e => e.alive)) sCheckWaveClear();
   sRender();
 }
@@ -758,6 +805,7 @@ function sStartGame() {
   sEnemies = [];
   sDamageFlash = 0;
   sBossAnnounce = 0;
+  sTrumpProjectiles = [];
   sNextWave();
 }
 
