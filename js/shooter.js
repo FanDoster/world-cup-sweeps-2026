@@ -139,7 +139,7 @@ function sRenderSprites() {
     const sprH = Math.min(Math.abs(Math.round(S_H / transformY)) * e.scale, S_H * 2);
     const sprW = sprH;
     const drawX = screenX - sprW / 2;
-    const drawY = (S_H - sprH) / 2;
+    const drawY = (S_H - sprH) / 2 + sBobOffset;
 
     const img = sSprites[e.sprite];
     if (!img) continue;
@@ -398,6 +398,8 @@ let sWave = 0;
 let sEnemies = [];
 let sZBuffer = new Array(S_W);
 let sDamageFlash = 0;
+let sBobPhase = 0;
+let sBobOffset = 0;
 let sProjectiles = [];
 let sTrumpProjectiles = [];
 let sSvenProjectiles = [];
@@ -594,6 +596,15 @@ function sUpdatePlayer(dt) {
 
   p.angle += sMouseDX * S_ROT_SPEED;
   sMouseDX = 0;
+
+  const isMoving = sKeys['KeyW'] || sKeys['KeyS'] || sKeys['KeyA'] || sKeys['KeyD'] || sKeys['ArrowUp'] || sKeys['ArrowDown'];
+  if (isMoving && sGameState === 'playing') {
+    sBobPhase += dt * Math.PI * 4.5;
+    sBobOffset = Math.sin(sBobPhase) * 4;
+  } else {
+    sBobOffset *= 0.82;
+    if (Math.abs(sBobOffset) < 0.05) { sBobOffset = 0; sBobPhase = 0; }
+  }
 
   if (sKeys['KeyW'] || sKeys['ArrowUp']) {
     const nx = p.x + cos * spd, ny = p.y + sin * spd;
@@ -965,12 +976,13 @@ function sRender() {
   const dirX = Math.cos(pa), dirY = Math.sin(pa);
   const plX = -dirY * S_PLANE_LEN, plY = dirX * S_PLANE_LEN;
 
+  const horizon = Math.round(S_H / 2 + sBobOffset);
   // Ceiling (stadium stands)
   ctx.fillStyle = '#1a1a2e';
-  ctx.fillRect(0, 0, S_W, S_H / 2);
+  ctx.fillRect(0, 0, S_W, horizon);
   // Floor (pitch)
   ctx.fillStyle = '#1a4a1a';
-  ctx.fillRect(0, S_H / 2, S_W, S_H / 2);
+  ctx.fillRect(0, horizon, S_W, S_H - horizon);
 
   // Walls
   for (let x = 0; x < S_W; x++) {
@@ -978,7 +990,7 @@ function sRender() {
     const rdx = dirX + plX * camX, rdy = dirY + plY * camX;
     const { dist, side, wallX, wallType } = sCastRay(px, py, rdx, rdy);
     const wallH = Math.min(S_H / dist, S_H);
-    const wallTop = (S_H - wallH) / 2;
+    const wallTop = Math.round(horizon - wallH / 2);
     const tex = sTextures[wallType] || sTextures[1];
     const texX = Math.floor(wallX * 64);
     ctx.drawImage(tex, texX, 0, 1, 64, x, wallTop, 1, wallH);
@@ -997,7 +1009,7 @@ function sRender() {
     const screenX = Math.round(S_W / 2 * (1 + tX / tY));
     if (screenX < 0 || screenX >= S_W || tY >= sZBuffer[screenX]) continue;
     const r = Math.max(3, Math.round(S_H / tY / 12));
-    const sY = S_H / 2;
+    const sY = horizon;
     ctx.save();
     ctx.beginPath();
     ctx.arc(screenX, sY, r, 0, Math.PI * 2);
@@ -1017,7 +1029,7 @@ function sRender() {
     const screenX2 = Math.round(S_W / 2 * (1 + tX / tY));
     if (screenX2 < 0 || screenX2 >= S_W || tY >= sZBuffer[screenX2]) continue;
     const r = Math.max(3, Math.round(S_H / tY / 14));
-    const sY2 = S_H / 2;
+    const sY2 = horizon;
     ctx.save();
     // Blue circle
     ctx.beginPath(); ctx.arc(screenX2, sY2, r, 0, Math.PI * 2);
@@ -1040,7 +1052,7 @@ function sRender() {
       const cH = Math.min(Math.abs(Math.round(S_H / ctY * 0.75)), S_H);
       const cW = cH;
       const cDrawX = cScrX - cW / 2;
-      const cDrawY = S_H / 2 - cH * 0.6;  // sits on floor line
+      const cDrawY = horizon - cH * 0.6;
       const cCenterCol = Math.max(0, Math.min(S_W - 1, cScrX));
       if (ctY < sZBuffer[cCenterCol]) {
         const img = sTextures.crate;
@@ -1197,6 +1209,8 @@ function sStartGame() {
   sMultiballAmmo = 0;
   sMultiballFireTimer = 0;
   sMouseFire = false;
+  sBobPhase = 0;
+  sBobOffset = 0;
   sNextWave();
 }
 
