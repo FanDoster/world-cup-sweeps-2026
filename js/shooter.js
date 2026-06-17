@@ -353,13 +353,14 @@ function sUpdatePlayer(dt) {
 function sSetupInput() {
   document.addEventListener('keydown', e => {
     sKeys[e.code] = true;
-    if (e.code === 'Space' && sPointerLocked) { e.preventDefault(); sShoot(); }
+    if (e.code === 'Space') { if (sPointerLocked) e.preventDefault(); sShoot(); }
   });
   document.addEventListener('keyup', e => { sKeys[e.code] = false; });
 
   sCanvas.addEventListener('click', () => {
     if (sGameState === 'idle' || sGameState === 'dead') { sStartGame(); return; }
     if (sGameState === 'paused') { sCanvas.requestPointerLock(); return; }
+    if (sPointerLocked) { sShoot(); return; }
     sCanvas.requestPointerLock();
   });
 
