@@ -15,8 +15,14 @@
 
 #shooter-canvas {
   display: block;
-  max-width: 100%;
-  max-height: 100%;
+  width: min(100%, calc((100vh - 120px) * 640 / 480));
+  height: auto;
   image-rendering: pixelated;
   cursor: none;
+}
+
+.shooter-tab .tab-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0;
 }
