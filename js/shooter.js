@@ -428,7 +428,7 @@ function sShoot() {
     target.hitFlash = 8;
     if (target.type === 'trump') {
       target.hitsReceived++;
-      if (target.hitsReceived % 2 === 0) target.fleeTimer = 4 + Math.random() * 2;
+      if (target.hitsReceived % 4 === 0) target.fleeTimer = 2 + Math.random() * 1;
     }
     if (target.hp <= 0) {
       target.alive = false;
