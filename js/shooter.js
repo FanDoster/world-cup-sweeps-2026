@@ -69,6 +69,20 @@ function sRandomSpawnPos() {
   return { x: 18.5, y: 11.5 };  // fallback: far corner
 }
 
+function sSpawnCrate() {
+  // Central third of the map (cols 6-14, rows 3-9)
+  const xMin = 6, xMax = 14, yMin = 3, yMax = 9;
+  for (let i = 0; i < 200; i++) {
+    const x = xMin + Math.random() * (xMax - xMin);
+    const y = yMin + Math.random() * (yMax - yMin);
+    if (sIsWall(x, y)) continue;
+    const dx = x - sPlayer.x, dy = y - sPlayer.y;
+    if (dx * dx + dy * dy < 9) continue;  // ≥ 3 units from player
+    return { x, y };
+  }
+  return { x: 10, y: 6 };  // fallback: map centre
+}
+
 const sSprites = {};
 
 function sRemoveBg(img, bgType) {
@@ -240,6 +254,19 @@ function sRenderHud() {
     sDrawText(ctx, bossLabel, S_W / 2, barY + barH / 2, 8, '#fff', isTrump ? '#600' : '#408', 'center');
   }
 
+  // Multiball ammo (bottom-centre)
+  if (sMultiballAmmo > 0) {
+    ctx.textBaseline = 'middle';
+    const ammoText = `MULTIBALL  x${String(sMultiballAmmo).padStart(3, '0')}`;
+    ctx.font = `10px 'Press Start 2P', monospace`;
+    const aw = ctx.measureText(ammoText).width;
+    ctx.fillStyle = 'rgba(0,0,0,0.65)';
+    ctx.fillRect(S_W / 2 - aw / 2 - 10, S_H - 58, aw + 20, 26);
+    const pulse = 0.8 + 0.2 * Math.sin(Date.now() / 150);
+    const ammoColor = `rgba(${Math.round(255 * pulse)},${Math.round(220 * pulse)},0,1)`;
+    sDrawText(ctx, ammoText, S_W / 2, S_H - 45, 10, ammoColor, '#440', 'center');
+  }
+
   ctx.restore();
 }
 
@@ -373,6 +400,9 @@ let sDamageFlash = 0;
 let sProjectiles = [];
 let sTrumpProjectiles = [];
 let sSvenProjectiles = [];
+let sCrate = null;
+let sMultiballAmmo = 0;
+let sMultiballFireTimer = 0;
 let sBossAnnounce = 0;
 let sSpriteReady = false;
 let sShooterInited = false;
@@ -588,7 +618,7 @@ function sUpdatePlayer(dt) {
 function sSetupInput() {
   document.addEventListener('keydown', e => {
     sKeys[e.code] = true;
-    if (e.code === 'Space') { if (sPointerLocked) e.preventDefault(); sShoot(); }
+    if (e.code === 'Space') { if (sPointerLocked) e.preventDefault(); if (!sMultiballAmmo) sShoot(); }
   });
   document.addEventListener('keyup', e => { sKeys[e.code] = false; });
 
@@ -779,6 +809,56 @@ function sUpdateSvenProjectiles(dt) {
   }
 }
 
+function sFireMultiball() {
+  if (!sMultiballAmmo) return;
+  sMultiballAmmo--;
+  sPlayKick();
+  sProjectiles.push({ age: 0, small: true });
+
+  // Hit detection — same cone as regular shot but 1 damage
+  const px = sPlayer.x, py = sPlayer.y, pa = sPlayer.angle;
+  const dirX = Math.cos(pa), dirY = Math.sin(pa);
+  const plX = -dirY * S_PLANE_LEN, plY = dirX * S_PLANE_LEN;
+  const invDet = 1 / (plX * dirY - dirX * plY);
+  let bestDist = Infinity, target = null;
+  for (const e of sEnemies) {
+    if (!e.alive) continue;
+    const sx = e.x - px, sy = e.y - py;
+    const tY = invDet * (-plY * sx + plX * sy);
+    if (tY <= 0 || tY > 10) continue;
+    if (tY >= sZBuffer[Math.round(S_W / 2)]) continue;
+    const tX = invDet * (dirY * sx - dirX * sy);
+    const sX = (S_W / 2) * (1 + tX / tY);
+    const sprW = Math.abs(S_H / tY) * e.scale;
+    if (sX < S_W / 2 - sprW / 2 || sX > S_W / 2 + sprW / 2) continue;
+    if (tY < bestDist) { bestDist = tY; target = e; }
+  }
+  if (target) {
+    target.hp -= 1;
+    target.hitFlash = 3;
+    if (target.hp <= 0) {
+      target.alive = false;
+      sPlayer.score += target.points;
+      sPlayHit(target.type);
+      sPlayDeath();
+      sCheckWaveClear();
+    }
+  }
+}
+
+function sUpdateMultiball(dt) {
+  if (!sMultiballAmmo || sGameState !== 'playing') return;
+  if (sKeys['Space']) {
+    sMultiballFireTimer -= dt;
+    if (sMultiballFireTimer <= 0) {
+      sMultiballFireTimer = 1 / 5;  // 5 rounds/sec
+      sFireMultiball();
+    }
+  } else {
+    sMultiballFireTimer = 0;  // reset so next press fires instantly
+  }
+}
+
 // ── RENDER ─────────────────────────────────────────────────────────────────
 // ── WALL TEXTURES ───────────────────────────────────────────────────────────
 const sTextures = {};
@@ -820,6 +900,29 @@ function sGenTextures() {
     ctx.fillStyle = '#dd0022';
     for (let i = 0; i < 4; i++) ctx.fillRect(i * 16 + 2, 46, 4, 14);
     sTextures[3] = c;
+  }
+  // Crate — bright yellow/brown wooden box with MULTIBALL label
+  {
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#c8820a'; ctx.fillRect(0, 0, 64, 64);
+    // Wood planks
+    ctx.strokeStyle = '#8b5a00'; ctx.lineWidth = 1.5;
+    for (let v = 0; v <= 64; v += 32) { ctx.beginPath(); ctx.moveTo(0, v); ctx.lineTo(64, v); ctx.stroke(); }
+    for (let h = 0; h <= 64; h += 32) { ctx.beginPath(); ctx.moveTo(h, 0); ctx.lineTo(h, 64); ctx.stroke(); }
+    // Metal corner brackets
+    ctx.fillStyle = '#555';
+    for (const [bx, by] of [[0,0],[57,0],[0,57],[57,57]]) ctx.fillRect(bx, by, 7, 7);
+    // Bright border to stand out in the dark arena
+    ctx.strokeStyle = '#ffe000'; ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, 62, 62);
+    // MULTIBALL text
+    ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#000'; // shadow
+    ctx.fillText('MULTI', 33, 25); ctx.fillText('BALL', 33, 40);
+    ctx.fillStyle = '#ffe000';
+    ctx.fillText('MULTI', 32, 24); ctx.fillText('BALL', 32, 39);
+    sTextures.crate = c;
   }
 }
 
@@ -894,12 +997,51 @@ function sRender() {
     ctx.restore();
   }
 
+  // Crate (world-space billboard)
+  if (sCrate) {
+    const csx = sCrate.x - px, csy = sCrate.y - py;
+    const ctX = invDet * (dirY * csx - dirX * csy);
+    const ctY = invDet * (-plY * csx + plX * csy);
+    if (ctY > 0.1) {
+      const cScrX = Math.round(S_W / 2 * (1 + ctX / ctY));
+      const cH = Math.min(Math.abs(Math.round(S_H / ctY * 0.75)), S_H);
+      const cW = cH;
+      const cDrawX = cScrX - cW / 2;
+      const cDrawY = S_H / 2 - cH;  // sits on floor line
+      const cCenterCol = Math.max(0, Math.min(S_W - 1, cScrX));
+      if (ctY < sZBuffer[cCenterCol]) {
+        const img = sTextures.crate;
+        const cx0 = Math.max(0, Math.floor(cDrawX));
+        const cx1 = Math.min(S_W - 1, Math.floor(cDrawX + cW));
+        let destY = cDrawY, destH = cH, srcY0 = 0;
+        if (destY < 0) { srcY0 = (-destY / cH) * img.height; destH += destY; destY = 0; }
+        if (destY + destH > S_H) destH = S_H - destY;
+        if (destH > 0) {
+          const srcHVis = (destH / cH) * img.height;
+          for (let x = cx0; x <= cx1; x++) {
+            const srcX = Math.floor((x - cDrawX) / cW * img.width);
+            ctx.drawImage(img, srcX, srcY0, 1, srcHVis, x, destY, 1, destH);
+          }
+        }
+        // Pulsing "MULTIBALL" label above crate
+        const labelY = cDrawY - 6;
+        if (cScrX > 20 && cScrX < S_W - 20 && labelY > 10) {
+          const pulse = 0.7 + 0.3 * Math.sin(Date.now() / 250);
+          ctx.save(); ctx.globalAlpha = pulse;
+          sDrawText(ctx, 'MULTIBALL', cScrX, labelY, 7, '#ffe000', '#440', 'center');
+          ctx.restore();
+        }
+      }
+    }
+  }
+
   // Soccer ball projectiles
   for (let i = sProjectiles.length - 1; i >= 0; i--) {
     const p = sProjectiles[i];
     p.age++;
-    const t = p.age / 9;
-    const size = 66 - t * 52;
+    const maxAge = p.small ? 6 : 9;
+    const t = p.age / maxAge;
+    const size = p.small ? (28 - t * 16) : (66 - t * 52);
     sCtx.save();
     sCtx.globalAlpha = 1;
     sCtx.font = `${Math.round(size)}px serif`;
@@ -907,7 +1049,7 @@ function sRender() {
     sCtx.textBaseline = 'middle';
     sCtx.fillText('⚽', S_W / 2, S_H * 0.75 - t * (S_H * 0.75 - S_H / 2));
     sCtx.restore();
-    if (p.age >= 9) sProjectiles.splice(i, 1);
+    if (p.age >= maxAge) sProjectiles.splice(i, 1);
   }
 
   if (sDamageFlash > 0) {
@@ -946,7 +1088,11 @@ function sLoop(ts) {
   const dt = Math.min((ts - sLastTime) / 1000, 0.05);
   sLastTime = ts;
   if (sGameState === 'playing' || sGameState === 'wave-clear') sUpdatePlayer(dt);
-  if (sGameState === 'playing') { sUpdateEnemies(dt); sUpdateTrumpProjectiles(dt); sUpdateSvenProjectiles(dt); }
+  if (sGameState === 'playing') { sUpdateEnemies(dt); sUpdateTrumpProjectiles(dt); sUpdateSvenProjectiles(dt); sUpdateMultiball(dt); }
+  if (sGameState === 'playing' && sCrate) {
+    const cdx = sCrate.x - sPlayer.x, cdy = sCrate.y - sPlayer.y;
+    if (cdx * cdx + cdy * cdy < 0.64) { sCrate = null; sMultiballAmmo = 100; sMultiballFireTimer = 0; }
+  }
   if (sGameState === 'playing' && sWave > 0 && !sEnemies.some(e => e.alive)) sCheckWaveClear();
   sRender();
 }
@@ -983,9 +1129,11 @@ function sWaveEnemyList(wave) {
 function sNextWave() {
   sSetWaveClearText(false);
   sShowWaveClearGif(false);
+  sCrate = null;  // disappears when next wave starts
   sWave++;
   sEnemies = [];
   sGameState = 'playing';
+  if (sWave === 3) sCrate = sSpawnCrate();
   if (sWave % 5 === 0) { sBossAnnounce = 180; sPlayBoss(); if (sWave % 10 !== 0) sPlayTrumpClip(); }
   const entries = sWaveEnemyList(sWave);
   for (const entry of entries) {
@@ -1005,6 +1153,9 @@ function sStartGame() {
   sBossAnnounce = 0;
   sTrumpProjectiles = [];
   sSvenProjectiles = [];
+  sCrate = null;
+  sMultiballAmmo = 0;
+  sMultiballFireTimer = 0;
   sNextWave();
 }
 
