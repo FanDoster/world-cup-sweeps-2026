@@ -25,7 +25,7 @@ const S_MAP = [
 // ── SPRITES ────────────────────────────────────────────────────────────────
 const S_SPRITE_DEFS = {
   rooney:         { src: 'sprites/rooney.png',        bg: 'transparent' },
-  gazza:          { src: 'sprites/gazza.png',          bg: 'white' },
+  gazza:          { src: 'sprites/gazza.png',          bg: 'transparent' },
   'gazza-trophy': { src: 'sprites/gazza-trophy.png',  bg: 'transparent' },
   sven:           { src: 'sprites/sven.png',           bg: 'transparent' },
   starmer:        { src: 'sprites/starmer.png',        bg: 'transparent' },
