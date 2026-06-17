@@ -394,6 +394,14 @@ const sBossSound = new Audio('sounds/boss.mp3');
 sBossSound.preload = 'auto';
 function sPlayBoss() { sBossSound.currentTime = 0; sBossSound.play().catch(() => {}); }
 
+const sBgm = new Audio('sounds/bgm.mp3');
+sBgm.loop = true;
+sBgm.volume = 0.5;
+sBgm.preload = 'auto';
+function sBgmPlay() { sBgm.play().catch(() => {}); }
+function sBgmPause() { sBgm.pause(); }
+function sBgmStop() { sBgm.pause(); sBgm.currentTime = 0; }
+
 const sTrumpClips = [
   'sounds/trump-maga.mp3', 'sounds/trump-fakenews.mp3', 'sounds/trump-indicted.mp3',
   'sounds/trump-dogs.mp3', 'sounds/trump-5.mp3', 'sounds/trump-6.mp3',
@@ -565,6 +573,7 @@ const sWaveClearGifs = [
 let sWaveClearGifIdx = 0;
 function sGameOver() {
   sGameState = 'dead';
+  sBgmStop();
   const gif = document.getElementById('game-over-gif');
   if (gif) { gif.src = 'sprites/gameover.mp4'; gif.load(); gif.play().catch(() => {}); gif.style.display = 'block'; }
   const ov = document.getElementById('game-over-overlay');
@@ -674,8 +683,8 @@ function sSetupInput() {
 
   document.addEventListener('pointerlockchange', () => {
     sPointerLocked = document.pointerLockElement === sCanvas;
-    if (!sPointerLocked && sGameState === 'playing') sGameState = 'paused';
-    if (sPointerLocked && sGameState === 'paused') sGameState = 'playing';
+    if (!sPointerLocked && sGameState === 'playing') { sGameState = 'paused'; sBgmPause(); }
+    if (sPointerLocked && sGameState === 'paused') { sGameState = 'playing'; sBgmPlay(); }
   });
 
   document.addEventListener('mousemove', e => {
@@ -1185,6 +1194,7 @@ function sNextWave() {
   sWave++;
   sEnemies = [];
   sGameState = 'playing';
+  if (sWave === 1) sBgmPlay();
   if (sWave === 3) sCrate = sSpawnCrate();
   if (sWave % 5 === 0) { sBossAnnounce = 180; sPlayBoss(); if (sWave % 10 !== 0) sPlayTrumpClip(); }
   const entries = sWaveEnemyList(sWave);
@@ -1198,6 +1208,7 @@ function sNextWave() {
 }
 
 function sStartGame() {
+  sBgmStop();
   sPlayer = { x: 1.5, y: 1.5, angle: 0, hp: 100, score: 0 };
   sWave = 0;
   sEnemies = [];
