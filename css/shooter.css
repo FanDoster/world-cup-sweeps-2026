@@ -33,6 +33,51 @@
   pointer-events: none;
 }
 
+#game-over-gif {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: calc(min(100%, calc(100vh - 120px)) - 80px);
+  width: auto;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#game-over-overlay {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  font-family: 'Press Start 2P', monospace;
+  text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
+  line-height: 2.2;
+}
+
+#game-over-overlay .go-title {
+  font-size: clamp(36px, 8vw, 64px);
+  color: #f44;
+  text-shadow: -3px 0 #600, 3px 0 #600, 0 -3px #600, 0 3px #600,
+               -4px -4px #600, 4px -4px #600, -4px 4px #600, 4px 4px #600;
+}
+
+#game-over-overlay .go-stats {
+  font-size: clamp(12px, 2.5vw, 18px);
+  color: #fff;
+  text-shadow: -2px 0 #333, 2px 0 #333, 0 -2px #333, 0 2px #333;
+}
+
+#game-over-overlay .go-prompt {
+  font-size: clamp(9px, 1.8vw, 14px);
+  color: #ff0;
+  text-shadow: -2px 0 #440, 2px 0 #440, 0 -2px #440, 0 2px #440;
+}
+
 .wave-clear-text {
   display: none;
   position: absolute;

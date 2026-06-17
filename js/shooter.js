@@ -286,14 +286,6 @@ function sRenderOverlay() {
     sDrawText(ctx, 'CLICK TO PLAY', S_W / 2, S_H / 2 + 76, 14, '#ff0', '#440', 'center');
   }
 
-  if (sGameState === 'dead') {
-    ctx.fillStyle = 'rgba(0,0,0,0.82)';
-    ctx.fillRect(0, 0, S_W, S_H);
-    sDrawText(ctx, 'GAME OVER', S_W / 2, S_H / 2 - 80, 30, '#f44', '#600', 'center');
-    sDrawText(ctx, `WAVE: ${sWave}`, S_W / 2, S_H / 2 - 14, 12, '#fff', '#333', 'center');
-    sDrawText(ctx, `SCORE: ${sPlayer.score}`, S_W / 2, S_H / 2 + 14, 12, '#fff', '#333', 'center');
-    sDrawText(ctx, 'CLICK TO PLAY AGAIN', S_W / 2, S_H / 2 + 76, 10, '#ff0', '#440', 'center');
-  }
 
   if (sGameState === 'paused') {
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
@@ -547,6 +539,17 @@ const sWaveClearGifs = [
   { src: 'sprites/waveclear6.mp4', duration: 4000 },
 ];
 let sWaveClearGifIdx = 0;
+function sGameOver() {
+  sGameState = 'dead';
+  const gif = document.getElementById('game-over-gif');
+  if (gif) { gif.src = 'sprites/gameover.mp4'; gif.load(); gif.play().catch(() => {}); gif.style.display = 'block'; }
+  const ov = document.getElementById('game-over-overlay');
+  if (ov) {
+    ov.innerHTML = `<div class="go-title">GAME OVER</div><div class="go-stats">WAVE: ${sWave} &nbsp;&nbsp; SCORE: ${sPlayer.score}</div><div class="go-prompt">CLICK TO PLAY AGAIN</div>`;
+    ov.style.display = 'block';
+  }
+}
+
 function sShowWaveClearGif(show) {
   const gif = document.getElementById('wave-clear-gif');
   if (!gif) return 4000;
@@ -677,7 +680,7 @@ function sUpdateEnemies(dt) {
         sPlayer.hp -= e.damage;
         e.attackCooldown = 1.0;
         sDamageFlash = 8;
-        if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameState = 'dead'; return; }
+        if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameOver(); return; }
       }
       continue;
     }
@@ -824,7 +827,7 @@ function sUpdateTrumpProjectiles(dt) {
       sPlayer.hp -= 15;
       sDamageFlash = 10;
       sTrumpProjectiles.splice(i, 1);
-      if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameState = 'dead'; }
+      if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameOver(); }
     }
   }
 }
@@ -840,7 +843,7 @@ function sUpdateSvenProjectiles(dt) {
       sPlayer.hp -= 10;
       sDamageFlash = 8;
       sSvenProjectiles.splice(i, 1);
-      if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameState = 'dead'; }
+      if (sPlayer.hp <= 0) { sPlayer.hp = 0; sGameOver(); }
     }
   }
 }
@@ -1213,6 +1216,10 @@ function sStartGame() {
   sMouseFire = false;
   sBobPhase = 0;
   sBobOffset = 0;
+  const goGif = document.getElementById('game-over-gif');
+  if (goGif) { goGif.pause(); goGif.style.display = 'none'; }
+  const goOv = document.getElementById('game-over-overlay');
+  if (goOv) goOv.style.display = 'none';
   sNextWave();
 }
 
