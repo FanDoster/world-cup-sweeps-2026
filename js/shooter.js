@@ -302,6 +302,9 @@ let sStarmerLastPlayed = 0;
 const sGazzaSound = new Audio('sounds/gazza.mp3');
 sGazzaSound.preload = 'auto';
 let sGazzaLastPlayed = 0;
+const sSvenSound = new Audio('sounds/sven.mp3');
+sSvenSound.preload = 'auto';
+let sSvenLastPlayed = 0;
 function sPlayHit(type) {
   if (type === 'rooney') {
     const now = performance.now();
@@ -325,6 +328,14 @@ function sPlayHit(type) {
     sGazzaLastPlayed = now;
     sGazzaSound.currentTime = 0;
     sGazzaSound.play().catch(() => {});
+    return;
+  }
+  if (type === 'sven') {
+    const now = performance.now();
+    if (!sSvenSound.paused || now - sSvenLastPlayed < 4000) return;
+    sSvenLastPlayed = now;
+    sSvenSound.currentTime = 0;
+    sSvenSound.play().catch(() => {});
     return;
   }
   sHitSound.currentTime = 0; sHitSound.play().catch(() => {});
