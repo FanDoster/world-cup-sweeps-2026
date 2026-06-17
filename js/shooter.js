@@ -53,7 +53,7 @@ function sSpawnEnemy(type, x, y) {
     sprite: def.sprite, hp: def.hp, maxHp: def.hp,
     speed: def.speed, scale: def.scale, damage: def.damage,
     behaviour: def.behaviour, points: def.points, shotDmg: def.shotDmg,
-    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, hideTarget: null, shootTimer: type === 'sven' ? 1 : 2,
+    alive: true, zigzagTimer: 0, zigzagDir: 1, hesitateTimer: 0, attackCooldown: 0, hitFlash: 0, voiceTimer: 3, hitsReceived: 0, fleeTimer: 0, hideTarget: null, shootTimer: type === 'sven' ? 1 : type === 'trump' ? 0.5 : 2,
     strafeTimer: 2, strafeDir: 1, chargeTimer: 3, chargeMode: false,
   };
 }
@@ -524,7 +524,7 @@ function sShoot() {
     target.hitFlash = 8;
     if (target.type === 'trump') {
       target.hitsReceived++;
-      if (target.hitsReceived % 3 === 0) { target.fleeTimer = 3 + Math.random() * 2; target.hideTarget = null; }
+      if (target.hitsReceived % 8 === 0) { target.fleeTimer = 2 + Math.random() * 1; target.hideTarget = null; }
     }
     if (target.hp <= 0) {
       target.alive = false;
@@ -735,7 +735,7 @@ function sUpdateEnemies(dt) {
     if (e.type === 'trump' && dist > 2) {
       e.shootTimer -= dt;
       if (e.shootTimer <= 0) {
-        e.shootTimer = 2.5 + Math.random() * 1.5;
+        e.shootTimer = 1 + Math.random() * 1;
         sTrumpProjectiles.push({ x: e.x, y: e.y, dx: (dx / dist) * 10, dy: (dy / dist) * 10 });
       }
     }
@@ -751,26 +751,24 @@ function sUpdateEnemies(dt) {
 
     let moveX = 0, moveY = 0;
     if (e.type === 'trump') {
-      // Strafe direction toggles every 1.5-3.5s
+      // Strafe direction toggles every 1-2.5s
       e.strafeTimer -= dt;
-      if (e.strafeTimer <= 0) { e.strafeDir *= -1; e.strafeTimer = 1.5 + Math.random() * 2; }
-      // Charge mode: sprint at player for ~0.7s, then orbit for 3-5s
+      if (e.strafeTimer <= 0) { e.strafeDir *= -1; e.strafeTimer = 1.0 + Math.random() * 1.5; }
+      // Charge mode: sprint straight for ~0.6s, then approach+sidestep for 1.5-3s
       e.chargeTimer -= dt;
       if (e.chargeTimer <= 0) {
         e.chargeMode = !e.chargeMode;
-        e.chargeTimer = e.chargeMode ? (0.5 + Math.random() * 0.5) : (3 + Math.random() * 2);
+        e.chargeTimer = e.chargeMode ? (0.4 + Math.random() * 0.4) : (1.5 + Math.random() * 1.5);
       }
-      if (e.chargeMode || dist > 9) {
-        // Sprint straight at player
-        moveX = (dx / dist) * e.speed * 2.0 * dt;
-        moveY = (dy / dist) * e.speed * 2.0 * dt;
+      if (e.chargeMode) {
+        moveX = (dx / dist) * e.speed * 2.5 * dt;
+        moveY = (dy / dist) * e.speed * 2.5 * dt;
       } else {
-        // Orbit: strafe perpendicular + maintain ~5 unit radius
+        // Always approach but weave left/right
         const perpX = -(dy / dist) * e.strafeDir;
         const perpY =  (dx / dist) * e.strafeDir;
-        const radial = (dist - 5) * 0.5;  // pull toward preferred radius
-        moveX = (perpX * e.speed + (dx / dist) * radial) * dt;
-        moveY = (perpY * e.speed + (dy / dist) * radial) * dt;
+        moveX = ((dx / dist) * 0.7 + perpX * 0.5) * e.speed * dt;
+        moveY = ((dy / dist) * 0.7 + perpY * 0.5) * e.speed * dt;
       }
     } else if (e.behaviour === 'direct') {
       moveX = (dx / dist) * e.speed * dt;
@@ -876,7 +874,7 @@ function sFireMultiball() {
     target.hitFlash = 3;
     if (target.type === 'trump') {
       target.hitsReceived++;
-      if (target.hitsReceived % 3 === 0) { target.fleeTimer = 3 + Math.random() * 2; target.hideTarget = null; }
+      if (target.hitsReceived % 8 === 0) { target.fleeTimer = 2 + Math.random() * 1; target.hideTarget = null; }
     }
     if (target.hp <= 0) {
       target.alive = false;
