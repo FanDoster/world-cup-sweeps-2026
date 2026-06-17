@@ -516,7 +516,7 @@ function sShoot() {
     target.hitFlash = 8;
     if (target.type === 'trump') {
       target.hitsReceived++;
-      if (target.hitsReceived % 8 === 0) { target.fleeTimer = 2 + Math.random() * 1; target.hideTarget = null; }
+      if (target.hitsReceived % 5 === 0) { target.fleeTimer = 3 + Math.random() * 1; target.hideTarget = null; }
     }
     if (target.hp <= 0) {
       target.alive = false;
@@ -687,49 +687,20 @@ function sUpdateEnemies(dt) {
 
     if (e.fleeTimer > 0) {
       e.fleeTimer -= dt;
-
-      // Already hidden behind a wall — stay put until timer expires or LOS returns
-      if (!sHasLos(e.x, e.y, sPlayer.x, sPlayer.y)) {
-        continue;
-      }
-
-      // Find a hiding spot once per flee episode (or if we arrived and player moved)
-      if (!e.hideTarget) {
-        e.hideTarget = sFindHideSpot(e.x, e.y, sPlayer.x, sPlayer.y);
-      }
-
-      const fleeSpd = e.speed * 3.0 * dt;
-
-      // Determine target direction
-      let tdx, tdy;
-      if (e.hideTarget) {
-        tdx = e.hideTarget.x - e.x;
-        tdy = e.hideTarget.y - e.y;
-        const hdist = Math.sqrt(tdx * tdx + tdy * tdy);
-        if (hdist < 0.4) {
-          // Arrived but player followed — pick a new spot
-          e.hideTarget = sFindHideSpot(e.x, e.y, sPlayer.x, sPlayer.y);
-          continue;
-        }
-        tdx /= hdist; tdy /= hdist;
-      } else {
-        // No hiding spot at all — run directly away from player
-        tdx = -dx / dist; tdy = -dy / dist;
-      }
-
+      // Sprint directly away from player at 5× speed
+      const fleeSpd = e.speed * 5.0 * dt;
+      const tdx = -dx / dist, tdy = -dy / dist;
       const nx = e.x + tdx * fleeSpd, ny = e.y + tdy * fleeSpd;
       if (!sEnemyBlocked(nx, e.y)) e.x = nx;
       else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
       else {
-        // Wall in the way — try angled slides; never abort flee
         const ang = Math.atan2(tdy, tdx);
-        for (const da of [0.5, -0.5, 1.0, -1.0, 1.5, -1.5]) {
+        for (const da of [0.4, -0.4, 0.8, -0.8, 1.2, -1.2]) {
           const ax = e.x + Math.cos(ang + da) * fleeSpd;
           const ay = e.y + Math.sin(ang + da) * fleeSpd;
           if (!sEnemyBlocked(ax, e.y)) { e.x = ax; break; }
           if (!sEnemyBlocked(e.x, ay)) { e.y = ay; break; }
         }
-        // If every angle is blocked, stay put and wait — flee timer still counts down
       }
       continue;
     }
@@ -877,7 +848,7 @@ function sFireMultiball() {
     target.hitFlash = 3;
     if (target.type === 'trump') {
       target.hitsReceived++;
-      if (target.hitsReceived % 8 === 0) { target.fleeTimer = 2 + Math.random() * 1; target.hideTarget = null; }
+      if (target.hitsReceived % 5 === 0) { target.fleeTimer = 3 + Math.random() * 1; target.hideTarget = null; }
     }
     if (target.hp <= 0) {
       target.alive = false;
