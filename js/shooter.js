@@ -413,18 +413,24 @@ function sHasLos(x1, y1, x2, y2) {
 }
 
 function sFindHideSpot(ex, ey, px, py) {
-  // Scan all open tiles; return the nearest one with no LOS to the player
-  let best = null, bestDist = Infinity;
-  for (let my = 1; my < S_MAP.length - 1; my++) {
-    for (let mx = 1; mx < S_MAP[0].length - 1; mx++) {
-      if (S_MAP[my][mx] !== 0) continue;
-      const cx = mx + 0.5, cy = my + 0.5;
-      if (sHasLos(cx, cy, px, py)) continue;       // player can see this tile
-      const d = (cx - ex) ** 2 + (cy - ey) ** 2;
-      if (d < bestDist) { bestDist = d; best = { x: cx, y: cy }; }
+  // Find the nearest hidden tile that is also safely away from the player.
+  // Try with a generous min-distance first, relax if nothing found.
+  for (const minPlayerDist2 of [16, 9, 4, 0]) {  // 4, 3, 2, 0 units
+    let best = null, bestDist = Infinity;
+    for (let my = 1; my < S_MAP.length - 1; my++) {
+      for (let mx = 1; mx < S_MAP[0].length - 1; mx++) {
+        if (S_MAP[my][mx] !== 0) continue;
+        const cx = mx + 0.5, cy = my + 0.5;
+        const dPlayer = (cx - px) ** 2 + (cy - py) ** 2;
+        if (dPlayer < minPlayerDist2) continue;    // too close to player
+        if (sHasLos(cx, cy, px, py)) continue;    // player can see this tile
+        const d = (cx - ex) ** 2 + (cy - ey) ** 2;
+        if (d < bestDist) { bestDist = d; best = { x: cx, y: cy }; }
+      }
     }
+    if (best) return best;
   }
-  return best; // null if every open tile has LOS to player (open arena)
+  return null;
 }
 
 // ── DDA RAY-CASTER ─────────────────────────────────────────────────────────
@@ -633,49 +639,48 @@ function sUpdateEnemies(dt) {
     if (e.fleeTimer > 0) {
       e.fleeTimer -= dt;
 
-      // Find a hiding spot once per flee episode
-      if (!e.hideTarget) {
-        e.hideTarget = sFindHideSpot(e.x, e.y, sPlayer.x, sPlayer.y);
-      }
-
-      // Already out of line-of-sight — crouch and wait
+      // Already hidden behind a wall — stay put until timer expires or LOS returns
       if (!sHasLos(e.x, e.y, sPlayer.x, sPlayer.y)) {
         continue;
       }
 
+      // Find a hiding spot once per flee episode (or if we arrived and player moved)
+      if (!e.hideTarget) {
+        e.hideTarget = sFindHideSpot(e.x, e.y, sPlayer.x, sPlayer.y);
+      }
+
+      const fleeSpd = e.speed * 3.0 * dt;
+
+      // Determine target direction
+      let tdx, tdy;
       if (e.hideTarget) {
-        // Navigate toward the hiding tile
-        const hdx = e.hideTarget.x - e.x, hdy = e.hideTarget.y - e.y;
-        const hdist = Math.sqrt(hdx * hdx + hdy * hdy);
+        tdx = e.hideTarget.x - e.x;
+        tdy = e.hideTarget.y - e.y;
+        const hdist = Math.sqrt(tdx * tdx + tdy * tdy);
         if (hdist < 0.4) {
-          // Reached spot but still visible — player must have moved; find a new one
+          // Arrived but player followed — pick a new spot
           e.hideTarget = sFindHideSpot(e.x, e.y, sPlayer.x, sPlayer.y);
           continue;
         }
-        const fleeSpd = e.speed * 2.0 * dt;
-        const nx = e.x + (hdx / hdist) * fleeSpd;
-        const ny = e.y + (hdy / hdist) * fleeSpd;
-        if (!sEnemyBlocked(nx, e.y)) e.x = nx;
-        else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
-        else {
-          // Obstacle on the direct path — try angled slides
-          const ang = Math.atan2(hdy, hdx);
-          for (const da of [0.4, -0.4, 0.8, -0.8]) {
-            const ax = e.x + Math.cos(ang + da) * fleeSpd;
-            const ay = e.y + Math.sin(ang + da) * fleeSpd;
-            if (!sEnemyBlocked(ax, e.y)) { e.x = ax; break; }
-            if (!sEnemyBlocked(e.x, ay)) { e.y = ay; break; }
-          }
-        }
+        tdx /= hdist; tdy /= hdist;
       } else {
-        // No hiding spot exists (open arena) — just run directly away
-        const fleeAngle = Math.atan2(-dy, -dx);
-        const fleeSpd = e.speed * 2.2 * dt;
-        const nx = e.x + Math.cos(fleeAngle) * fleeSpd;
-        const ny = e.y + Math.sin(fleeAngle) * fleeSpd;
-        if (!sEnemyBlocked(nx, e.y)) e.x = nx;
-        else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
-        else e.fleeTimer = 0;
+        // No hiding spot at all — run directly away from player
+        tdx = -dx / dist; tdy = -dy / dist;
+      }
+
+      const nx = e.x + tdx * fleeSpd, ny = e.y + tdy * fleeSpd;
+      if (!sEnemyBlocked(nx, e.y)) e.x = nx;
+      else if (!sEnemyBlocked(e.x, ny)) e.y = ny;
+      else {
+        // Wall in the way — try angled slides; never abort flee
+        const ang = Math.atan2(tdy, tdx);
+        for (const da of [0.5, -0.5, 1.0, -1.0, 1.5, -1.5]) {
+          const ax = e.x + Math.cos(ang + da) * fleeSpd;
+          const ay = e.y + Math.sin(ang + da) * fleeSpd;
+          if (!sEnemyBlocked(ax, e.y)) { e.x = ax; break; }
+          if (!sEnemyBlocked(e.x, ay)) { e.y = ay; break; }
+        }
+        // If every angle is blocked, stay put and wait — flee timer still counts down
       }
       continue;
     }
