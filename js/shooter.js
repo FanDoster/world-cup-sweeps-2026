@@ -403,6 +403,7 @@ let sSvenProjectiles = [];
 let sCrate = null;
 let sMultiballAmmo = 0;
 let sMultiballFireTimer = 0;
+let sMouseFire = false;
 let sBossAnnounce = 0;
 let sSpriteReady = false;
 let sShooterInited = false;
@@ -622,10 +623,13 @@ function sSetupInput() {
   });
   document.addEventListener('keyup', e => { sKeys[e.code] = false; });
 
+  document.addEventListener('mousedown', () => { if (sPointerLocked) sMouseFire = true; });
+  document.addEventListener('mouseup', () => { sMouseFire = false; });
+
   sCanvas.addEventListener('click', () => {
     if (sGameState === 'idle' || sGameState === 'dead') { sStartGame(); return; }
     if (sGameState === 'paused') { sCanvas.requestPointerLock(); return; }
-    if (sPointerLocked) { sShoot(); return; }
+    if (sPointerLocked) { if (!sMultiballAmmo) sShoot(); return; }
     sCanvas.requestPointerLock();
   });
 
@@ -848,7 +852,7 @@ function sFireMultiball() {
 
 function sUpdateMultiball(dt) {
   if (!sMultiballAmmo || sGameState !== 'playing') return;
-  if (sKeys['Space']) {
+  if (sKeys['Space'] || sMouseFire) {
     sMultiballFireTimer -= dt;
     if (sMultiballFireTimer <= 0) {
       sMultiballFireTimer = 1 / 10;  // 10 rounds/sec
@@ -1163,6 +1167,7 @@ function sStartGame() {
   sCrate = null;
   sMultiballAmmo = 0;
   sMultiballFireTimer = 0;
+  sMouseFire = false;
   sNextWave();
 }
 
