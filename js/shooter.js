@@ -987,11 +987,15 @@ function sRender() {
     const camX = 2 * x / S_W - 1;
     const rdx = dirX + plX * camX, rdy = dirY + plY * camX;
     const { dist, side, wallX, wallType } = sCastRay(px, py, rdx, rdy);
-    const wallH = Math.min(S_H / dist, S_H);
+    const actualWallH = S_H / dist;
+    const wallH = Math.min(actualWallH, S_H);
     const wallTop = Math.round(horizon - wallH / 2);
     const tex = sTextures[wallType] || sTextures[1];
     const texX = Math.floor(wallX * 64);
-    ctx.drawImage(tex, texX, 0, 1, 64, x, wallTop, 1, wallH);
+    // When very close, crop texture to the visible centre slice so texels stay square
+    let srcY0 = 0, srcH = 64;
+    if (actualWallH > S_H) { srcH = 64 * S_H / actualWallH; srcY0 = (64 - srcH) / 2; }
+    ctx.drawImage(tex, texX, srcY0, 1, srcH, x, wallTop, 1, wallH);
     if (side === 1) { ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(x, wallTop, 1, wallH); }
     sZBuffer[x] = dist;
   }
