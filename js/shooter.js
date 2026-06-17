@@ -518,13 +518,13 @@ function sRender() {
     const p = sProjectiles[i];
     p.age++;
     const t = p.age / 18;
-    const size = 14 + t * 52;
+    const size = 66 - t * 52;
     sCtx.save();
-    sCtx.globalAlpha = Math.max(0, 1 - t);
+    sCtx.globalAlpha = Math.max(0, 1 - t * 0.8);
     sCtx.font = `${Math.round(size)}px serif`;
     sCtx.textAlign = 'center';
     sCtx.textBaseline = 'middle';
-    sCtx.fillText('⚽', S_W / 2, S_H / 2 - t * 40);
+    sCtx.fillText('⚽', S_W / 2, S_H * 0.75 - t * (S_H * 0.75 - S_H / 2));
     sCtx.restore();
     if (p.age >= 18) sProjectiles.splice(i, 1);
   }
