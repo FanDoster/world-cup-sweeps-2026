@@ -272,7 +272,7 @@ function sRenderOverlay() {
 }
 
 // ── AUDIO ──────────────────────────────────────────────────────────────────
-const sKickSounds = ['sounds/kick1.wav', 'sounds/kick2.wav', 'sounds/kick3.wav'].map(src => {
+const sKickSounds = ['sounds/kick1.mp3', 'sounds/kick2.mp3', 'sounds/kick3.mp3'].map(src => {
   const a = new Audio(src); a.preload = 'auto'; return a;
 });
 let sKickIdx = 0;
@@ -283,9 +283,9 @@ function sPlayKick() {
   a.play().catch(() => {});
 }
 
-const sHitSound = new Audio('sounds/hit.wav');
+const sHitSound = new Audio('sounds/hit.mp3');
 sHitSound.preload = 'auto';
-const sDeathSound = new Audio('sounds/death.wav');
+const sDeathSound = new Audio('sounds/death.mp3');
 sDeathSound.preload = 'auto';
 const sRooneySound = new Audio('sounds/rooney.mp3');
 sRooneySound.preload = 'auto';
@@ -325,11 +325,11 @@ function sPlayHit(type) {
 }
 function sPlayDeath() { sDeathSound.currentTime = 0; sDeathSound.play().catch(() => {}); }
 
-const sWaveClearSound = new Audio('sounds/waveclear.wav');
+const sWaveClearSound = new Audio('sounds/waveclear.mp3');
 sWaveClearSound.preload = 'auto';
 function sPlayWaveClear() { sWaveClearSound.currentTime = 0; sWaveClearSound.play().catch(() => {}); }
 
-const sBossSound = new Audio('sounds/boss.wav');
+const sBossSound = new Audio('sounds/boss.mp3');
 sBossSound.preload = 'auto';
 function sPlayBoss() { sBossSound.currentTime = 0; sBossSound.play().catch(() => {}); }
 
