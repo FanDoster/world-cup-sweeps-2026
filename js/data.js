@@ -58,22 +58,23 @@ async function loadData() {
     match_date, kickoff_time, tz_offset,
     home:home_team_id(name), away:away_team_id(name),
     group_letter, home_score, away_score, tv_channel,
-    prob_home, prob_draw, prob_away
+    prob_home, prob_draw, prob_away, is_complete
   `).order('match_date').order('kickoff_time');
 
   matchData = m.map(r => ({
-    date:    r.match_date,
-    time:    r.kickoff_time.substring(0, 5),
-    tz:      r.tz_offset,
-    team1:   r.home.name,
-    team2:   r.away.name,
-    group:   r.group_letter,
-    score1:  r.home_score,
-    score2:  r.away_score,
-    channel: r.tv_channel,
-    prob1:   r.prob_home,
-    probD:   r.prob_draw,
-    prob2:   r.prob_away,
+    date:       r.match_date,
+    time:       r.kickoff_time.substring(0, 5),
+    tz:         r.tz_offset,
+    team1:      r.home.name,
+    team2:      r.away.name,
+    group:      r.group_letter,
+    score1:     r.home_score,
+    score2:     r.away_score,
+    channel:    r.tv_channel,
+    prob1:      r.prob_home,
+    probD:      r.prob_draw,
+    prob2:      r.prob_away,
+    isComplete: r.is_complete === true,
   }));
 
   // Build matchByKey for globe venue panel

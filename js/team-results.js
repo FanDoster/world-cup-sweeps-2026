@@ -12,10 +12,7 @@ function checkTeamResults() {
   const results = [];
 
   for (const m of matchData) {
-    if (m.score1 === null || m.score2 === null) continue;
-    // Only show results for matches that have actually kicked off
-    const kickoff = toDate(m.date, m.time, m.tz);
-    if (new Date() < kickoff) continue;
+    if (!m.isComplete) continue;
     if (!playerTeams.some(t => t.team === m.team1 || t.team === m.team2)) continue;
 
     const matchKey = `${m.team1}|${m.team2}|${m.date}`;

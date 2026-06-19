@@ -5,7 +5,7 @@ async function renderPredictions() {
 
   const now = new Date();
   const upcoming = matchData
-    .filter(m => m.score1 === null)
+    .filter(m => !m.isComplete)
     .map(m => ({ ...m, kickoff: toDate(m.date, m.time, m.tz) }))
     .sort((a, b) => a.kickoff - b.kickoff)
     .slice(0, 20);
@@ -119,7 +119,7 @@ async function renderPredictions() {
       const am = allMatches?.find(am => am.id === p.match_id);
       if (!am) continue;
       const m = matchData.find(m => m.team1 === am.home_team_id.name && m.team2 === am.away_team_id.name && m.date === am.match_date);
-      if (!m || m.score1 === null) continue;
+      if (!m || !m.isComplete) continue;
 
       const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2);
       if (pts === 5) exactCount++; else if (pts >= 1) correctCount++;

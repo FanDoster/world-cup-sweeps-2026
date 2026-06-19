@@ -43,8 +43,8 @@ function renderMatches() {
   }
 
   // Split into upcoming vs completed
-  const upcomingOnly = all.filter(m => m.score1 === null);
-  const completed = all.filter(m => m.score1 !== null);
+  const upcomingOnly = all.filter(m => !m.isComplete);
+  const completed = all.filter(m => m.isComplete);
   let visible;
   if (matchFilter === 'all') visible = all;
   else if (matchFilter === 'completed') visible = completed;
@@ -75,7 +75,7 @@ function renderMatches() {
       const dateLabel = formatDateLabel(m.date, m.time, m.tz);
       const showCountdown = m.kickoff <= twoDays;
       const localTime = formatLocalTime(m.date, m.time, m.tz);
-      const isFinished = m.score1 !== null && m.score2 !== null;
+      const isFinished = m.isComplete;
       const rowCls = isFinished ? 'finished' : cd.rowCls;
       const countdownText = isFinished ? (m.score1 + '–' + m.score2) : (showCountdown ? cd.text : localTime);
       const countdownCls = isFinished ? '' : cd.cls;

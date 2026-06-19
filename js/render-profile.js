@@ -33,7 +33,7 @@ function renderPredPanel(key) {
   const now = new Date();
   const kickoff = toDate(m.date, m.time, m.tz);
   const isLocked = kickoff - now < 5 * 60 * 1000;
-  const isFinished = m.score1 !== null && m.score2 !== null;
+  const isFinished = m.isComplete;
 
   const isEngland = t1 === 'England' || t2 === 'England';
   const isScotland = t1 === 'Scotland' || t2 === 'Scotland';
@@ -424,7 +424,7 @@ async function renderProfile(playerName) {
 
   const teamStats = {};
   for (const m of matchData) {
-    if (m.score1 === null || m.score2 === null) continue;
+    if (!m.isComplete) continue;
     for (const tn of [m.team1, m.team2]) {
       if (!teamStats[tn]) teamStats[tn] = { p:0,w:0,d:0,l:0,gf:0,ga:0,results:[] };
     }
@@ -439,7 +439,7 @@ async function renderProfile(playerName) {
 
   let matchPts = 0, matchW = 0, matchD = 0, matchL = 0;
   for (const m of matchData) {
-    if (m.score1 === null || m.score2 === null) continue;
+    if (!m.isComplete) continue;
     const o1 = teamOwner[m.team1], o2 = teamOwner[m.team2];
     if (o1 === owner && m.score1 > m.score2) { matchPts += 3; matchW++; }
     else if (o2 === owner && m.score2 > m.score1) { matchPts += 3; matchW++; }
@@ -517,7 +517,7 @@ async function renderProfile(playerName) {
 
   let feedHtml = '';
   const playerMatches = matchData
-    .filter(m => m.score1 !== null && (teamOwner[m.team1] === owner || teamOwner[m.team2] === owner))
+    .filter(m => m.isComplete && (teamOwner[m.team1] === owner || teamOwner[m.team2] === owner))
     .sort((a, b) => toDate(b.date, b.time, b.tz) - toDate(a.date, a.time, a.tz))
     .slice(0, 10);
   if (playerMatches.length > 0) {

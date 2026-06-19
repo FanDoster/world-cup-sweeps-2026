@@ -46,8 +46,8 @@ function renderTeamSchedule() {
     .sort((a, b) => a.kickoff - b.kickoff);
 
   let filtered = teamMatches;
-  if (teamScheduleFilter === 'upcoming') filtered = teamMatches.filter(m => m.score1 === null);
-  else if (teamScheduleFilter === 'completed') filtered = teamMatches.filter(m => m.score1 !== null);
+  if (teamScheduleFilter === 'upcoming') filtered = teamMatches.filter(m => !m.isComplete);
+  else if (teamScheduleFilter === 'completed') filtered = teamMatches.filter(m => m.isComplete);
 
   const now = new Date();
   const twoDays = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
@@ -65,7 +65,7 @@ function renderTeamSchedule() {
       const cd = getCountdown(m.date, m.time, m.tz);
       const i1 = teamIso[m.team1];
       const i2 = teamIso[m.team2];
-      const isFinished = m.score1 !== null && m.score2 !== null;
+      const isFinished = m.isComplete;
       const rowCls = isFinished ? 'finished' : cd.rowCls;
       const countdownText = isFinished ? (m.score1 + '–' + m.score2) : (m.kickoff <= twoDays ? cd.text : formatLocalTime(m.date, m.time, m.tz));
       const countdownCls = isFinished ? '' : cd.cls;

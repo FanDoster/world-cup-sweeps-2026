@@ -33,7 +33,7 @@ function getMatchSlugs() {
   if (!matchData.length) return [];
   const todayStr = new Date().toISOString().slice(0, 10);
   return matchData
-    .filter(m => m.date >= todayStr && m.score1 === null && m.score2 === null)
+    .filter(m => m.date >= todayStr && !m.isComplete)
     .slice(0, 9)
     .map(m => {
       const poly1 = ISO_TO_POLY[teamIso[m.team1]];
@@ -129,7 +129,7 @@ function buildCountdownTicker() {
   const now = new Date();
   const upcoming = matchData
     .filter(m => {
-      if (m.score1 !== null && m.score2 !== null) return false;
+      if (m.isComplete) return false;
       const end = new Date(toDate(m.date, m.time, m.tz).getTime() + 2 * 60 * 60 * 1000);
       return end > now;
     })
@@ -213,7 +213,7 @@ async function loadStatsTracker() {
   const track = document.getElementById('statsTrack');
   if (!track) return;
 
-  const played = matchData.filter(m => m.score1 !== null && m.score2 !== null);
+  const played = matchData.filter(m => m.isComplete);
 
   // Clean sheets (goals conceded = 0)
   const cleanSheets = {};

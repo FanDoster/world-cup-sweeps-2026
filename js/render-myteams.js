@@ -12,7 +12,7 @@ function getPlayerTeams() {
 
 function getNextMatch(teamName) {
   return matchData
-    .filter(m => (m.team1 === teamName || m.team2 === teamName) && m.score1 === null)
+    .filter(m => (m.team1 === teamName || m.team2 === teamName) && !m.isComplete)
     .map(m => ({ ...m, kickoff: toDate(m.date, m.time, m.tz) }))
     .sort((a, b) => a.kickoff - b.kickoff)[0] || null;
 }

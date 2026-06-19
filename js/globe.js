@@ -518,7 +518,7 @@ function renderTerritoryPanel(territoryName) {
       if (!m) continue;
       const { date, time, tz, team1, team2, group, score1, score2 } = m;
       const kickoff = toDate(date, time, tz);
-      const isFinished = score1 !== null && score2 !== null;
+      const isFinished = m.isComplete;
       const locked = kickoff - now < 5 * 60 * 1000;
       const iso1 = teamIso[team1] || '', iso2 = teamIso[team2] || '';
       const mid = matchIdByTeamDate[key];
@@ -587,7 +587,7 @@ function renderVenueMatches(venueName) {
 
     const { date, time, tz, team1, team2, group, score1, score2 } = m;
     const kickoff = toDate(date, time, tz);
-    const isFinished = score1 !== null && score2 !== null;
+    const isFinished = m.isComplete;
     const locked = kickoff - now < 5 * 60 * 1000;
     const iso1 = teamIso[team1] || '', iso2 = teamIso[team2] || '';
     const mid = matchIdByTeamDate[key];
