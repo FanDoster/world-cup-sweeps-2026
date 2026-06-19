@@ -74,3 +74,14 @@
 .award-card .aw-name { font-size: 0.66rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
 .award-card .aw-holder { font-weight: 800; font-size: 0.92rem; margin-top: 1px; }
 .award-card .aw-detail { font-size: 0.68rem; color: var(--text-secondary); margin-top: 1px; }
+/* ── JOKER EFFICIENCY ── */
+.joker-table-wrap { overflow-x: auto; }
+.joker-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.joker-table th { text-align: left; font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 12px 6px; border-bottom: 1px solid var(--border-subtle); font-weight: 700; }
+.joker-table td { padding: 9px 12px; font-size: 0.8rem; border-bottom: 1px solid var(--border-subtle); }
+.joker-table tbody tr:last-child td { border-bottom: none; }
+.joker-table tbody tr:hover td { background: rgba(245,158,11,0.03); }
+.joker-rank { font-size: 0.85rem; }
+.joker-num { font-family: var(--font-mono); text-align: center; font-weight: 700; color: var(--text-secondary); }
+.joker-detail { font-size: 0.72rem; color: var(--text-muted); }
+.joker-match { color: var(--text-muted); font-size: 0.68rem; margin-left: 4px; }

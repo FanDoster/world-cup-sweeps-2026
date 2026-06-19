@@ -67,6 +67,7 @@ if (!isComplete) continue;
 67|  document.getElementById('sortArrowTotal').textContent = arrow('total');
 68|
 69|  renderAwards(standings);
+  renderJokerStats();
 70|}
 71|
 72|// ── TOURNAMENT AWARDS ──
@@ -123,12 +124,18 @@ if (!isComplete) continue;
 123|    if (!mid) continue;
 124|    for (const p of (predLookup[mid] || [])) {
 125|      if (p.home === undefined || p.home === null) continue;
-126|      if (!stats[p.player_name]) stats[p.player_name] = { settled: 0, pts: 0, exact: 0, scored: 0, cur: 0, best: 0, upsets: 0, jokerPts: 0 };
-127|      const st = stats[p.player_name];
-128|      const base = calcPredPoints(p.home, p.away, m.score1, m.score2);
-129|      st.settled++;
-130|      st.pts += p.j ? base * 2 : base;
-131|      if (p.j) st.jokerPts += base;
+if (!stats[p.player_name]) stats[p.player_name] = { settled: 0, pts: 0, exact: 0, scored: 0, cur: 0, best: 0, upsets: 0, jokerPts: 0, jokersUsed: 0, jokerBest: 0, jokerBestMatch: '', jokerWorst: 999, jokerWorstMatch: '' };
+const st = stats[p.player_name];
+const base = calcPredPoints(p.home, p.away, m.score1, m.score2);
+st.settled++;
+st.pts += p.j ? base * 2 : base;
+if (p.j) {
+  st.jokerPts += base;
+  st.jokersUsed++;
+  const doubled = base * 2;
+  if (doubled > st.jokerBest) { st.jokerBest = doubled; st.jokerBestMatch = `${m.team1} ${m.score1}-${m.score2} ${m.team2}`; }
+  if (doubled < st.jokerWorst) { st.jokerWorst = doubled; st.jokerWorstMatch = `${m.team1} ${m.score1}-${m.score2} ${m.team2}`; }
+}
 132|      if (base === 5) st.exact++;
 133|      const resultRight = Math.sign(p.home - p.away) === Math.sign(m.score1 - m.score2);
 134|      if (resultRight) { st.scored++; st.cur++; st.best = Math.max(st.best, st.cur); }
@@ -243,7 +250,44 @@ if (!isComplete) continue;
 243|      return `<div class="ts-card contested"><div class="ts-name">${t.name}</div><div class="ts-controller">${dots}<span style="color:var(--text-muted)">Contested</span></div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
 244|    }
 245|    const pts = t.totalPts[t.controller] ?? 0;
-246|    return `<div class="ts-card controlled" style="border-left-color:${ownerHexColors[t.controller]}"><div class="ts-name">${t.name}</div><div class="ts-controller"><span class="ts-dot" style="background:${ownerHexColors[t.controller]}"></span><span style="color:${ownerHexColors[t.controller]}">${t.controller}</span></div><div class="ts-avg">${pts} pts</div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
-247|  }).join('');
-248|}
+return `<div class="ts-card controlled" style="border-left-color:${ownerHexColors[t.controller]}"><div class="ts-name">${t.name}</div><div class="ts-controller"><span class="ts-dot" style="background:${ownerHexColors[t.controller]}"></span><span style="color:${ownerHexColors[t.controller]}">${t.controller}</span></div><div class="ts-avg">${pts} pts</div><div class="ts-progress"><div class="ts-progress-bar" style="width:${pct}%"></div></div><div class="ts-avg" style="margin-top:4px">${t.matchesPlayed}/${t.totalMatches} matches</div></div>`;
+}).join('');
+}
+
+// ── JOKER EFFICIENCY STATS ──
+function renderJokerStats() {
+const el = document.getElementById('jokerStatsWrap');
+if (!el) return;
+const stats = getPredStatsByPlayer();
+const rows = Object.entries(stats)
+.filter(([, s]) => s.jokersUsed > 0)
+.sort((a, b) => {
+  const avgA = a[1].jokerPts / a[1].jokersUsed;
+  const avgB = b[1].jokerPts / b[1].jokersUsed;
+  return avgB - avgA || b[1].jokerPts - a[1].jokerPts;
+});
+
+if (!rows.length) { el.innerHTML = ''; return; }
+
+el.innerHTML = `
+<div class="awards-title label-sm">🃏 Joker Efficiency</div>
+<div class="joker-table-wrap">
+  <table class="joker-table">
+    <thead><tr><th></th><th>Used</th><th>Pts</th><th>Avg</th><th>Best</th><th>Worst</th></tr></thead>
+    <tbody>${rows.map(([name, s], i) => {
+      const avg = (s.jokerPts / s.jokersUsed).toFixed(1);
+      const badge = avg >= 3 ? '⭐' : avg >= 2 ? '👍' : '👎';
+      const worstShow = s.jokerWorst < 999 ? `${s.jokerWorst}★` : '—';
+      return `<tr>
+        <td><span class="joker-rank">${badge}</span> ${playerDisplayName(name)}</td>
+        <td class="joker-num">${s.jokersUsed}</td>
+        <td class="joker-num">+${s.jokerPts}</td>
+        <td class="joker-num" style="color:${avg >= 3 ? 'var(--accent)' : avg >= 2 ? 'var(--gold)' : 'var(--live)'}">${avg}</td>
+        <td class="joker-detail"><span style="color:var(--gold)">${s.jokerBest}★</span> <span class="joker-match">${s.jokerBestMatch}</span></td>
+        <td class="joker-detail"><span style="color:${s.jokerWorst === 0 ? 'var(--live)' : 'var(--text-muted)'}">${worstShow}</span> <span class="joker-match">${s.jokerWorst < 999 ? s.jokerWorstMatch : ''}</span></td>
+      </tr>`;
+    }).join('')}</tbody>
+  </table>
+</div>`;
+}
 249|
