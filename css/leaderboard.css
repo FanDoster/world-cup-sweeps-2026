@@ -16,6 +16,19 @@
   letter-spacing: 0.08em;
   border-bottom: 1px solid var(--border);
   font-weight: 700;
+  user-select: none;
+}
+.leaderboard-table th.sortable {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.leaderboard-table th.sortable:hover {
+  color: var(--text);
+}
+.sort-arrow {
+  font-size: 0.55rem;
+  margin-left: 3px;
+  vertical-align: middle;
 }
 .leaderboard-table td {
   padding: 13px 18px;

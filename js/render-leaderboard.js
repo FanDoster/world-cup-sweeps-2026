@@ -1,3 +1,16 @@
+// ── LEADERBOARD SORT STATE ──
+let leaderboardSort = { col: 'total', dir: 'desc' };
+
+function sortLeaderboard(col) {
+  if (leaderboardSort.col === col) {
+    leaderboardSort.dir = leaderboardSort.dir === 'desc' ? 'asc' : 'desc';
+  } else {
+    leaderboardSort.col = col;
+    leaderboardSort.dir = 'desc';
+  }
+  renderLeaderboard();
+}
+
 function calcLeaderboard() {
   const scores = {};
   for (const name of Object.keys(people)) scores[name] = { pts: 0, w: 0, d: 0, l: 0 };
@@ -13,12 +26,21 @@ function calcLeaderboard() {
     else { scores[o1].pts += 1; scores[o2].pts += 1; scores[o1].d++; scores[o2].d++; }
   }
 
-  return Object.entries(scores)
+  const standings = Object.entries(scores)
     .map(([name, s]) => {
       const predPts = predPointsByPlayer[name] || 0;
       return { name, ...s, predPts, total: s.pts + predPts };
-    })
-    .sort((a, b) => b.total - a.total || b.pts - a.pts || b.w - a.w);
+    });
+
+  const { col, dir } = leaderboardSort;
+  const m = dir === 'desc' ? -1 : 1;
+  standings.sort((a, b) => {
+    if (col === 'pts') return (b.pts - a.pts) * m || (b.w - a.w) * m;
+    if (col === 'predPts') return (b.predPts - a.predPts) * m || (b.pts - a.pts) * m;
+    return (b.total - a.total) * m || (b.pts - a.pts) * m || (b.w - a.w) * m;
+  });
+
+  return standings;
 }
 
 function renderLeaderboard() {
@@ -34,6 +56,16 @@ function renderLeaderboard() {
       <td class="pts">${p.total}</td>
     </tr>
   `).join('');
+
+  // Update sort arrows
+  const arrow = (col) => {
+    if (leaderboardSort.col !== col) return '';
+    return leaderboardSort.dir === 'desc' ? '▼' : '▲';
+  };
+  document.getElementById('sortArrowPts').textContent = arrow('pts');
+  document.getElementById('sortArrowPredPts').textContent = arrow('predPts');
+  document.getElementById('sortArrowTotal').textContent = arrow('total');
+
   renderAwards(standings);
 }
 

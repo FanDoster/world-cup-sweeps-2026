@@ -216,7 +216,7 @@
     <div class="section-leaderboard" id="sectionLeaderboard">
       <div class="leaderboard-wrap card-base">
         <table class="leaderboard-table" id="leaderboard">
-          <thead><tr><th>#</th><th>Player</th><th class="wdl">W–D–L</th><th class="sub-pts">⚽ Match</th><th class="sub-pts">🔮 Pred</th><th class="pts">Total</th></tr></thead>
+          <thead><tr><th>#</th><th>Player</th><th class="wdl">W–D–L</th><th class="sub-pts sortable" data-sort="pts" onclick="sortLeaderboard('pts')">⚽ Match <span class="sort-arrow" id="sortArrowPts"></span></th><th class="sub-pts sortable" data-sort="predPts" onclick="sortLeaderboard('predPts')">🔮 Pred <span class="sort-arrow" id="sortArrowPredPts"></span></th><th class="pts sortable" data-sort="total" onclick="sortLeaderboard('total')">Total <span class="sort-arrow" id="sortArrowTotal"></span></th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
