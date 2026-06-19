@@ -54,28 +54,55 @@ async function loadData() {
   }
 
   // Fetch matches
-  const { data: m } = await sb.from('matches').select(`
+  let { data: m, error } = await sb.from('matches').select(`
     match_date, kickoff_time, tz_offset,
     home:home_team_id(name), away:away_team_id(name),
     group_letter, home_score, away_score, tv_channel,
     prob_home, prob_draw, prob_away, is_complete
   `).order('match_date').order('kickoff_time');
 
-  matchData = m.map(r => ({
-    date:       r.match_date,
-    time:       r.kickoff_time.substring(0, 5),
-    tz:         r.tz_offset,
-    team1:      r.home.name,
-    team2:      r.away.name,
-    group:      r.group_letter,
-    score1:     r.home_score,
-    score2:     r.away_score,
-    channel:    r.tv_channel,
-    prob1:      r.prob_home,
-    probD:      r.prob_draw,
-    prob2:      r.prob_away,
-    isComplete: r.is_complete === true,
-  }));
+  // Fallback: if is_complete column doesn't exist yet, re-query without it
+  let hasIsComplete = true;
+  if (error || !m) {
+    const retry = await sb.from('matches').select(`
+      match_date, kickoff_time, tz_offset,
+      home:home_team_id(name), away:away_team_id(name),
+      group_letter, home_score, away_score, tv_channel,
+      prob_home, prob_draw, prob_away
+    `).order('match_date').order('kickoff_time');
+    m = retry.data;
+    hasIsComplete = false;
+  }
+
+  matchData = m.map(r => {
+    const score1 = r.home_score;
+    const score2 = r.away_score;
+    // Compute isComplete server-side if column exists, else client-side fallback
+    let isComplete;
+    if (hasIsComplete) {
+      isComplete = r.is_complete === true;
+    } else {
+      const now = new Date();
+      const kickoff = new Date(r.match_date + 'T' + r.kickoff_time);
+      kickoff.setHours(kickoff.getHours() - r.tz_offset); // convert to UTC
+      isComplete = score1 !== null && score2 !== null && now >= kickoff;
+    }
+    return {
+      date:       r.match_date,
+      time:       r.kickoff_time.substring(0, 5),
+      tz:         r.tz_offset,
+      team1:      r.home.name,
+      team2:      r.away.name,
+      group:      r.group_letter,
+      score1,
+      score2,
+      channel:    r.tv_channel,
+      prob1:      r.prob_home,
+      probD:      r.prob_draw,
+      prob2:      r.prob_away,
+      isComplete,
+    };
+  });
 
   // Build matchByKey for globe venue panel
   matchByKey = {};
