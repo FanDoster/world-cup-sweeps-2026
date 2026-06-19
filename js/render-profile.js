@@ -152,7 +152,8 @@ function renderPredPanel(key) {
   el.innerHTML = `
     ${showMatchVideo ? `<div style="position:relative"><iframe src="${videoSrc}" width="100%" style="aspect-ratio:16/9;display:block;border:none" allow="autoplay; fullscreen" allowfullscreen></iframe><div style="position:absolute;inset:0"></div></div>` : ''}
     ${isUSA ? `<canvas class="usa-flag-canvas" id="usaFlagCanvas"></canvas>` : ''}
-    ${isUSA ? `<iframe id="usaAnthemFrame" src="${USA_ANTHEM_SC_URL}" width="1" height="1" style="position:absolute;opacity:0;pointer-events:none;border:none" allow="autoplay"></iframe>` : ''}
+    ${isUSA ? `<audio id="usaAnthemAudio" src="us-anthem.mp3" loop preload="auto" style="display:none"></audio>` : ''}
+    ${isUSA ? `<button class="usa-anthem-btn" id="usaAnthemBtn" onclick="event.stopPropagation();playUSA();this.remove()">🔊 Play Anthem</button>` : ''}
     <div class="pp-header">
       <div>
         <div class="pp-match">${t1} vs ${t2}</div>
@@ -186,12 +187,7 @@ function renderPredPanel(key) {
   }
 
   if (isUSA) startUSAFlagAnimation();
-  if (isUSA) {
-    const iframe = document.getElementById('usaAnthemFrame');
-    if (iframe) {
-      iframe.onload = () => setTimeout(() => playUSA(), 300);
-    }
-  }
+  if (isUSA) setTimeout(() => playUSA(), 300);
   if (!isUSA) stopUSA();
 }
 
@@ -334,21 +330,15 @@ function stopUSAFlagAnimation() {
   }
 }
 
-// ── USA NATIONAL ANTHEM (SoundCloud embed) ──
-const USA_ANTHEM_SC_URL = 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2124665256&auto_play=false&visual=false&buying=false&sharing=false&download=false&show_artwork=false&hide_related=true&show_user=false&show_playcount=false&liking=false&show_comments=false&color=0a0c12';
-
+// ── USA NATIONAL ANTHEM ──
 function playUSA() {
-  const iframe = document.getElementById('usaAnthemFrame');
-  if (!iframe) return;
-  // postMessage to SoundCloud widget: play
-  iframe.contentWindow.postMessage(JSON.stringify({method: 'play'}), '*');
+  const audio = document.getElementById('usaAnthemAudio');
+  if (audio) audio.play().catch(() => {});
 }
 
 function stopUSA() {
-  const iframe = document.getElementById('usaAnthemFrame');
-  if (iframe) {
-    iframe.contentWindow.postMessage(JSON.stringify({method: 'pause'}), '*');
-  }
+  const audio = document.getElementById('usaAnthemAudio');
+  if (audio) { audio.pause(); audio.currentTime = 0; }
 }
 
 // ── H2H HISTORY ──
