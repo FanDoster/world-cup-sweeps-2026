@@ -187,7 +187,13 @@ function renderPredPanel(key) {
   }
 
   if (isUSA) startUSAFlagAnimation();
-  if (isUSA) setTimeout(() => playUSA(), 300);
+  if (isUSA) {
+    const audio = document.getElementById('usaAnthemAudio');
+    if (audio) {
+      if (audio.readyState >= 2) { audio.play().catch(() => {}); }
+      else { audio.addEventListener('canplay', function h() { audio.play().catch(() => {}); audio.removeEventListener('canplay', h); }); }
+    }
+  }
   if (!isUSA) stopUSA();
 }
 
