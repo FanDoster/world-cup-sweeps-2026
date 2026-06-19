@@ -41,6 +41,14 @@
 .pred-panel-overlay.active { visibility: visible; opacity: 1; pointer-events: auto; }
 .pred-panel { max-width: 520px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transform: scale(0.95) translateY(8px); transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
 .pred-panel.england-mode { max-width: 720px; }
+/* ── USA FLAG (canvas wave) ── */
+.usa-flag-canvas {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+.pred-panel.usa-mode { position: relative; }
+.pred-panel.usa-mode > :not(.usa-flag-canvas) { position: relative; z-index: 2; }
 .pred-panel-overlay.active .pred-panel { transform: scale(1) translateY(0); }
 .pred-panel .pp-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; }
 .pred-panel .pp-match { font-weight: 800; font-size: 1rem; }

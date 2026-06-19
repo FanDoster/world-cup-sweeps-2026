@@ -15,8 +15,11 @@ function showPredPanel(key) {
 }
 
 function closePredPanel() {
+  stopUSAFlagAnimation();
+  stopUSA();
   document.getElementById('predPanelOverlay').classList.remove('active');
   document.getElementById('predPanel').classList.remove('england-mode');
+  document.getElementById('predPanel').classList.remove('usa-mode');
   if (commentsChannel) { sb.removeChannel(commentsChannel); commentsChannel = null; }
 }
 
@@ -41,6 +44,9 @@ function renderPredPanel(key) {
     ? 'https://www.youtube.com/embed/va6nPu-1auE?autoplay=1&controls=0&rel=0&modestbranding=1&start=11'
     : 'https://www.youtube.com/embed/32wDFCM7iSI?autoplay=1&controls=0&rel=0&modestbranding=1&start=71';
   if (showMatchVideo) el.classList.add('england-mode'); else el.classList.remove('england-mode');
+
+  const isUSA = t1 === 'United States' || t2 === 'United States';
+  if (isUSA) el.classList.add('usa-mode'); else el.classList.remove('usa-mode');
   const showScores = isLocked || isFinished;
 
   const preds = predLookup[mid] || [];
@@ -145,6 +151,8 @@ function renderPredPanel(key) {
 
   el.innerHTML = `
     ${showMatchVideo ? `<div style="position:relative"><iframe src="${videoSrc}" width="100%" style="aspect-ratio:16/9;display:block;border:none" allow="autoplay; fullscreen" allowfullscreen></iframe><div style="position:absolute;inset:0"></div></div>` : ''}
+    ${isUSA ? `<canvas class="usa-flag-canvas" id="usaFlagCanvas"></canvas>` : ''}
+    ${isUSA ? `<iframe id="usaAnthemFrame" src="${USA_ANTHEM_SC_URL}" width="1" height="1" style="position:absolute;opacity:0;pointer-events:none;border:none" allow="autoplay"></iframe>` : ''}
     <div class="pp-header">
       <div>
         <div class="pp-match">${t1} vs ${t2}</div>
@@ -175,6 +183,171 @@ function renderPredPanel(key) {
     commentsChannel = sb.channel('comments-' + mid)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'match_comments', filter: `match_id=eq.${mid}` }, () => loadComments(mid))
       .subscribe();
+  }
+
+  if (isUSA) startUSAFlagAnimation();
+  if (isUSA) {
+    const iframe = document.getElementById('usaAnthemFrame');
+    if (iframe) {
+      iframe.onload = () => setTimeout(() => playUSA(), 300);
+    }
+  }
+  if (!isUSA) stopUSA();
+}
+
+// ── USA FLAG WEBGL ANIMATION ──
+let usaFlagAnimId = null;
+let usaFlagImg = null;
+
+const USA_VERTEX_SHADER = `
+attribute vec2 a_position;
+attribute vec2 a_texcoord;
+varying vec2 v_texcoord;
+void main() {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+  v_texcoord = a_texcoord;
+}`;
+
+const USA_FRAGMENT_SHADER = `
+precision mediump float;
+varying vec2 v_texcoord;
+uniform sampler2D u_flag;
+uniform float u_time;
+uniform float u_freq;
+uniform float u_amp;
+void main() {
+  float dy = sin(v_texcoord.x * u_freq + u_time) * u_amp;
+  vec2 tc = vec2(v_texcoord.x, v_texcoord.y + dy);
+  gl_FragColor = texture2D(u_flag, tc);
+  gl_FragColor.a *= 0.2;
+}`;
+
+function compileShader(gl, type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error('Shader error:', gl.getShaderInfoLog(shader));
+    gl.deleteShader(shader);
+    return null;
+  }
+  return shader;
+}
+
+function initUSAGL(canvas, img) {
+  const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false });
+  if (!gl) return null;
+
+  const vs = compileShader(gl, gl.VERTEX_SHADER, USA_VERTEX_SHADER);
+  const fs = compileShader(gl, gl.FRAGMENT_SHADER, USA_FRAGMENT_SHADER);
+  if (!vs || !fs) return null;
+
+  const program = gl.createProgram();
+  gl.attachShader(program, vs);
+  gl.attachShader(program, fs);
+  gl.linkProgram(program);
+  gl.useProgram(program);
+
+  // Full-screen quad (two triangles as triangle strip)
+  const positions = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
+  const texcoords = new Float32Array([0,1, 1,1, 0,0, 1,0]);
+
+  const setupAttrib = (name, data, size) => {
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    const loc = gl.getAttribLocation(program, name);
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+  };
+  setupAttrib('a_position', positions, 2);
+  setupAttrib('a_texcoord', texcoords, 2);
+
+  // Upload flag texture
+  const tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+
+  return {
+    gl, program,
+    locs: {
+      time: gl.getUniformLocation(program, 'u_time'),
+      freq: gl.getUniformLocation(program, 'u_freq'),
+      amp: gl.getUniformLocation(program, 'u_amp'),
+    }
+  };
+}
+
+function startUSAFlagAnimation() {
+  stopUSAFlagAnimation();
+  const canvas = document.getElementById('usaFlagCanvas');
+  if (!canvas) return;
+
+  const loadAndAnimate = (img) => {
+    usaFlagImg = img;
+
+    function resize() {
+      const panel = document.getElementById('predPanel');
+      canvas.width = panel.offsetWidth;
+      canvas.height = panel.offsetHeight;
+    }
+    resize();
+
+    const state = initUSAGL(canvas, img);
+    if (!state) return;
+    const { gl, locs } = state;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform1f(locs.freq, 8.0);
+    gl.uniform1f(locs.amp, 0.06);
+
+    const startTime = performance.now();
+
+    function draw() {
+      if (!document.getElementById('usaFlagCanvas')) return;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform1f(locs.time, (performance.now() - startTime) * 0.004);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      usaFlagAnimId = requestAnimationFrame(draw);
+    }
+
+    setTimeout(draw, 250);
+  };
+
+  if (usaFlagImg) {
+    loadAndAnimate(usaFlagImg);
+  } else {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => loadAndAnimate(img);
+    img.src = flagUrl('us');
+  }
+}
+
+function stopUSAFlagAnimation() {
+  if (usaFlagAnimId) {
+    cancelAnimationFrame(usaFlagAnimId);
+    usaFlagAnimId = null;
+  }
+}
+
+// ── USA NATIONAL ANTHEM (SoundCloud embed) ──
+const USA_ANTHEM_SC_URL = 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/2124665256&auto_play=false&visual=false&buying=false&sharing=false&download=false&show_artwork=false&hide_related=true&show_user=false&show_playcount=false&liking=false&show_comments=false&color=0a0c12';
+
+function playUSA() {
+  const iframe = document.getElementById('usaAnthemFrame');
+  if (!iframe) return;
+  // postMessage to SoundCloud widget: play
+  iframe.contentWindow.postMessage(JSON.stringify({method: 'play'}), '*');
+}
+
+function stopUSA() {
+  const iframe = document.getElementById('usaAnthemFrame');
+  if (iframe) {
+    iframe.contentWindow.postMessage(JSON.stringify({method: 'pause'}), '*');
   }
 }
 
