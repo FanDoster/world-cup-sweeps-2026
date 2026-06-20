@@ -11,6 +11,7 @@ var pfpUploading = false;   // Whether an upload is in progress
 async function showUserProfile(playerName) {
   userProfilePlayer = playerName;
   switchTab('profile');
+  renderUserProfile(playerName);
   window.location.hash = '#/users/' + encodeURIComponent(playerName);
 }
 

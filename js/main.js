@@ -21,8 +21,7 @@ function switchTab(tab) {
   if (tab === 'shooter') initShooter();
   if (tab !== 'shooter') pauseShooter();
   if (tab === 'profile') {
-    const player = userProfilePlayer || (currentProfile ? currentProfile.player_name : null);
-    if (player) renderUserProfile(player);
+    // Profile rendering is handled explicitly by showUserProfile / handleProfileRoute
   }
 }
 
