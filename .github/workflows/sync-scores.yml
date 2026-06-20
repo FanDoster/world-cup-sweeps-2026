@@ -2,7 +2,7 @@ name: Sync FIFA Scores
 
 on:
   schedule:
-    - cron: '0 * * * *'     # every hour
+    - cron: '0 12 * * *'    # daily at 12:00 UTC
   workflow_dispatch:          # manual trigger from Actions tab
 
 jobs:
