@@ -229,9 +229,9 @@ function renderTerritoryStandings() {
     const maxScore = Math.max(...Object.values(scores));
     const winners = PLAYERS.filter(p => scores[p] === maxScore);
     if (winners.length === 1) {
-      champion.innerHTML = `<div class="ts-champion"><div class="tc-icon">🏆</div><div><div class="tc-label">Territory Champion</div><div class="tc-name">${winners[0]}</div><div class="tc-detail">Controls ${maxScore} of 6 territories</div></div></div>`;
+      champion.innerHTML = `<div class="ts-champion"><div class="tc-icon">🏆</div><div><div class="tc-label">Territory Champion</div><div class="tc-name">${playerDisplayName(winners[0])}</div><div class="tc-detail">Controls ${maxScore} of 6 territories</div></div></div>`;
     } else {
-      champion.innerHTML = `<div class="ts-champion"><div class="tc-icon">⚔️</div><div><div class="tc-label">Tied for Territory Champion</div><div class="tc-name">${winners.join(' · ')}</div><div class="tc-detail">${maxScore} territories each</div></div></div>`;
+      champion.innerHTML = `<div class="ts-champion"><div class="tc-icon">⚔️</div><div><div class="tc-label">Tied for Territory Champion</div><div class="tc-name">${winners.map(playerDisplayName).join(' · ')}</div><div class="tc-detail">${maxScore} territories each</div></div></div>`;
     }
   } else {
     champion.innerHTML = '';
