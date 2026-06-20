@@ -26,7 +26,7 @@ function toDate(dateStr, timeStr, tz) {
   const [h, m] = timeStr.split(':');
   return new Date(Date.UTC(
     parseInt(dateStr.slice(0,4)), parseInt(dateStr.slice(5,7))-1, parseInt(dateStr.slice(8,10)),
-    parseInt(h) - tz, parseInt(m)
+    parseInt(h) - (tz || 0), parseInt(m)
   ));
 }
 
