@@ -80,5 +80,6 @@ function ordinal(n) {
 }
 
 function escapeHtml(s) {
+  if (s == null) return '';
   return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
