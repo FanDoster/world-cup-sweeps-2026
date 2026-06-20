@@ -298,18 +298,17 @@
 .up-gauge-wrap { position: relative; width: 104px; height: 120px; flex-shrink: 0; }
 .up-gauge-val {
   position: absolute;
-  inset: 0 0 28px 0;
+  top: 0; left: 0; right: 0; bottom: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
   font-weight: 800;
   font-family: var(--font-mono);
-  padding-top: 4px;
 }
 .up-gauge-label {
   position: absolute;
-  bottom: 2px;
+  bottom: 0px;
   left: 0; right: 0;
   text-align: center;
   font-size: 0.58rem;
