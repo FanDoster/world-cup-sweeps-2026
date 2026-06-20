@@ -120,7 +120,7 @@ async function loadData() {
   renderTeamChips();
   if (selectedTeam) renderTeamSchedule();
   // Fetch predictions for match card status dots
-  loadPredData();
+  loadPredData().catch(e => console.error('loadPredData failed:', e));
 }
 
 async function loadPredData() {
