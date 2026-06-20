@@ -46,6 +46,11 @@
   color: var(--text-muted);
 }
 .leaderboard-table .player-cell { font-weight: 700; letter-spacing: -0.01em; }
+.leaderboard-table .player-cell .avatar-wrap,
+.leaderboard-table .player-cell > span[style*="inline-flex"] {
+  margin-right: 6px;
+  vertical-align: middle;
+}
 .sponsor-tag { font-size: 0.65rem; font-weight: 400; color: var(--text-muted); letter-spacing: 0; vertical-align: middle; white-space: nowrap; }
 .person-sponsor { font-size: 0.65rem; font-weight: 400; color: var(--text-muted); letter-spacing: 0; white-space: nowrap; margin-top: -8px; margin-bottom: 10px; }
 .sponsor-logo { height: 18px; vertical-align: middle; margin-left: 3px; position: relative; top: -1px; }
