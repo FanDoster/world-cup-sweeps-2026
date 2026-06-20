@@ -1,0 +1,18 @@
+name: Update Polymarket Odds
+
+on:
+  schedule:
+    - cron: '0 6 * * *'        # daily at 06:00 UTC
+  workflow_dispatch:             # manual trigger from Actions tab
+
+jobs:
+  update-odds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write Supabase key
+        run: echo "${{ secrets.SB_KEY }}" > /tmp/sb_key
+
+      - name: Update odds from Polymarket
+        run: python3 scripts/update-odds.py
