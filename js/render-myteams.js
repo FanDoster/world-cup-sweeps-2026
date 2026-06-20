@@ -1,13 +1,7 @@
 function getPlayerTeams() {
   if (!currentProfile) return [];
   const owner = currentProfile.player_name;
-  return matchData.reduce((acc, m) => {
-    if (m.team1 && teamOwner[m.team1] === owner && !acc.find(t => t.name === m.team1))
-      acc.push({ name: m.team1, iso: teamIso[m.team1], group: m.group });
-    if (m.team2 && teamOwner[m.team2] === owner && !acc.find(t => t.name === m.team2))
-      acc.push({ name: m.team2, iso: teamIso[m.team2], group: m.group });
-    return acc;
-  }, []);
+  return (people[owner] || []).map(t => ({ name: t.team, iso: t.iso, group: t.group }));
 }
 
 function getNextMatch(teamName) {
