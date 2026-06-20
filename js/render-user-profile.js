@@ -14,9 +14,15 @@ async function showUserProfile(playerName) {
   window.location.hash = '#/users/' + encodeURIComponent(playerName);
 }
 
+let _profileLoading = null;  // player name currently being rendered (prevents double-render)
+
 async function renderUserProfile(playerName) {
   const el = document.getElementById('userProfileContent');
   if (!el) return;
+
+  // Prevent double-render from handleProfileRoute + switchTab both calling
+  if (_profileLoading === playerName) return;
+  _profileLoading = playerName;
 
   // Save player name for reloads
   userProfilePlayer = playerName;
@@ -28,6 +34,7 @@ async function renderUserProfile(playerName) {
   const userId = await getUserIdByName(playerName);
   if (!userId) {
     el.innerHTML = `<div class="up-error">Could not find a user profile for <strong>${escapeHtml(playerName)}</strong>.</div>`;
+    _profileLoading = null;
     return;
   }
 
@@ -140,6 +147,8 @@ async function renderUserProfile(playerName) {
   if (isOwnProfile && avatarsEnabled) {
     pfpSetupListeners();
   }
+
+  _profileLoading = null;  // render complete — allow re-renders
 }
 
 // ── PREDICTION DASHBOARD ──
