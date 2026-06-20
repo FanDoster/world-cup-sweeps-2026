@@ -74,7 +74,9 @@ function formatDateHeader(dateStr, timeStr, tz) {
 }
 
 function ordinal(n) {
-  return n + (['', 'st', 'nd', 'rd'][n] || 'th');
+  const s = n % 100;
+  if (s >= 11 && s <= 13) return n + 'th';
+  return n + (['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 }
 
 function escapeHtml(s) {
