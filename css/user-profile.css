@@ -295,10 +295,10 @@
   gap: 24px;
   padding: 24px;
 }
-.up-gauge-wrap { position: relative; width: 104px; height: 104px; flex-shrink: 0; }
+.up-gauge-wrap { position: relative; width: 104px; height: 120px; flex-shrink: 0; }
 .up-gauge-val {
   position: absolute;
-  inset: 0;
+  inset: 0 0 28px 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -309,13 +309,13 @@
 }
 .up-gauge-label {
   position: absolute;
-  bottom: 12px;
+  bottom: 2px;
   left: 0; right: 0;
   text-align: center;
-  font-size: 0.55rem;
+  font-size: 0.58rem;
+  font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 .up-pd-grid {
   display: grid;
