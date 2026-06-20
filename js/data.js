@@ -112,6 +112,9 @@ async function loadData() {
     matchByKey[`${m.team1}|${m.team2}|${m.date}`] = m;
   }
 
+  // Fetch predictions before rendering — profile pages, leaderboard, etc. read predLookup
+  await loadPredData().catch(e => console.error('loadPredData failed:', e));
+
   // Render everything
   renderMatches();
   renderPeople();
@@ -119,8 +122,6 @@ async function loadData() {
   renderLeaderboard();
   renderTeamChips();
   if (selectedTeam) renderTeamSchedule();
-  // Fetch predictions for match card status dots
-  loadPredData().catch(e => console.error('loadPredData failed:', e));
 }
 
 async function loadPredData() {
