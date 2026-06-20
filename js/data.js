@@ -74,6 +74,8 @@ async function loadData() {
     hasIsComplete = false;
   }
 
+  if (!m) { console.error('Failed to load match data from Supabase'); return; }
+
   matchData = m.map(r => {
     const score1 = r.home_score;
     const score2 = r.away_score;
