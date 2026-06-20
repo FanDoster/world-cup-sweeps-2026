@@ -77,7 +77,7 @@ async function renderUserProfile(playerName) {
   }
   sectionsHtml += '</div>';
 
-  // Recent Predictions — settled matches only (no peeking at pending scores)
+  // Recent Predictions — settled matches only, collapsed to 4 with expand toggle
   sectionsHtml += '<div class="up-sec-label">📋 Recent Predictions</div>';
   sectionsHtml += '<div class="up-section-card">';
   if (!predData) {
@@ -86,9 +86,8 @@ async function renderUserProfile(playerName) {
     sectionsHtml += '<div class="up-empty">No predictions made yet.</div>';
   } else {
     const settled = predData.predictions.filter(p => p.match_played);
-    const toShow = settled.slice(0, 20);
-    if (toShow.length) {
-      sectionsHtml += buildPredictionList(toShow);
+    if (settled.length) {
+      sectionsHtml += buildExpandablePredictionList(settled);
     } else {
       sectionsHtml += '<div class="up-empty">No settled predictions yet.</div>';
     }
@@ -450,6 +449,42 @@ function buildTeamRosterFromClient(playerName) {
       };
     }),
   };
+}
+
+// ── EXPANDABLE PREDICTION LIST ──
+// Shows 4 items collapsed, with a toggle to expand/collapse.
+// Clicking "+ N more" or "show less" switches between states.
+function buildExpandablePredictionList(predictions) {
+  const INITIAL = 4;
+  const id = 'predlist-' + Math.random().toString(36).slice(2, 8);
+  const hasMore = predictions.length > INITIAL;
+
+  const listHtml = buildPredictionList(predictions);
+
+  if (!hasMore) return listHtml;
+
+  const visibleHtml = buildPredictionList(predictions.slice(0, INITIAL));
+  const moreCount = predictions.length - INITIAL;
+
+  return `<div id="${id}" class="up-expand-list">
+    <div class="up-expand-collapsed">${visibleHtml}</div>
+    <div class="up-expand-full" style="display:none">${listHtml}</div>
+    <button class="up-expand-toggle" onclick="
+      var el=document.getElementById('${id}');
+      var col=el.querySelector('.up-expand-collapsed');
+      var full=el.querySelector('.up-expand-full');
+      var btn=el.querySelector('.up-expand-toggle');
+      if(full.style.display==='none'){
+        col.style.display='none';
+        full.style.display='';
+        btn.textContent='▲ Show less';
+      }else{
+        col.style.display='';
+        full.style.display='none';
+        btn.textContent='▼ Show all (+${moreCount} more)';
+      }
+    ">▼ Show all (+${moreCount} more)</button>
+  </div>`;
 }
 
 function buildPredictionList(predictions) {

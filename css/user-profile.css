@@ -194,6 +194,23 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 .up-pred-item:last-child { border-bottom: none; }
+
+/* Expandable prediction list toggle */
+.up-expand-toggle {
+  display: block;
+  width: 100%;
+  padding: 10px 0;
+  background: none;
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: color 0.15s;
+}
+.up-expand-toggle:hover { color: var(--accent-hover, #93c5fd); }
 .up-pred-match { font-size: 0.82rem; flex: 1; min-width: 0; }
 .up-pred-match .up-pm-teams { font-weight: 700; }
 .up-pred-match .up-pm-date {
