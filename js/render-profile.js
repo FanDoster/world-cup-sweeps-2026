@@ -389,9 +389,9 @@ async function loadComments(mid) {
   const { data: comments } = await sb.from('match_comments')
     .select('user_id,body,created_at').eq('match_id', mid)
     .order('created_at').limit(100);
-  const { data: profs } = await sb.from('player_profiles').select('id,player_name');
+  const { data: profs } = await sb.from('player_profiles').select('id,player_name,avatar_url');
   const nameById = {};
-  (profs || []).forEach(p => { nameById[p.id] = p.player_name; });
+  (profs || []).forEach(p => { nameById[p.id] = p.player_name; avatarCache[p.player_name] = p.avatar_url || null; });
   if (!comments || !comments.length) {
     el.innerHTML = '<div class="pp-comment-empty">No banter yet — get it started.</div>';
     return;
@@ -404,7 +404,7 @@ async function loadComments(mid) {
       : t.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
     const authorName = nameById[c.user_id] || '?';
     const authorClickable = authorName !== '?' ? `onclick="showUserProfile('${authorName}')" style="cursor:pointer" title="View profile"` : '';
-    return `<div class="pp-comment"><span class="c-author" ${authorClickable}>${authorName}</span><span class="c-body">${escapeHtml(c.body)}</span><span class="c-time">${when}</span></div>`;
+    return `<div class="pp-comment">${avatarHtml(authorName, 24)}<span class="c-author" ${authorClickable}>${authorName}</span><span class="c-body">${escapeHtml(c.body)}</span><span class="c-time">${when}</span></div>`;
   }).join('');
 }
 

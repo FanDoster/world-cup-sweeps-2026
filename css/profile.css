@@ -131,7 +131,7 @@
 /* ── COMMENTS ── */
 .pp-comments { border-top: 1px solid var(--border-subtle); padding: 13px 18px 16px; }
 .pp-comments-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.pp-comment { display: flex; gap: 8px; padding: 5px 0; font-size: 0.8rem; align-items: baseline; }
+.pp-comment { display: flex; gap: 8px; padding: 5px 0; font-size: 0.8rem; align-items: center; }
 .pp-comment .c-author { font-weight: 700; flex-shrink: 0; }
 .pp-comment .c-body { color: var(--text-secondary); word-break: break-word; }
 .pp-comment .c-time { margin-left: auto; font-size: 0.62rem; color: var(--text-muted); flex-shrink: 0; }
