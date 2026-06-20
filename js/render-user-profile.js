@@ -110,10 +110,15 @@ async function renderUserProfile(playerName) {
     sectionsHtml += '</div>';
   }
 
-  // Activity Feed (chronological merge of predictions + team results)
+  // Activity Feed — collapsed to 6 items with expand toggle
   sectionsHtml += '<div class="up-sec-label">📰 Activity Feed</div>';
   sectionsHtml += '<div class="up-section-card">';
-  sectionsHtml += buildActivityFeed(playerName, predData, matchData);
+  const feedItems = buildActivityFeedItems(playerName, predData, matchData);
+  if (!feedItems.length) {
+    sectionsHtml += '<div class="up-empty">No activity yet — matches and predictions will appear here.</div>';
+  } else {
+    sectionsHtml += buildExpandableFeed(feedItems);
+  }
   sectionsHtml += '</div>';
 
   // Head-to-Head comparison
@@ -196,7 +201,8 @@ function buildJokerReport(stats) {
 }
 
 // ── ACTIVITY FEED ──
-function buildActivityFeed(playerName, predData, matchData) {
+// Returns array of {ts, icon, text, detail} — caller handles rendering
+function buildActivityFeedItems(playerName, predData, matchData) {
   const events = [];
 
   // Team match results — completed matches involving player's teams
@@ -254,13 +260,41 @@ function buildActivityFeed(playerName, predData, matchData) {
 
   // Sort newest first, limit to 25
   events.sort((a, b) => b.ts - a.ts);
-  const recent = events.slice(0, 25);
+  return events.slice(0, 25);
+}
 
-  if (!recent.length) {
-    return '<div class="up-empty">No activity yet — matches and predictions will appear here.</div>';
-  }
+// ── EXPANDABLE FEED ──
+// Shows 6 items collapsed, with a toggle to expand/collapse all.
+function buildExpandableFeed(items) {
+  const INITIAL = 6;
+  if (items.length <= INITIAL) return renderFeedItems(items);
 
-  return recent.map(e => `<div class="up-feed-item">
+  const id = 'feed-' + Math.random().toString(36).slice(2, 8);
+  const moreCount = items.length - INITIAL;
+
+  return `<div id="${id}" class="up-expand-list">
+    <div class="up-expand-collapsed">${renderFeedItems(items.slice(0, INITIAL))}</div>
+    <div class="up-expand-full" style="display:none">${renderFeedItems(items)}</div>
+    <button class="up-expand-toggle" onclick="
+      var el=document.getElementById('${id}');
+      var col=el.querySelector('.up-expand-collapsed');
+      var full=el.querySelector('.up-expand-full');
+      var btn=el.querySelector('.up-expand-toggle');
+      if(full.style.display==='none'){
+        col.style.display='none';
+        full.style.display='';
+        btn.textContent='▲ Show less';
+      }else{
+        col.style.display='';
+        full.style.display='none';
+        btn.textContent='▼ Show all (+${moreCount} more)';
+      }
+    ">▼ Show all (+${moreCount} more)</button>
+  </div>`;
+}
+
+function renderFeedItems(items) {
+  return items.map(e => `<div class="up-feed-item">
     <span class="up-feed-icon">${e.icon}</span>
     <div class="up-feed-body">
       <div class="up-feed-text">${e.text}</div>
