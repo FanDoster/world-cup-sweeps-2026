@@ -318,6 +318,15 @@
   white-space: nowrap;
   text-align: center;
 }
+.match-score-pill.live-score {
+  background: rgba(239,68,68,0.12);
+  color: #fca5a5;
+  animation: liveScorePulse 2.5s ease-in-out infinite;
+}
+@keyframes liveScorePulse {
+  0%, 100% { background: rgba(239,68,68,0.10); }
+  50% { background: rgba(239,68,68,0.22); }
+}
 
 /* Full-width probability bar at the bottom of the card */
 .match-prob-bar {
