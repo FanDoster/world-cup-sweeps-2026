@@ -154,8 +154,11 @@ def parse_match_status(m):
 
     winner = m.get("Winner")
 
-    # A match is finished when MatchTime >= 90 minutes
-    is_finished = minutes >= 90
+    # A match is finished when:
+    #   MatchTime >= 120 (extra time / penalties completed), OR
+    #   MatchTime 90-104 (regulation time finished, no extra time)
+    # The gap 105-119' only occurs during extra time — never in group stage
+    is_finished = minutes >= 120 or (90 <= minutes < 105)
     # A match is live when 0 < MatchTime < 90 AND scores may be present
     is_live = 0 < minutes < 90
 

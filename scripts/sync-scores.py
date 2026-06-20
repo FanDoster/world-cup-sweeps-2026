@@ -78,17 +78,21 @@ def fetch_fifa_matches():
         if hs is None or aws is None:
             continue
 
-        # Only sync scores for finished matches (MatchTime >= 90 minutes)
-        # Prevents mid-game scores from marking a match as complete prematurely
+        # Only sync scores for finished matches.
+        # Regulation time: MatchTime 90-104' (group stage + normal-time results)
+        # Extra time:      MatchTime >= 120' (knockout extra time / penalties)
+        # The gap 105-119' only occurs during extra time — never in group stage.
         match_time = m.get("MatchTime", "")
         try:
             minutes = int(match_time.replace("'", ""))
         except (ValueError, AttributeError):
             minutes = -1
 
-        if minutes < 90:
-            skipped_live += 1
-            continue  # match still in progress — don't sync partial scores
+        is_finished = minutes >= 120 or (90 <= minutes < 105)
+        if not is_finished:
+            if 0 < minutes < 90 or (105 <= minutes < 120):
+                skipped_live += 1  # match still in progress
+            continue
 
         home_name = home.get("TeamName", [{}])[0].get("Description", "")
         away_name = away.get("TeamName", [{}])[0].get("Description", "")
