@@ -26,12 +26,11 @@ function switchTab(tab) {
 }
 
 // ── INIT ──
-restoreSession().then(() => {
-  // Avatar feature detection — must run after session is restored
-  // (checkAvatarsEnabled needs currentSession to be set)
-  checkAvatarsEnabled().then(() => {
-    if (avatarsEnabled) preloadAvatars(PLAYERS);
-  });
+restoreSession().then(async () => {
+  // Avatar feature detection — must complete before profile renders
+  await checkAvatarsEnabled();
+  if (avatarsEnabled) preloadAvatars(PLAYERS);
+
   return loadData().then(() => {
     loadOdds(); buildCountdownTicker(); loadStatsTracker(); checkTeamResults();
     // Handle hash route for direct profile links (after data is loaded)
