@@ -416,10 +416,13 @@
   margin-bottom: 8px;
 }
 .up-h2h-dot {
-  width: 10px;
-  height: 10px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .up-h2h-name { font-size: 0.82rem; font-weight: 700; }
 .up-h2h-pts { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-left: auto; }

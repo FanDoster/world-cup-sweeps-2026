@@ -351,7 +351,7 @@ function buildHeadToHead(playerName, myStats) {
 
     return `<div class="up-h2h-row">
       <div class="up-h2h-player">
-        <span class="up-h2h-dot" style="background:${hex}"></span>
+        <span class="up-h2h-dot">${typeof avatarHtml === 'function' ? avatarHtml(opp, 18) : ''}</span>
         <span class="up-h2h-name">${displayName}</span>
         <span class="up-h2h-pts">${oppPts} pts</span>
       </div>
