@@ -41,7 +41,7 @@ async function uploadAvatar(file) {
   }
 
   const userId = currentSession.user.id;
-  const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
+  const ext = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : 'jpg';
   const path = userId + '/avatar.' + ext;
 
   // Remove any existing avatar files for this user (ignore errors)

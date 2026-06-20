@@ -572,6 +572,7 @@ function handleProfileRoute() {
     if (PLAYERS.includes(playerName)) {
       userProfilePlayer = playerName;
       switchTab('profile');
+      renderUserProfile(playerName);  // belt and suspenders — don't rely on switchTab internals
       return true;
     }
   }
@@ -588,12 +589,13 @@ function buildProfilePictureSection(playerName, currentUrl) {
   return '<div class="pfp-section card-base">' +
     '<div class="pfp-section-label">📷 Profile Picture</div>' +
     '<div class="pfp-editor">' +
-      // Avatar circle
-      '<div class="pfp-avatar' + (hasPhoto ? ' pfp-has-photo' : '') + '" id="pfpAvatar">' +
+      // Avatar circle (clickable — opens file picker)
+      '<div class="pfp-avatar' + (hasPhoto ? ' pfp-has-photo' : ' pfp-no-photo') + '" id="pfpAvatar"' +
+        (hasPhoto ? '' : ' onclick="document.getElementById(\'pfpInput\').click()"') + '>' +
         (hasPhoto
           ? '<img class="pfp-img" src="' + escapeHtml(currentUrl) + '" alt="Your profile photo" id="pfpImg" onerror="var i=document.getElementById(\'pfpImg\');var n=document.getElementById(\'pfpInitials\');if(i)i.style.display=\'none\';if(n)n.style.display=\'\'">'
           : '<span class="pfp-initials" id="pfpInitials" style="background:' + hex + '">' + initials + '</span>') +
-        '<div class="pfp-hover-overlay"><span>Change<br>photo</span></div>' +
+        '<div class="pfp-hover-overlay"><span>' + (hasPhoto ? 'Change<br>photo' : '📷<br>Add photo') + '</span></div>' +
         (hasPhoto ? '<div class="pfp-success-badge" id="pfpBadge" style="display:none">✓</div>' : '') +
       '</div>' +
       // Drop zone
@@ -601,7 +603,7 @@ function buildProfilePictureSection(playerName, currentUrl) {
         '<div class="pfp-drop-icon">📷</div>' +
         '<div class="pfp-drop-text"><strong>Add a profile photo</strong></div>' +
         '<div class="pfp-drop-hint">Click or drag an image here</div>' +
-        '<input type="file" class="pfp-input" id="pfpInput" accept="image/jpeg,image/png,image/webp">' +
+        '<input type="file" class="pfp-input" id="pfpInput" accept="image/jpeg,image/png,image/gif,image/webp">' +
       '</div>' +
       // Progress
       '<div class="pfp-progress" id="pfpProgress" style="display:none">' +
@@ -684,9 +686,9 @@ function pfpSetupListeners() {
 
 function pfpHandleFile(file) {
   // Validate type
-  var allowed = ['image/jpeg', 'image/png', 'image/webp'];
+  var allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
   if (allowed.indexOf(file.type) === -1) {
-    pfpShowError('Only JPG, PNG, and WebP images are supported (max 5 MB).');
+    pfpShowError('Only JPG, PNG, GIF, and WebP images are supported (max 5 MB).');
     return;
   }
   // Validate size

@@ -66,12 +66,14 @@
   user-select: none;
 }
 
-/* ── HOVER OVERLAY (change photo) ── */
-.pfp-has-photo {
+/* ── HOVER OVERLAY (change/add photo) ── */
+.pfp-has-photo,
+.pfp-no-photo {
   cursor: pointer;
 }
 
-.pfp-has-photo:hover .pfp-hover-overlay {
+.pfp-has-photo:hover .pfp-hover-overlay,
+.pfp-no-photo:hover .pfp-hover-overlay {
   opacity: 1;
 }
 
