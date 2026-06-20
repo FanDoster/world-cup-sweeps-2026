@@ -33,7 +33,7 @@ if (!isComplete) continue;
     });
 
   const { col, dir } = leaderboardSort;
-  const m = dir === 'desc' ? -1 : 1;
+  const m = dir === 'desc' ? 1 : -1;
   standings.sort((a, b) => {
     if (col === 'pts') return (b.pts - a.pts) * m || (b.w - a.w) * m;
     if (col === 'predPts') return (b.predPts - a.predPts) * m || (b.pts - a.pts) * m;
