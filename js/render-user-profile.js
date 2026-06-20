@@ -266,7 +266,7 @@ function buildActivityFeedItems(playerName, predData, matchData) {
 // ── EXPANDABLE FEED ──
 // Shows 6 items collapsed, with a toggle to expand/collapse all.
 function buildExpandableFeed(items) {
-  const INITIAL = 6;
+  const INITIAL = 4;
   if (items.length <= INITIAL) return renderFeedItems(items);
 
   const id = 'feed-' + Math.random().toString(36).slice(2, 8);
