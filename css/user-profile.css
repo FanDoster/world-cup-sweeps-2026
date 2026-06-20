@@ -95,6 +95,21 @@
   margin-top: 3px;
 }
 
+/* ── TOP ROW: Team Roster + Prediction Dashboard side by side ── */
+.up-top-row {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+}
+.up-top-col {
+  flex: 1 1 50%;
+  min-width: 0;
+}
+.up-top-col .up-section-card {
+  height: 100%;
+  overflow-y: auto;
+}
+
 /* ── SECTION LABEL ── */
 .up-sec-label {
   font-size: 0.8rem;

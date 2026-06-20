@@ -65,7 +65,12 @@ async function renderUserProfile(playerName) {
   // Build sections
   let sectionsHtml = '';
 
+  // Team Roster + Prediction Dashboard — side by side
+  const hasDashboard = predStats && predStats.settled > 0;
+  if (hasDashboard) sectionsHtml += '<div class="up-top-row">';
+
   // Team Roster — try RPC first, fall back to client-side `people` data
+  sectionsHtml += '<div class="' + (hasDashboard ? 'up-top-col' : '') + '">';
   sectionsHtml += '<div class="up-sec-label">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Team Roster</div>';
   sectionsHtml += '<div class="up-section-card">';
   const rpcTeams = (teamsData && teamsData.teams && teamsData.teams.length) ? teamsData.teams : null;
@@ -75,14 +80,16 @@ async function renderUserProfile(playerName) {
   } else {
     sectionsHtml += '<div class="up-empty">No teams assigned to this player.</div>';
   }
-  sectionsHtml += '</div>';
+  sectionsHtml += '</div></div>';
 
   // Prediction Dashboard (accuracy gauge + stats grid)
-  if (predStats && predStats.settled > 0) {
+  if (hasDashboard) {
+    sectionsHtml += '<div class="up-top-col">';
     sectionsHtml += '<div class="up-sec-label">🎯 Prediction Dashboard</div>';
     sectionsHtml += '<div class="up-section-card">';
     sectionsHtml += buildPredDashboard(predStats);
-    sectionsHtml += '</div>';
+    sectionsHtml += '</div></div>';
+    sectionsHtml += '</div>'; // close up-top-row
   }
 
   // Recent Predictions — settled matches only, collapsed to 4 with expand toggle
