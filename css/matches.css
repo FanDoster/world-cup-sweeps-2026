@@ -18,7 +18,7 @@
 .match-date-header:first-child { margin-top: 0; padding-top: 4px; }
 
 .matches-toolbar { display: flex; justify-content: space-between; margin-bottom: 10px; }
-.teams-toolbar { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.teams-toolbar { display: flex; justify-content: center; margin-bottom: 10px; }
 .filter-bar {
   display: inline-flex;
   background: var(--card);

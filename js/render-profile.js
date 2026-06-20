@@ -402,7 +402,9 @@ async function loadComments(mid) {
     const when = sameDay
       ? `${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`
       : t.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-    return `<div class="pp-comment"><span class="c-author">${nameById[c.user_id] || '?'}</span><span class="c-body">${escapeHtml(c.body)}</span><span class="c-time">${when}</span></div>`;
+    const authorName = nameById[c.user_id] || '?';
+    const authorClickable = authorName !== '?' ? `onclick="showUserProfile('${authorName}')" style="cursor:pointer" title="View profile"` : '';
+    return `<div class="pp-comment"><span class="c-author" ${authorClickable}>${authorName}</span><span class="c-body">${escapeHtml(c.body)}</span><span class="c-time">${when}</span></div>`;
   }).join('');
 }
 
@@ -421,6 +423,8 @@ async function renderProfile(playerName) {
   const el = document.getElementById('profileCard');
   const teams = people[playerName] || [];
   const owner = playerName;
+
+  await getAvatarUrl(playerName).catch(() => {});
 
   const teamStats = {};
   for (const m of matchData) {
@@ -448,26 +452,39 @@ async function renderProfile(playerName) {
     else if (o1 === owner || o2 === owner) matchL++;
   }
 
+  // ── Prediction stats (via RPC if available, else client-side) ──
   let predStats = null;
   if (currentSession) {
-    const { data: allPreds } = await sb.from('predictions').select('user_id,match_id,predicted_home_score,predicted_away_score');
-    if (allPreds) {
-      const { data: profs } = await sb.from('player_profiles').select('id').eq('player_name', playerName);
-      const uid = profs && profs[0] ? profs[0].id : null;
-      if (uid) {
-        const userPreds = allPreds.filter(p => p.user_id === uid);
-        const { data: allMatches } = await sb.from('matches').select('id,home_score,away_score,home_team_id(name),away_team_id(name)');
-        let total = 0, exact = 0, correct = 0, totalPts = 0;
-        for (const p of userPreds) {
-          const m = allMatches?.find(am => am.id === p.match_id);
-          if (!m || m.home_score === null) continue;
-          total++;
-          const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.home_score, m.away_score);
-          totalPts += pts;
-          if (pts === 5) exact++;
-          else if (pts >= 1) correct++;
+    const { data: profs } = await sb.from('player_profiles').select('id').eq('player_name', playerName);
+    const uid = profs && profs[0] ? profs[0].id : null;
+    if (uid) {
+      // Try the server-side RPC first — single call, no client-side filtering
+      const rpcData = await getUserPredictions(uid);
+      if (rpcData && rpcData.stats && rpcData.stats.resolved > 0) {
+        const s = rpcData.stats;
+        predStats = {
+          total: s.resolved, totalPts: s.total_points,
+          exact: s.exact_scores, correct: s.correct,
+          accuracy: Math.round(s.win_rate_pct),
+        };
+      } else {
+        // Fallback: client-side calculation (RPC not deployed yet)
+        const { data: allPreds } = await sb.from('predictions').select('user_id,match_id,predicted_home_score,predicted_away_score');
+        if (allPreds) {
+          const userPreds = allPreds.filter(p => p.user_id === uid);
+          const { data: allMatches } = await sb.from('matches').select('id,home_score,away_score,home_team_id(name),away_team_id(name)');
+          let total = 0, exact = 0, correct = 0, totalPts = 0;
+          for (const p of userPreds) {
+            const m = allMatches?.find(am => am.id === p.match_id);
+            if (!m || m.home_score === null) continue;
+            total++;
+            const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.home_score, m.away_score);
+            totalPts += pts;
+            if (pts === 5) exact++;
+            else if (pts >= 1) correct++;
+          }
+          if (total > 0) predStats = { total, exact, correct, totalPts, accuracy: Math.round(((exact + correct) / total) * 100) };
         }
-        if (total > 0) predStats = { total, exact, correct, totalPts, accuracy: Math.round(((exact + correct) / total) * 100) };
       }
     }
   }
@@ -531,10 +548,44 @@ async function renderProfile(playerName) {
     feedHtml += '</div>';
   }
 
+  const isOwnProfile = currentProfile && currentProfile.player_name === owner;
+  const avatarUrl = avatarCache[owner];
+
+  const avatarImgFallback = avatarUrl
+    ? `<img class="avatar-profile" src="${avatarUrl}" alt=""
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+       <span style="display:none;width:64px;height:64px;border-radius:50%;flex-shrink:0;
+         background:${ownerHexColors[owner]||'#888'};color:#fff;align-items:center;justify-content:center;
+         font-weight:700;font-size:28px">${owner.charAt(0).toUpperCase()}</span>`
+    : `<span style="display:inline-flex;width:64px;height:64px;border-radius:50%;flex-shrink:0;
+         background:${ownerHexColors[owner]||'#888'};color:#fff;align-items:center;justify-content:center;
+         font-weight:700;font-size:28px">${owner.charAt(0).toUpperCase()}</span>`;
+
+  const avatarEl = isOwnProfile
+    ? `<div>
+         <label class="avatar-upload" id="avatarUploadWrap" title="Click to change profile picture">
+           <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/gif,image/webp"
+             style="display:none" onchange="handleAvatarUpload(this)">
+           ${avatarImgFallback}
+           <div class="avatar-upload-overlay"><span>Change<br>photo</span></div>
+         </label>
+         <div class="avatar-actions" id="avatarActions" style="display:none">
+           <button type="button" class="avatar-btn upload" onclick="confirmAvatarUpload()">Upload</button>
+           <button type="button" class="avatar-btn cancel" onclick="cancelAvatarUpload()">✕</button>
+         </div>
+       </div>`
+    : avatarImgFallback;
+
   el.innerHTML = `
     <div class="pc-header">
       <button class="pc-close" onclick="closeProfile()">✕</button>
-      <div class="pc-name">${playerDisplayName(owner)}</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+        ${avatarEl}
+        <div>
+          <div class="pc-name">${playerDisplayName(owner)}</div>
+        </div>
+      </div>
+      ${isOwnProfile ? '<div class="avatar-error" id="avatarError" style="display:none"></div>' : ''}
       <div class="pc-badges">
         <span class="pc-badge points">${matchPts} match pts</span>
         ${predStats ? `<span class="pc-badge pred-pts">🔮 ${predStats.totalPts} pred pts</span>` : ''}
@@ -552,4 +603,117 @@ async function renderProfile(playerName) {
       ${feedHtml}
     </div>
   `;
+}
+// ── AVATAR UPLOAD HANDLER ──
+let pendingAvatarFile = null;
+let pendingAvatarUrl = null;
+
+// Step 1: file selected → show preview + Upload/Cancel buttons
+async function handleAvatarUpload(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+
+  const errEl = document.getElementById('avatarError');
+  if (errEl) errEl.style.display = 'none';
+
+  // Validate type
+  if (!ALLOWED_AVATAR_TYPES.includes(file.type)) {
+    if (errEl) { errEl.textContent = 'Only JPEG, PNG, GIF, and WebP images are allowed.'; errEl.style.display = 'block'; }
+    input.value = '';
+    return;
+  }
+  // Validate size
+  if (file.size > AVATAR_MAX_SIZE) {
+    if (errEl) { errEl.textContent = 'Image must be under 5 MB.'; errEl.style.display = 'block'; }
+    input.value = '';
+    return;
+  }
+
+  // Show preview
+  pendingAvatarFile = file;
+  if (pendingAvatarUrl) URL.revokeObjectURL(pendingAvatarUrl);
+  pendingAvatarUrl = URL.createObjectURL(file);
+
+  // Replace avatar display with local preview
+  const wrap = document.getElementById('avatarUploadWrap');
+  if (wrap) {
+    let img = wrap.querySelector('img.avatar-profile');
+    const fallback = wrap.querySelector('span:not(.avatar-upload-overlay span)');
+
+    if (!img) {
+      // No <img> yet (initials-only) — create one for the preview
+      img = document.createElement('img');
+      img.className = 'avatar-profile';
+      img.alt = '';
+      const overlay = wrap.querySelector('.avatar-upload-overlay');
+      if (overlay) wrap.insertBefore(img, overlay);
+      else wrap.appendChild(img);
+    }
+
+    img.src = pendingAvatarUrl;
+    img.style.display = '';
+    img.onerror = null;
+    if (fallback) fallback.style.display = 'none';
+
+    // Update overlay hint
+    const overlaySpan = wrap.querySelector('.avatar-upload-overlay span');
+    if (overlaySpan) overlaySpan.textContent = 'Change\nphoto';
+  }
+
+  // Show Upload / Cancel buttons
+  const actions = document.getElementById('avatarActions');
+  if (actions) actions.style.display = '';
+
+  input.value = '';
+}
+
+// Step 2: cancel preview → re-render to discard
+function cancelAvatarUpload() {
+  if (pendingAvatarUrl) { URL.revokeObjectURL(pendingAvatarUrl); pendingAvatarUrl = null; }
+  pendingAvatarFile = null;
+  if (currentProfile) renderProfile(currentProfile.player_name);
+}
+
+// Step 3: confirm upload → loading → success/error
+async function confirmAvatarUpload() {
+  if (!pendingAvatarFile) return;
+
+  const file = pendingAvatarFile;
+  const errEl = document.getElementById('avatarError');
+  if (errEl) errEl.style.display = 'none';
+
+  // Loading state
+  const wrap = document.getElementById('avatarUploadWrap');
+  const actions = document.getElementById('avatarActions');
+  if (wrap) {
+    wrap.classList.add('avatar-uploading');
+    const overlaySpan = wrap.querySelector('.avatar-upload-overlay span');
+    if (overlaySpan) overlaySpan.textContent = 'Uploading…';
+  }
+  if (actions) actions.style.display = 'none';
+
+  try {
+    const url = await uploadAvatar(file);
+
+    // Clean up local preview blob
+    if (pendingAvatarUrl) { URL.revokeObjectURL(pendingAvatarUrl); pendingAvatarUrl = null; }
+    pendingAvatarFile = null;
+
+    // Brief success state before re-render
+    if (wrap) {
+      wrap.classList.remove('avatar-uploading');
+      wrap.classList.add('avatar-success');
+      const overlaySpan = wrap.querySelector('.avatar-upload-overlay span');
+      if (overlaySpan) overlaySpan.textContent = '✓';
+    }
+
+    setTimeout(() => {
+      if (currentProfile) renderProfile(currentProfile.player_name);
+      updateAuthBar();
+    }, 900);
+  } catch (e) {
+    if (wrap) wrap.classList.remove('avatar-uploading');
+    if (actions) actions.style.display = '';
+    if (errEl) { errEl.textContent = e.message; errEl.style.display = 'block'; }
+  }
 }

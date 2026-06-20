@@ -20,6 +20,8 @@
   <link rel="stylesheet" href="css/myteams.css">
   <link rel="stylesheet" href="css/globe.css">
   <link rel="stylesheet" href="css/shooter.css">
+  <link rel="stylesheet" href="css/profile-picture.css">
+  <link rel="stylesheet" href="css/user-profile.css">
   <link rel="stylesheet" href="css/responsive.css">
 </head>
 <body>
@@ -188,6 +190,7 @@
       <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span><span class="tab-label"> Teams</span></button>
       <button type="button" class="tab-btn" data-tab="map" onclick="switchTab('map')"><span class="emoji">🌐</span><span class="tab-label"> Battle Map</span></button>
       <button type="button" class="tab-btn shooter-tab" data-tab="shooter" onclick="switchTab('shooter')"><span class="emoji">🔫</span><span class="tab-label"> Shooter</span></button>
+      <button type="button" class="tab-btn" data-tab="profile" onclick="switchTab('profile')"><span class="emoji">👤</span><span class="tab-label"> Profile</span></button>
     </div>
 
     <div class="section-players" id="sectionPlayers">
@@ -226,6 +229,7 @@
     </div>
 
     <div class="section-teams" id="sectionTeams">
+      <div class="team-chips" id="teamChips"></div>
       <div class="teams-toolbar">
         <div class="filter-bar" id="teamFilterBar">
           <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'teams')">Upcoming</button>
@@ -233,7 +237,6 @@
           <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'teams')">All</button>
         </div>
       </div>
-      <div class="team-chips" id="teamChips"></div>
       <div id="teamSchedule"></div>
     </div>
 
@@ -278,6 +281,10 @@
 
     <div class="section-predictions" id="sectionPredictions">
       <div class="predictions-wrap" id="predictionsWrap"></div>
+    </div>
+
+    <div class="section-profile" id="sectionProfile">
+      <div id="userProfileContent"></div>
     </div>
 
     <!-- Sign In Modal -->
@@ -380,6 +387,8 @@
   <script src="js/shooter.js"></script>
   <script src="js/odds.js"></script>
   <script src="js/team-results.js"></script>
+  <script src="js/profile-picture.js"></script>
+  <script src="js/render-user-profile.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

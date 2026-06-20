@@ -1,6 +1,8 @@
 /* ── AUTH STYLES ── */
 .auth-bar { position: absolute; top: 12px; right: 0; display: flex; align-items: center; gap: 10px; font-size: 0.82rem; }
 .auth-bar .signed-in { color: var(--accent); font-weight: 600; }
+.auth-bar .signed-in-link { text-decoration: none; color: inherit; cursor: pointer; }
+.auth-bar .signed-in-link:hover .signed-in { text-decoration: underline; }
 .auth-bar button { background: var(--card); color: var(--text-secondary); border: 1px solid var(--border); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-family: var(--font); font-size: 0.8rem; font-weight: 600; transition: all 0.15s; }
 .auth-bar button:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
 .auth-bar button.sign-out-btn { border-color: transparent; color: var(--text-muted); }

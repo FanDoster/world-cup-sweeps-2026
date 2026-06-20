@@ -7,8 +7,8 @@ async function restoreSession() {
   if (user) {
     const { data: { session } } = await sb.auth.getSession();
     currentSession = session;
-    const { data: profile } = await sb.from('player_profiles').select('player_name').eq('id', user.id).single();
-    if (profile) currentProfile = profile;
+    const { data: profile } = await sb.from('player_profiles').select('player_name, avatar_url').eq('id', user.id).single();
+    if (profile) { currentProfile = profile; avatarCache[profile.player_name] = profile.avatar_url || null; }
   }
   updateAuthBar();
   if (currentSession) showJokerNotification();
@@ -21,7 +21,7 @@ function updateAuthBar() {
   tabBar.querySelectorAll('.auth-tab').forEach(el => el.remove());
 
   if (currentSession && currentProfile) {
-    bar.innerHTML = `<span class="signed-in">🟢 ${currentProfile.player_name}</span>
+    bar.innerHTML = `<a class="signed-in-link" onclick="showUserProfile('${currentProfile.player_name}')"><span class="signed-in"><span class="avatar-auth">${avatarHtml(currentProfile.player_name, 24)}</span> ${currentProfile.player_name}</span></a>
       <button class="sign-out-btn" onclick="doSignOut()">Sign out</button>`;
     // Inject logged-in tabs
     tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="myteams" onclick="switchTab('myteams')"><span class="emoji">⭐</span><span class="tab-label"> My Teams</span></button>`);
@@ -52,8 +52,9 @@ async function doSignIn() {
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
   if (error) { errEl.textContent = error.message; errEl.style.display = 'block'; return; }
   currentSession = data.session;
-  const { data: profile } = await sb.from('player_profiles').select('player_name').eq('id', data.user.id).single();
+  const { data: profile } = await sb.from('player_profiles').select('player_name, avatar_url').eq('id', data.user.id).single();
   currentProfile = profile;
+  if (profile) avatarCache[profile.player_name] = profile.avatar_url || null;
   closeModals();
   updateAuthBar();
   showJokerNotification();

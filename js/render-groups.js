@@ -8,7 +8,7 @@ function renderPeople() {
     const card = document.createElement("div");
     card.className = "person-card card-base";
     card.style.cursor = 'pointer';
-    card.onclick = () => showProfile(name);
+    card.onclick = () => showUserProfile(name);
     const badges = [];
     if (matchPts[name]) badges.push(`<span class="match-pts-badge">⚽${matchPts[name]}pts</span>`);
     if (predPointsByPlayer[name]) badges.push(`<span class="pred-pts-badge">🔮${predPointsByPlayer[name]}pts</span>`);
@@ -116,7 +116,7 @@ function renderGroups() {
         <td class="stat-cell">${r.ga}</td>
         <td class="stat-cell">${r.gd > 0 ? '+' + r.gd : r.gd}</td>
         <td class="stat-cell pts">${r.pts}</td>
-        <td>${r.owner ? `<span class="owner-tag ${ownerColors[r.owner]}" onclick="event.stopPropagation();showProfile('${r.owner}')" style="cursor:pointer">${r.owner}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
+        <td>${r.owner ? `<span class="owner-tag ${ownerColors[r.owner]}" onclick="event.stopPropagation();showUserProfile('${r.owner}')" style="cursor:pointer">${r.owner}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
       </tr>
     `).join("");
 
@@ -166,7 +166,7 @@ function renderGroups() {
           <td class="stat-cell">${r.l}</td>
           <td class="stat-cell">${r.gd > 0 ? '+' + r.gd : r.gd}</td>
           <td class="stat-cell pts">${r.pts}</td>
-          <td>${r.owner ? `<span class="owner-tag ${ownerColors[r.owner]}" onclick="event.stopPropagation();showProfile('${r.owner}')" style="cursor:pointer">${r.owner}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
+          <td>${r.owner ? `<span class="owner-tag ${ownerColors[r.owner]}" onclick="event.stopPropagation();showUserProfile('${r.owner}')" style="cursor:pointer">${r.owner}</span>` : '<span style="color:var(--text-muted)">—</span>'}</td>
         </tr>
       `).join('')}</tbody>
     </table>

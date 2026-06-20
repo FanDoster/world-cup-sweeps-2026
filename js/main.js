@@ -11,6 +11,7 @@ function switchTab(tab) {
   document.getElementById('sectionPredictions').classList.toggle('active', tab === 'predictions');
   document.getElementById('sectionMap').classList.toggle('active', tab === 'map');
   document.getElementById('sectionShooter').classList.toggle('active', tab === 'shooter');
+  document.getElementById('sectionProfile').classList.toggle('active', tab === 'profile');
   if (tab === 'teams') { renderTeamChips(); }
   if (tab === 'map') { initGlobe(); renderTerritoryStandings(); }
   if (tab !== 'map') stopAutoRotate();
@@ -19,10 +20,25 @@ function switchTab(tab) {
   if (tab === 'predictions') renderPredictions();
   if (tab === 'shooter') initShooter();
   if (tab !== 'shooter') pauseShooter();
+  if (tab === 'profile') {
+    const player = userProfilePlayer || (currentProfile ? currentProfile.player_name : null);
+    if (player) renderUserProfile(player);
+  }
 }
 
 // ── INIT ──
-restoreSession().then(() => loadData().then(() => { loadOdds(); buildCountdownTicker(); loadStatsTracker(); checkTeamResults(); }));
+restoreSession().then(() => {
+  // Avatar feature detection — must run after session is restored
+  // (checkAvatarsEnabled needs currentSession to be set)
+  checkAvatarsEnabled().then(() => {
+    if (avatarsEnabled) preloadAvatars(PLAYERS);
+  });
+  return loadData().then(() => {
+    loadOdds(); buildCountdownTicker(); loadStatsTracker(); checkTeamResults();
+    // Handle hash route for direct profile links (after data is loaded)
+    handleProfileRoute();
+  });
+});
 setInterval(renderMatches, 60000);
 setInterval(() => { if (selectedTeam) renderTeamSchedule(); }, 60000);
 setInterval(() => loadData().then(checkTeamResults), 180000);

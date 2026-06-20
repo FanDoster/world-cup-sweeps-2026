@@ -50,7 +50,7 @@ function renderLeaderboard() {
   tbody.innerHTML = standings.map((p, i) => `
     <tr>
       <td class="rank rank-${i+1}">${i+1}</td>
-      <td class="player-cell">${playerDisplayName(p.name)}</td>
+      <td class="player-cell" style="cursor:pointer" onclick="showUserProfile('${p.name}')">${playerDisplayName(p.name)}</td>
       <td class="wdl">${p.w}–${p.d}–${p.l}</td>
       <td class="sub-pts">${p.pts}</td>
       <td class="sub-pts">${p.predPts}</td>

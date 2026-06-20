@@ -178,3 +178,50 @@ async function loadPredData() {
   renderLeaderboard();
   if (selectedTeam) renderTeamSchedule();
 }
+
+// ── User prediction stats via RPC ──
+// Replaces client-side all-predictions fetch-and-filter with a single
+// server-side call. Returns null if the function isn't deployed yet
+// (caller falls back to client-side calculation).
+const _userPredCache = {};
+async function getUserPredictions(userId) {
+  if (_userPredCache[userId]) return _userPredCache[userId];
+  try {
+    const { data, error } = await sb.rpc('get_user_predictions', { target_user_id: userId });
+    if (error || !data) return null;
+    _userPredCache[userId] = data;
+    return data;
+  } catch (e) {
+    return null;  // RPC not deployed yet — caller falls back
+  }
+}
+
+// ── User teams via RPC ──
+// Returns team roster with group standings, recent results, and upcoming
+// fixtures. Returns null if the function isn't deployed yet.
+const _userTeamsCache = {};
+async function getUserTeams(userId) {
+  if (_userTeamsCache[userId]) return _userTeamsCache[userId];
+  try {
+    const { data, error } = await sb.rpc('get_user_teams', { user_id: userId });
+    if (error || !data) return null;
+    _userTeamsCache[userId] = data;
+    return data;
+  } catch (e) {
+    return null;  // RPC not deployed yet — caller falls back
+  }
+}
+
+// ── User ID lookup by player name ──
+const _userIdByNameCache = {};
+async function getUserIdByName(playerName) {
+  if (_userIdByNameCache[playerName]) return _userIdByNameCache[playerName];
+  try {
+    const { data } = await sb.from('player_profiles').select('id').eq('player_name', playerName).single();
+    if (data) {
+      _userIdByNameCache[playerName] = data.id;
+      return data.id;
+    }
+  } catch (e) { /* fall through */ }
+  return null;
+}
