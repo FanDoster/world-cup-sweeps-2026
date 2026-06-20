@@ -39,7 +39,7 @@ function getCountdown(dateStr, timeStr, tz) {
   const kickoff = toDate(dateStr, timeStr, tz);
   const now = new Date();
   const diff = kickoff - now;
-  const endDiff = diff - (2 * 60 * 60 * 1000); // 2 hour match window
+  const endDiff = diff + (2.5 * 60 * 60 * 1000); // 2h30 after kickoff = live window
 
   if (diff <= 0 && endDiff > 0) return { text: 'LIVE', cls: 'live-now', rowCls: 'live' };
   if (diff <= 0) return { text: 'FT', cls: '', rowCls: '' };

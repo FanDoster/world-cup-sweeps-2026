@@ -79,6 +79,7 @@ function renderMatches() {
       const localTime = formatLocalTime(m.date, m.time, m.tz);
       const isFinished = m.isComplete;
       const isLive = !isFinished && cd.rowCls === 'live';
+      const hasKickedOff = m.kickoff <= now;
       const rowCls = isFinished ? 'finished' : cd.rowCls;
       const countdownText = isFinished ? (m.score1 + '–' + m.score2) : (showCountdown ? cd.text : localTime);
       const countdownCls = isFinished ? '' : cd.cls;
@@ -106,7 +107,7 @@ function renderMatches() {
                   </div>
                 </div>
                 <div class="match-centre">
-                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : isLive ? `<span class="match-score-pill live-score">${m.score1 ?? 0}–${m.score2 ?? 0}</span>` : '<span class="match-vs">vs</span>'}
+                  ${isFinished ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : isLive ? `<span class="match-score-pill live-score">${m.score1 ?? 0}–${m.score2 ?? 0}</span>` : (hasKickedOff && m.score1 !== null) ? `<span class="match-score-pill">${m.score1}–${m.score2}</span>` : '<span class="match-vs">vs</span>'}
                 </div>
                 <div class="match-team-away">
                   <img class="match-flag" src="${flagUrl(i2)}" alt="" loading="lazy" onerror="this.style.display='none'">
