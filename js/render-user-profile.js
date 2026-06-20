@@ -65,7 +65,7 @@ async function renderUserProfile(playerName) {
   // Profile picture editor (only for own profile)
   var isOwnProfile = currentProfile && currentProfile.player_name === playerName;
   var pfpSectionHtml = '';
-  if (isOwnProfile && avatarsEnabled) {
+  if (isOwnProfile) {
     var avatarUrl = avatarCache[playerName] || null;
     pfpSectionHtml = buildProfilePictureSection(playerName, avatarUrl);
   }
@@ -145,7 +145,7 @@ async function renderUserProfile(playerName) {
   el.innerHTML = heroHtml + pfpSectionHtml + statsHtml + sectionsHtml;
 
   // Set up profile picture event listeners (only when own profile)
-  if (isOwnProfile && avatarsEnabled) {
+  if (isOwnProfile) {
     pfpSetupListeners();
   }
 
