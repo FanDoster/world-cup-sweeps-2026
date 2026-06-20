@@ -63,6 +63,7 @@ def fetch_fifa_matches():
         sys.exit(1)
 
     results = []
+    skipped_live = 0
     for m in data.get("Results", []):
         comp = m.get("CompetitionName", [{}])[0].get("Description", "")
         if "World Cup" not in comp:
@@ -76,6 +77,18 @@ def fetch_fifa_matches():
         # Skip matches without scores yet
         if hs is None or aws is None:
             continue
+
+        # Only sync scores for finished matches (MatchTime >= 90 minutes)
+        # Prevents mid-game scores from marking a match as complete prematurely
+        match_time = m.get("MatchTime", "")
+        try:
+            minutes = int(match_time.replace("'", ""))
+        except (ValueError, AttributeError):
+            minutes = -1
+
+        if minutes < 90:
+            skipped_live += 1
+            continue  # match still in progress — don't sync partial scores
 
         home_name = home.get("TeamName", [{}])[0].get("Description", "")
         away_name = away.get("TeamName", [{}])[0].get("Description", "")
@@ -95,6 +108,9 @@ def fetch_fifa_matches():
             "away_score": int(aws),
             "group": group_letter,
         })
+
+    if skipped_live:
+        print(f"Skipped {skipped_live} live/in-progress match(es) — waiting for full-time")
 
     return results
 
@@ -173,7 +189,7 @@ def find_match(session, home_team, away_team, group_letter):
         f"?home_team_id=eq.{home_id}"
         f"&away_team_id=eq.{away_id}"
         f"&group_letter=eq.{group_letter}"
-        f"&select=id,home_score,away_score"
+        f"&select=id,home_score,away_score,is_complete"
     )
     status, body = session.get(path)
     if status != 200:
@@ -186,13 +202,17 @@ def find_match(session, home_team, away_team, group_letter):
         return None
 
     r = rows[0]
-    return r["id"], r.get("home_score"), r.get("away_score")
+    return r["id"], r.get("home_score"), r.get("away_score"), r.get("is_complete")
 
 
 def update_score(session, match_id, home_score, away_score):
-    """Update match scores in Supabase."""
+    """Update match scores and mark as complete in Supabase."""
     path = f"matches?id=eq.{match_id}"
-    body = {"home_score": home_score, "away_score": away_score}
+    body = {
+        "home_score": home_score,
+        "away_score": away_score,
+        "is_complete": True,
+    }
     status, _ = session.patch(path, body)
     return status in (200, 204)
 
@@ -216,10 +236,10 @@ def main():
             skipped += 1
             continue
 
-        mid, existing_hs, existing_aws = found
+        mid, existing_hs, existing_aws, already_complete = found
 
-        # Skip if already up to date
-        if existing_hs == r["home_score"] and existing_aws == r["away_score"]:
+        # Skip if already up to date (scores match AND already marked complete)
+        if existing_hs == r["home_score"] and existing_aws == r["away_score"] and already_complete:
             skipped += 1
             continue
 
