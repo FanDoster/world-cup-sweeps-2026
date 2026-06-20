@@ -18,7 +18,8 @@ function calcLeaderboard() {
   for (const m of matchData) {
 const { score1, score2, team1, team2, isComplete } = m;
 if (!isComplete) continue;
-    const o1 = teamOwner[team1], o2 = teamOwner[team2];
+if (score1 === null || score2 === null) continue;
+const o1 = teamOwner[team1], o2 = teamOwner[team2];
     if (!o1 || !o2) continue;
 
     if (score1 > score2) { scores[o1].pts += 3; scores[o1].w++; scores[o2].l++; }
