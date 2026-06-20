@@ -1,5 +1,5 @@
 // ── LEADERBOARD SORT STATE ──
-let leaderboardSort = { col: 'total', dir: 'desc' };
+let leaderboardSort = { col: 'pts', dir: 'desc' };
 
 function sortLeaderboard(col) {
   if (leaderboardSort.col === col) {
