@@ -2,6 +2,8 @@ let matchFilter = 'upcoming';
 let teamScheduleFilter = 'upcoming';
 let matchTeamFilter = 'all';
 
+function safeAttr(s) { return (s||'').replace(/'/g, "\\'").replace(/\|/g, ''); }
+
 function setMatchFilter(filter, tab) {
   if (tab === 'matches') {
     matchFilter = filter;
@@ -83,7 +85,7 @@ function renderMatches() {
       const hasProbs = probTotal > 0 && !isFinished;
 
       html += `
-        <div class="match-row ${rowCls}" onclick="showPredPanel('${m.team1}|${m.team2}|${m.date}')" style="cursor:pointer">
+        <div class="match-row ${rowCls}" onclick="showPredPanel('${safeAttr(m.team1)}|${safeAttr(m.team2)}|${m.date}')" style="cursor:pointer">
           <div class="flag-bg flag-bg-home" style="background-image:url('${flagUrl(i1)}')"></div>
           <div class="flag-bg flag-bg-away" style="background-image:url('${flagUrl(i2)}')"></div>
           <div class="match-countdown ${countdownCls}">

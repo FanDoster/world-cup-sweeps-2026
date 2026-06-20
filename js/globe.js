@@ -1,7 +1,6 @@
 // ── GLOBE ──
 async function initGlobe() {
   if (globeInitialised) { startIdleDrift(); return; }
-  globeInitialised = true;
 
   if (!worldGeoData) {
     const res = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
@@ -246,6 +245,7 @@ async function initGlobe() {
 
   if (typeof renderVenueMarkers === 'function') renderVenueMarkers(markerGroup, projection, tooltip);
   playIntroAnimation();
+  globeInitialised = true;
 }
 
 function updateMarkers(projection) {

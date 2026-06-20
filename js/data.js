@@ -176,4 +176,5 @@ async function loadPredData() {
   if (globeInitialised) updateTerritoryFills();
   renderPeople();
   renderLeaderboard();
+  if (selectedTeam) renderTeamSchedule();
 }

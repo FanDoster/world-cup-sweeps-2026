@@ -15,6 +15,7 @@ async function renderPredictions() {
   if (existing) existing.forEach(p => { predMap[p.match_id] = p; });
 
   const { data: allMatches } = await sb.from('matches').select('id,match_date,kickoff_time,home_team_id(name),away_team_id(name)').order('match_date').order('kickoff_time');
+  if (!allMatches) { el.innerHTML = '<div class=\"pred-empty\">Unable to load match data. Try refreshing.</div>'; return; }
   const matchIdMap = {};
   if (allMatches) allMatches.forEach(m => {
     matchIdMap[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
