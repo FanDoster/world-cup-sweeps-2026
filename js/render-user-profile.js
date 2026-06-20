@@ -183,7 +183,15 @@ function buildPredDashboard(stats) {
     <div class="up-pd-cell"><div class="up-pd-val">${stats.upsets || 0}</div><div class="up-pd-lbl">Upsets 💣</div></div>
   </div>`;
 
-  return `<div class="up-pd-row">${gaugeHtml}${gridHtml}</div>`;
+  // Badges
+  const badges = [];
+  if (stats.best >= 2) badges.push(`<span class="up-pd-badge">🔥 ${stats.best} streak</span>`);
+  if (stats.exact > 0) badges.push(`<span class="up-pd-badge">⭐ ${stats.exact} exact</span>`);
+  if (stats.upsets > 0) badges.push(`<span class="up-pd-badge">💣 ${stats.upsets} upset${stats.upsets > 1 ? 's' : ''}</span>`);
+  if (stats.jokerPts > 0) badges.push(`<span class="up-pd-badge">🃏 +${stats.jokerPts} joker</span>`);
+
+  return `<div class="up-pd-row">${gaugeHtml}${gridHtml}</div>`
+    + (badges.length ? `<div class="up-pd-badges">${badges.join('')}</div>` : '');
 }
 
 // ── JOKER REPORT ──
