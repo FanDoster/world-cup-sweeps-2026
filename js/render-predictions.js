@@ -39,6 +39,8 @@ async function renderPredictions() {
   for (const m of upcoming) {
     const key = `${m.team1}|${m.team2}|${m.date}`;
     const mid = matchIdMap[key];
+    if (!mid) continue;
+
     const ep = mid ? predMap[mid] : null;
     const isLocked = m.kickoff - now < 5 * 60 * 1000;
 
