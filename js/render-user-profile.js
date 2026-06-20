@@ -608,8 +608,7 @@ function buildProfilePictureSection(playerName, currentUrl) {
     '<div class="pfp-section-label">📷 Profile Picture</div>' +
     '<div class="pfp-editor">' +
       // Avatar circle (clickable — opens file picker)
-      '<div class="pfp-avatar' + (hasPhoto ? ' pfp-has-photo' : ' pfp-no-photo') + '" id="pfpAvatar"' +
-        (hasPhoto ? '' : ' onclick="document.getElementById(\'pfpInput\').click()"') + '>' +
+      '<div class="pfp-avatar' + (hasPhoto ? ' pfp-has-photo' : ' pfp-no-photo') + '" id="pfpAvatar" onclick="pfpTriggerChange()">' +
         (hasPhoto
           ? '<img class="pfp-img" src="' + escapeHtml(currentUrl) + '" alt="Your profile photo" id="pfpImg" onerror="var i=document.getElementById(\'pfpImg\');var n=document.getElementById(\'pfpInitials\');if(i)i.style.display=\'none\';if(n)n.style.display=\'\'">'
           : '<span class="pfp-initials" id="pfpInitials" style="background:' + hex + '">' + initials + '</span>') +
