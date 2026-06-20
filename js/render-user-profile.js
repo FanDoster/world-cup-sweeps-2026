@@ -77,6 +77,14 @@ async function renderUserProfile(playerName) {
   }
   sectionsHtml += '</div>';
 
+  // Prediction Dashboard (accuracy gauge + stats grid)
+  if (predStats && predStats.settled > 0) {
+    sectionsHtml += '<div class="up-sec-label">🎯 Prediction Dashboard</div>';
+    sectionsHtml += '<div class="up-section-card">';
+    sectionsHtml += buildPredDashboard(predStats);
+    sectionsHtml += '</div>';
+  }
+
   // Recent Predictions — settled matches only, collapsed to 4 with expand toggle
   sectionsHtml += '<div class="up-sec-label">📋 Recent Predictions</div>';
   sectionsHtml += '<div class="up-section-card">';
@@ -93,14 +101,6 @@ async function renderUserProfile(playerName) {
     }
   }
   sectionsHtml += '</div>';
-
-  // Prediction Dashboard (accuracy gauge + stats grid)
-  if (predStats && predStats.settled > 0) {
-    sectionsHtml += '<div class="up-sec-label">🎯 Prediction Dashboard</div>';
-    sectionsHtml += '<div class="up-section-card">';
-    sectionsHtml += buildPredDashboard(predStats);
-    sectionsHtml += '</div>';
-  }
 
   // Joker Report
   if (predStats && predStats.jokersUsed > 0) {
