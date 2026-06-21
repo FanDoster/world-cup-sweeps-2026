@@ -1,25 +1,37 @@
-// ── LEADERBOARD SORT STATE ──
-let leaderboardSort = { col: 'pts', dir: 'desc' };
+// ── SORT STATE (independent per leaderboard) ──
+let matchSort = { col: 'pts', dir: 'desc' };
+let predSort = { col: 'predPts', dir: 'desc' };
 
-function sortLeaderboard(col) {
-  if (leaderboardSort.col === col) {
-    leaderboardSort.dir = leaderboardSort.dir === 'desc' ? 'asc' : 'desc';
+function sortMatchLeaderboard(col) {
+  if (matchSort.col === col) {
+    matchSort.dir = matchSort.dir === 'desc' ? 'asc' : 'desc';
   } else {
-    leaderboardSort.col = col;
-    leaderboardSort.dir = 'desc';
+    matchSort.col = col;
+    matchSort.dir = 'desc';
   }
-  renderLeaderboard();
+  renderMatchLeaderboard();
 }
 
-function calcLeaderboard() {
+function sortPredLeaderboard(col) {
+  if (predSort.col === col) {
+    predSort.dir = predSort.dir === 'desc' ? 'asc' : 'desc';
+  } else {
+    predSort.col = col;
+    predSort.dir = 'desc';
+  }
+  renderPredLeaderboard();
+}
+
+// ── MATCH RESULTS LEADERBOARD ──
+function calcMatchLeaderboard() {
   const scores = {};
   for (const name of Object.keys(people)) scores[name] = { pts: 0, w: 0, d: 0, l: 0 };
 
   for (const m of matchData) {
-const { score1, score2, team1, team2, isComplete } = m;
-if (!isComplete) continue;
-if (score1 === null || score2 === null) continue;
-const o1 = teamOwner[team1], o2 = teamOwner[team2];
+    const { score1, score2, team1, team2, isComplete } = m;
+    if (!isComplete) continue;
+    if (score1 === null || score2 === null) continue;
+    const o1 = teamOwner[team1], o2 = teamOwner[team2];
     if (!o1 || !o2) continue;
 
     if (score1 > score2) { scores[o1].pts += 3; scores[o1].w++; scores[o2].l++; }
@@ -27,47 +39,90 @@ const o1 = teamOwner[team1], o2 = teamOwner[team2];
     else { scores[o1].pts += 1; scores[o2].pts += 1; scores[o1].d++; scores[o2].d++; }
   }
 
-  const standings = Object.entries(scores)
-    .map(([name, s]) => {
-      const predPts = predPointsByPlayer[name] || 0;
-      return { name, ...s, predPts, total: s.pts + predPts };
-    });
+  const standings = Object.entries(scores).map(([name, s]) => ({ name, ...s }));
 
-  const { col, dir } = leaderboardSort;
+  const { col, dir } = matchSort;
   const m = dir === 'desc' ? 1 : -1;
   standings.sort((a, b) => {
     if (col === 'pts') return (b.pts - a.pts) * m || (b.w - a.w) * m;
-    if (col === 'predPts') return (b.predPts - a.predPts) * m || (b.pts - a.pts) * m;
-    return (b.total - a.total) * m || (b.pts - a.pts) * m || (b.w - a.w) * m;
+    return (b.pts - a.pts) * m || (b.w - a.w) * m;
   });
 
   return standings;
 }
 
-function renderLeaderboard() {
-  const standings = calcLeaderboard();
-  const tbody = document.querySelector('#leaderboard tbody');
+function renderMatchLeaderboard() {
+  const standings = calcMatchLeaderboard();
+  const tbody = document.querySelector('#matchLeaderboard tbody');
+  if (!tbody) return;
   tbody.innerHTML = standings.map((p, i) => `
     <tr>
       <td class="rank rank-${i+1}">${i+1}</td>
       <td class="player-cell" style="cursor:pointer" onclick="showUserProfile('${p.name}')">${typeof avatarHtml === 'function' ? avatarHtml(p.name, 22) : ''} ${playerDisplayName(p.name)}</td>
       <td class="wdl">${p.w}–${p.d}–${p.l}</td>
-      <td class="sub-pts">${p.pts}</td>
-      <td class="sub-pts">${p.predPts}</td>
-      <td class="pts">${p.total}</td>
+      <td class="pts">${p.pts}</td>
     </tr>
   `).join('');
 
-  // Update sort arrows
+  // Sort arrow
   const arrow = (col) => {
-    if (leaderboardSort.col !== col) return '';
-    return leaderboardSort.dir === 'desc' ? '▼' : '▲';
+    if (matchSort.col !== col) return '';
+    return matchSort.dir === 'desc' ? '▼' : '▲';
   };
-  document.getElementById('sortArrowPts').textContent = arrow('pts');
-  document.getElementById('sortArrowPredPts').textContent = arrow('predPts');
-  document.getElementById('sortArrowTotal').textContent = arrow('total');
+  const el = document.getElementById('sortArrowMatchPts');
+  if (el) el.textContent = arrow('pts');
+}
 
-  renderAwards(standings);
+// ── PREDICTIONS LEADERBOARD ──
+function calcPredLeaderboard() {
+  const stats = getPredStatsByPlayer();
+  const standings = Object.entries(stats).map(([name, s]) => ({
+    name,
+    predPts: s.pts,
+    settled: s.settled,
+    exact: s.exact,
+    bestStreak: s.best,
+    avg: s.settled > 0 ? (s.pts / s.settled).toFixed(2) : '0.00'
+  }));
+
+  const { col, dir } = predSort;
+  const m = dir === 'desc' ? 1 : -1;
+  standings.sort((a, b) => {
+    if (col === 'predPts') return (b.predPts - a.predPts) * m;
+    return (b.predPts - a.predPts) * m;
+  });
+
+  return standings;
+}
+
+function renderPredLeaderboard() {
+  const standings = calcPredLeaderboard();
+  const tbody = document.querySelector('#predLeaderboard tbody');
+  if (!tbody) return;
+  tbody.innerHTML = standings.map((p, i) => `
+    <tr>
+      <td class="rank rank-${i+1}">${i+1}</td>
+      <td class="player-cell" style="cursor:pointer" onclick="showUserProfile('${p.name}')">${typeof avatarHtml === 'function' ? avatarHtml(p.name, 22) : ''} ${playerDisplayName(p.name)}</td>
+      <td class="pts">${p.predPts}</td>
+      <td class="sub-pts">${p.avg}</td>
+      <td class="sub-pts">${p.exact}</td>
+      <td class="sub-pts">${p.bestStreak}</td>
+    </tr>
+  `).join('');
+
+  const arrow = (col) => {
+    if (predSort.col !== col) return '';
+    return predSort.dir === 'desc' ? '▼' : '▲';
+  };
+  const el = document.getElementById('sortArrowPredPts');
+  if (el) el.textContent = arrow('predPts');
+}
+
+// ── COMBINED RENDER (called from switchTab) ──
+function renderLeaderboard() {
+  renderMatchLeaderboard();
+  renderPredLeaderboard();
+  renderAwards(calcMatchLeaderboard());
   renderJokerStats();
 }
 
@@ -97,8 +152,8 @@ function renderAwards(standings) {
   pick('upsets', 1, '💣', 'Upset Oracle', s => `${s.upsets} underdog win${s.upsets > 1 ? 's' : ''} called`);
   pick('jokerPts', 1, '🃏', 'Joker Master', s => `+${s.jokerPts} bonus pts from jokers`);
   const bottom = standings[standings.length - 1];
-  if (bottom && standings.length > 1 && bottom.total < standings[0].total) {
-    awards.push(['🥄', 'Wooden Spoon', bottom.name, `${bottom.total} total pts… so far`]);
+  if (bottom && standings.length > 1 && bottom.pts < standings[0].pts) {
+    awards.push(['🥄', 'Wooden Spoon', bottom.name, `${bottom.pts} match pts… so far`]);
   }
 
   el.innerHTML = awards.length ? `<div class="awards-title label-sm">🏆 Tournament Awards</div><div class="awards-grid">${awards.map(([icon, name, holder, detail]) => `
@@ -291,4 +346,14 @@ el.innerHTML = `
     }).join('')}</tbody>
   </table>
 </div>`;
+}
+
+// ── LEGACY: used by render-groups.js and render-user-profile.js ──
+function calcLeaderboard() {
+  const matchLb = calcMatchLeaderboard();
+  return matchLb.map(s => ({
+    ...s,
+    predPts: predPointsByPlayer[s.name] || 0,
+    total: s.pts + (predPointsByPlayer[s.name] || 0),
+  }));
 }

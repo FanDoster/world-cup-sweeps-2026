@@ -1,6 +1,45 @@
 /* ── LEADERBOARD ── */
+.lb-two-col {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+.lb-col {
+  flex: 1;
+  min-width: 0;
+}
+.lb-col-header {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.lb-col-header::before,
+.lb-col-header::after {
+  content: "";
+  height: 2px;
+  width: 28px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  opacity: 0.55;
+}
+.lb-col-header::after {
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
 .leaderboard-wrap {
   overflow: hidden;
+}
+@media (max-width: 700px) {
+  .lb-two-col {
+    flex-direction: column;
+  }
 }
 .leaderboard-table {
   width: 100%;
@@ -71,7 +110,31 @@
 .stat-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--border-subtle); border-radius: 18px; padding: 6px 13px; font-size: 0.74rem; font-weight: 700; color: var(--text-secondary); }
 .stat-badge .sb-val { color: var(--text); }
 /* ── AWARDS ── */
-.awards-title { margin: 28px 0 10px; }
+.awards-title {
+  margin: 28px 0 14px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.awards-title::before,
+.awards-title::after {
+  content: "";
+  height: 2px;
+  width: 28px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  opacity: 0.55;
+}
+.awards-title::after {
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
 .awards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 10px; }
 .award-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 13px 15px; display: flex; gap: 12px; align-items: center; transition: border-color 0.15s; }
 .award-card:hover { border-color: var(--border); }

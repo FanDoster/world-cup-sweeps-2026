@@ -30,7 +30,33 @@
 .vm-pred-dot.has-pred { border-color: var(--accent); color: var(--accent); }
 .vm-pred-dot.no-pred { color: var(--text-muted); }
 .territory-fill { cursor: pointer; }
-.tp-section-title { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; color: var(--text-muted); text-transform: uppercase; padding: 14px 20px 6px; }
+.tp-section-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  padding: 20px 0 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.tp-section-title::before,
+.tp-section-title::after {
+  content: "";
+  height: 2px;
+  width: 28px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  opacity: 0.55;
+}
+.tp-section-title::after {
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
 .tp-standings { padding: 0 20px 8px; }
 .tp-player-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 0.82rem; border-bottom: 1px solid var(--border-subtle); }
 .tp-player-row:last-child { border-bottom: none; }
@@ -69,7 +95,31 @@
 .globe-reset:hover { background: var(--card-hover); color: var(--text); border-color: var(--accent-dim); }
 /* Territory standings */
 .territory-standings { padding: 20px; border-top: 1px solid var(--border-subtle); background: var(--bg); }
-.ts-title { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+.ts-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 16px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.ts-title::before,
+.ts-title::after {
+  content: "";
+  height: 2px;
+  width: 28px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent));
+  opacity: 0.55;
+}
+.ts-title::after {
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
 .ts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
 .ts-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 12px 14px; transition: border-color 0.2s; }
 .ts-card.controlled { border-left-width: 3px; }

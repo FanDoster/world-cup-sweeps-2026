@@ -269,13 +269,28 @@
     </div>
 
     <div class="section-leaderboard" id="sectionLeaderboard">
-      <div class="leaderboard-wrap card-base">
-        <table class="leaderboard-table" id="leaderboard">
-          <thead><tr><th>#</th><th>Player</th><th class="wdl">W–D–L</th><th class="sub-pts sortable" data-sort="pts" onclick="sortLeaderboard('pts')">⚽ Match <span class="sort-arrow" id="sortArrowPts"></span></th><th class="sub-pts sortable" data-sort="predPts" onclick="sortLeaderboard('predPts')">🔮 Pred <span class="sort-arrow" id="sortArrowPredPts"></span></th><th class="pts sortable" data-sort="total" onclick="sortLeaderboard('total')">Total <span class="sort-arrow" id="sortArrowTotal"></span></th></tr></thead>
-          <tbody></tbody>
-        </table>
+      <div class="lb-two-col">
+        <div class="lb-col">
+          <div class="lb-col-header">⚽ Match Results</div>
+          <div class="leaderboard-wrap card-base">
+            <table class="leaderboard-table" id="matchLeaderboard">
+              <thead><tr><th>#</th><th>Player</th><th class="wdl">W–D–L</th><th class="pts sortable" data-sort="pts" onclick="sortMatchLeaderboard('pts')">Pts <span class="sort-arrow" id="sortArrowMatchPts"></span></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">3 pts win · 1 pt draw</p>
+        </div>
+        <div class="lb-col">
+          <div class="lb-col-header">🔮 Predictions</div>
+          <div class="leaderboard-wrap card-base">
+            <table class="leaderboard-table" id="predLeaderboard">
+              <thead><tr><th>#</th><th>Player</th><th class="pts sortable" data-sort="predPts" onclick="sortPredLeaderboard('predPts')">Pts <span class="sort-arrow" id="sortArrowPredPts"></span></th><th class="sub-pts">Avg</th><th class="sub-pts">★</th><th class="sub-pts">🔥</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">1 pt correct winner · +2 per exact score (max 5) · 🃏 doubles</p>
+        </div>
       </div>
-      <p style="color:var(--text-muted);font-size:0.72rem;margin-top:14px;text-align:center;letter-spacing:0.02em">Match pts — 3 pts win, 1 pt draw for owned teams &nbsp;|&nbsp; Pred pts 🔮 — 1 pt correct winner + 2 pts per exact score (max 5) &nbsp;|&nbsp; 🃏 joker doubles a match's pred pts</p>
       <div id="awardsWrap"></div>
       <div id="jokerStatsWrap"></div>
     </div>
