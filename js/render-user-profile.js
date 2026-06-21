@@ -58,17 +58,12 @@ async function renderUserProfile(playerName) {
   const rank = lbEntry ? lb.findIndex(p => p.name === playerName) + 1 : '–';
   const totalPts = lbEntry ? lbEntry.total : 0;
 
-  // Build hero + stats
-  const heroHtml = buildHero(playerName, rank, totalPts, matchPts, predStats);
-  const statsHtml = buildStatsBar(matchPts, predStats);
-
   // Profile picture editor (only for own profile)
   var isOwnProfile = currentProfile && currentProfile.player_name === playerName;
-  var pfpSectionHtml = '';
-  if (isOwnProfile) {
-    var avatarUrl = avatarCache[playerName] || null;
-    pfpSectionHtml = buildProfilePictureSection(playerName, avatarUrl);
-  }
+
+  // Build hero + stats
+  const heroHtml = buildHero(playerName, rank, totalPts, matchPts, predStats, isOwnProfile);
+  const statsHtml = buildStatsBar(matchPts, predStats);
 
   // Build sections
   let sectionsHtml = '';
@@ -142,7 +137,7 @@ async function renderUserProfile(playerName) {
   sectionsHtml += buildHeadToHead(playerName, predStats);
   sectionsHtml += '</div>';
 
-  el.innerHTML = heroHtml + pfpSectionHtml + statsHtml + sectionsHtml;
+  el.innerHTML = heroHtml + statsHtml + '<div class="up-hero-separator"></div>' + (isOwnProfile ? '<input type="file" id="pfpInput" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none">' : '') + sectionsHtml;
 
   // Set up profile picture event listeners (only when own profile)
   if (isOwnProfile) {
@@ -200,29 +195,20 @@ function buildJokerReport(stats) {
     ? ((stats.jokerPts + (stats.jokersUsed * 1)) / stats.jokersUsed).toFixed(1)
     : '0';
 
-  const statsHtml = `<div class="up-joker-stats">
-    <div class="up-joker-stat"><div class="up-stat-val" style="color:#c084fc">${stats.jokersUsed}</div><div class="up-stat-label">Jokers Used</div></div>
-    <div class="up-joker-stat"><div class="up-stat-val" style="color:var(--accent)">+${stats.jokerPts}</div><div class="up-stat-label">Bonus Pts</div></div>
-    <div class="up-joker-stat"><div class="up-stat-val">${avgPerJoker}</div><div class="up-stat-label">Avg / Joker</div></div>
-  </div>`;
+  const parts = [
+    `🃏 ${stats.jokersUsed} jokers used`,
+    `+${stats.jokerPts} bonus pts`,
+    `${avgPerJoker} avg/joker`,
+  ];
 
-  const bestHtml = stats.jokerBestMatch
-    ? `<div class="up-joker-card best">
-      <div class="up-joker-card-label">🃏 Best Joker</div>
-      <div class="up-joker-card-match">${escapeHtml(stats.jokerBestMatch)}</div>
-      <div class="up-joker-card-pts">${stats.jokerBest} pts</div>
-    </div>`
-    : '';
+  if (stats.jokerBestMatch) {
+    parts.push(`Best: ${escapeHtml(stats.jokerBestMatch)} (${stats.jokerBest}pts)`);
+  }
+  if (stats.jokerWorstMatch && stats.jokerWorst < 999) {
+    parts.push(`Worst: ${escapeHtml(stats.jokerWorstMatch)} (${stats.jokerWorst}pts)`);
+  }
 
-  const worstHtml = stats.jokerWorstMatch && stats.jokerWorst < 999
-    ? `<div class="up-joker-card worst">
-      <div class="up-joker-card-label">🃏 Worst Joker</div>
-      <div class="up-joker-card-match">${escapeHtml(stats.jokerWorstMatch)}</div>
-      <div class="up-joker-card-pts">${stats.jokerWorst} pts</div>
-    </div>`
-    : '';
-
-  return statsHtml + (bestHtml || worstHtml ? `<div class="up-joker-cards">${bestHtml}${worstHtml}</div>` : '');
+  return `<div class="up-joker-compact">${parts.join(' · ')}</div>`;
 }
 
 // ── ACTIVITY FEED ──
@@ -255,6 +241,7 @@ function buildActivityFeedItems(playerName, predData, matchData) {
       events.push({
         ts: toDate(m.date, m.time, m.tz),
         icon: '⚽',
+        resultType: resultText,
         text: `<strong>${escapeHtml(myTeam)}</strong> ${resultText} ${myScore}–${oppScore} vs ${escapeHtml(opp)}`,
         detail: `+${pts} match pts · ${formatDateLabel(m.date, m.time, m.tz)}`,
       });
@@ -277,6 +264,7 @@ function buildActivityFeedItems(playerName, predData, matchData) {
       events.push({
         ts: predTs,
         icon: '🔮',
+        resultType: 'prediction',
         text: `Predicted <strong>${escapeHtml(p.home_team)}</strong> vs <strong>${escapeHtml(p.away_team)}</strong> (${predScore})${jokerTag}`,
         detail: `${formatDateLabel(p.match_date, p.kickoff_time, p.tz_offset)}${ptsText}`,
       });
@@ -319,7 +307,7 @@ function buildExpandableFeed(items) {
 }
 
 function renderFeedItems(items) {
-  return items.map(e => `<div class="up-feed-item">
+  return items.map(e => `<div class="up-feed-item ${e.resultType || ''}">
     <span class="up-feed-icon">${e.icon}</span>
     <div class="up-feed-body">
       <div class="up-feed-text">${e.text}</div>
@@ -332,6 +320,7 @@ function renderFeedItems(items) {
 function buildHeadToHead(playerName, myStats) {
   const allStats = getPredStatsByPlayer();
   const myPts = myStats ? myStats.pts : 0;
+  const myHex = ownerHexColors[playerName] || 'var(--accent)';
   const maxPts = Math.max(...Object.values(allStats).map(s => s.pts), myPts, 1);
 
   const others = PLAYERS
@@ -341,10 +330,10 @@ function buildHeadToHead(playerName, myStats) {
   return others.map(opp => {
     const oppStats = allStats[opp];
     const oppPts = oppStats ? oppStats.pts : 0;
-    const myWidth = maxPts > 0 ? (myPts / maxPts) * 100 : 0;
-    const oppWidth = maxPts > 0 ? (oppPts / maxPts) * 100 : 0;
+    const totalPair = myPts + oppPts;
+    const myPct = totalPair > 0 ? (myPts / totalPair) * 100 : 50;
 
-    const hex = ownerHexColors[opp] || '#888';
+    const oppHex = ownerHexColors[opp] || '#888';
     const displayName = typeof playerDisplayName === 'function'
       ? playerDisplayName(opp)
       : escapeHtml(opp);
@@ -355,20 +344,27 @@ function buildHeadToHead(playerName, myStats) {
         <span class="up-h2h-name">${displayName}</span>
         <span class="up-h2h-pts">${oppPts} pts</span>
       </div>
-      <div class="up-h2h-bars">
-        <div class="up-h2h-bar-wrap"><div class="up-h2h-bar me" style="width:${myWidth}%">${myPts}</div></div>
-        <div class="up-h2h-bar-wrap"><div class="up-h2h-bar them" style="width:${oppWidth}%">${oppPts}</div></div>
+      <div class="up-h2h-compare">
+        <span class="up-h2h-mypts">${myPts}</span>
+        <div class="up-h2h-bar-wrap up-h2h-bar-single">
+          <div class="up-h2h-bar me" style="width:${myPct}%"></div>
+        </div>
+        <span class="up-h2h-oppts">${oppPts}</span>
       </div>
     </div>`;
   }).join('');
 }
 
-function buildHero(playerName, rank, totalPts, matchPts, predStats) {
+function buildHero(playerName, rank, totalPts, matchPts, predStats, isOwnProfile) {
   const hex = ownerHexColors[playerName] || '#888';
   const teams = people[playerName] || [];
-  const flagsHtml = teams.map(t =>
+  const MAX_FLAGS = 4;
+  const flagsHtml = teams.slice(0, MAX_FLAGS).map(t =>
     `<img src="${flagUrl(t.iso)}" alt="${escapeHtml(t.team)}" loading="lazy" title="${escapeHtml(t.team)} (G${t.group})" onerror="this.style.display='none'">`
   ).join('');
+  const moreFlagsHtml = teams.length > MAX_FLAGS
+    ? `<span class="up-flags-more">+${teams.length - MAX_FLAGS} more</span>`
+    : '';
 
   const predPts = predStats ? predStats.pts : 0;
 
@@ -382,9 +378,13 @@ function buildHero(playerName, rank, totalPts, matchPts, predStats) {
     ? playerDisplayName(playerName)
     : escapeHtml(playerName);
 
+  const avatarClass = isOwnProfile ? 'up-hero-avatar own-profile' : 'up-hero-avatar';
+  const avatarOnClick = isOwnProfile ? ' onclick="pfpTriggerChange()"' : '';
+  const cameraOverlay = isOwnProfile ? '<div class="up-hero-camera-overlay">📷</div>' : '';
+
   return `
     <div class="up-hero">
-      <div class="up-hero-avatar" style="background:${hex}">${avatarHtml_str}</div>
+      <div class="${avatarClass}" style="background:${hex}"${avatarOnClick}>${avatarHtml_str}${cameraOverlay}</div>
       <div class="up-hero-info">
         <div class="up-hero-name">${displayName}</div>
         <div class="up-hero-meta">
@@ -392,32 +392,39 @@ function buildHero(playerName, rank, totalPts, matchPts, predStats) {
           <span class="up-hero-badge total">${totalPts} Total Pts</span>
           ${predStats ? `<span class="up-hero-badge pred">🔮 ${predPts} Pred Pts</span>` : ''}
         </div>
-        <div class="up-hero-flags">${flagsHtml}</div>
+        <div class="up-hero-flags">${flagsHtml}${moreFlagsHtml}</div>
       </div>
     </div>`;
 }
 
 function buildStatsBar(matchPts, predStats) {
-  if (!predStats) {
-    return `<div class="up-stats-bar">
-      <div class="up-stat-box"><div class="up-stat-val" style="color:var(--accent)">${matchPts}</div><div class="up-stat-label">Match Pts</div></div>
-      <div class="up-stat-box"><div class="up-stat-val" style="color:var(--text-muted)">—</div><div class="up-stat-label">Pred Pts</div></div>
-      <div class="up-stat-box"><div class="up-stat-val" style="color:var(--text-muted)">—</div><div class="up-stat-label">Accuracy</div></div>
-      <div class="up-stat-box"><div class="up-stat-val" style="color:var(--text-muted)">—</div><div class="up-stat-label">Exact ★</div></div>
-      <div class="up-stat-box"><div class="up-stat-val" style="color:var(--text-muted)">—</div><div class="up-stat-label">Best Streak</div></div>
-    </div>`;
-  }
-
-  const accuracy = predStats.settled > 0
+  const accuracy = predStats && predStats.settled > 0
     ? Math.round((predStats.scored / predStats.settled) * 100)
     : 0;
 
+  const gaugeColor = accuracy >= 70 ? 'var(--accent)' : accuracy >= 40 ? 'var(--gold)' : 'var(--live)';
+  const r = 30;
+  const circ = 2 * Math.PI * r;
+  const dash = (accuracy / 100) * circ;
+  const gap = circ - dash;
+
+  const gaugeHtml = `<div class="up-stats-gauge">
+    <svg class="up-stats-gauge-svg" viewBox="0 0 80 80" width="80" height="80">
+      <circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--border)" stroke-width="5"/>
+      <circle cx="40" cy="40" r="${r}" fill="none" stroke="${gaugeColor}" stroke-width="5"
+        stroke-dasharray="${dash} ${gap}" stroke-linecap="round"
+        transform="rotate(-90 40 40)" style="transition: stroke-dasharray 0.6s ease"/>
+    </svg>
+    <div class="up-stats-gauge-val">${accuracy}%</div>
+  </div>`;
+
   return `<div class="up-stats-bar">
-    <div class="up-stat-box"><div class="up-stat-val" style="color:var(--accent)">${matchPts}</div><div class="up-stat-label">Match Pts</div></div>
-    <div class="up-stat-box"><div class="up-stat-val" style="color:#c084fc">${predStats.pts}</div><div class="up-stat-label">Pred Pts</div></div>
-    <div class="up-stat-box"><div class="up-stat-val" style="color:var(--gold)">${accuracy}%</div><div class="up-stat-label">Accuracy</div></div>
-    <div class="up-stat-box"><div class="up-stat-val">${predStats.exact}</div><div class="up-stat-label">Exact ★</div></div>
-    <div class="up-stat-box"><div class="up-stat-val">${predStats.best}</div><div class="up-stat-label">Best Streak</div></div>
+    <div class="up-stats-left">
+      <div class="up-stat-box"><div class="up-stat-val" style="color:var(--accent)">${matchPts}</div><div class="up-stat-label">Match Pts</div></div>
+      <div class="up-stat-box"><div class="up-stat-val" style="color:#c084fc">${predStats ? predStats.pts : '—'}</div><div class="up-stat-label">Pred Pts</div></div>
+      <div class="up-stat-box"><div class="up-stat-val" style="color:${gaugeColor}">${predStats ? accuracy + '%' : '—'}</div><div class="up-stat-label">Accuracy</div></div>
+    </div>
+    ${gaugeHtml}
   </div>`;
 }
 
@@ -656,7 +663,14 @@ function buildProfilePictureSection(playerName, currentUrl) {
 function pfpSetupListeners() {
   var drop = document.getElementById('pfpDrop');
   var input = document.getElementById('pfpInput');
-  if (!drop || !input) return;
+  if (!input) return;
+
+  // File selected via native picker
+  input.addEventListener('change', function() {
+    if (input.files && input.files.length) pfpHandleFile(input.files[0]);
+  });
+
+  if (!drop) return;
 
   // Click drop zone → open file picker
   drop.addEventListener('click', function() { input.click(); });
@@ -720,28 +734,57 @@ function pfpHandleFile(file) {
   var reader = new FileReader();
   reader.onload = function(e) {
     var avatar = document.getElementById('pfpAvatar');
-    var img = document.getElementById('pfpImg');
-    var initials = document.getElementById('pfpInitials');
-    var drop = document.getElementById('pfpDrop');
-    var actions = document.getElementById('pfpActions');
+    var heroAvatar = document.querySelector('.up-hero-avatar');
 
-    // Show preview in avatar circle
-    if (img) {
-      img.src = e.target.result;
-      img.style.display = 'block';
-    } else if (avatar) {
-      // No img element yet — create one
-      var newImg = document.createElement('img');
-      newImg.className = 'pfp-img';
-      newImg.id = 'pfpImg';
-      newImg.src = e.target.result;
-      newImg.alt = 'Profile photo preview';
-      avatar.insertBefore(newImg, avatar.firstChild);
+    // If standalone pfp section exists, use it; otherwise update hero avatar
+    if (avatar) {
+      var img = document.getElementById('pfpImg');
+      var initials = document.getElementById('pfpInitials');
+      var drop = document.getElementById('pfpDrop');
+      var actions = document.getElementById('pfpActions');
+
+      // Show preview in avatar circle
+      if (img) {
+        img.src = e.target.result;
+        img.style.display = 'block';
+      } else if (avatar) {
+        var newImg = document.createElement('img');
+        newImg.className = 'pfp-img';
+        newImg.id = 'pfpImg';
+        newImg.src = e.target.result;
+        newImg.alt = 'Profile photo preview';
+        avatar.insertBefore(newImg, avatar.firstChild);
+      }
+      if (initials) initials.style.display = 'none';
+      if (avatar) avatar.classList.add('pfp-has-photo');
+      if (drop) pfpSetDisplay(drop, 'none');
+      if (actions) pfpSetDisplay(actions, 'flex');
+    } else if (heroAvatar) {
+      // Update hero avatar with preview
+      var existingImg = heroAvatar.querySelector('img');
+      if (existingImg) {
+        existingImg.src = e.target.result;
+        existingImg.style.display = '';
+      } else {
+        var heroImg = document.createElement('img');
+        heroImg.src = e.target.result;
+        heroImg.alt = 'Profile photo preview';
+        heroImg.style.width = '100%';
+        heroImg.style.height = '100%';
+        heroImg.style.borderRadius = '50%';
+        heroImg.style.objectFit = 'cover';
+        // Remove text/initials node, insert img
+        heroAvatar.innerHTML = '';
+        heroAvatar.appendChild(heroImg);
+        // Re-add camera overlay if own profile
+        if (heroAvatar.classList.contains('own-profile')) {
+          var overlay = document.createElement('div');
+          overlay.className = 'up-hero-camera-overlay';
+          overlay.textContent = '📷';
+          heroAvatar.appendChild(overlay);
+        }
+      }
     }
-    if (initials) initials.style.display = 'none';
-    if (avatar) avatar.classList.add('pfp-has-photo');
-    if (drop) pfpSetDisplay(drop, 'none');
-    if (actions) pfpSetDisplay(actions, 'flex');
   };
   reader.readAsDataURL(file);
 }

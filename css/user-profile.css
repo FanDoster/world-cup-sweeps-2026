@@ -24,6 +24,27 @@
   font-weight: 900;
   color: #000;
   flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+.up-hero-avatar.own-profile {
+  cursor: pointer;
+}
+.up-hero-avatar.own-profile:hover .up-hero-camera-overlay {
+  opacity: 1;
+}
+.up-hero-camera-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
 }
 .up-hero-avatar img {
   width: 100%;
@@ -67,13 +88,58 @@
   border-radius: 3px;
   object-fit: cover;
 }
+.up-flags-more {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 2px 10px;
+  white-space: nowrap;
+  height: 23px;
+}
+
+/* ── HERO SEPARATOR ── */
+.up-hero-separator {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-subtle), transparent);
+  margin: 12px 0;
+}
 
 /* ── STATS BAR ── */
 .up-stats-bar {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
   margin-top: 16px;
+}
+.up-stats-left {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  flex: 1;
+}
+.up-stats-gauge {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+}
+.up-stats-gauge-svg {
+  display: block;
+}
+.up-stats-gauge-val {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
 }
 .up-stat-box {
   background: var(--card);
@@ -349,6 +415,16 @@
 .up-pd-lbl { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }
 
 /* ── JOKER REPORT ── */
+.up-joker-compact {
+  padding: 16px 20px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.up-joker-compact {
+  word-break: break-word;
+}
+/* Keep old styles for any fallback */
 .up-joker-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -386,8 +462,13 @@
   gap: 12px;
   padding: 12px 16px;
   border-bottom: 1px solid var(--border-subtle);
+  border-left: 3px solid transparent;
 }
 .up-feed-item:last-child { border-bottom: none; }
+.up-feed-item.won { border-left-color: var(--accent); }
+.up-feed-item.lost { border-left-color: var(--live); }
+.up-feed-item.drew { border-left-color: var(--gold); }
+.up-feed-item.prediction { border-left-color: #c084fc; }
 .up-feed-icon {
   font-size: 0.95rem;
   flex-shrink: 0;
@@ -413,7 +494,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .up-h2h-dot {
   width: 18px;
@@ -426,13 +507,30 @@
 }
 .up-h2h-name { font-size: 0.82rem; font-weight: 700; }
 .up-h2h-pts { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); margin-left: auto; }
-.up-h2h-bars { display: flex; flex-direction: column; gap: 3px; }
+.up-h2h-compare {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.up-h2h-mypts,
+.up-h2h-oppts {
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  min-width: 32px;
+  text-align: center;
+}
+.up-h2h-mypts { color: var(--accent); }
+.up-h2h-oppts { color: var(--text-muted); }
 .up-h2h-bar-wrap {
   height: 16px;
   background: var(--surface);
   border-radius: 3px;
   overflow: hidden;
   position: relative;
+}
+.up-h2h-bar-single {
+  flex: 1;
 }
 .up-h2h-bar {
   height: 100%;
@@ -444,7 +542,7 @@
   display: flex;
   align-items: center;
   padding: 0 6px;
-  min-width: 28px;
+  min-width: 0;
   transition: width 0.4s ease;
 }
 .up-h2h-bar.me { background: var(--accent); }
@@ -452,7 +550,8 @@
 
 /* ── RESPONSIVE ── */
 @media (max-width: 600px) {
-  .up-stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .up-stats-bar { flex-direction: column; align-items: center; }
+  .up-stats-gauge { margin-top: 8px; }
   .up-hero { flex-direction: column; text-align: center; }
   .up-hero-flags { justify-content: center; }
   .up-hero-meta { justify-content: center; }
