@@ -35,20 +35,17 @@
 .odds-wrap,
 .stats-wrap {
   flex: 1;
-  overflow: hidden;
   display: flex;
-  align-items: center;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+  align-items: flex-start;
 }
 
 .odds-track,
 .stats-track {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  width: max-content;
-  white-space: nowrap;
-  will-change: transform;
+  gap: 6px 12px;
+  padding: 6px 12px;
 }
 
 .odds-item {
@@ -71,14 +68,6 @@
   padding: 0 20px;
 }
 
-.odds-track.scrolling { animation: odds-scroll 30s linear infinite; }
-.stats-track          { transition: opacity 0.35s ease; }
-
-@keyframes odds-scroll  { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-@keyframes stats-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-.odds-outer:hover .odds-track.scrolling { animation-play-state: paused; }
-.stats-outer:hover .stats-track         { animation-play-state: paused; }
 
 /* ── POLYMARKET ODDS TICKER ── */
 .odds-outer { background: rgba(0,0,0,0.35); }
@@ -167,3 +156,26 @@
   color: var(--color-polymarket);
   text-transform: uppercase;
 }
+
+/* ── CHIP GRID ── */
+.odds-chip,
+.stats-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  padding: 3px 8px;
+}
+.odds-chip .oc-match { color: rgba(255,255,255,0.55); font-size: 0.75rem; }
+.odds-chip .oc-name  { color: #fff; font-weight: 700; }
+.odds-chip .oc-prob  { color: #f90; font-weight: 700; }
+.stats-chip .sc-flag { width: 17px; height: 12px; object-fit: cover; border-radius: 1px; flex-shrink: 0; }
+.stats-chip .sc-rank { color: rgba(255,255,255,0.4); font-size: 0.75rem; font-weight: 700; }
+.stats-chip .sc-name { color: #fff; font-weight: 700; }
+.stats-chip .sc-stat { color: #f90; font-weight: 700; }
