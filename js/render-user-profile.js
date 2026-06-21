@@ -338,18 +338,25 @@ function buildHeadToHead(playerName, myStats) {
       ? playerDisplayName(opp)
       : escapeHtml(opp);
 
+    // Lead indicator: who's ahead and by how much
+    const diff = myPts - oppPts;
+    let leadHtml;
+    if (diff > 0)      leadHtml = `<span class="up-h2h-lead ahead">▲ +${diff}</span>`;
+    else if (diff < 0) leadHtml = `<span class="up-h2h-lead behind">▼ ${diff}</span>`;
+    else               leadHtml = `<span class="up-h2h-lead level">= level</span>`;
+
     return `<div class="up-h2h-row">
       <div class="up-h2h-player">
         <span class="up-h2h-dot">${typeof avatarHtml === 'function' ? avatarHtml(opp, 18) : ''}</span>
         <span class="up-h2h-name">${displayName}</span>
-        <span class="up-h2h-pts">${oppPts} pts</span>
+        ${leadHtml}
       </div>
       <div class="up-h2h-compare">
-        <span class="up-h2h-mypts">${myPts}</span>
+        <span class="up-h2h-mypts" title="Your points">You ${myPts}</span>
         <div class="up-h2h-bar-wrap up-h2h-bar-single">
           <div class="up-h2h-bar me" style="width:${myPct}%"></div>
         </div>
-        <span class="up-h2h-oppts">${oppPts}</span>
+        <span class="up-h2h-oppts" style="color:${oppHex}" title="${escapeHtml(opp)}">${oppPts}</span>
       </div>
     </div>`;
   }).join('');
@@ -402,29 +409,12 @@ function buildStatsBar(matchPts, predStats) {
     ? Math.round((predStats.scored / predStats.settled) * 100)
     : 0;
 
-  const gaugeColor = accuracy >= 70 ? 'var(--accent)' : accuracy >= 40 ? 'var(--gold)' : 'var(--live)';
-  const r = 30;
-  const circ = 2 * Math.PI * r;
-  const dash = (accuracy / 100) * circ;
-  const gap = circ - dash;
-
-  const gaugeHtml = `<div class="up-stats-gauge">
-    <svg class="up-stats-gauge-svg" viewBox="0 0 80 80" width="80" height="80">
-      <circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--border)" stroke-width="5"/>
-      <circle cx="40" cy="40" r="${r}" fill="none" stroke="${gaugeColor}" stroke-width="5"
-        stroke-dasharray="${dash} ${gap}" stroke-linecap="round"
-        transform="rotate(-90 40 40)" style="transition: stroke-dasharray 0.6s ease"/>
-    </svg>
-    <div class="up-stats-gauge-val">${accuracy}%</div>
-  </div>`;
+  const accColor = accuracy >= 70 ? 'var(--accent)' : accuracy >= 40 ? 'var(--gold)' : 'var(--live)';
 
   return `<div class="up-stats-bar">
-    <div class="up-stats-left">
-      <div class="up-stat-box"><div class="up-stat-val" style="color:var(--accent)">${matchPts}</div><div class="up-stat-label">Match Pts</div></div>
-      <div class="up-stat-box"><div class="up-stat-val" style="color:#c084fc">${predStats ? predStats.pts : '—'}</div><div class="up-stat-label">Pred Pts</div></div>
-      <div class="up-stat-box"><div class="up-stat-val" style="color:${gaugeColor}">${predStats ? accuracy + '%' : '—'}</div><div class="up-stat-label">Accuracy</div></div>
-    </div>
-    ${gaugeHtml}
+    <div class="up-stat-box"><div class="up-stat-val" style="color:var(--accent)">${matchPts}</div><div class="up-stat-label">Match Pts</div></div>
+    <div class="up-stat-box"><div class="up-stat-val" style="color:#c084fc">${predStats ? predStats.pts : '—'}</div><div class="up-stat-label">Pred Pts</div></div>
+    <div class="up-stat-box"><div class="up-stat-val" style="color:${predStats ? accColor : 'var(--text-muted)'}">${predStats ? accuracy + '%' : '—'}</div><div class="up-stat-label">Accuracy</div></div>
   </div>`;
 }
 
@@ -559,14 +549,19 @@ function buildPredictionList(predictions) {
       ? `${p.predicted_score.home}–${p.predicted_score.away}`
       : '—';
 
-    let scoreHtml;
+    // Result indicator (left border) + score badge
+    let rowClass, scoreHtml;
     if (!p.match_played) {
+      rowClass = 'pending';
       scoreHtml = '<span class="up-pred-score" style="color:var(--text-muted)">🔒</span>';
     } else if (p.points === 0) {
+      rowClass = 'miss';
       scoreHtml = '<span class="up-pred-score miss">✗</span>';
     } else if (p.base_points === 5) {
+      rowClass = 'perfect';
       scoreHtml = `<span class="up-pred-score perfect">${p.points}★</span>`;
     } else {
+      rowClass = 'hit';
       scoreHtml = `<span class="up-pred-score hit">+${p.points}</span>`;
     }
 
@@ -574,9 +569,18 @@ function buildPredictionList(predictions) {
       ? '<span class="up-pred-joker" title="Joker — doubled">🃏</span>'
       : '';
 
-    const dateStr = formatDateLabel(p.match_date, p.kickoff_time, p.tz_offset);
+    // Team flags — predictions carry team NAMES, look up iso via teamIso global
+    const homeIso = (typeof teamIso !== 'undefined' && teamIso[p.home_team]) || '';
+    const awayIso = (typeof teamIso !== 'undefined' && teamIso[p.away_team]) || '';
+    const homeFlag = homeIso
+      ? `<img class="up-pred-flag" src="${flagUrl(homeIso)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : '<span class="up-pred-flag up-pred-flag-blank"></span>';
+    const awayFlag = awayIso
+      ? `<img class="up-pred-flag" src="${flagUrl(awayIso)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      : '<span class="up-pred-flag up-pred-flag-blank"></span>';
 
-    return `<div class="up-pred-item">
+    return `<div class="up-pred-item ${rowClass}">
+      <span class="up-pred-flags">${homeFlag}${awayFlag}</span>
       <span class="up-pred-match">
         <span class="up-pm-teams">${escapeHtml(p.home_team)} vs ${escapeHtml(p.away_team)}</span>
         <span class="up-pm-date">${formatDateLabel(p.match_date, p.kickoff_time, p.tz_offset)} · G${p.group}</span>
