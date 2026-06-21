@@ -111,89 +111,16 @@ async function loadOdds() {
 // loadOdds() and loadStatsTracker() are called from main.js after matchData is populated by loadData()
 
 // ── TOURNAMENT STATS TICKER ──
-let _statsCategories = [];
-let _statsCatIndex = 0;
-let _statsGeneration = 0;
-
-function showStatsCategory(index, gen) {
-  const track = document.getElementById('statsTrack');
-  const brandEl = document.querySelector('.stats-label .sl-brand');
-  if (!track || !brandEl || !_statsCategories.length) return;
-
-  const cat = _statsCategories[index % _statsCategories.length];
-
-  brandEl.style.opacity = '0';
-  track.style.opacity = '0';
-
-  setTimeout(() => {
-    if (gen !== _statsGeneration) return;
-
-    brandEl.textContent = cat.label;
-    track.style.animation = 'none';
-    track.innerHTML = cat.html + cat.html;
-    void track.offsetWidth;
-
-    const singleWidth = track.scrollWidth / 2;
-    const dur = Math.max(8, singleWidth / 90).toFixed(1);
-    track.style.animation = `stats-scroll ${dur}s linear infinite`;
-    track.style.animationPlayState = '';
-
-    brandEl.style.opacity = '1';
-    track.style.opacity = '1';
-
-    // Show for ~2 full passes (min 8s, max 20s) then advance
-    const displayMs = Math.min(20000, Math.max(8000, (singleWidth / 90) * 2000));
-    setTimeout(() => {
-      if (gen !== _statsGeneration) return;
-      _statsCatIndex = (_statsCatIndex + 1) % _statsCategories.length;
-      showStatsCategory(_statsCatIndex, gen);
-    }, displayMs);
-  }, 350);
-}
 
 async function loadStatsTracker() {
   const track = document.getElementById('statsTrack');
+  const brandEl = document.querySelector('.stats-label .sl-brand');
   if (!track) return;
 
   const played = matchData.filter(m => m.isComplete);
+  let chips = [];
+  let categoryLabel = '';
 
-  // Clean sheets (goals conceded = 0)
-  const cleanSheets = {};
-  for (const m of played) {
-    if (m.score2 === 0) cleanSheets[m.team1] = (cleanSheets[m.team1] || 0) + 1;
-    if (m.score1 === 0) cleanSheets[m.team2] = (cleanSheets[m.team2] || 0) + 1;
-  }
-  const topCleanSheets = Object.entries(cleanSheets)
-    .sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-  // Most goals scored
-  const goalsFor = {};
-  for (const m of played) {
-    goalsFor[m.team1] = (goalsFor[m.team1] || 0) + m.score1;
-    goalsFor[m.team2] = (goalsFor[m.team2] || 0) + m.score2;
-  }
-  const topGoals = Object.entries(goalsFor)
-    .sort((a, b) => b[1] - a[1]).slice(0, 5);
-
-  // Biggest wins (show winner first)
-  const biggestWins = played
-    .map(m => {
-      const diff = m.score1 - m.score2;
-      if (diff > 0) return { label: `${m.team1.toUpperCase()} ${m.score1}–${m.score2} ${m.team2.toUpperCase()}`, diff };
-      if (diff < 0) return { label: `${m.team2.toUpperCase()} ${m.score2}–${m.score1} ${m.team1.toUpperCase()}`, diff: -diff };
-      return null;
-    })
-    .filter(Boolean)
-    .sort((a, b) => b.diff - a.diff)
-    .slice(0, 3);
-
-  // Tournament totals
-  const totalGoals = played.reduce((s, m) => s + m.score1 + m.score2, 0);
-  const avgGoals = played.length ? (totalGoals / played.length).toFixed(1) : '0.0';
-
-  // Optional API: scorers from football-data.org
-  let topScorers = [];
-  let topAssisters = [];
   if (typeof FOOTBALL_DATA_TOKEN === 'string' && FOOTBALL_DATA_TOKEN) {
     try {
       const res = await fetch('https://api.football-data.org/v4/competitions/WC/scorers?limit=10', {
@@ -201,64 +128,41 @@ async function loadStatsTracker() {
       });
       if (res.ok) {
         const data = await res.json();
-        const scorers = data.scorers || [];
-        topScorers = scorers
-          .filter(s => s.goals > 0)
-          .slice(0, 5)
-          .map(s => ({ name: s.player.name.toUpperCase(), stat: `${s.goals}G` }));
-        topAssisters = scorers
-          .filter(s => (s.assists || 0) > 0)
-          .sort((a, b) => (b.assists || 0) - (a.assists || 0))
-          .slice(0, 5)
-          .map(s => ({ name: s.player.name.toUpperCase(), stat: `${s.assists}A` }));
+        const topScorers = (data.scorers || []).filter(s => s.goals > 0).slice(0, 5);
+        if (topScorers.length) {
+          categoryLabel = 'GOLDEN BOOT';
+          chips = topScorers.map((s, i) =>
+            `<span class="stats-chip"><span class="sc-rank">${i + 1}</span><span class="sc-name">${escapeHtml(s.player.name.toUpperCase())}</span><span class="sc-stat">${s.goals}G</span></span>`
+          );
+        }
       }
     } catch (e) {
-      console.warn('Stats ticker: API fetch failed', e);
+      console.warn('Stats chips: API fetch failed', e);
     }
   }
 
-  // Build per-category HTML
-  const dot = '<span class="st-divider">\xB7</span>';
-  const itm = (name, stat) =>
-    `<span class="st-item"><span class="si-name">${escapeHtml(name)}</span><span class="si-stat">${escapeHtml(stat)}</span></span>`;
-  const teamItm = (rank, teamName, stat) => {
-    const iso = teamIso[teamName];
-    const flag = iso ? `<img class="si-flag" src="${flagUrl(iso)}" alt="">` : '';
-    return `<span class="st-item">${flag}<span class="si-rank">${rank}</span><span class="si-name">${escapeHtml(teamName.toUpperCase())}</span><span class="si-stat">${escapeHtml(stat)}</span></span>`;
-  };
+  if (!chips.length && played.length) {
+    const goalsFor = {};
+    for (const m of played) {
+      goalsFor[m.team1] = (goalsFor[m.team1] || 0) + m.score1;
+      goalsFor[m.team2] = (goalsFor[m.team2] || 0) + m.score2;
+    }
+    categoryLabel = 'MOST GOALS';
+    chips = Object.entries(goalsFor)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([teamName, n], i) => {
+        const iso = teamIso[teamName];
+        const flag = iso ? `<img class="sc-flag" src="${flagUrl(iso)}" alt="">` : '';
+        return `<span class="stats-chip">${flag}<span class="sc-rank">${i + 1}</span><span class="sc-name">${escapeHtml(teamName.toUpperCase())}</span><span class="sc-stat">${n}G</span></span>`;
+      });
+  }
 
-  const categories = [];
-
-  if (topScorers.length)
-    categories.push({ label: 'GOLDEN BOOT', html: topScorers.map((s, i) => itm(`${i + 1}. ${s.name}`, s.stat)).join(dot) });
-
-  if (topAssisters.length)
-    categories.push({ label: 'TOP ASSISTS', html: topAssisters.map((s, i) => itm(`${i + 1}. ${s.name}`, s.stat)).join(dot) });
-
-  if (topCleanSheets.length)
-    categories.push({ label: 'CLEAN SHEETS', html: topCleanSheets.map(([t, n], i) => teamItm(i + 1, t, `${n} CS`)).join(dot) });
-
-  if (topGoals.length)
-    categories.push({ label: 'MOST GOALS', html: topGoals.map(([t, n], i) => teamItm(i + 1, t, `${n}G`)).join(dot) });
-
-  if (biggestWins.length)
-    categories.push({ label: 'BIGGEST WIN', html: biggestWins.map(w =>
-      `<span class="st-item"><span class="si-name">${escapeHtml(w.label)}</span></span>`
-    ).join(dot) });
-
-  if (played.length)
-    categories.push({ label: 'TOURNAMENT', html:
-      itm(`${totalGoals} GOALS`, `IN ${played.length} GAMES`) + dot + itm(avgGoals, 'PER GAME')
-    });
-
-  if (!categories.length) {
+  if (!chips.length) {
     track.innerHTML = '<span class="stats-loading">NO MATCH DATA YET</span>';
-    track.classList.remove('scrolling');
     return;
   }
 
-  _statsCategories = categories;
-  _statsCatIndex = 0;
-  _statsGeneration++;
-  showStatsCategory(0, _statsGeneration);
+  if (brandEl) brandEl.textContent = categoryLabel;
+  track.innerHTML = chips.join('');
 }
