@@ -12,15 +12,11 @@
   flex-direction: column;
   min-width: 0;
 }
-.tickers-rows .ticker-outer { border-bottom: 1px solid rgba(255,255,255,0.06); }
-
 /* ── SHARED ROW BASES ── */
-.ticker-outer,
 .odds-outer,
 .kickoff-outer,
 .stats-outer { display: flex; align-items: stretch; }
 
-.ticker-label,
 .odds-label,
 .kickoff-label,
 .stats-label {
@@ -70,7 +66,6 @@
   color: var(--ticker-full);
 }
 
-.ticker-divider,
 .odds-divider,
 .kickoff-divider,
 .stats-divider { font-size: 1rem; padding: 0 2px; }
@@ -88,71 +83,13 @@
 .kickoff-track.scrolling { animation: kickoff-scroll 20s linear infinite; }
 .stats-track             { transition: opacity 0.35s ease; }
 
-@keyframes ticker-scroll  { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 @keyframes odds-scroll    { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 @keyframes kickoff-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 @keyframes stats-scroll   { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-.ticker-outer:hover .ticker-track             { animation-play-state: paused; }
 .odds-outer:hover .odds-track.scrolling       { animation-play-state: paused; }
 .kickoff-outer:hover .kickoff-track.scrolling { animation-play-state: paused; }
 .stats-outer:hover .stats-track               { animation-play-state: paused; }
-
-/* ── SPONSOR TICKER (Infantino quotes) ── */
-.ticker-outer { background: rgba(0,0,0,0.2); }
-.ticker-label {
-  padding: 6px 12px;
-  gap: 3px;
-  background: #000;
-  border-right: 1px solid var(--border-alpha-mid);
-}
-.ticker-label img { height: 26px; width: auto; display: block; }
-.ticker-label .tl-partners {
-  font-size: 0.42rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ticker-mid);
-  white-space: nowrap;
-}
-.ticker-wrap {
-  flex: 1;
-  overflow: hidden;
-  padding: 6px 0;
-  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
-}
-.ticker-track {
-  display: flex;
-  align-items: center;
-  width: max-content;
-  animation: ticker-scroll 22s linear infinite;
-}
-.sponsor {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  padding: 0 36px;
-  flex-shrink: 0;
-}
-.sponsor img {
-  height: 24px;
-  width: auto;
-  max-width: 100px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-.sponsor img.invert { filter: brightness(0) invert(1) opacity(0.75); }
-.sponsor img.gs     { filter: brightness(100%) grayscale(1) opacity(0.75); }
-.ticker-track .sponsor-tag {
-  font-size: 0.95rem;
-  color: var(--ticker-mid);
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-.ticker-divider { color: rgba(255,255,255,0.15); }
 
 /* ── POLYMARKET ODDS TICKER ── */
 .odds-outer { background: rgba(0,0,0,0.35); }
