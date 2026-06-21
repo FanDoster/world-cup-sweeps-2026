@@ -72,18 +72,22 @@ async function loadOdds() {
       fetch('https://gamma-api.polymarket.com/events?slug=world-cup-winner').then(r => r.json())
     ]);
 
-    const items = [];
+    const chips = [];
 
+    // Top 4 World Cup winner odds
     const wc = winnerRes[0];
     if (wc) {
       const topMarkets = (wc.markets || [])
         .filter(m => { const p = safePrices(m); return p && p[0] > 0.05; })
-        .sort((a,b) => safePrices(b)[0] - safePrices(a)[0])
-        .slice(0,4);
-      const oddsStr = topMarkets.map(m => `${oddsTeamName(m.question)} ${fmtPct(safePrices(m)[0])}`).join(' · ');
-      items.push({ type:'winner', oddsStr, vol: wc.volume || 0 });
+        .sort((a, b) => safePrices(b)[0] - safePrices(a)[0])
+        .slice(0, 4);
+      for (const m of topMarkets) {
+        const name = oddsTeamName(m.question);
+        chips.push(`<span class="odds-chip"><span class="oc-match">🏆</span><span class="oc-name">${escapeHtml(name)}</span><span class="oc-prob">${fmtPct(safePrices(m)[0])}</span></span>`);
+      }
     }
 
+    // Today's match odds
     for (const events of matchRes) {
       const ev = events[0];
       if (!ev || !ev.markets) continue;
@@ -93,29 +97,14 @@ async function loadOdds() {
       const [p1, p2] = winMarkets.map(m => safePrices(m)[0]);
       const dp = drawMarket ? safePrices(drawMarket)[0] : null;
       const [n1, n2] = winMarkets.map(m => oddsTeamName(m.question));
-      const line = `${n1} ${fmtPct(p1)} · ${dp ? `DRAW ${fmtPct(dp)} · ` : ''}${n2} ${fmtPct(p2)}`;
-      items.push({ type:'match', match: `${n1} vs ${n2}`, line, vol: parseFloat(ev.volume || 0) });
+      const probStr = `${fmtPct(p1)}${dp ? ` · D ${fmtPct(dp)}` : ''} · ${fmtPct(p2)}`;
+      chips.push(`<span class="odds-chip"><span class="oc-match">${escapeHtml(n1)} vs ${escapeHtml(n2)}</span><span class="oc-prob">${escapeHtml(probStr)}</span></span>`);
     }
 
-    if (!items.length) return;
-
-    const buildItems = () => items.map(item => {
-      if (item.type === 'winner') {
-        return `<span class="odds-item"><span class="oi-match">🏆 WORLD CUP WINNER</span><span>—</span><span class="oi-prob">${item.oddsStr}</span><span class="oi-vol">${fmtVol(item.vol)} WAGERED</span></span><span class="odds-divider">|</span>`;
-      }
-      return `<span class="odds-item"><span class="oi-match">${item.match}</span><span>·</span><span class="oi-prob">${item.line}</span><span class="oi-vol">${fmtVol(item.vol)} WAGERED</span></span><span class="odds-divider">|</span>`;
-    }).join('');
-
-    const track = document.getElementById('oddsTrack');
-    track.innerHTML = buildItems() + buildItems();
-    void track.offsetWidth;
-    const oddsSingleWidth = track.scrollWidth / 2;
-    const oddsDur = Math.max(10, oddsSingleWidth / 90).toFixed(1);
-    track.style.animation = `odds-scroll ${oddsDur}s linear infinite`;
-    track.style.animationPlayState = '';
-    track.classList.add('scrolling');
+    if (!chips.length) return;
+    document.getElementById('oddsTrack').innerHTML = chips.join('');
   } catch (e) {
-    console.warn('Polymarket ticker failed to load:', e);
+    console.warn('Polymarket chips failed to load:', e);
   }
 }
 
