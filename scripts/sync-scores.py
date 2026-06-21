@@ -23,8 +23,6 @@ SUPABASE_URL = "https://nkztkzrkbeacyltidqwr.supabase.co"
 SB_KEY_FILE = "/tmp/sb_key"          # service_role key (prefix sb_secret_)
 
 FIFA_API = "https://api.fifa.com/api/v3/calendar/matches"
-COMPETITION_ID = "17"        # FIFA World Cup™
-SEASON_ID = "285023"         # FIFA World Cup 2026™
 
 # ── Team name mapping: FIFA API → our matches table ─────
 FIFA_TO_DB = {

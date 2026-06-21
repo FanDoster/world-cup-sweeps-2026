@@ -26,8 +26,9 @@ SUPABASE_URL = "https://nkztkzrkbeacyltidqwr.supabase.co"
 SB_KEY_FILE = "/tmp/sb_key"          # service_role key (prefix sb_secret_)
 
 FIFA_API = "https://api.fifa.com/api/v3/calendar/matches"
-COMPETITION_ID = "17"
-SEASON_ID = "285023"
+FROM_DATE = "2026-06-11T00:00:00Z"
+TO_DATE = "2026-07-20T00:00:00Z"
+FETCH_COUNT = 200
 
 POLL_INTERVAL = 60       # seconds between FIFA API calls
 MAX_RUNTIME = 19800      # 5.5 hours (stays under the 6 h GA limit)
@@ -101,11 +102,9 @@ def fetch_fifa_matches():
     url = (
         f"{FIFA_API}"
         f"?language=en"
-        f"&competitionId={COMPETITION_ID}"
-        f"&seasonId={SEASON_ID}"
-        f"&from=2026-06-11T00:00:00Z"
-        f"&to=2026-07-20T00:00:00Z"
-        f"&count=200"
+        f"&from={FROM_DATE}"
+        f"&to={TO_DATE}"
+        f"&count={FETCH_COUNT}"
     )
     req = urllib.request.Request(url, headers={
         "User-Agent": "Mozilla/5.0 (compatible; WC2026Sweeps/1.0)"
