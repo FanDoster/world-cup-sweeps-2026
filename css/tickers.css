@@ -48,18 +48,6 @@
   padding: 6px 12px;
 }
 
-.odds-item {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.9rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ticker-full);
-}
-
-.odds-divider,
-.stats-divider { font-size: 1rem; padding: 0 2px; }
-
 .odds-loading,
 .stats-loading {
   font-size: 0.7rem;
@@ -84,12 +72,6 @@
   font-size: 0.38rem; font-weight: 700; letter-spacing: 0.12em;
   color: var(--ticker-mid); text-transform: uppercase; white-space: nowrap;
 }
-.odds-item { gap: 6px; padding: 0 28px; }
-.odds-item .oi-match { color: #fff; font-weight: 700; }
-.odds-item .oi-prob  { color: #f90; font-weight: 700; }
-.odds-item .oi-vol   { color: var(--ticker-full); font-size: 0.8rem; }
-.odds-divider { color: var(--color-polymarket); opacity: 0.6; }
-
 /* ── TOURNAMENT STATS TICKER ── */
 .stats-outer { background: rgba(0,0,0,0.3); }
 .stats-label { background: var(--color-stats-green); }
@@ -100,23 +82,12 @@
 .stats-label .sl-brand {
   font-size: 0.65rem; font-weight: 900; letter-spacing: 0.05em;
   color: #fff; text-transform: uppercase; white-space: nowrap;
-  min-width: 4ch; text-align: center; transition: opacity 0.35s ease;
+  min-width: 4ch; text-align: center;
 }
 .stats-label .sl-sub {
   font-size: 0.38rem; font-weight: 700; letter-spacing: 0.12em;
   color: var(--ticker-mid); text-transform: uppercase; white-space: nowrap;
 }
-.st-cat { font-size: 0; }
-.st-item {
-  display: inline-flex; align-items: center; gap: 5px;
-  font-size: 0.9rem; letter-spacing: 0.04em;
-  text-transform: uppercase; white-space: nowrap;
-}
-.st-item .si-flag { width: 17px; height: 12px; object-fit: cover; border-radius: 1px; flex-shrink: 0; }
-.st-item .si-rank { color: rgba(255,255,255,0.45); font-size: 0.7rem; font-weight: 700; min-width: 1ch; }
-.st-item .si-name { color: #fff; font-weight: 700; }
-.st-item .si-stat { color: #f90; font-weight: 700; padding-left: 2px; }
-.st-divider { color: rgba(255,255,255,0.45); font-size: 1rem; padding: 0 8px; }
 
 /* ── BROADCAST CLOCK ── */
 .ticker-clock {

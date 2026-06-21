@@ -113,8 +113,6 @@
   .ticker-label img { height: 22px; }
   .ticker-label .tl-partners { display: none; }
   .ticker-track .sponsor-tag { font-size: 0.75rem; }
-  .odds-item { font-size: 0.72rem; }
-  .odds-item .oi-vol { font-size: 0.65rem; }
   .sponsor img { height: 18px; max-width: 72px; }
   .sponsor { padding: 0 20px; }
 }
