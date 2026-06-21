@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360       # 6 hours (max allowed)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Write Supabase key
         run: echo "${{ secrets.SB_KEY }}" > /tmp/sb_key
