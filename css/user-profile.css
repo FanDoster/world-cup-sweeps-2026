@@ -118,10 +118,10 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 10px;
-  margin-top: 32px;
+  margin-top: 36px;
   text-align: center;
 }
-.up-sec-label:first-child { margin-top: 0; }
+.up-sec-label:first-child { margin-top: 36px; }
 
 /* ── SECTION CARD ── */
 .up-section-card {
