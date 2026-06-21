@@ -478,10 +478,11 @@ async function renderProfile(playerName) {
             const m = allMatches?.find(am => am.id === p.match_id);
             if (!m || m.home_score === null) continue;
             total++;
-            const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.home_score, m.away_score);
+            const base = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.home_score, m.away_score);
+            const pts = p.is_joker ? base * 2 : base;
             totalPts += pts;
-            if (pts === 5) exact++;
-            else if (pts >= 1) correct++;
+            if (base === 5) exact++;
+            else if (base >= 1) correct++;
           }
           if (total > 0) predStats = { total, exact, correct, totalPts, accuracy: Math.round(((exact + correct) / total) * 100) };
         }

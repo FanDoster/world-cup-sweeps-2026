@@ -125,6 +125,8 @@ async function loadData() {
 }
 
 async function loadPredData() {
+  // Invalidate profile stats cache so stale RPC results don't persist across data refreshes
+  Object.keys(_userPredCache).forEach(k => delete _userPredCache[k]);
   if (!featureProbeDone) {
     const [j, c] = await Promise.all([
       sb.from('predictions').select('is_joker').limit(1),

@@ -125,6 +125,7 @@ function getPredStatsByPlayer() {
     if (!mid) continue;
     for (const p of (predLookup[mid] || [])) {
       if (p.home === undefined || p.home === null) continue;
+    if (m.score1 === null || m.score2 === null) continue;
 if (!stats[p.player_name]) stats[p.player_name] = { settled: 0, pts: 0, exact: 0, scored: 0, cur: 0, best: 0, upsets: 0, jokerPts: 0, jokersUsed: 0, jokerBest: 0, jokerBestMatch: '', jokerWorst: 999, jokerWorstMatch: '' };
 const st = stats[p.player_name];
 const base = calcPredPoints(p.home, p.away, m.score1, m.score2);
