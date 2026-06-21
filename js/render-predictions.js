@@ -35,7 +35,7 @@ async function renderPredictions() {
     <div class="pred-stat"><div class="ps-num">${locked}</div><div class="ps-label">Locked</div></div>
   </div>`;
 
-  // Group by US venue date (day headers show where the match is actually played)
+  // Group by US venue date (day shows where the match is actually played)
   const byDate = {};
   for (const m of upcoming) {
     if (!byDate[m.date]) byDate[m.date] = [];
