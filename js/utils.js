@@ -73,6 +73,22 @@ function formatDateHeader(dateStr, timeStr, tz) {
   return days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
 }
 
+// Day name based on the US venue date string (e.g. "2026-06-24")
+// Used for predictions tab — day headers reflect where the match is actually played.
+function getUSDateLabel(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const matchDate = new Date(y, m - 1, d);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffDays = Math.round((matchDate - today) / 86400000);
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Tomorrow';
+  if (diffDays >= -1 && diffDays <= 6) return days[matchDate.getDay()];
+  return days[matchDate.getDay()] + ' ' + d + ' ' + months[matchDate.getMonth()];
+}
+
 function ordinal(n) {
   const s = n % 100;
   if (s >= 11 && s <= 13) return n + 'th';

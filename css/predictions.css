@@ -82,6 +82,51 @@
 .pmc-btn.edit { background: transparent; color: var(--accent); border: 1px solid var(--accent-dim); }
 .pmc-btn.edit:hover { background: var(--accent-glow); }
 .pmc-btn.save { background: var(--accent); color: #000; }
+/* ── JOKER ACTIVE CARD ── */
+.pred-match-card.joker-active {
+  border-color: var(--gold-dim);
+  background: linear-gradient(135deg, rgba(245,158,11,0.06), rgba(245,158,11,0.02));
+  box-shadow: 0 0 12px rgba(245,158,11,0.12), inset 0 0 0 1px rgba(245,158,11,0.08);
+}
+.pred-match-card.joker-active:hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgba(245,158,11,0.18), inset 0 0 0 1px rgba(245,158,11,0.12);
+}
+.pred-match-card.joker-active .pmc-status.locked {
+  background: rgba(245,158,11,0.18);
+  color: var(--gold);
+}
+.pred-match-card.joker-active .pmc-score input {
+  border-color: var(--gold-dim);
+  box-shadow: 0 0 0 2px rgba(245,158,11,0.10);
+}
+.pred-match-card.joker-active .pmc-score input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.20);
+}
+.joker-active-score {
+  color: var(--gold) !important;
+  font-weight: 800;
+}
+.joker-locked-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--gold);
+  color: #000;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px 3px 8px;
+  border-radius: 99px;
+  letter-spacing: 0.02em;
+  margin-left: 6px;
+}
+.joker-chip.active {
+  background: rgba(245,158,11,0.18);
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 8px rgba(245,158,11,0.20);
+}
 /* ── HISTORY ── */
 .pred-history-card { background: var(--card); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 6px; display: flex; align-items: center; gap: 14px; }
 .pred-history-card .phc-result { min-width: 52px; text-align: center; }
@@ -97,6 +142,41 @@
 .phc-scores .exact-marker { color: var(--gold); }
 .pred-empty { text-align: center; padding: 48px 20px; color: var(--text-muted); }
 .pred-empty .pe-icon { font-size: 2.5rem; margin-bottom: 12px; opacity: 0.4; }
+/* ── PREDICTIONS DAY HEADER ── */
+.pred-day-header {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 20px 0 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pred-day-header:first-of-type { padding-top: 0; }
+.pred-day-header .pdh-count {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 99px;
+  padding: 2px 9px;
+  margin-left: auto;
+  text-transform: none;
+}
+.pred-day-header .pdh-joker-note {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+}
 /* ── MATCH PREDICTION DOTS ── */
 .match-pred-dots { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
 .pred-dot { font-size: 0.62rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-family: var(--font); letter-spacing: 0.02em; white-space: nowrap; }

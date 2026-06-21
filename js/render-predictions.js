@@ -35,9 +35,27 @@ async function renderPredictions() {
     <div class="pred-stat"><div class="ps-num">${locked}</div><div class="ps-label">Locked</div></div>
   </div>`;
 
-  html += '<div class="pred-section-title label-sm">Upcoming Matches</div>';
-  let hasOpen = false;
+  // Group by US venue date (day headers show where the match is actually played)
+  const byDate = {};
   for (const m of upcoming) {
+    if (!byDate[m.date]) byDate[m.date] = [];
+    byDate[m.date].push(m);
+  }
+
+  let hasOpen = false;
+  for (const [date, dayMatches] of Object.entries(byDate)) {
+    const headerLabel = getUSDateLabel(date);
+    // Check if any match in this day has a joker active
+    const dayHasJoker = dayMatches.some(m => {
+      const key = `${m.team1}|${m.team2}|${m.date}`;
+      const mid = matchIdMap[key];
+      const ep = mid ? predMap[mid] : null;
+      return ep && ep.is_joker;
+    });
+    const jokerNote = dayHasJoker ? '<span class="pdh-joker-note">🃏 Joker active</span>' : '';
+    html += `<div class="pred-day-header"><span>${headerLabel}</span><span class="pdh-count">${dayMatches.length} match${dayMatches.length > 1 ? 'es' : ''}</span>${jokerNote}</div>`;
+
+    for (const m of dayMatches) {
     const key = `${m.team1}|${m.team2}|${m.date}`;
     const mid = matchIdMap[key];
     if (!mid) continue;
@@ -46,21 +64,22 @@ async function renderPredictions() {
     const isLocked = m.kickoff - now < 5 * 60 * 1000;
 
     if (ep && isLocked) {
-      html += `<div class="pred-match-card">
+      const jokerCls = ep.is_joker ? ' joker-active' : '';
+      html += `<div class="pred-match-card${jokerCls}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
           <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
-          <span class="pmc-status locked">🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}${ep.is_joker ? ' <span class="joker-mini" title="Joker — points doubled">🃏2×</span>' : ''}</span>
+          <span class="pmc-status locked"><span${ep.is_joker ? ' class="joker-active-score"' : ''}>🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}</span>${ep.is_joker ? '<span class="joker-locked-badge">🃏 2×</span>' : ''}</span>
         </div></div>`;
     } else if (ep) {
       const lockMs = m.kickoff - 5 * 60 * 1000;
       const lockStr = getLockCountdown(lockMs);
       hasOpen = true;
-      html += `<div class="pred-match-card" id="pred-${mid}">
+      html += `<div class="pred-match-card${ep.is_joker ? ' joker-active' : ''}" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
           <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
-          <span class="pmc-status predicted" id="pred-display-${mid}">${ep.predicted_home_score}–${ep.predicted_away_score}</span>
+          <span class="pmc-status predicted" id="pred-display-${mid}"><span class="${ep.is_joker ? 'joker-active-score' : ''}">${ep.predicted_home_score}–${ep.predicted_away_score}</span></span>
           ${jokersEnabled ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
           <div class="pmc-score" id="pred-edit-${mid}" style="display:none">
             <div class="pmc-score-wrap">
@@ -108,6 +127,7 @@ async function renderPredictions() {
           </div>
           <button class="pmc-btn predict" onclick="submitPrediction(${mid})">Predict</button>
         </div></div>`;
+    }
     }
   }
   if (!hasOpen && predicted === 0 && upcoming.length === 0) {
