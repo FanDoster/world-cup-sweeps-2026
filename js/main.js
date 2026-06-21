@@ -28,8 +28,8 @@ function switchTab(tab) {
 // ── INIT ──
 restoreSession().then(async () => {
   // Avatar feature detection — must complete before profile renders
-  await checkAvatarsEnabled();
-  if (avatarsEnabled) preloadAvatars(PLAYERS);
+  // Preload all avatars — public data, no auth needed
+  await preloadAvatars(PLAYERS).catch(() => {});
 
   return loadData().then(() => {
     loadOdds(); loadStatsTracker(); checkTeamResults();
