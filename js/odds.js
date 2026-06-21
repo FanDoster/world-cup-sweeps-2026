@@ -121,53 +121,6 @@ async function loadOdds() {
 
 // loadOdds() and loadStatsTracker() are called from main.js after matchData is populated by loadData()
 
-// ── KICKOFF COUNTDOWN TICKER ──
-function buildCountdownTicker() {
-  const track = document.getElementById('kickoffTrack');
-  if (!track) return;
-
-  const now = new Date();
-  const upcoming = matchData
-    .filter(m => {
-      if (m.isComplete) return false;
-      const end = new Date(toDate(m.date, m.time, m.tz).getTime() + 2 * 60 * 60 * 1000);
-      return end > now;
-    })
-    .sort((a, b) => toDate(a.date, a.time, a.tz) - toDate(b.date, b.time, b.tz))
-    .slice(0, 4);
-
-  if (!upcoming.length) {
-    track.innerHTML = '<span class="kickoff-loading">NO UPCOMING MATCHES</span>';
-    track.classList.remove('scrolling');
-    return;
-  }
-
-  const buildItem = m => {
-    const iso1 = teamIso[m.team1] || '';
-    const iso2 = teamIso[m.team2] || '';
-    const cd = getCountdown(m.date, m.time, m.tz);
-    const cdClass = cd.cls === 'live-now' ? 'ki-cd ki-live' : 'ki-cd';
-    return `<span class="kickoff-item">` +
-      `<img class="ki-flag" src="${flagUrl(iso1)}" alt="">` +
-      `<span class="ki-team">${escapeHtml(m.team1.toUpperCase())}</span>` +
-      `<span class="ki-vs">vs</span>` +
-      `<span class="ki-team">${escapeHtml(m.team2.toUpperCase())}</span>` +
-      `<img class="ki-flag" src="${flagUrl(iso2)}" alt="">` +
-      `<span class="ki-sep">·</span>` +
-      `<span class="${cdClass}">${cd.text.toUpperCase()}</span>` +
-      `</span><span class="kickoff-divider">|</span>`;
-  };
-
-  const html = upcoming.map(buildItem).join('');
-  track.innerHTML = html + html;
-  void track.offsetWidth;
-  const kiSingleWidth = track.scrollWidth / 2;
-  const kiDur = Math.max(10, kiSingleWidth / 90).toFixed(1);
-  track.style.animation = `kickoff-scroll ${kiDur}s linear infinite`;
-  track.style.animationPlayState = '';
-  track.classList.add('scrolling');
-}
-
 // ── TOURNAMENT STATS TICKER ──
 let _statsCategories = [];
 let _statsCatIndex = 0;

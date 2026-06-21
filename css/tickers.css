@@ -14,11 +14,9 @@
 }
 /* ── SHARED ROW BASES ── */
 .odds-outer,
-.kickoff-outer,
 .stats-outer { display: flex; align-items: stretch; }
 
 .odds-label,
-.kickoff-label,
 .stats-label {
   flex-shrink: 0;
   display: flex;
@@ -28,7 +26,6 @@
 }
 
 .odds-label,
-.kickoff-label,
 .stats-label {
   padding: 5px 12px;
   gap: 1px;
@@ -36,7 +33,6 @@
 }
 
 .odds-wrap,
-.kickoff-wrap,
 .stats-wrap {
   flex: 1;
   overflow: hidden;
@@ -47,7 +43,6 @@
 }
 
 .odds-track,
-.kickoff-track,
 .stats-track {
   display: flex;
   align-items: center;
@@ -56,8 +51,7 @@
   will-change: transform;
 }
 
-.odds-item,
-.kickoff-item {
+.odds-item {
   display: inline-flex;
   align-items: center;
   font-size: 0.9rem;
@@ -67,11 +61,9 @@
 }
 
 .odds-divider,
-.kickoff-divider,
 .stats-divider { font-size: 1rem; padding: 0 2px; }
 
 .odds-loading,
-.kickoff-loading,
 .stats-loading {
   font-size: 0.7rem;
   color: var(--ticker-dim);
@@ -79,17 +71,14 @@
   padding: 0 20px;
 }
 
-.odds-track.scrolling    { animation: odds-scroll    30s linear infinite; }
-.kickoff-track.scrolling { animation: kickoff-scroll 20s linear infinite; }
-.stats-track             { transition: opacity 0.35s ease; }
+.odds-track.scrolling { animation: odds-scroll 30s linear infinite; }
+.stats-track          { transition: opacity 0.35s ease; }
 
-@keyframes odds-scroll    { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-@keyframes kickoff-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-@keyframes stats-scroll   { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes odds-scroll  { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes stats-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-.odds-outer:hover .odds-track.scrolling       { animation-play-state: paused; }
-.kickoff-outer:hover .kickoff-track.scrolling { animation-play-state: paused; }
-.stats-outer:hover .stats-track               { animation-play-state: paused; }
+.odds-outer:hover .odds-track.scrolling { animation-play-state: paused; }
+.stats-outer:hover .stats-track         { animation-play-state: paused; }
 
 /* ── POLYMARKET ODDS TICKER ── */
 .odds-outer { background: rgba(0,0,0,0.35); }
@@ -111,26 +100,6 @@
 .odds-item .oi-prob  { color: #f90; font-weight: 700; }
 .odds-item .oi-vol   { color: var(--ticker-full); font-size: 0.8rem; }
 .odds-divider { color: var(--color-polymarket); opacity: 0.6; }
-
-/* ── KICKOFF COUNTDOWN TICKER ── */
-.kickoff-outer { background: rgba(0,0,0,0.25); }
-.kickoff-label { background: #000; }
-.kickoff-label .kl-top {
-  font-size: 0.5rem; font-weight: 900; letter-spacing: 0.18em;
-  color: rgba(255,255,255,0.8); text-transform: uppercase;
-}
-.kickoff-label .kl-brand {
-  font-size: 0.7rem; font-weight: 900; letter-spacing: 0.08em;
-  color: #fff; text-transform: uppercase; white-space: nowrap;
-}
-.kickoff-item { gap: 8px; padding: 0 28px; }
-.ki-flag { height: 18px; width: auto; }
-.ki-team { color: #fff; font-weight: 700; }
-.ki-vs   { color: rgba(255,255,255,0.4); font-size: 0.75rem; }
-.ki-sep  { color: rgba(255,255,255,0.3); }
-.ki-cd   { color: #f90; font-weight: 700; }
-.ki-live { color: #4ade80; font-weight: 700; }
-.kickoff-divider { color: rgba(255,255,255,0.2); }
 
 /* ── TOURNAMENT STATS TICKER ── */
 .stats-outer { background: rgba(0,0,0,0.3); }
