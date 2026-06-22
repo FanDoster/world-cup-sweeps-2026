@@ -202,6 +202,7 @@ async function toggleJoker(matchId) {
     alert(error.message.includes('one joker') ? 'Your 🃏 is already locked in on another match that day.' : 'Error: ' + error.message);
     return;
   }
+  if (turningOn) playJokerVideo();
   loadPredData();
   renderPredictions();
 }
@@ -258,6 +259,7 @@ async function toggleJokerFromPanel(matchId) {
     alert(error.message.includes('one joker') ? 'Your 🃏 is already locked in on another match that day.' : 'Error: ' + error.message);
     return;
   }
+  if (turningOn) playJokerVideo();
   await loadPredData();
   const m = matchData.find(m => {
     const key = `${m.team1}|${m.team2}|${m.date}`;
@@ -285,4 +287,21 @@ function stepScore(inputId, delta) {
   v = Math.max(0, Math.min(20, v + delta));
   el.value = v;
   el.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function playJokerVideo() {
+  const overlay = document.getElementById('joker-video-overlay');
+  const video = document.getElementById('joker-video');
+  if (!overlay || !video) return;
+  video.currentTime = 0;
+  overlay.classList.add('active');
+  video.play().catch(() => {});
+  video.onended = closeJokerVideo;
+}
+
+function closeJokerVideo() {
+  const overlay = document.getElementById('joker-video-overlay');
+  const video = document.getElementById('joker-video');
+  if (overlay) overlay.classList.remove('active');
+  if (video) { video.pause(); video.currentTime = 0; }
 }
