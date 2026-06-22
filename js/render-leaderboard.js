@@ -441,6 +441,10 @@ function renderWarDispatch() {
     const esc = players.map(escapeHtml);
     return esc.length <= 1 ? esc[0] : esc.slice(0, -1).join(', ') + ' and ' + esc[esc.length - 1];
   };
+  const joinPlayerSpans = (players) => {
+    const spans = players.map(pSpan);
+    return spans.length <= 1 ? spans[0] : spans.slice(0, -1).join(', ') + ' and ' + spans[spans.length - 1];
+  };
 
   // Single-challenger headline templates (used when exactly one challenger)
   const CONTESTED_HEADLINES_1 = [
@@ -449,11 +453,11 @@ function renderWarDispatch() {
     (s, c) => `${pSpan(s.displaced)}'S HOLD ON ${tSpan(s.territory)} UNDER THREAT`,
     (s, c) => `${pSpan(c)} TIES ${pSpan(s.displaced)} IN ${tSpan(s.territory)}`,
   ];
-  // Multi-challenger headline templates (used when 2+ challengers)
+  // Multi-challenger headline templates — names all challengers
   const CONTESTED_HEADLINES_N = [
-    (s) => `${pSpan(s.displaced)}'S GRIP ON ${tSpan(s.territory)} UNDER THREAT`,
-    (s) => `${tSpan(s.territory)} NOW THREE-WAY CONTESTED`,
-    (s) => `${pSpan(s.displaced)}'S HOLD ON ${tSpan(s.territory)} BROKEN`,
+    (s, cs) => `${joinPlayerSpans(cs)} BREAK ${pSpan(s.displaced)}'S GRIP ON ${tSpan(s.territory)}`,
+    (s, cs) => `${joinPlayerSpans(cs)} CHALLENGE ${pSpan(s.displaced)} FOR ${tSpan(s.territory)}`,
+    (s, cs) => `${joinPlayerSpans(cs)} TIE ${pSpan(s.displaced)} IN ${tSpan(s.territory)}`,
   ];
   const CONTESTED_SUBS = [
     (s) => `${joinPlayers(s.contestedPlayers)} level · ${escapeHtml(s.displaced)} had sole control · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`,
@@ -495,7 +499,7 @@ function renderWarDispatch() {
       if (challengers.length === 1) {
         headline = pick(s.type, CONTESTED_HEADLINES_1)(s, challengers[0]);
       } else {
-        headline = pick(s.type, CONTESTED_HEADLINES_N)(s);
+        headline = pick(s.type, CONTESTED_HEADLINES_N)(s, challengers);
       }
       subline = pick(s.type + '_sub', CONTESTED_SUBS)(s);
     } else if (s.type === 'broke-deadlock') {
