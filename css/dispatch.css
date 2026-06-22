@@ -1,4 +1,71 @@
-/* War Dispatch CSS - Placeholder for future dispatch card styling */
+/* ── WAR DISPATCH ── */
 .war-dispatch {
-  /* Placeholder */
+  background: rgba(0,0,0,0.35);
+  border-top: 1px solid var(--border-alpha);
+  border-bottom: 1px solid var(--border-alpha);
+}
+
+.wd-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--border-alpha);
+}
+
+.wd-masthead-title {
+  font-size: 0.6rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.9);
+}
+
+.wd-masthead-sub {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+
+.wd-stories {
+  padding: 0 16px;
+}
+
+.wd-story {
+  padding: 8px 0;
+  border-top: 1px solid var(--border-alpha);
+}
+
+.wd-story:first-child {
+  border-top: none;
+}
+
+.wd-headline {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.wd-territory {
+  color: rgba(255,255,255,0.65);
+}
+
+.wd-subline {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+  letter-spacing: 0.03em;
+}
+
+.wd-empty {
+  padding: 10px 0;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
