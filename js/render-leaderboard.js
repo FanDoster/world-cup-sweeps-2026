@@ -396,49 +396,108 @@ function renderWarDispatch() {
 
   const stories = calcBattleMapUpdates();
 
-  const playerSpan = (name) =>
-    `<span style="color:${ownerHexColors[name]}">${escapeHtml(name.toUpperCase())}</span>`;
-  const territorySpan = (name) =>
-    `<span class="wd-territory">${escapeHtml(name.toUpperCase())}</span>`;
-
   const masthead = `
     <div class="wd-masthead">
-      <span class="wd-masthead-title">THE WAR DISPATCH</span>
-      <span class="wd-masthead-sub">after last 5 results</span>
+      <span class="wd-masthead-label">BATTLE MAP</span>
+      <span class="wd-sitrep">[ SITREP ]</span>
+      <span class="wd-masthead-sub">AFTER LAST 5 RESULTS</span>
     </div>`;
 
   if (!stories.length) {
-    el.innerHTML = masthead +
-      `<div class="wd-stories"><div class="wd-empty">No territory changes from last 5 results</div></div>`;
+    el.innerHTML = masthead + `<div class="wd-empty">NO TERRITORY CHANGES FROM LAST 5 RESULTS</div>`;
     return;
   }
 
+  const pick = (seed, pool) => pool[seed.charCodeAt(0) % pool.length];
+  const pCol = (name) => ownerHexColors[name] || '#fff';
+  const pSpan = (name) => `<span style="color:${pCol(name)}">${escapeHtml(name.toUpperCase())}</span>`;
+  const tSpan = (name) => `<span class="wd-territory">${escapeHtml(name.toUpperCase())}</span>`;
+  const ptStr = (n) => `${n} pt${n !== 1 ? 's' : ''}`;
+
+  const SEIZED_VERBS = ['SEIZES', 'CAPTURES', 'CLAIMS', 'TAKES CONTROL OF'];
+  const SEIZED_SUBS = [
+    (s) => `Leads ${escapeHtml(s.runnerUp || 'the field')} by ${ptStr(s.margin)} · after ${escapeHtml(s.triggerMatch)}`,
+    (s) => `${ptStr(s.margin)} clear of ${escapeHtml(s.runnerUp || 'the field')} · after ${escapeHtml(s.triggerMatch)}`,
+    (s) => `Takes the lead by ${ptStr(s.margin)} · after ${escapeHtml(s.triggerMatch)}`,
+  ];
+
+  const WRESTED_HEADLINES = [
+    (s) => `${pSpan(s.player)} WRESTS ${tSpan(s.territory)} FROM ${pSpan(s.displaced)}`,
+    (s) => `${pSpan(s.player)} OVERTHROWS ${pSpan(s.displaced)} IN ${tSpan(s.territory)}`,
+    (s) => `${pSpan(s.player)} TAKES ${tSpan(s.territory)} FROM ${pSpan(s.displaced)}`,
+    (s) => `${pSpan(s.player)} DEFEATS ${pSpan(s.displaced)} FOR ${tSpan(s.territory)}`,
+  ];
+  const WRESTED_SUBS = [
+    (s) => `Overtook ${escapeHtml(s.displaced)} by ${ptStr(s.margin)} · after ${escapeHtml(s.triggerMatch)}`,
+    (s) => `Took the lead by ${ptStr(s.margin)} · after ${escapeHtml(s.triggerMatch)}`,
+    (s) => `${ptStr(s.margin)} ahead of ${escapeHtml(s.displaced)} · after ${escapeHtml(s.triggerMatch)}`,
+  ];
+
+  const CONTESTED_HEADLINES = [
+    (s, c) => `${pSpan(c)} BREAKS ${pSpan(s.displaced)}'S GRIP ON ${tSpan(s.territory)}`,
+    (s, c) => `${pSpan(c)} CHALLENGES ${pSpan(s.displaced)} FOR ${tSpan(s.territory)}`,
+    (s, c) => `${pSpan(s.displaced)}'S HOLD ON ${tSpan(s.territory)} UNDER THREAT`,
+    (s, c) => `${pSpan(c)} TIES ${pSpan(s.displaced)} IN ${tSpan(s.territory)}`,
+  ];
+  const CONTESTED_SUBS = [
+    (s, c) => `${escapeHtml(c)} and ${escapeHtml(s.displaced)} level · ${escapeHtml(s.displaced)} had sole control · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`,
+    (s, c) => `Disputed — ${escapeHtml(c)} pulls level with ${escapeHtml(s.displaced)} · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} left`,
+    (s, c) => `${escapeHtml(s.displaced)}'s sole control broken by ${escapeHtml(c)} · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`,
+  ];
+
+  const DEADLOCK_VERBS = ['BREAKS DEADLOCK IN', 'PULLS CLEAR IN', 'ENDS STALEMATE IN', 'EMERGES FROM CHAOS IN'];
+  const DEADLOCK_SUBS = [
+    (s) => `${ptStr(s.margin)} clear · after ${escapeHtml(s.triggerMatch)}`,
+    (s) => `Pulls ${ptStr(s.margin)} ahead · after ${escapeHtml(s.triggerMatch)}`,
+    (s) => `Decisive move — ${ptStr(s.margin)} clear · after ${escapeHtml(s.triggerMatch)}`,
+  ];
+
+  const EXTENDED_VERBS = ['TIGHTENS HOLD ON', 'EXTENDS GRIP ON', 'STRENGTHENS LEAD IN', 'PULLS FURTHER AHEAD IN'];
+  const EXTENDED_SUBS = [
+    (s) => `${ptStr(s.margin)} clear of ${escapeHtml(s.runnerUp || 'the field')} · after ${escapeHtml(s.triggerMatch)}`,
+    (s) => `Lead extended to ${ptStr(s.margin)} over ${escapeHtml(s.runnerUp || 'the field')} · after ${escapeHtml(s.triggerMatch)}`,
+    (s) => `${ptStr(s.margin)} ahead of ${escapeHtml(s.runnerUp || 'the field')} · after ${escapeHtml(s.triggerMatch)}`,
+  ];
+
   const storyHtml = stories.map(s => {
-    let headline, subline;
-    const pts = s.margin;
-    const ptStr = `${pts} pt${pts !== 1 ? 's' : ''}`;
+    const seed = s.territory;
+    let stripeColor, statusLabel, headline, subline;
 
     if (s.type === 'seized') {
-      headline = `${playerSpan(s.player)} SEIZES ${territorySpan(s.territory)}`;
-      subline = `Leads by ${ptStr} · ${escapeHtml(s.triggerMatch)}`;
-    } else if (s.type === 'broke-deadlock') {
-      headline = `${playerSpan(s.player)} BREAKS DEADLOCK IN ${territorySpan(s.territory)}`;
-      subline = `${ptStr} clear · ${escapeHtml(s.triggerMatch)}`;
+      stripeColor = pCol(s.player);
+      statusLabel = 'SEIZED';
+      headline = `${pSpan(s.player)} ${pick(seed, SEIZED_VERBS)} ${tSpan(s.territory)}`;
+      subline = pick(seed, SEIZED_SUBS)(s);
     } else if (s.type === 'wrested') {
-      headline = `${playerSpan(s.player)} WRESTS ${territorySpan(s.territory)} FROM ${playerSpan(s.displaced)}`;
-      subline = `Overtook by ${ptStr} · ${escapeHtml(s.triggerMatch)}`;
+      stripeColor = pCol(s.player);
+      statusLabel = 'CONTROL CHANGE';
+      headline = pick(seed, WRESTED_HEADLINES)(s);
+      subline = pick(seed, WRESTED_SUBS)(s);
     } else if (s.type === 'contested') {
-      const names = s.contestedPlayers.map(playerSpan).join(' and ');
-      headline = `${territorySpan(s.territory)} NOW CONTESTED`;
-      subline = `${names} level · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`;
+      const challenger = s.contestedPlayers.find(p => p !== s.displaced) || s.contestedPlayers[0];
+      stripeColor = 'var(--live)';
+      statusLabel = 'CONTESTED';
+      headline = pick(seed, CONTESTED_HEADLINES)(s, challenger);
+      subline = pick(seed, CONTESTED_SUBS)(s, challenger);
+    } else if (s.type === 'broke-deadlock') {
+      stripeColor = pCol(s.player);
+      statusLabel = 'DEADLOCK BROKEN';
+      headline = `${pSpan(s.player)} ${pick(seed, DEADLOCK_VERBS)} ${tSpan(s.territory)}`;
+      subline = pick(seed, DEADLOCK_SUBS)(s);
     } else {
-      headline = `${playerSpan(s.player)} EXTENDS GRIP ON ${territorySpan(s.territory)}`;
-      subline = `${ptStr} clear · ${escapeHtml(s.triggerMatch)}`;
+      stripeColor = pCol(s.player);
+      statusLabel = 'LEAD EXTENDED';
+      headline = `${pSpan(s.player)} ${pick(seed, EXTENDED_VERBS)} ${tSpan(s.territory)}`;
+      subline = pick(seed, EXTENDED_SUBS)(s);
     }
 
     return `<div class="wd-story">
-      <div class="wd-headline">${headline}</div>
-      <div class="wd-subline">${subline}</div>
+      <div class="wd-stripe" style="background:${stripeColor}"></div>
+      <div class="wd-body">
+        <span class="wd-status">${statusLabel}</span>
+        <div class="wd-headline">${headline}</div>
+        <div class="wd-subline">${subline}</div>
+      </div>
     </div>`;
   }).join('');
 
