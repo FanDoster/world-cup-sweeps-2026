@@ -21,8 +21,14 @@ function switchTab(tab) {
   if (tab === 'shooter') initShooter();
   if (tab !== 'shooter') pauseShooter();
   if (tab === 'profile') {
-    // Profile rendering is handled explicitly by showUserProfile / handleProfileRoute
+    // Profile rendering is handled explicitly by showUserProfile / handleHashRoute
   }
+
+  // Update hash URL for all tabs (use pushState so back/forward works between tabs)
+  const tabHash = (tab === 'profile' && typeof userProfilePlayer !== 'undefined' && userProfilePlayer)
+    ? '#/users/' + encodeURIComponent(userProfilePlayer)
+    : '#/' + tab;
+  history.pushState(null, '', tabHash);
 }
 
 // ── INIT ──
@@ -34,8 +40,8 @@ restoreSession().then(async () => {
   return loadData().then(() => {
     renderWarDispatch();
     checkTeamResults();
-    // Handle hash route for direct profile links (after data is loaded)
-    handleProfileRoute();
+    // Handle hash route for direct links (after data is loaded)
+    handleHashRoute();
   });
 });
 setInterval(renderMatches, 60000);

@@ -12,7 +12,6 @@ async function showUserProfile(playerName) {
   userProfilePlayer = playerName;
   switchTab('profile');
   renderUserProfile(playerName);
-  window.location.hash = '#/users/' + encodeURIComponent(playerName);
 }
 
 let _profileLoading = null;  // player name currently being rendered (prevents double-render)
@@ -21,7 +20,7 @@ async function renderUserProfile(playerName) {
   const el = document.getElementById('userProfileContent');
   if (!el) return;
 
-  // Prevent double-render from handleProfileRoute + switchTab both calling
+  // Prevent double-render from handleHashRoute + switchTab both calling
   if (_profileLoading === playerName) return;
   _profileLoading = playerName;
 
@@ -593,18 +592,34 @@ function buildPredictionList(predictions) {
 }
 
 // ── Handle hash-based routing ──
-function handleProfileRoute() {
+// Returns true if a valid route was matched, false otherwise.
+function handleHashRoute() {
   const hash = window.location.hash;
-  const m = hash.match(/^#\/users\/(.+)$/);
-  if (m) {
-    const playerName = decodeURIComponent(m[1]);
+  if (!hash || hash === '#') return false;
+
+  // Check for user profile route: #/users/PlayerName
+  const userMatch = hash.match(/^#\/users\/(.+)$/);
+  if (userMatch) {
+    const playerName = decodeURIComponent(userMatch[1]);
     if (PLAYERS.includes(playerName)) {
       userProfilePlayer = playerName;
       switchTab('profile');
-      renderUserProfile(playerName);  // belt and suspenders — don't rely on switchTab internals
+      renderUserProfile(playerName);
       return true;
     }
   }
+
+  // Check for main tab route: #/tabName
+  const validTabs = ['players', 'matches', 'groups', 'leaderboard', 'teams', 'map', 'shooter', 'myteams', 'predictions'];
+  const tabMatch = hash.match(/^#\/(\w+)$/);
+  if (tabMatch) {
+    const tab = tabMatch[1];
+    if (validTabs.includes(tab)) {
+      switchTab(tab);
+      return true;
+    }
+  }
+
   return false;
 }
 
@@ -988,14 +1003,37 @@ function pfpSetDisplay(el, value) {
   el.style.display = value;
 }
 window.addEventListener('hashchange', () => {
-  if (userProfilePlayer) {
-    // Only re-render if hash changed to a different player
-    const hash = window.location.hash;
-    const m = hash.match(/^#\/users\/(.+)$/);
-    if (m) {
-      const playerName = decodeURIComponent(m[1]);
-      if (playerName !== userProfilePlayer && PLAYERS.includes(playerName)) {
+  const hash = window.location.hash;
+  if (!hash || hash === '#') return;
+
+  // Check for user profile route
+  const userMatch = hash.match(/^#\/users\/(.+)$/);
+  if (userMatch) {
+    const playerName = decodeURIComponent(userMatch[1]);
+    if (PLAYERS.includes(playerName)) {
+      if (userProfilePlayer !== playerName) {
+        // Different player — re-render
         renderUserProfile(playerName);
+      } else {
+        // Same player, switch to profile tab if not already there
+        const profileSection = document.getElementById('sectionProfile');
+        if (profileSection && !profileSection.classList.contains('active')) {
+          switchTab('profile');
+        }
+      }
+      return;
+    }
+  }
+
+  // Check for main tab route: #/tabName
+  const validTabs = ['players', 'matches', 'groups', 'leaderboard', 'teams', 'map', 'shooter', 'myteams', 'predictions'];
+  const tabMatch = hash.match(/^#\/(\w+)$/);
+  if (tabMatch) {
+    const tab = tabMatch[1];
+    if (validTabs.includes(tab)) {
+      const activeBtn = document.querySelector('.tab-btn.active');
+      if (!activeBtn || activeBtn.dataset.tab !== tab) {
+        switchTab(tab);
       }
     }
   }

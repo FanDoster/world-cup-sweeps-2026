@@ -99,3 +99,18 @@ function escapeHtml(s) {
   if (s == null) return '';
   return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+
+// Escape HTML then convert URLs to clickable links (same page, new tab)
+function linkifyHtml(s) {
+  if (s == null) return '';
+  // First escape HTML chars
+  const escaped = s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // Then convert URLs to anchor tags — greedy match to end of URL, strip trailing punctuation
+  return escaped.replace(
+    /https?:\/\/[^\s<"']+/gi,
+    (match) => {
+      const url = match.replace(/[.,;:!?)]+$/, '');
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+    }
+  );
+}

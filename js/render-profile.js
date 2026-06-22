@@ -404,7 +404,7 @@ async function loadComments(mid) {
       : t.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
     const authorName = nameById[c.user_id] || '?';
     const authorClickable = authorName !== '?' ? `onclick="showUserProfile('${authorName}')" style="cursor:pointer" title="View profile"` : '';
-    return `<div class="pp-comment">${avatarHtml(authorName, 24)}<span class="c-author" ${authorClickable}>${authorName}</span><span class="c-body">${escapeHtml(c.body)}</span><span class="c-time">${when}</span></div>`;
+    return `<div class="pp-comment">${avatarHtml(authorName, 24)}<span class="c-author" ${authorClickable}>${authorName}</span><span class="c-body">${linkifyHtml(c.body)}</span><span class="c-time">${when}</span></div>`;
   }).join('');
 }
 
