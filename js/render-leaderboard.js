@@ -385,6 +385,61 @@ function calcBattleMapUpdates() {
   return stories;
 }
 
+function renderWarDispatch() {
+  const el = document.getElementById('warDispatch');
+  if (!el) return;
+
+  const stories = calcBattleMapUpdates();
+
+  const playerSpan = (name) =>
+    `<span style="color:${ownerHexColors[name]}">${escapeHtml(name.toUpperCase())}</span>`;
+  const territorySpan = (name) =>
+    `<span class="wd-territory">${escapeHtml(name.toUpperCase())}</span>`;
+
+  const masthead = `
+    <div class="wd-masthead">
+      <span class="wd-masthead-title">THE WAR DISPATCH</span>
+      <span class="wd-masthead-sub">after last 5 results</span>
+    </div>`;
+
+  if (!stories.length) {
+    el.innerHTML = masthead +
+      `<div class="wd-stories"><div class="wd-empty">No territory changes from last 5 results</div></div>`;
+    return;
+  }
+
+  const storyHtml = stories.map(s => {
+    let headline, subline;
+    const pts = s.margin;
+    const ptStr = `${pts} pt${pts !== 1 ? 's' : ''}`;
+
+    if (s.type === 'seized') {
+      headline = `${playerSpan(s.player)} SEIZES ${territorySpan(s.territory)}`;
+      subline = `Leads by ${ptStr} · ${escapeHtml(s.triggerMatch)}`;
+    } else if (s.type === 'broke-deadlock') {
+      headline = `${playerSpan(s.player)} BREAKS DEADLOCK IN ${territorySpan(s.territory)}`;
+      subline = `${ptStr} clear · ${escapeHtml(s.triggerMatch)}`;
+    } else if (s.type === 'wrested') {
+      headline = `${playerSpan(s.player)} WRESTS ${territorySpan(s.territory)} FROM ${playerSpan(s.displaced)}`;
+      subline = `Overtook by ${ptStr} · ${escapeHtml(s.triggerMatch)}`;
+    } else if (s.type === 'contested') {
+      const names = s.contestedPlayers.map(playerSpan).join(' and ');
+      headline = `${territorySpan(s.territory)} NOW CONTESTED`;
+      subline = `${names} level · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`;
+    } else {
+      headline = `${playerSpan(s.player)} EXTENDS GRIP ON ${territorySpan(s.territory)}`;
+      subline = `${ptStr} clear · ${escapeHtml(s.triggerMatch)}`;
+    }
+
+    return `<div class="wd-story">
+      <div class="wd-headline">${headline}</div>
+      <div class="wd-subline">${subline}</div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = masthead + `<div class="wd-stories">${storyHtml}</div>`;
+}
+
 function calcPredPointsForAll() {
   predPointsByPlayer = {};
   for (const [name, st] of Object.entries(getPredStatsByPlayer())) predPointsByPlayer[name] = st.pts;

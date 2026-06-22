@@ -32,6 +32,7 @@ restoreSession().then(async () => {
   await preloadAvatars(PLAYERS).catch(() => {});
 
   return loadData().then(() => {
+    renderWarDispatch();
     checkTeamResults();
     // Handle hash route for direct profile links (after data is loaded)
     handleProfileRoute();
