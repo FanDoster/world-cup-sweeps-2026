@@ -29,91 +29,6 @@
   <link rel="stylesheet" href="css/profile-picture.css">
   <link rel="stylesheet" href="css/user-profile.css">
   <link rel="stylesheet" href="css/responsive.css">
-  <style>
-    .qc-banner {
-      display: flex;
-      flex-direction: column;
-      background: rgba(245,158,11,0.10);
-      border: 1px solid var(--gold);
-      border-radius: var(--radius);
-      box-shadow: 0 0 32px rgba(245,158,11,0.18), inset 0 0 0 1px rgba(245,158,11,0.10);
-      margin: 16px 0;
-      overflow: hidden;
-    }
-    .qc-header {
-      background: var(--gold);
-      color: var(--bg);
-      padding: 7px 20px;
-      font-size: 0.85rem;
-      font-weight: 800;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-    }
-    .qc-content {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      padding: 16px 20px;
-    }
-    .qc-icon {
-      font-size: 3.2rem;
-      line-height: 1;
-      flex-shrink: 0;
-      color: var(--gold);
-      filter: drop-shadow(0 0 8px rgba(245,158,11,0.6));
-      margin-top: 2px;
-    }
-    .qc-body {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .qc-headline-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .qc-headline {
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--gold);
-    }
-    .qc-badge {
-      font-size: 0.75rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      background: var(--gold);
-      color: var(--bg);
-      padding: 3px 10px;
-      border-radius: 99px;
-    }
-    .qc-sub {
-      font-size: 1rem;
-      color: #fff;
-      line-height: 1.6;
-    }
-    .qc-rules {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      margin-top: 6px;
-    }
-    .qc-rule {
-      font-family: var(--font-mono);
-      font-size: 0.9rem;
-      color: var(--gold);
-    }
-    @media (max-width: 700px) {
-      .qc-content { flex-direction: column; gap: 10px; padding: 14px 16px; }
-      .qc-icon { font-size: 2rem; }
-    }
-  </style>
 </head>
 <body>
   <div class="container">
@@ -168,29 +83,6 @@
         <button onclick="showSignUp()">Create account</button>
       </div>
     </header>
-
-    <!-- Queen Card feature announcement -->
-    <div class="qc-banner">
-      <div class="qc-header">&#9889; Coming Soon</div>
-      <div class="qc-content">
-        <div class="qc-icon">🂽</div>
-        <div class="qc-body">
-          <div class="qc-headline-row">
-            <span class="qc-headline">Queen Card</span>
-            <span class="qc-badge">New</span>
-          </div>
-          <p class="qc-sub">Play your Queen Card in the 48 hours after the group stage ends. Pick a rival and swap up to 3 of your predictions with theirs — jokers stay put, scores update immediately. One card. One chance. Use it wisely.</p>
-          <div class="qc-rules">
-            <span class="qc-rule">&gt; One card per player &lt;</span>
-            <span class="qc-rule">&gt; Swap up to 3 group stage predictions with any one rival &lt;</span>
-            <span class="qc-rule">&gt; Play within 48 hours of the final group stage fixture &lt;</span>
-            <span class="qc-rule">&gt; Jokers are not transferable &lt;</span>
-            <span class="qc-rule">&gt; Cannot swap identical predictions &lt;</span>
-            <span class="qc-rule">&gt; Expires at Round of 32 kickoff &lt;</span>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div id="warDispatch" class="war-dispatch"></div>
 

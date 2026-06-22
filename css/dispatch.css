@@ -16,7 +16,7 @@
 }
 
 .wd-masthead-label {
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -24,7 +24,7 @@
 }
 
 .wd-sitrep {
-  font-size: 0.55rem;
+  font-size: 0.65rem;
   font-weight: 900;
   letter-spacing: 0.15em;
   text-transform: uppercase;
@@ -36,7 +36,7 @@
 
 .wd-masthead-sub {
   margin-left: auto;
-  font-size: 0.5rem;
+  font-size: 0.6rem;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -64,7 +64,7 @@
 
 .wd-status {
   display: block;
-  font-size: 0.58rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -73,7 +73,7 @@
 }
 
 .wd-headline {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -86,7 +86,7 @@
 }
 
 .wd-subline {
-  font-size: 0.65rem;
+  font-size: 0.78rem;
   color: var(--text-secondary);
   margin-top: 3px;
   letter-spacing: 0.02em;
@@ -94,7 +94,7 @@
 
 .wd-empty {
   padding: 10px 16px;
-  font-size: 0.65rem;
+  font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
