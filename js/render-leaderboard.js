@@ -408,7 +408,11 @@ function renderWarDispatch() {
     return;
   }
 
-  const pick = (seed, pool) => pool[seed.charCodeAt(0) % pool.length];
+  const typeCounters = {};
+  const pick = (type, pool) => {
+    typeCounters[type] = (typeCounters[type] ?? -1) + 1;
+    return pool[typeCounters[type] % pool.length];
+  };
   const pCol = (name) => ownerHexColors[name] || '#fff';
   const pSpan = (name) => `<span style="color:${pCol(name)}">${escapeHtml(name.toUpperCase())}</span>`;
   const tSpan = (name) => `<span class="wd-territory">${escapeHtml(name.toUpperCase())}</span>`;
@@ -460,35 +464,34 @@ function renderWarDispatch() {
   ];
 
   const storyHtml = stories.map(s => {
-    const seed = s.territory;
     let stripeColor, statusLabel, headline, subline;
 
     if (s.type === 'seized') {
       stripeColor = pCol(s.player);
       statusLabel = 'SEIZED';
-      headline = `${pSpan(s.player)} ${pick(seed, SEIZED_VERBS)} ${tSpan(s.territory)}`;
-      subline = pick(seed, SEIZED_SUBS)(s);
+      headline = `${pSpan(s.player)} ${pick(s.type, SEIZED_VERBS)} ${tSpan(s.territory)}`;
+      subline = pick(s.type + '_sub', SEIZED_SUBS)(s);
     } else if (s.type === 'wrested') {
       stripeColor = pCol(s.player);
       statusLabel = 'CONTROL CHANGE';
-      headline = pick(seed, WRESTED_HEADLINES)(s);
-      subline = pick(seed, WRESTED_SUBS)(s);
+      headline = pick(s.type, WRESTED_HEADLINES)(s);
+      subline = pick(s.type + '_sub', WRESTED_SUBS)(s);
     } else if (s.type === 'contested') {
       const challenger = s.contestedPlayers.find(p => p !== s.displaced) || s.contestedPlayers[0];
       stripeColor = 'var(--live)';
       statusLabel = 'CONTESTED';
-      headline = pick(seed, CONTESTED_HEADLINES)(s, challenger);
-      subline = pick(seed, CONTESTED_SUBS)(s, challenger);
+      headline = pick(s.type, CONTESTED_HEADLINES)(s, challenger);
+      subline = pick(s.type + '_sub', CONTESTED_SUBS)(s, challenger);
     } else if (s.type === 'broke-deadlock') {
       stripeColor = pCol(s.player);
       statusLabel = 'DEADLOCK BROKEN';
-      headline = `${pSpan(s.player)} ${pick(seed, DEADLOCK_VERBS)} ${tSpan(s.territory)}`;
-      subline = pick(seed, DEADLOCK_SUBS)(s);
+      headline = `${pSpan(s.player)} ${pick(s.type, DEADLOCK_VERBS)} ${tSpan(s.territory)}`;
+      subline = pick(s.type + '_sub', DEADLOCK_SUBS)(s);
     } else {
       stripeColor = pCol(s.player);
       statusLabel = 'LEAD EXTENDED';
-      headline = `${pSpan(s.player)} ${pick(seed, EXTENDED_VERBS)} ${tSpan(s.territory)}`;
-      subline = pick(seed, EXTENDED_SUBS)(s);
+      headline = `${pSpan(s.player)} ${pick(s.type, EXTENDED_VERBS)} ${tSpan(s.territory)}`;
+      subline = pick(s.type + '_sub', EXTENDED_SUBS)(s);
     }
 
     return `<div class="wd-story">
