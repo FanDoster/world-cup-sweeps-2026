@@ -15,13 +15,37 @@ jobs:
       - run: npx surge . --domain world-cup-sweeps-2026.surge.sh
         env:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+      - name: Wait for CDN propagation
+        run: |
+          echo "Waiting for site to be reachable..."
+          for i in $(seq 1 30); do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 https://world-cup-sweeps-2026.surge.sh || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "Site is live (HTTP 200)"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $HTTP_CODE — waiting..."
+            sleep 3
+          done
+          echo "Site did not return 200 within 90 seconds"
+          exit 1
       - name: Update version in Supabase
         run: |
           VERSION=$(sed -n "s/.*APP_VERSION = '\(.*\)';.*/\1/p" js/version.js)
           echo "Deployed version: $VERSION"
           SQL="INSERT INTO public.app_version (id, version, updated_at) VALUES (1, '$VERSION', now()) ON CONFLICT (id) DO UPDATE SET version = EXCLUDED.version, updated_at = EXCLUDED.updated_at;"
           PAYLOAD=$(python3 -c "import sys,json; print(json.dumps({'query': sys.argv[1]}))" "$SQL")
-          curl -s -X POST "https://api.supabase.com/v1/projects/nkztkzrkbeacyltidqwr/database/query" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_PAT }}" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD"
+          for i in $(seq 1 3); do
+            RESP=$(curl -s -X POST "https://api.supabase.com/v1/projects/nkztkzrkbeacyltidqwr/database/query" \
+              -H "Authorization: Bearer *** secrets.SUPABASE_PAT }}" \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD" --max-time 15)
+            if echo "$RESP" | python3 -c "import sys,json; json.load(sys.stdin)" 2>/dev/null; then
+              echo "Supabase version updated successfully"
+              exit 0
+            fi
+            echo "Supabase API attempt $i failed, retrying..."
+            sleep 3
+          done
+          echo "Failed to update Supabase after 3 attempts"
+          exit 1

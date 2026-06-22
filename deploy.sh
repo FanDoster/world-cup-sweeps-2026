@@ -7,7 +7,6 @@ VERSION_FILE="js/version.js"
 
 # 1. Bump version
 TODAY=$(date +%Y-%m-%d)
-# Find the current counter for today — e.g. 2026-06-22-003
 CUR=$(grep -oP "APP_VERSION = '\K[^']+" "$VERSION_FILE" || echo "unknown")
 if [[ "$CUR" == $TODAY-* ]]; then
   SEQ=$((10#${CUR##*-} + 1))
@@ -23,9 +22,29 @@ sed -i '' "s/APP_VERSION = '.*'/APP_VERSION = '$NEW_VERSION'/" "$VERSION_FILE"
 echo "Deploying to $DOMAIN..."
 npx surge . --domain "$DOMAIN"
 
-# 3. Update Supabase
+# 3. Wait for CDN propagation (health check)
+echo "Waiting for site to be reachable..."
+for i in $(seq 1 30); do
+  HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "https://$DOMAIN" || echo "000")
+  if [ "$HTTP_CODE" = "200" ]; then
+    echo "Site is live (HTTP 200)"
+    break
+  fi
+  echo "Attempt $i: HTTP $HTTP_CODE — waiting..."
+  sleep 3
+done
+
+# 4. Update Supabase (with retries)
 echo "Updating Supabase app_version..."
 SQL="INSERT INTO public.app_version (id, version, updated_at) VALUES (1, '$NEW_VERSION', now()) ON CONFLICT (id) DO UPDATE SET version = EXCLUDED.version, updated_at = EXCLUDED.updated_at;"
-echo "$SQL" | bash ~/.hermes/scripts/supabase-sql.sh
+for i in $(seq 1 3); do
+  RESULT=$(echo "$SQL" | bash ~/.hermes/scripts/supabase-sql.sh 2>/dev/null || echo "FAILED")
+  if echo "$RESULT" | grep -q '"version"'; then
+    echo "Supabase updated successfully"
+    break
+  fi
+  echo "Supabase attempt $i failed, retrying..."
+  sleep 3
+done
 
 echo "Done — version $NEW_VERSION deployed."
