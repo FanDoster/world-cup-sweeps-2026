@@ -19,6 +19,9 @@
     overlay.className = 'update-overlay';
     overlay.id = 'updateOverlay';
 
+    var wrap = document.createElement('div');
+    wrap.className = 'update-wrap';
+
     var accent = document.createElement('div');
     accent.className = 'update-accent';
 
@@ -45,8 +48,9 @@
 
     band.appendChild(row);
     band.appendChild(subEl);
-    overlay.appendChild(accent);
-    overlay.appendChild(band);
+    wrap.appendChild(accent);
+    wrap.appendChild(band);
+    overlay.appendChild(wrap);
     document.body.appendChild(overlay);
   }
 

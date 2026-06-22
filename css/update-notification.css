@@ -1,35 +1,55 @@
-/* ── Update notification — World Cup broadcast lower-third HUD ── */
-/* Mimics the on-screen graphics used during hydration breaks / match
-   stoppages: full-width dark band at the bottom, accent bar, slides up. */
+/* ── Update notification — World Cup broadcast HUD style, centred ── */
+/* Dark centred band with accent bar, slides in from above, like a
+   World Cup broadcast graphic overlaid mid-screen. */
 
 .update-overlay {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  inset: 0;
   z-index: 99999;
   pointer-events: none;
-  transform: translateY(100%);
-  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
 }
 
 .update-overlay.show {
+  opacity: 1;
+}
+
+/* Wrapper that holds accent bar + band so they move together */
+.update-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 600px;
+  transform: translateY(-30px);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.update-overlay.show .update-wrap {
   transform: translateY(0);
 }
 
-/* Accent bar — the colored stripe at the top of the band */
+/* Accent bar — the coloured stripe at the top of the band */
 .update-accent {
   height: 3px;
   background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dim) 100%);
   width: 100%;
+  border-radius: 2px 2px 0 0;
 }
 
-/* Main band — dark, extends full viewport width */
+/* Main band — dark, with blur */
 .update-band {
   background: rgba(7, 11, 16, 0.94);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  padding: 18px 32px 22px;
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 20px 36px 24px;
   text-align: center;
 }
 
@@ -43,7 +63,7 @@
 }
 
 .update-emoji {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   line-height: 1;
   flex-shrink: 0;
 }
