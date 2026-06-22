@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="css/groups.css">
   <link rel="stylesheet" href="css/leaderboard.css">
   <link rel="stylesheet" href="css/teams.css">
-  <link rel="stylesheet" href="css/tickers.css">
+  <link rel="stylesheet" href="css/dispatch.css">
   <link rel="stylesheet" href="css/predictions.css">
   <link rel="stylesheet" href="css/profile.css">
   <link rel="stylesheet" href="css/auth.css">
@@ -192,47 +192,7 @@
       </div>
     </div>
 
-    <div class="tickers-container">
-      <div class="tickers-rows">
-
-        <!-- Polymarket odds ticker -->
-        <div class="odds-outer">
-          <div class="odds-label">
-            <span class="ol-top">LIVE ODDS</span>
-            <span class="ol-brand">POLYMARKET</span>
-            <span class="ol-sub">PREDICTION MARKET</span>
-          </div>
-          <div class="odds-wrap">
-            <div class="odds-track" id="oddsTrack">
-              <span class="odds-loading">LOADING LIVE MARKETS…</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tournament stats ticker -->
-        <div class="stats-outer">
-          <div class="stats-label">
-            <span class="sl-top">LIVE</span>
-            <span class="sl-brand"></span>
-            <span class="sl-sub">STATS</span>
-          </div>
-          <div class="stats-wrap">
-            <div class="stats-track" id="statsTrack">
-              <span class="stats-loading">LOADING…</span>
-            </div>
-          </div>
-        </div>
-
-
-      </div><!-- /.tickers-rows -->
-
-      <!-- Clock spans both rows -->
-      <div class="ticker-clock">
-        <span class="tc-time" id="tcTime">00:00:00</span>
-        <span class="tc-date" id="tcDate"></span>
-        <span class="tc-tz">BST</span>
-      </div>
-    </div><!-- /.tickers-container -->
+    <div id="warDispatch" class="war-dispatch"></div>
 
     <div class="tab-bar" id="tabBar">
       <button type="button" class="tab-btn" data-tab="players" onclick="switchTab('players')"><span class="emoji">🏆</span><span class="tab-label"> Players</span></button>
@@ -452,7 +412,6 @@
   <script src="js/render-profile.js"></script>
   <script src="js/globe.js"></script>
   <script src="js/shooter.js"></script>
-  <script src="js/odds.js"></script>
   <script src="js/team-results.js"></script>
   <script src="js/profile-picture.js"></script>
   <script src="js/render-user-profile.js"></script>

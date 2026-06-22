@@ -58,7 +58,7 @@ async function doSignIn() {
   closeModals();
   updateAuthBar();
   showJokerNotification();
-  loadData().then(() => { loadOdds(); buildCountdownTicker(); loadStatsTracker(); checkTeamResults(); });
+  loadData().then(() => { checkTeamResults(); });
 }
 
 async function doSignUp() {
@@ -102,7 +102,7 @@ async function doSignUp() {
   closeModals();
   updateAuthBar();
   showJokerNotification();
-  loadData().then(() => { loadOdds(); buildCountdownTicker(); loadStatsTracker(); checkTeamResults(); });
+  loadData().then(() => { checkTeamResults(); });
 }
 
 async function doSignOut() {

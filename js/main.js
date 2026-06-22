@@ -32,7 +32,7 @@ restoreSession().then(async () => {
   await preloadAvatars(PLAYERS).catch(() => {});
 
   return loadData().then(() => {
-    loadOdds(); loadStatsTracker(); checkTeamResults();
+    checkTeamResults();
     // Handle hash route for direct profile links (after data is loaded)
     handleProfileRoute();
   });
@@ -40,5 +40,3 @@ restoreSession().then(async () => {
 setInterval(renderMatches, 60000);
 setInterval(() => { if (selectedTeam) renderTeamSchedule(); }, 60000);
 setInterval(() => loadData().then(checkTeamResults), 180000);
-setInterval(loadOdds, 600000);
-setInterval(loadStatsTracker, 300000);
