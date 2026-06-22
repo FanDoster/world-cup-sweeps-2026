@@ -15,3 +15,13 @@ jobs:
       - run: npx surge . --domain world-cup-sweeps-2026.surge.sh
         env:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
+      - name: Update version in Supabase
+        run: |
+          VERSION=$(sed -n "s/.*APP_VERSION = '\(.*\)';.*/\1/p" js/version.js)
+          echo "Deployed version: $VERSION"
+          SQL="INSERT INTO public.app_version (id, version, updated_at) VALUES (1, '$VERSION', now()) ON CONFLICT (id) DO UPDATE SET version = EXCLUDED.version, updated_at = EXCLUDED.updated_at;"
+          PAYLOAD=$(python3 -c "import sys,json; print(json.dumps({'query': sys.argv[1]}))" "$SQL")
+          curl -s -X POST "https://api.supabase.com/v1/projects/nkztkzrkbeacyltidqwr/database/query" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_PAT }}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
