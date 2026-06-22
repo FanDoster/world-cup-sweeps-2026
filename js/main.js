@@ -40,4 +40,4 @@ restoreSession().then(async () => {
 });
 setInterval(renderMatches, 60000);
 setInterval(() => { if (selectedTeam) renderTeamSchedule(); }, 60000);
-setInterval(() => loadData().then(checkTeamResults), 180000);
+setInterval(() => loadData().then(() => { renderWarDispatch(); checkTeamResults(); }), 180000);

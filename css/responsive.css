@@ -107,14 +107,6 @@
 
   /* Hide shooter tab on mobile — not playable without mouse/keyboard */
   .shooter-tab { display: none; }
-
-  /* Tickers on mobile */
-  .ticker-clock { display: none; }
-  .ticker-label img { height: 22px; }
-  .ticker-label .tl-partners { display: none; }
-  .ticker-track .sponsor-tag { font-size: 0.75rem; }
-  .sponsor img { height: 18px; max-width: 72px; }
-  .sponsor { padding: 0 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
