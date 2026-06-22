@@ -319,7 +319,10 @@ function calcBattleMapUpdates() {
     const after = calcTerritoryControlForTerritory(territory, new Set());
     const before = calcTerritoryControlForTerritory(territory, territoryRecentKeys);
 
-    const triggerKey = allTerritoryKeys.find(k => recentKeys.has(k));
+    // Iterate recent5 (newest-first) to find the most recent match in this territory
+    const triggerKey = recent5
+      .map(m => `${m.team1}|${m.team2}|${m.date}`)
+      .find(k => territoryRecentKeys.has(k));
     const triggerMatch = triggerKey ? triggerKey.split('|').slice(0, 2).join(' vs ') : '';
 
     const afterController = after.controller;
@@ -329,6 +332,7 @@ function calcBattleMapUpdates() {
 
     const sortedAfter = Object.entries(after.totalPts).sort((a, b) => b[1] - a[1]);
     const afterMargin = sortedAfter[0] ? sortedAfter[0][1] - (sortedAfter[1]?.[1] ?? 0) : 0;
+    const runnerUp = sortedAfter[1]?.[0] ?? null;
 
     let type, player, displaced, contestedPlayers, margin;
 
@@ -376,6 +380,7 @@ function calcBattleMapUpdates() {
       margin,
       triggerMatch,
       matchesRemaining,
+      runnerUp,
     });
   }
 
