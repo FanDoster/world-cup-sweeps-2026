@@ -252,6 +252,139 @@ function calcTerritoryControl() {
   });
 }
 
+function calcTerritoryControlForTerritory(territory, excludeKeys) {
+  const totalMatches = territory.venues.reduce((n, v) => n + (VENUE_DATA[v]?.matches.length || 0), 0);
+  let matchesPlayed = 0;
+  const totals = Object.fromEntries(PLAYERS.map(p => [p, 0]));
+
+  for (const venueName of territory.venues) {
+    const venue = VENUE_DATA[venueName];
+    if (!venue) continue;
+    for (const key of venue.matches) {
+      if (excludeKeys && excludeKeys.has(key)) continue;
+      const m = matchByKey[key];
+      if (!m || !m.isComplete) continue;
+      matchesPlayed++;
+      const matchId = matchIdByTeamDate[key];
+      if (!matchId) continue;
+      const preds = predLookup[matchId] || [];
+      for (const player of PLAYERS) {
+        const pred = preds.find(p => p.player_name === player);
+        if (pred && pred.home !== null && pred.home !== undefined) {
+          totals[player] += calcPredPoints(pred.home, pred.away, m.score1, m.score2);
+        }
+      }
+    }
+  }
+
+  if (matchesPlayed === 0) {
+    return { controller: null, contested: false, contestedPlayers: [], totalPts: {}, matchesPlayed: 0, totalMatches };
+  }
+
+  const maxPts = Math.max(...Object.values(totals));
+  const leaders = PLAYERS.filter(p => totals[p] === maxPts);
+
+  return {
+    controller: leaders.length === 1 ? leaders[0] : null,
+    contested: leaders.length > 1,
+    contestedPlayers: leaders.length > 1 ? leaders : [],
+    totalPts: { ...totals },
+    matchesPlayed,
+    totalMatches,
+  };
+}
+
+function calcBattleMapUpdates() {
+  const completed = matchData
+    .filter(m => m.isComplete)
+    .sort((a, b) => {
+      const da = new Date(`${a.date}T${a.time || '00:00'}`);
+      const db = new Date(`${b.date}T${b.time || '00:00'}`);
+      return db - da;
+    });
+  const recent5 = completed.slice(0, 5);
+  if (!recent5.length) return [];
+
+  const recentKeys = new Set(recent5.map(m => `${m.team1}|${m.team2}|${m.date}`));
+
+  const stories = [];
+
+  for (const territory of TERRITORY_DATA) {
+    const allTerritoryKeys = territory.venues.flatMap(v => VENUE_DATA[v]?.matches || []);
+    const hasRecentMatch = allTerritoryKeys.some(k => recentKeys.has(k));
+    if (!hasRecentMatch) continue;
+
+    const territoryRecentKeys = new Set(allTerritoryKeys.filter(k => recentKeys.has(k)));
+
+    const after = calcTerritoryControlForTerritory(territory, new Set());
+    const before = calcTerritoryControlForTerritory(territory, territoryRecentKeys);
+
+    const triggerKey = allTerritoryKeys.find(k => recentKeys.has(k));
+    const triggerMatch = triggerKey ? triggerKey.split('|').slice(0, 2).join(' vs ') : '';
+
+    const afterController = after.controller;
+    const beforeController = before.controller;
+    const afterContested = after.contested;
+    const beforeContested = before.contested;
+
+    const sortedAfter = Object.entries(after.totalPts).sort((a, b) => b[1] - a[1]);
+    const afterMargin = sortedAfter[0] ? sortedAfter[0][1] - (sortedAfter[1]?.[1] ?? 0) : 0;
+
+    let type, player, displaced, contestedPlayers, margin;
+
+    if (afterController && !beforeController && !beforeContested) {
+      type = 'seized';
+      player = afterController;
+      displaced = null;
+      margin = afterMargin;
+    } else if (afterController && !beforeController && beforeContested) {
+      type = 'broke-deadlock';
+      player = afterController;
+      displaced = null;
+      margin = afterMargin;
+    } else if (afterController && beforeController && afterController !== beforeController) {
+      type = 'wrested';
+      player = afterController;
+      displaced = beforeController;
+      margin = afterMargin;
+    } else if (afterContested && beforeController) {
+      type = 'contested';
+      player = null;
+      displaced = beforeController;
+      contestedPlayers = after.contestedPlayers;
+      margin = 0;
+    } else if (afterController && beforeController && afterController === beforeController) {
+      const sortedBefore = Object.entries(before.totalPts).sort((a, b) => b[1] - a[1]);
+      const beforeMargin = sortedBefore[0] ? sortedBefore[0][1] - (sortedBefore[1]?.[1] ?? 0) : 0;
+      if (afterMargin <= beforeMargin) continue;
+      type = 'extended';
+      player = afterController;
+      displaced = null;
+      margin = afterMargin;
+    } else {
+      continue;
+    }
+
+    const matchesRemaining = after.totalMatches - after.matchesPlayed;
+
+    stories.push({
+      type,
+      territory: territory.name,
+      player,
+      displaced,
+      contestedPlayers: contestedPlayers || [],
+      margin,
+      triggerMatch,
+      matchesRemaining,
+    });
+  }
+
+  const order = { wrested: 0, seized: 1, 'broke-deadlock': 2, contested: 3, extended: 4 };
+  stories.sort((a, b) => (order[a.type] ?? 5) - (order[b.type] ?? 5));
+
+  return stories;
+}
+
 function calcPredPointsForAll() {
   predPointsByPlayer = {};
   for (const [name, st] of Object.entries(getPredStatsByPlayer())) predPointsByPlayer[name] = st.pts;
