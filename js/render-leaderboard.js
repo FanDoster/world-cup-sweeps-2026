@@ -437,16 +437,28 @@ function renderWarDispatch() {
     (s) => `${ptStr(s.margin)} ahead of ${escapeHtml(s.displaced)} · after ${escapeHtml(s.triggerMatch)}`,
   ];
 
-  const CONTESTED_HEADLINES = [
+  const joinPlayers = (players) => {
+    const esc = players.map(escapeHtml);
+    return esc.length <= 1 ? esc[0] : esc.slice(0, -1).join(', ') + ' and ' + esc[esc.length - 1];
+  };
+
+  // Single-challenger headline templates (used when exactly one challenger)
+  const CONTESTED_HEADLINES_1 = [
     (s, c) => `${pSpan(c)} BREAKS ${pSpan(s.displaced)}'S GRIP ON ${tSpan(s.territory)}`,
     (s, c) => `${pSpan(c)} CHALLENGES ${pSpan(s.displaced)} FOR ${tSpan(s.territory)}`,
     (s, c) => `${pSpan(s.displaced)}'S HOLD ON ${tSpan(s.territory)} UNDER THREAT`,
     (s, c) => `${pSpan(c)} TIES ${pSpan(s.displaced)} IN ${tSpan(s.territory)}`,
   ];
+  // Multi-challenger headline templates (used when 2+ challengers)
+  const CONTESTED_HEADLINES_N = [
+    (s) => `${pSpan(s.displaced)}'S GRIP ON ${tSpan(s.territory)} UNDER THREAT`,
+    (s) => `${tSpan(s.territory)} NOW THREE-WAY CONTESTED`,
+    (s) => `${pSpan(s.displaced)}'S HOLD ON ${tSpan(s.territory)} BROKEN`,
+  ];
   const CONTESTED_SUBS = [
-    (s, c) => `${escapeHtml(c)} and ${escapeHtml(s.displaced)} level · ${escapeHtml(s.displaced)} had sole control · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`,
-    (s, c) => `Disputed — ${escapeHtml(c)} pulls level with ${escapeHtml(s.displaced)} · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} left`,
-    (s, c) => `${escapeHtml(s.displaced)}'s sole control broken by ${escapeHtml(c)} · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`,
+    (s) => `${joinPlayers(s.contestedPlayers)} level · ${escapeHtml(s.displaced)} had sole control · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`,
+    (s) => `Disputed — ${joinPlayers(s.contestedPlayers.filter(p => p !== s.displaced))} pull${s.contestedPlayers.length === 2 ? 's' : ''} level with ${escapeHtml(s.displaced)} · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} left`,
+    (s) => `${escapeHtml(s.displaced)}'s sole control broken · ${joinPlayers(s.contestedPlayers)} now level · ${s.matchesRemaining} match${s.matchesRemaining !== 1 ? 'es' : ''} remaining`,
   ];
 
   const DEADLOCK_VERBS = ['BREAKS DEADLOCK IN', 'PULLS CLEAR IN', 'ENDS STALEMATE IN', 'EMERGES FROM CHAOS IN'];
@@ -477,11 +489,15 @@ function renderWarDispatch() {
       headline = pick(s.type, WRESTED_HEADLINES)(s);
       subline = pick(s.type + '_sub', WRESTED_SUBS)(s);
     } else if (s.type === 'contested') {
-      const challenger = s.contestedPlayers.find(p => p !== s.displaced) || s.contestedPlayers[0];
+      const challengers = s.contestedPlayers.filter(p => p !== s.displaced);
       stripeColor = 'var(--live)';
       statusLabel = 'CONTESTED';
-      headline = pick(s.type, CONTESTED_HEADLINES)(s, challenger);
-      subline = pick(s.type + '_sub', CONTESTED_SUBS)(s, challenger);
+      if (challengers.length === 1) {
+        headline = pick(s.type, CONTESTED_HEADLINES_1)(s, challengers[0]);
+      } else {
+        headline = pick(s.type, CONTESTED_HEADLINES_N)(s);
+      }
+      subline = pick(s.type + '_sub', CONTESTED_SUBS)(s);
     } else if (s.type === 'broke-deadlock') {
       stripeColor = pCol(s.player);
       statusLabel = 'DEADLOCK BROKEN';
