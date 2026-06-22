@@ -19,8 +19,14 @@
     overlay.className = 'update-overlay';
     overlay.id = 'updateOverlay';
 
+    var accent = document.createElement('div');
+    accent.className = 'update-accent';
+
     band = document.createElement('div');
     band.className = 'update-band';
+
+    var row = document.createElement('div');
+    row.className = 'update-row';
 
     var emoji = document.createElement('span');
     emoji.className = 'update-emoji';
@@ -30,13 +36,16 @@
     labelEl.className = 'update-label';
     labelEl.textContent = 'UPDATE AVAILABLE';
 
+    row.appendChild(emoji);
+    row.appendChild(labelEl);
+
     subEl = document.createElement('div');
     subEl.className = 'update-sub';
     subEl.textContent = 'Reloading with latest changes…';
 
-    band.appendChild(emoji);
-    band.appendChild(labelEl);
+    band.appendChild(row);
     band.appendChild(subEl);
+    overlay.appendChild(accent);
     overlay.appendChild(band);
     document.body.appendChild(overlay);
   }
