@@ -1,0 +1,72 @@
+/* ── Update notification — World Cup broadcast HUD style ── */
+.update-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.update-overlay.show {
+  opacity: 1;
+}
+
+.update-band {
+  background: rgba(7, 11, 16, 0.88);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-right: none;
+  padding: 24px 48px;
+  text-align: center;
+  transform: translateY(-40px);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  max-width: 600px;
+}
+.update-overlay.show .update-band {
+  transform: translateY(0);
+}
+
+.update-emoji {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.update-label {
+  font-family: 'Press Start 2P', 'Impact', 'Arial Black', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+
+.update-sub {
+  font-family: var(--font);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+/* ── Testing hint (hidden unless toggled) ── */
+.update-test-hint {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  z-index: 99999;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  pointer-events: none;
+  opacity: 0.6;
+}
