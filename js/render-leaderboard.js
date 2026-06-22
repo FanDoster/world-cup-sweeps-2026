@@ -501,7 +501,7 @@ function renderWarDispatch() {
     </div>`;
   }).join('');
 
-  el.innerHTML = masthead + `<div class="wd-stories">${storyHtml}</div>`;
+  el.innerHTML = masthead + `<div>${storyHtml}</div>`;
 }
 
 function calcPredPointsForAll() {
