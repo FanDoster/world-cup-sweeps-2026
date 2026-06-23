@@ -3,11 +3,11 @@ const SB_KEY = 'sb_publishable_gSNbsrsq5ZV0glBJBeCZmQ_kBajhUPn';
 const FOOTBALL_DATA_TOKEN = ''; // Register free at football-data.org and paste token here
 const sb = supabase.createClient(SB_URL, SB_KEY);
 
-const PLAYERS = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat the Grub', 'Steven'];
+const PLAYERS = ['Anton', 'Chris', 'Dan', 'Laurie', 'Pat', 'Steven'];
 
 const ownerColors = {
   Anton: 'owner-anton', Chris: 'owner-chris', Dan: 'owner-dan',
-  Laurie: 'owner-laurie', 'Pat the Grub': 'owner-pat', Steven: 'owner-steven',
+  Laurie: 'owner-laurie', Pat: 'owner-pat', Steven: 'owner-steven',
 };
 
 const ownerHexColors = {
@@ -15,7 +15,7 @@ const ownerHexColors = {
   Chris:  '#3b82f6',
   Dan:    '#22c55e',
   Laurie: '#a855f7',
-  'Pat the Grub': '#f97316',
+  Pat:    '#f97316',
   Steven: '#ef4444',
 };
 
