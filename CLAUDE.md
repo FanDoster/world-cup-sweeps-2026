@@ -32,7 +32,7 @@ Scripts load in dependency order (each file can call globals defined by earlier 
 | `js/profile-picture.js` | Avatar upload/crop to the Supabase Storage `avatars` bucket; feature-detected (`profile-picture-migration.sql`) |
 | `js/render-user-profile.js` | Full-page Profile tab (`showUserProfile`, hash route `#/users/:name`) — distinct from the `render-profile.js` popup |
 | `js/render-bracket.js` | Bracket tab: `R32_SLOTS`/`KNOCKOUT_BRACKET` fixture maps, per-player projected knockout (`calcProjectedStandings`→`calcProjectedQualifiers`→`calcProjectedBracket`), `renderBracket`, `setBracketRound` |
-| `js/version.js` | `window.APP_VERSION` deploy marker string (bumped each deploy) |
+| `js/version.js` | `window.APP_VERSION` deploy marker string (auto-stamped at deploy time by `deploy.yml` with date + commit SHA; committed value is just the local-dev placeholder `'dev'`) |
 | `js/version-refresh.js` | Polls Supabase `app_version` every 30s; shows the broadcast-HUD update notification then reloads |
 | `js/main.js` | `switchTab` (incl. shooter start/stop), init calls (`restoreSession`, `setInterval`) |
 

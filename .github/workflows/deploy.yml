@@ -12,6 +12,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Stamp deploy version
+        run: |
+          # Unique per deploy: date + short commit SHA. Baked into the file that
+          # gets uploaded so the deployed site and the Supabase row always agree,
+          # and version-refresh.js can detect every deploy without manual bumps.
+          VERSION="$(date -u +%Y-%m-%d)-${GITHUB_SHA::7}"
+          sed -i "s/window.APP_VERSION = '.*';/window.APP_VERSION = '$VERSION';/" js/version.js
+          echo "Stamped version: $VERSION"
       - run: npx surge . --domain world-cup-sweeps-2026.surge.sh
         env:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}

@@ -1,4 +1,6 @@
 // ── WC2026 Sweepstakes version marker ──
-// Bump this string whenever client-side code is deployed.
-// The version-refresh poller detects changes and auto-reloads.
-window.APP_VERSION = '2026-06-23-001';
+// Auto-stamped at deploy time by .github/workflows/deploy.yml (date + commit SHA),
+// then mirrored into Supabase so version-refresh.js can prompt open clients to
+// reload. No need to bump this by hand — the value below is just the local-dev
+// placeholder shown when running from a working copy.
+window.APP_VERSION = 'dev';
