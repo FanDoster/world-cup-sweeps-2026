@@ -1,3 +1,43 @@
+// ── R32 BRACKET STRUCTURE (FIFA 2026) ──
+const R32_SLOTS = [
+  { match: 73, date: '2026-06-28', home: '2A', away: '2B' },
+  { match: 74, date: '2026-06-29', home: '1E', away: '3rd', thirdPool: ['A','B','C','D','F'] },
+  { match: 75, date: '2026-06-29', home: '1F', away: '2C' },
+  { match: 76, date: '2026-06-29', home: '1C', away: '2F' },
+  { match: 77, date: '2026-06-30', home: '1I', away: '3rd', thirdPool: ['C','D','F','G','H'] },
+  { match: 78, date: '2026-06-30', home: '2E', away: '2I' },
+  { match: 79, date: '2026-06-30', home: '1A', away: '3rd', thirdPool: ['C','E','F','H','I'] },
+  { match: 80, date: '2026-07-01', home: '1L', away: '3rd', thirdPool: ['E','H','I','J','K'] },
+  { match: 81, date: '2026-07-01', home: '1D', away: '3rd', thirdPool: ['B','E','F','I','J'] },
+  { match: 82, date: '2026-07-01', home: '1G', away: '3rd', thirdPool: ['A','E','H','I','J'] },
+  { match: 83, date: '2026-07-02', home: '2K', away: '2L' },
+  { match: 84, date: '2026-07-02', home: '1H', away: '2J' },
+  { match: 85, date: '2026-07-02', home: '1B', away: '3rd', thirdPool: ['E','F','G','I','J'] },
+  { match: 86, date: '2026-07-03', home: '1K', away: '3rd', thirdPool: ['D','E','I','J','L'] },
+  { match: 87, date: '2026-07-03', home: '1J', away: '2H' },
+  { match: 88, date: '2026-07-03', home: '2D', away: '2G' },
+];
+
+// Subsequent round pairings — winner references (W73 = winner of match 73)
+const KNOCKOUT_BRACKET = [
+  { match: 89,  round: 'R16',   home: 'W73', away: 'W75' },
+  { match: 90,  round: 'R16',   home: 'W74', away: 'W77' },
+  { match: 91,  round: 'R16',   home: 'W76', away: 'W78' },
+  { match: 92,  round: 'R16',   home: 'W79', away: 'W80' },
+  { match: 93,  round: 'R16',   home: 'W83', away: 'W84' },
+  { match: 94,  round: 'R16',   home: 'W81', away: 'W82' },
+  { match: 95,  round: 'R16',   home: 'W86', away: 'W88' },
+  { match: 96,  round: 'R16',   home: 'W85', away: 'W87' },
+  { match: 97,  round: 'QF',    home: 'W89', away: 'W90' },
+  { match: 98,  round: 'QF',    home: 'W93', away: 'W94' },
+  { match: 99,  round: 'QF',    home: 'W91', away: 'W92' },
+  { match: 100, round: 'QF',    home: 'W95', away: 'W96' },
+  { match: 101, round: 'SF',    home: 'W97', away: 'W98' },
+  { match: 102, round: 'SF',    home: 'W99', away: 'W100' },
+  { match: 103, round: '3P',    home: 'L101', away: 'L102' },
+  { match: 104, round: 'Final', home: 'W101', away: 'W102' },
+];
+
 // ── BRACKET STATE ──
 let bracketRound = 'R32';
 
@@ -154,6 +194,37 @@ function calcProjectedQualifiers(playerName) {
     runners,
     qualifyingThirds: allThirds.slice(0, 8),
   };
+}
+
+function calcProjectedBracket(playerName) {
+  const { winners, runners, qualifyingThirds } = calcProjectedQualifiers(playerName);
+  const bracket = {};
+
+  // Greedy third-place slot assignment: iterate slots in match order,
+  // assign the best-ranked unassigned qualifying third whose group is eligible.
+  const thirdsLeft = [...qualifyingThirds]; // already sorted best-to-worst
+
+  function resolvePos(pos, thirdPool) {
+    if (pos === '3rd') {
+      const idx = thirdsLeft.findIndex(t => thirdPool.includes(t.group));
+      if (idx === -1) return null;
+      const t = thirdsLeft.splice(idx, 1)[0];
+      return t.team;
+    }
+    const placement = pos[0]; // '1' or '2'
+    const group = pos[1];     // 'A'-'L'
+    return placement === '1' ? (winners[group] || null)
+                             : (runners[group]  || null);
+  }
+
+  for (const slot of R32_SLOTS) {
+    bracket[slot.match] = {
+      home: resolvePos(slot.home, slot.thirdPool),
+      away: resolvePos(slot.away, slot.thirdPool),
+    };
+  }
+
+  return bracket;
 }
 
 function renderBracket() {
