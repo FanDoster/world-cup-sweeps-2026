@@ -269,7 +269,7 @@ function renderBracket() {
 
       const homeTeams = PLAYERS.map(p => allBrackets[p][slot.match]?.home);
       const awayTeams  = PLAYERS.map(p => allBrackets[p][slot.match]?.away);
-      const allAgree = homeTeams.every(t => t === homeTeams[0]) && awayTeams.every(t => t === awayTeams[0]) && homeTeams[0];
+      const allAgree = homeTeams.every(t => t === homeTeams[0]) && awayTeams.every(t => t === awayTeams[0]) && homeTeams[0] && awayTeams[0];
 
       const slotLabel = `${slot.home} vs ${slot.away === '3rd' ? '3rd place qualifier' : slot.away}`;
 

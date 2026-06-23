@@ -72,6 +72,16 @@ async function loadData() {
     `).order('match_date').order('kickoff_time');
     m = retry.data;
     hasIsComplete = false;
+    // If round column doesn't exist yet, fall back without it
+    if (!m) {
+      const retry2 = await sb.from('matches').select(`
+        match_date, kickoff_time, tz_offset,
+        home:home_team_id(name), away:away_team_id(name),
+        group_letter, home_score, away_score, tv_channel,
+        prob_home, prob_draw, prob_away
+      `).order('match_date').order('kickoff_time');
+      m = retry2.data;
+    }
   }
 
   if (!m) { console.error('Failed to load match data from Supabase'); return; }

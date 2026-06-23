@@ -1,4 +1,7 @@
 /* ── BRACKET TAB ── */
+.section-bracket { display: none; }
+.section-bracket.active { display: block; }
+
 .bracket-round-selector {
   display: flex;
   gap: 8px;
