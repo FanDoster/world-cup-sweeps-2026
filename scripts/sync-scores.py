@@ -82,11 +82,14 @@ def fetch_fifa_matches():
         # The gap 105-119' only occurs during extra time — never in group stage.
         match_time = m.get("MatchTime", "")
         try:
-            minutes = int(match_time.replace("'", ""))
+            minutes = int(match_time.replace("'", "").split("+")[0])
         except (ValueError, AttributeError):
             minutes = -1
 
-        is_finished = minutes >= 120 or (90 <= minutes < 105)
+        # Also treat as finished when MatchTime is empty/null (FIFA API clears it
+        # after the match fully completes) — only safe because scores are already
+        # confirmed non-None by the check above.
+        is_finished = minutes >= 120 or (90 <= minutes < 105) or minutes == -1
         if not is_finished:
             if 0 < minutes < 90 or (105 <= minutes < 120):
                 skipped_live += 1  # match still in progress
