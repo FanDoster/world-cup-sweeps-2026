@@ -15,7 +15,7 @@ Scripts load in dependency order (each file can call globals defined by earlier 
 | File | Responsibility |
 |------|---------------|
 | `h2h-data.js` | Head-to-head lookup table (generated) |
-| `js/config.js` | Supabase client, `PLAYERS`, `ownerColors`, `ownerHexColors`, `VENUE_DATA`, `TERRITORY_DATA` |
+| `js/config.js` | Supabase client, `PLAYERS`, `ownerColors`, `ownerHexColors`, `FIFA_RANK` (bracket tiebreaker), `VENUE_DATA`, `TERRITORY_DATA` |
 | `js/utils.js` | `flagUrl`, date/time helpers (`toDate`, `formatLocalTime`, `formatDateLabel`, `formatDateHeader`, `getCountdown`), `ordinal`, `escapeHtml` |
 | `js/auth.js` | `currentSession`, `currentProfile`, sign-in/up/out, `updateAuthBar`, joker notification |
 | `js/data.js` | Data globals, `loadData`, `loadPredData`; also globe state vars (`territoryControl` etc.) |
@@ -31,6 +31,7 @@ Scripts load in dependency order (each file can call globals defined by earlier 
 | `js/team-results.js` | Post-result celebration popups for your own teams (`checkTeamResults`, confetti) |
 | `js/profile-picture.js` | Avatar upload/crop to the Supabase Storage `avatars` bucket; feature-detected (`profile-picture-migration.sql`) |
 | `js/render-user-profile.js` | Full-page Profile tab (`showUserProfile`, hash route `#/users/:name`) — distinct from the `render-profile.js` popup |
+| `js/render-bracket.js` | Bracket tab: `R32_SLOTS`/`KNOCKOUT_BRACKET` fixture maps, per-player projected knockout (`calcProjectedStandings`→`calcProjectedQualifiers`→`calcProjectedBracket`), `renderBracket`, `setBracketRound` |
 | `js/version.js` | `window.APP_VERSION` deploy marker string (bumped each deploy) |
 | `js/version-refresh.js` | Polls Supabase `app_version` every 30s; shows the broadcast-HUD update notification then reloads |
 | `js/main.js` | `switchTab` (incl. shooter start/stop), init calls (`restoreSession`, `setInterval`) |
@@ -47,6 +48,7 @@ Stylesheets load in dependency order via `<link>` tags in `<head>` (tokens first
 | `css/groups.css` | People/player cards, group tables, owner tags, qualification scenarios |
 | `css/leaderboard.css` | Leaderboard table, stat badges, awards grid |
 | `css/teams.css` | Team chips, channel badges, win-probability badges |
+| `css/bracket.css` | Bracket tab: round selector, projected match cards, per-player rows |
 | `css/dispatch.css` | War Dispatch tactical-briefing strip (stripe layout, sitrep masthead) |
 | `css/predictions.css` | Prediction cards, prediction history, match prediction dots |
 | `css/profile.css` | Player profile modal, match predictions panel, H2H block, your-prediction form, joker chip, comments |
@@ -72,11 +74,11 @@ Stylesheets load in dependency order via `<link>` tags in `<head>` (tokens first
 All data lives in Supabase; the client is anonymous-readable via RLS (`SELECT USING (true)` on every table). Writes are restricted to the authenticated user's own rows (`auth.uid() = user_id`). On page load, `restoreSession().then(() => loadData())` fetches teams + matches and populates module-level globals that every render function reads:
 
 - `people` (owner → teams), `groups` (letter → teams), `teamOwner`, `teamIso`, `teamWinPct` — lookups built from the `teams` table
-- `matchData` — **named-field objects**: `{ date, time, tz, team1, team2, group, score1, score2, channel, prob1, probD, prob2 }`. Built in `loadData` from the raw Supabase rows; all render functions use field names (e.g. `m.score1 === null` means "not played yet").
+- `matchData` — **named-field objects**: `{ date, time, tz, team1, team2, group, score1, score2, channel, prob1, probD, prob2, round }`. Built in `loadData` from the raw Supabase rows; all render functions use field names (e.g. `m.score1 === null` means "not played yet"). `round` (knockout fixture detection for the Bracket tab) is read defensively — `loadData` re-queries without it if the `round` column hasn't been added to the `matches` table.
 - `predLookup` (matchId → predictions) and `matchIdByTeamDate` — matches are keyed client-side by the string `"team1|team2|date"`, which is also what `showPredPanel()` receives via inline `onclick`.
 - `matchByKey` — same `"team1|team2|date"` key → matchData object, used by the globe's venue panel.
 
-Rendering is full innerHTML regeneration: `renderMatches()`, `renderGroups()`, `renderLeaderboard()`, etc. rebuild their section from the globals. `renderMatches` re-runs every 60s for countdowns. Tabs are show/hide via `switchTab()` (Players, Matches, Groups, Leaderboard, Teams, Battle Map, Shooter, Profile); the My Teams and Predictions tabs only exist when signed in (injected by `updateAuthBar()`). The **Shooter** tab is a self-contained game started/stopped by `switchTab`; the **War Dispatch** strip above the tabs is a rendered headline summary; tab routing is also reflected in the URL hash. Separately, `version-refresh.js` polls Supabase for a new deployed `APP_VERSION` and prompts a reload — this is how clients pick up a deploy without a manual refresh.
+Rendering is full innerHTML regeneration: `renderMatches()`, `renderGroups()`, `renderLeaderboard()`, etc. rebuild their section from the globals. `renderMatches` re-runs every 60s for countdowns. Tabs are show/hide via `switchTab()` (Players, Matches, Groups, Leaderboard, Teams, Battle Map, Shooter, Bracket, Profile); the My Teams and Predictions tabs only exist when signed in (injected by `updateAuthBar()`). The **Bracket** tab projects each player's knockout path by simulating the group tables client-side (`calcProjectedStandings`→`calcProjectedQualifiers`→`calcProjectedBracket` in `render-bracket.js`), keyed off the static `R32_SLOTS`/`KNOCKOUT_BRACKET` fixture maps and `FIFA_RANK` tiebreaker. The **Shooter** tab is a self-contained game started/stopped by `switchTab`; the **War Dispatch** strip above the tabs is a rendered headline summary; tab routing is also reflected in the URL hash. Separately, `version-refresh.js` polls Supabase for a new deployed `APP_VERSION` and prompts a reload — this is how clients pick up a deploy without a manual refresh.
 
 ### Scoring rules (duplicated client-side, keep consistent)
 
