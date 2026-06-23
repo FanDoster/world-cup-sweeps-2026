@@ -24,6 +24,10 @@ header svg {
 .tab-btn {
   flex: 1;
   padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   background: transparent;
   border: none;
   color: var(--text-secondary);
@@ -45,8 +49,8 @@ header svg {
   color: var(--text);
   box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
 }
-.tab-btn .emoji { margin-right: 4px; }
-.tab-btn .tab-label { /* inline by default on desktop */ }
+.tab-btn .emoji { /* stacked above the label via the button's flex column */ }
+.tab-btn .tab-label { /* sits on its own line below the emoji */ }
 
 /* ── SECTION VISIBILITY ── */
 .section-players, .section-matches, .section-groups, .section-leaderboard, .section-teams { display: none; }
