@@ -10,7 +10,7 @@
 .bracket-round-btn {
   padding: 6px 16px;
   border: 1px solid var(--border);
-  background: var(--bg-card);
+  background: var(--card);
   color: var(--text);
   border-radius: 20px;
   cursor: pointer;

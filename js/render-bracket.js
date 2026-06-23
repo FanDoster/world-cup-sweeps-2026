@@ -230,5 +230,108 @@ function calcProjectedBracket(playerName) {
 function renderBracket() {
   const section = document.getElementById('sectionBracket');
   if (!section) return;
-  section.innerHTML = '<p class="bracket-empty">Bracket loading…</p>';
+
+  // Detect which rounds have real knockout matches in the DB (Phase 2)
+  const realRounds = new Set(matchData.filter(m => m.round).map(m => m.round));
+  const hasRealR32 = realRounds.has('R32');
+
+  // Round selector
+  const rounds = [
+    { id: 'R32',   label: 'R32' },
+    { id: 'R16',   label: 'R16' },
+    { id: 'QF',    label: 'QF' },
+    { id: 'SF',    label: 'SF' },
+    { id: 'Final', label: 'Final' },
+  ];
+
+  const selectorHtml = `
+    <div class="bracket-round-selector">
+      ${rounds.map(r => {
+        const available = r.id === 'R32' || realRounds.has(r.id);
+        return `<button class="bracket-round-btn${r.id === bracketRound ? ' active' : ''}${!available ? ' disabled' : ''}"
+          onclick="${available ? `setBracketRound('${r.id}')` : ''}">${r.label}</button>`;
+      }).join('')}
+    </div>`;
+
+  // Calculate all players' brackets
+  const allBrackets = {};
+  for (const player of PLAYERS) {
+    allBrackets[player] = calcProjectedBracket(player);
+  }
+
+  // Render R32 cards (Phase 1 — projected)
+  let cardsHtml = '';
+
+  if (bracketRound === 'R32' && !hasRealR32) {
+    cardsHtml = R32_SLOTS.map(slot => {
+      const date = new Date(slot.date + 'T12:00:00');
+      const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+
+      const homeTeams = PLAYERS.map(p => allBrackets[p][slot.match]?.home);
+      const awayTeams  = PLAYERS.map(p => allBrackets[p][slot.match]?.away);
+      const allAgree = homeTeams.every(t => t === homeTeams[0]) && awayTeams.every(t => t === awayTeams[0]) && homeTeams[0];
+
+      const slotLabel = `${slot.home} vs ${slot.away === '3rd' ? '3rd place qualifier' : slot.away}`;
+
+      let rowsHtml;
+      if (allAgree) {
+        rowsHtml = `<div class="bracket-consensus">
+          All: ${bracketTeam(homeTeams[0])} vs ${bracketTeam(awayTeams[0])}
+        </div>`;
+      } else {
+        rowsHtml = PLAYERS.map(p => {
+          const home = allBrackets[p][slot.match]?.home;
+          const away = allBrackets[p][slot.match]?.away;
+          const ownsHome = home && teamOwner[home] === p;
+          const ownsAway = away && teamOwner[away] === p;
+          return `<div class="bracket-player-row">
+            <span class="bracket-player-name ${ownerColour(p)}">${p}</span>
+            <span class="bracket-team${ownsHome ? ' bracket-team-owned' : ''}">${home ? bracketTeam(home) : '?'}</span>
+            <span class="bracket-vs">vs</span>
+            <span class="bracket-team${ownsAway ? ' bracket-team-owned' : ''}">${away ? bracketTeam(away) : '?'}</span>
+          </div>`;
+        }).join('');
+      }
+
+      return `<div class="bracket-match-card card-base">
+        <div class="bracket-match-header">
+          <span class="bracket-match-num">Match ${slot.match} · ${dateStr}</span>
+          <span class="bracket-projected-badge">Projected</span>
+        </div>
+        <div class="bracket-slot-label">${slotLabel}</div>
+        <div class="bracket-player-rows">${rowsHtml}</div>
+      </div>`;
+    }).join('');
+  } else if (bracketRound === 'R32' && hasRealR32) {
+    // Phase 2: show real R32 fixtures from matchData
+    const realR32 = matchData.filter(m => m.round === 'R32').sort((a, b) => a.date.localeCompare(b.date));
+    cardsHtml = realR32.map(m => {
+      const date = new Date(m.date + 'T12:00:00');
+      const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+      return `<div class="bracket-match-card card-base">
+        <div class="bracket-match-header">
+          <span class="bracket-match-num">${dateStr}</span>
+        </div>
+        <div class="bracket-player-rows">
+          <div class="bracket-consensus">${bracketTeam(m.team1)} vs ${bracketTeam(m.team2)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    cardsHtml = `<p class="bracket-empty">Available once ${bracketRound} fixtures are confirmed.</p>`;
+  }
+
+  section.innerHTML = selectorHtml + `<div class="bracket-cards">${cardsHtml}</div>`;
+}
+
+// Render a team name with its flag
+function bracketTeam(teamName) {
+  const iso = teamIso[teamName];
+  const flag = iso ? `<img src="${flagUrl(iso)}" class="bracket-flag" alt="" loading="lazy" onerror="this.style.display='none'">` : '';
+  return `<span class="bracket-team">${flag}${escapeHtml(teamName)}</span>`;
+}
+
+// Map player name to owner CSS colour class
+function ownerColour(playerName) {
+  return ownerColors[playerName] || '';
 }
