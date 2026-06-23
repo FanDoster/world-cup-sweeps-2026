@@ -17,6 +17,9 @@ function showPredPanel(key) {
 function closePredPanel() {
   stopUSAFlagAnimation();
   stopUSA();
+  // Clearing the iframe src stops the YouTube video — hiding the overlay with CSS alone doesn't.
+  const iframe = document.querySelector('#predPanel iframe');
+  if (iframe) { iframe.removeAttribute('src'); iframe.src = 'about:blank'; }
   document.getElementById('predPanelOverlay').classList.remove('active');
   document.getElementById('predPanel').classList.remove('england-mode');
   document.getElementById('predPanel').classList.remove('usa-mode');
