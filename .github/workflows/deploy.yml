@@ -38,21 +38,31 @@ jobs:
           echo "Site did not return 200 within 90 seconds"
           exit 1
       - name: Update version in Supabase
+        env:
+          SB_KEY: ${{ secrets.SB_KEY }}
         run: |
           VERSION=$(sed -n "s/.*APP_VERSION = '\(.*\)';.*/\1/p" js/version.js)
           echo "Deployed version: $VERSION"
-          SQL="INSERT INTO public.app_version (id, version, updated_at) VALUES (1, '$VERSION', now()) ON CONFLICT (id) DO UPDATE SET version = EXCLUDED.version, updated_at = EXCLUDED.updated_at;"
-          PAYLOAD=$(python3 -c "import sys,json; print(json.dumps({'query': sys.argv[1]}))" "$SQL")
+          # Upsert the single app_version row via PostgREST using the service_role
+          # key (bypasses RLS) — the same key/endpoint sync-live.py uses. We verify
+          # the row actually came back with the new version, so a failed write fails
+          # the step instead of silently passing.
+          NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          PAYLOAD=$(python3 -c "import json,sys; print(json.dumps([{'id':1,'version':sys.argv[1],'updated_at':sys.argv[2]}]))" "$VERSION" "$NOW")
           for i in $(seq 1 3); do
-            RESP=$(curl -s -X POST "https://api.supabase.com/v1/projects/nkztkzrkbeacyltidqwr/database/query" \
-              -H "Authorization: Bearer *** secrets.SUPABASE_PAT }}" \
+            HTTP=$(curl -s -o /tmp/version_resp.json -w "%{http_code}" \
+              -X POST "https://nkztkzrkbeacyltidqwr.supabase.co/rest/v1/app_version?on_conflict=id" \
+              -H "apikey: $SB_KEY" \
+              -H "Authorization: Bearer $SB_KEY" \
               -H "Content-Type: application/json" \
+              -H "Prefer: resolution=merge-duplicates,return=representation" \
               -d "$PAYLOAD" --max-time 15)
-            if echo "$RESP" | python3 -c "import sys,json; json.load(sys.stdin)" 2>/dev/null; then
-              echo "Supabase version updated successfully"
+            if { [ "$HTTP" = "200" ] || [ "$HTTP" = "201" ]; } && \
+               python3 -c "import json,sys; d=json.load(open('/tmp/version_resp.json')); sys.exit(0 if isinstance(d,list) and any(r.get('version')==sys.argv[1] for r in d) else 1)" "$VERSION"; then
+              echo "Supabase version updated to $VERSION"
               exit 0
             fi
-            echo "Supabase API attempt $i failed, retrying..."
+            echo "Supabase update attempt $i failed (HTTP $HTTP): $(cat /tmp/version_resp.json)"
             sleep 3
           done
           echo "Failed to update Supabase after 3 attempts"
