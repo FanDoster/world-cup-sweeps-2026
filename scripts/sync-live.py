@@ -30,6 +30,12 @@ SUPABASE_URL = "https://nkztkzrkbeacyltidqwr.supabase.co"
 SB_KEY_FILE = "/tmp/sb_key"          # service_role key (prefix sb_secret_)
 
 FIFA_API = "https://api.fifa.com/api/v3/calendar/matches"
+# WC2026 competition/season IDs. WITHOUT these the endpoint returns every
+# competition's fixtures interleaved by date and truncates at `count`, so WC
+# matches later in the tournament fall off the end and never sync. Filtering
+# pins the feed to exactly the 104 World Cup matches.
+ID_COMPETITION = "17"
+ID_SEASON = "285023"
 FROM_DATE = "2026-06-11T00:00:00Z"
 TO_DATE = "2026-07-20T00:00:00Z"
 FETCH_COUNT = 200
@@ -106,6 +112,8 @@ def fetch_fifa_matches():
     url = (
         f"{FIFA_API}"
         f"?language=en"
+        f"&idCompetition={ID_COMPETITION}"
+        f"&idSeason={ID_SEASON}"
         f"&from={FROM_DATE}"
         f"&to={TO_DATE}"
         f"&count={FETCH_COUNT}"
@@ -158,14 +166,16 @@ def parse_match_status(m):
 
     winner = m.get("Winner")
 
-    # A match is finished when:
-    #   MatchTime >= 120 (extra time / penalties completed), OR
-    #   MatchTime 90-104 (regulation time finished, no extra time), OR
-    #   MatchTime is empty/null (-1) but scores are present — FIFA API clears
-    #   MatchTime once the match fully completes.
-    is_finished = minutes >= 120 or (90 <= minutes < 105) or (minutes == -1 and hs is not None and aws is not None)
-    # A match is live when 0 < MatchTime < 90 AND scores may be present
-    is_live = 0 < minutes < 90
+    # MatchStatus is the authoritative state: 0 = finished (every status-0 fixture
+    # in the WC feed carries final scores), 1 = not started, 3 = live. We key
+    # "finished" off it rather than parsing MatchTime minute ranges (which broke on
+    # stoppage time and on the post-match clock). Live still uses the MatchTime
+    # heuristic so we push in-play scores during the run of play.
+    status = m.get("MatchStatus")
+    is_finished = status == 0
+    # A match is live when it's in open play (1st/2nd half). Stoppage/half-time
+    # gaps simply skip an in-play update until the next clean minute.
+    is_live = (0 < minutes < 90) and not is_finished
 
     return {
         "home_name": home_name,

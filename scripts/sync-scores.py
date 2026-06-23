@@ -40,9 +40,15 @@ FIFA_TO_DB = {
 
 def fetch_fifa_matches():
     """Fetch all WC2026 group stage matches from the FIFA API."""
+    # idCompetition/idSeason pin the feed to the 104 World Cup matches. Without
+    # them the endpoint returns every competition interleaved by date and
+    # truncates at `count`, dropping WC matches later in the tournament — they'd
+    # never sync (this is what stranded England vs Ghana).
     url = (
         f"{FIFA_API}"
         f"?language=en"
+        f"&idCompetition=17"
+        f"&idSeason=285023"
         f"&from=2026-06-11T00:00:00Z"
         f"&to=2026-07-20T00:00:00Z"
         f"&count=500"
@@ -76,22 +82,13 @@ def fetch_fifa_matches():
         if hs is None or aws is None:
             continue
 
-        # Only sync scores for finished matches.
-        # Regulation time: MatchTime 90-104' (group stage + normal-time results)
-        # Extra time:      MatchTime >= 120' (knockout extra time / penalties)
-        # The gap 105-119' only occurs during extra time — never in group stage.
-        match_time = m.get("MatchTime", "")
-        try:
-            minutes = int(match_time.replace("'", "").split("+")[0])
-        except (ValueError, AttributeError):
-            minutes = -1
-
-        # Also treat as finished when MatchTime is empty/null (FIFA API clears it
-        # after the match fully completes) — only safe because scores are already
-        # confirmed non-None by the check above.
-        is_finished = minutes >= 120 or (90 <= minutes < 105) or minutes == -1
-        if not is_finished:
-            if 0 < minutes < 90 or (105 <= minutes < 120):
+        # Only sync scores for finished matches. MatchStatus is authoritative:
+        # 0 = finished (every status-0 fixture in the WC feed has final scores),
+        # 1 = not started, 3 = live. This replaces the old MatchTime minute-range
+        # parsing, which mis-handled stoppage time and the post-match clock.
+        status = m.get("MatchStatus")
+        if status != 0:
+            if status == 3:
                 skipped_live += 1  # match still in progress
             continue
 
