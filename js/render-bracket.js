@@ -130,6 +130,32 @@ function sortByTiebreakers(teams) {
   });
 }
 
+function calcProjectedQualifiers(playerName) {
+  const standings = calcProjectedStandings(playerName);
+  const winners = {}, runners = {}, allThirds = [];
+
+  for (const [letter, teams] of Object.entries(standings)) {
+    winners[letter] = teams[0].team;
+    runners[letter] = teams[1].team;
+    // Third-placed team with their group for slot assignment
+    allThirds.push({ ...teams[2], group: letter });
+  }
+
+  // Rank all 12 third-placed teams: pts → GD → GF → FIFA_RANK
+  allThirds.sort((a, b) => {
+    if (b.pts !== a.pts) return b.pts - a.pts;
+    if (b.gd  !== a.gd)  return b.gd  - a.gd;
+    if (b.gf  !== a.gf)  return b.gf  - a.gf;
+    return (FIFA_RANK[a.team] || 999) - (FIFA_RANK[b.team] || 999);
+  });
+
+  return {
+    winners,
+    runners,
+    qualifyingThirds: allThirds.slice(0, 8),
+  };
+}
+
 function renderBracket() {
   const section = document.getElementById('sectionBracket');
   if (!section) return;
