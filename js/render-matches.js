@@ -77,8 +77,12 @@ function renderMatches() {
       const dateLabel = formatDateLabel(m.date, m.time, m.tz);
       const showCountdown = m.kickoff <= twoDays;
       const localTime = formatLocalTime(m.date, m.time, m.tz);
-      const isFinished = m.isComplete;
-      const isLive = !isFinished && cd.rowCls === 'live';
+      // A match within the live window (kickoff → +2.5h) stays "live" even after
+      // scores are entered — otherwise is_complete flips it to "finished" the moment
+      // the first goal goes in, killing the live treatment mid-match.
+      const inLiveWindow = cd.rowCls === 'live';
+      const isLive = inLiveWindow;
+      const isFinished = m.isComplete && !inLiveWindow;
       const hasKickedOff = m.kickoff <= now;
       const rowCls = isFinished ? 'finished' : cd.rowCls;
       const countdownText = isFinished ? (m.score1 + '–' + m.score2) : (showCountdown ? cd.text : localTime);

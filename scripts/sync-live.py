@@ -2,9 +2,13 @@
 """
 Live match score poller for World Cup 2026.
 
-Polls the FIFA API every 60 seconds during live matches and syncs
-finished scores to Supabase in near-real-time. Designed to run inside a
-GitHub Actions workflow that triggers 3× daily (15:00, 21:00, 03:00 UTC).
+Polls the FIFA API every 60 seconds during live matches and writes scores
+to Supabase in near-real-time — both in-play (so the frontend shows the
+running score on the LIVE card) and at full-time. We only write the scores;
+the is_complete column is maintained by the check_match_complete() trigger,
+and the frontend reads "LIVE" off each match's kickoff window. Designed to
+run inside a GitHub Actions workflow that triggers 3× daily (15:00, 21:00,
+03:00 UTC).
 
 Each invocation covers a ~5.5-hour window. Exits early if no World Cup
 matches are live or upcoming within the window.
@@ -145,9 +149,10 @@ def parse_match_status(m):
     group = m.get("GroupName", [{}])[0].get("Description", "")
     group_letter = group.replace("Group ", "").strip()
 
+    # MatchTime is like "37'" or "45+2'" (stoppage) — take the base minute.
     match_time_str = m.get("MatchTime", "")
     try:
-        minutes = int(match_time_str.replace("'", ""))
+        minutes = int(match_time_str.replace("'", "").split("+")[0])
     except (ValueError, AttributeError):
         minutes = -1
 
@@ -177,9 +182,16 @@ def parse_match_status(m):
 
 # ── Supabase Sync ───────────────────────────────────────
 
-def find_and_update(session, status, team_lookup):
+def find_and_update(session, status, team_lookup, label):
     """
-    Find the match in Supabase and update scores + is_complete if finished.
+    Find the match in Supabase and write its current scores.
+
+    We only PATCH home_score/away_score — the is_complete column is owned by the
+    check_match_complete() trigger (TRUE once both scores are set and kickoff has
+    passed), so we never send it. The frontend distinguishes a live match from a
+    finished one by its kickoff time window, not by is_complete. `label` ("live"
+    or "FT") is only used for logging.
+
     Returns True if updated, False if skipped/not-found/error.
     """
     home_db = FIFA_TO_DB.get(status["home_name"], status["home_name"])
@@ -195,7 +207,7 @@ def find_and_update(session, status, team_lookup):
         f"?home_team_id=eq.{home_id}"
         f"&away_team_id=eq.{away_id}"
         f"&group_letter=eq.{status['group_letter']}"
-        f"&select=id,home_score,away_score,is_complete"
+        f"&select=id,home_score,away_score"
     )
     code, body = session.get(path)
     if code != 200:
@@ -209,24 +221,22 @@ def find_and_update(session, status, team_lookup):
     mid = r["id"]
     existing_hs = r.get("home_score")
     existing_aws = r.get("away_score")
-    already_complete = r.get("is_complete")
 
     new_hs = int(status["home_score"])
     new_aws = int(status["away_score"])
 
-    # Skip if already up to date
-    if existing_hs == new_hs and existing_aws == new_aws and already_complete:
+    # Skip if the scores are already up to date
+    if existing_hs == new_hs and existing_aws == new_aws:
         return False
 
     body_patch = {
         "home_score": new_hs,
         "away_score": new_aws,
-        "is_complete": True,
     }
     code, _ = session.patch(f"matches?id=eq.{mid}", body_patch)
 
     if code in (200, 204):
-        print(f"  ✓ {home_db} {new_hs}-{new_aws} {away_db}  (was {existing_hs}-{existing_aws})")
+        print(f"  ✓ [{label}] {home_db} {new_hs}-{new_aws} {away_db}  (was {existing_hs}-{existing_aws})")
         return True
     return False
 
@@ -309,15 +319,26 @@ def main():
         statuses = [parse_match_status(m) for m in fifa_matches]
 
         live_count = sum(1 for s in statuses if s["is_live"])
+        live_unsynced = [
+            s for s in statuses
+            if s["is_live"] and s["has_scores"]
+        ]
         finished_unsynced = [
             s for s in statuses
             if s["is_finished"] and s["has_scores"]
         ]
 
-        # Sync finished matches
+        # Sync in-play scores (trigger keeps is_complete in step; the card reads
+        # LIVE off its kickoff window regardless)
+        live_updated = 0
+        for s in live_unsynced:
+            if find_and_update(session, s, team_lookup, label="live"):
+                live_updated += 1
+
+        # Sync finished matches (trigger finalises is_complete=True)
         updated_this_poll = 0
         for s in finished_unsynced:
-            if find_and_update(session, s, team_lookup):
+            if find_and_update(session, s, team_lookup, label="FT"):
                 updated_this_poll += 1
         updated_total += updated_this_poll
 
@@ -325,7 +346,7 @@ def main():
         if live_count > 0:
             # Matches are live — keep polling
             consecutive_idle = 0
-            status_line = f"poll #{poll_count}: {live_count} live, synced {updated_this_poll} finished"
+            status_line = f"poll #{poll_count}: {live_count} live ({live_updated} score updates), synced {updated_this_poll} finished"
         elif finished_unsynced:
             # No live matches but some just finished
             consecutive_idle = 0
@@ -358,7 +379,7 @@ def main():
                     f"poll #{poll_count}: idle {consecutive_idle}/{MAX_IDLE_POLLS}"
                 )
 
-        if updated_this_poll > 0 or poll_count % 5 == 0:
+        if updated_this_poll > 0 or live_updated > 0 or poll_count % 5 == 0:
             print(status_line)
 
         if consecutive_idle >= MAX_IDLE_POLLS:
