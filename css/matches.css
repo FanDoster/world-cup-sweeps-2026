@@ -115,12 +115,14 @@
 }
 .match-row.live {
   border-left-color: var(--live);
-  box-shadow: 0 0 0 1px rgba(239,68,68,0.1);
-  animation: liveGlow 2.5s ease-in-out infinite;
+  border-left-width: 4px;
+  background: linear-gradient(90deg, rgba(239,68,68,0.07) 0%, transparent 60%);
+  box-shadow: 0 0 0 1px rgba(239,68,68,0.18), inset 0 0 30px rgba(239,68,68,0.04);
+  animation: liveGlow 2s ease-in-out infinite;
 }
 @keyframes liveGlow {
-  0%, 100% { border-left-color: var(--live); box-shadow: 0 0 0 1px rgba(239,68,68,0.1); }
-  50% { border-left-color: #dc2626; box-shadow: 0 0 0 1px rgba(239,68,68,0.2); }
+  0%, 100% { box-shadow: 0 0 0 1px rgba(239,68,68,0.18), inset 0 0 30px rgba(239,68,68,0.04); }
+  50% { box-shadow: 0 0 0 1px rgba(239,68,68,0.35), inset 0 0 30px rgba(239,68,68,0.08); }
 }
 .match-row.finished {
   opacity: 0.70;
@@ -140,18 +142,33 @@
   gap: 6px;
 }
 .match-countdown.soon { color: var(--accent); }
-.match-countdown.live-now { color: var(--live); }
+.match-countdown.live-now {
+  color: #fff;
+  background: var(--live);
+  padding: 3px 8px 3px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  align-self: flex-start;
+  box-shadow: 0 0 8px rgba(239,68,68,0.5);
+  animation: liveBadgePulse 1.5s ease-in-out infinite;
+}
 .match-countdown.live-now::before {
   content: '';
-  width: 7px; height: 7px;
-  background: var(--live);
+  width: 6px; height: 6px;
+  background: #fff;
   border-radius: 50%;
   flex-shrink: 0;
   animation: dotPulse 1s ease-in-out infinite;
 }
 @keyframes dotPulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.7); }
+  50% { opacity: 0.5; transform: scale(0.65); }
+}
+@keyframes liveBadgePulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(239,68,68,0.5); }
+  50% { box-shadow: 0 0 16px rgba(239,68,68,0.8); }
 }
 .match-countdown-badge {
   display: inline-block;
