@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="css/shooter.css">
   <link rel="stylesheet" href="css/profile-picture.css">
   <link rel="stylesheet" href="css/user-profile.css">
+  <link rel="stylesheet" href="css/bracket.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/update-notification.css">
 </head>
@@ -94,6 +95,7 @@
       <button type="button" class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')"><span class="emoji">🏅</span><span class="tab-label"> Leaderboard</span></button>
       <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span><span class="tab-label"> Teams</span></button>
       <button type="button" class="tab-btn" data-tab="map" onclick="switchTab('map')"><span class="emoji">🌐</span><span class="tab-label"> Battle Map</span></button>
+      <button type="button" class="tab-btn" data-tab="bracket" onclick="switchTab('bracket')"><span class="emoji">📊</span><span class="tab-label"> Bracket</span></button>
       <button type="button" class="tab-btn shooter-tab" data-tab="shooter" onclick="switchTab('shooter')"><span class="emoji">🔫</span><span class="tab-label"> Shooter</span></button>
       <button type="button" class="tab-btn" data-tab="profile" onclick="switchTab('profile')"><span class="emoji">👤</span><span class="tab-label"> Profile</span></button>
     </div>
@@ -207,6 +209,8 @@
       <div id="userProfileContent"></div>
     </div>
 
+    <div class="section-bracket" id="sectionBracket"></div>
+
     <!-- Sign In Modal -->
     <div class="auth-modal-overlay" id="signInModal">
       <div class="auth-modal">
@@ -308,6 +312,7 @@
   <script src="js/team-results.js"></script>
   <script src="js/profile-picture.js"></script>
   <script src="js/render-user-profile.js"></script>
+  <script src="js/render-bracket.js"></script>
   <script src="js/version.js"></script>
   <script src="js/version-refresh.js"></script>
   <script src="js/main.js"></script>
