@@ -20,15 +20,20 @@ Scripts load in dependency order (each file can call globals defined by earlier 
 | `js/auth.js` | `currentSession`, `currentProfile`, sign-in/up/out, `updateAuthBar`, joker notification |
 | `js/data.js` | Data globals, `loadData`, `loadPredData`; also globe state vars (`territoryControl` etc.) |
 | `js/render-matches.js` | Match list with 3-way filters (`matchFilter`, `matchTeamFilter`) |
-| `js/render-groups.js` | Group tables, qual scenarios, player cards (`renderPeople`) |
-| `js/render-leaderboard.js` | `calcLeaderboard`, `renderLeaderboard`, `renderAwards`, `calcPredPoints`, `getPredStatsByPlayer`, `calcTerritoryControl`, `calcPredPointsForAll`, `predResultBadge`, `renderTerritoryStandings` |
+| `js/render-groups.js` | Group tables, qual scenarios, player cards (`renderPeople`), sponsor chips |
+| `js/render-leaderboard.js` | `calcLeaderboard`, `renderLeaderboard`, `renderAwards`, `calcPredPoints`, `getPredStatsByPlayer`, `calcTerritoryControl`, `calcPredPointsForAll`, `predResultBadge`, `renderTerritoryStandings`, `renderWarDispatch` (the tactical-briefing headline strip) |
 | `js/render-predictions.js` | Prediction entry/edit UI, `submitPrediction`, joker toggle, `getLockCountdown`, `stepScore` |
 | `js/render-teams.js` | `selectedTeam`, team chips, team schedule, `selectTeam` |
 | `js/render-myteams.js` | My Teams tab cards |
-| `js/render-profile.js` | Profile overlay, match pred panel, H2H block, match comments |
+| `js/render-profile.js` | Player profile popup overlay, match pred panel, H2H block, match comments |
 | `js/globe.js` | D3 globe, territory fills/stripes, venue/territory panels |
-| `js/odds.js` | Broadcast clock, Polymarket odds ticker |
-| `js/main.js` | `switchTab`, init calls (`restoreSession`, `setInterval`) |
+| `js/shooter.js` | Self-contained raycaster arcade game (the 🔫 Shooter tab); `S_`-prefixed globals, own game loop |
+| `js/team-results.js` | Post-result celebration popups for your own teams (`checkTeamResults`, confetti) |
+| `js/profile-picture.js` | Avatar upload/crop to the Supabase Storage `avatars` bucket; feature-detected (`profile-picture-migration.sql`) |
+| `js/render-user-profile.js` | Full-page Profile tab (`showUserProfile`, hash route `#/users/:name`) — distinct from the `render-profile.js` popup |
+| `js/version.js` | `window.APP_VERSION` deploy marker string (bumped each deploy) |
+| `js/version-refresh.js` | Polls Supabase `app_version` every 30s; shows the broadcast-HUD update notification then reloads |
+| `js/main.js` | `switchTab` (incl. shooter start/stop), init calls (`restoreSession`, `setInterval`) |
 
 ### CSS file layout
 
@@ -42,19 +47,23 @@ Stylesheets load in dependency order via `<link>` tags in `<head>` (tokens first
 | `css/groups.css` | People/player cards, group tables, owner tags, qualification scenarios |
 | `css/leaderboard.css` | Leaderboard table, stat badges, awards grid |
 | `css/teams.css` | Team chips, channel badges, win-probability badges |
-| `css/tickers.css` | All 4 ticker rows (sponsor, Polymarket odds, kickoff countdown, stats) + broadcast clock; shared base selectors reduce duplication |
+| `css/dispatch.css` | War Dispatch tactical-briefing strip (stripe layout, sitrep masthead) |
 | `css/predictions.css` | Prediction cards, prediction history, match prediction dots |
 | `css/profile.css` | Player profile modal, match predictions panel, H2H block, your-prediction form, joker chip, comments |
 | `css/auth.css` | Auth bar, sign-in/sign-up modal |
 | `css/myteams.css` | My Teams tab grid |
 | `css/globe.css` | D3 globe, venue panel, territory standings |
+| `css/shooter.css` | Shooter tab canvas, wave-clear / game-over overlays |
+| `css/profile-picture.css` | Avatar styles (auth-bar avatar, upload widget, crop UI) |
+| `css/user-profile.css` | Full-page Profile tab (hero, stats, sections) |
 | `css/responsive.css` | `@media (max-width: 700px)` overrides for the main layout (auth and globe embed their own responsive rules inline) |
+| `css/update-notification.css` | Broadcast-HUD "update available" notification (used by `version-refresh.js`) |
 
 ## Commands
 
 - **Run locally**: just open `index.html` in a browser (or any static server). It talks to the live Supabase project.
 - **Deploy**: pushing to `main` auto-deploys to Surge via `.github/workflows/deploy.yml`. Manual deploy: `./deploy.sh` (needs `SURGE_TOKEN` env var). `.surgeignore` keeps SQL/markdown/config files off the public site — never weaken it: the invite code lives in SQL, and that file was once publicly readable.
-- **Database changes**: the `.sql` files are not run by any tooling — they are pasted into the Supabase SQL Editor by hand. `supabase-schema.sql` (teams, matches, picks + seed data) is **destructive**: it starts with `DROP TABLE ... CASCADE` and reseeds everything. `supabase-auth.sql` adds `player_profiles`, `predictions`, and the `validate_invite_code` RPC. `supabase-fixes.sql` (June 2026) adds the prediction UPDATE policy, the server-side kickoff lock (`match_locked`), the `prediction_status` existence-only view, and rotates the invite code. `supabase-features.sql` adds the `is_joker` column (one 2× confidence pick per player per match day, enforced by trigger) and the `match_comments` table (banter thread, realtime-enabled). The frontend **feature-detects** both (`jokersEnabled`/`commentsEnabled` probes in `loadPredData`) and hides the UI until the SQL has been run.
+- **Database changes**: the `.sql` files are not run by any tooling — they are pasted into the Supabase SQL Editor by hand. `supabase-schema.sql` (teams, matches, picks + seed data) is **destructive**: it starts with `DROP TABLE ... CASCADE` and reseeds everything. `supabase-auth.sql` adds `player_profiles`, `predictions`, and the `validate_invite_code` RPC. `supabase-fixes.sql` (June 2026) adds the prediction UPDATE policy, the server-side kickoff lock (`match_locked`), the `prediction_status` existence-only view, and rotates the invite code. `supabase-features.sql` adds the `is_joker` column (one 2× confidence pick per player per match day, enforced by trigger) and the `match_comments` table (banter thread, realtime-enabled). `supabase-is-complete.sql` adds the `is_complete` column + trigger (TRUE only when both scores are set AND kickoff has passed) that the frontend's null-score checks now key off. `supabase-user-api.sql` adds the `get_user_predictions` RPC powering the full-page Profile tab. `profile-picture-migration.sql` adds `avatar_url` to `player_profiles` and creates the public `avatars` Storage bucket with RLS. The frontend **feature-detects** the optional ones (`jokersEnabled`/`commentsEnabled` probes in `loadPredData`, plus the avatars-bucket probe) and hides the UI until the SQL has been run.
 
 ## Architecture
 
@@ -67,7 +76,7 @@ All data lives in Supabase; the client is anonymous-readable via RLS (`SELECT US
 - `predLookup` (matchId → predictions) and `matchIdByTeamDate` — matches are keyed client-side by the string `"team1|team2|date"`, which is also what `showPredPanel()` receives via inline `onclick`.
 - `matchByKey` — same `"team1|team2|date"` key → matchData object, used by the globe's venue panel.
 
-Rendering is full innerHTML regeneration: `renderMatches()`, `renderGroups()`, `renderLeaderboard()`, etc. rebuild their section from the globals. `renderMatches` re-runs every 60s for countdowns. Tabs are show/hide via `switchTab()`; the My Teams and Predictions tabs only exist when signed in (injected by `updateAuthBar()`).
+Rendering is full innerHTML regeneration: `renderMatches()`, `renderGroups()`, `renderLeaderboard()`, etc. rebuild their section from the globals. `renderMatches` re-runs every 60s for countdowns. Tabs are show/hide via `switchTab()` (Players, Matches, Groups, Leaderboard, Teams, Battle Map, Shooter, Profile); the My Teams and Predictions tabs only exist when signed in (injected by `updateAuthBar()`). The **Shooter** tab is a self-contained game started/stopped by `switchTab`; the **War Dispatch** strip above the tabs is a rendered headline summary; tab routing is also reflected in the URL hash. Separately, `version-refresh.js` polls Supabase for a new deployed `APP_VERSION` and prompts a reload — this is how clients pick up a deploy without a manual refresh.
 
 ### Scoring rules (duplicated client-side, keep consistent)
 
