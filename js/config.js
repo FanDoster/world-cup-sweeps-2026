@@ -19,6 +19,20 @@ const ownerHexColors = {
   Steven: '#ef4444',
 };
 
+const FIFA_RANK = {
+  Argentina: 1, France: 2, Spain: 3, England: 4, Brazil: 5,
+  Morocco: 6, Netherlands: 7, Germany: 8, Portugal: 9, Belgium: 10,
+  Mexico: 11, Colombia: 12, 'United States': 13, Croatia: 15, Japan: 16,
+  Senegal: 17, Switzerland: 18, Uruguay: 19, Austria: 21, Iran: 22,
+  'South Korea': 23, Australia: 25, Egypt: 26, Norway: 27, Canada: 28,
+  Algeria: 29, Ecuador: 30, 'Ivory Coast': 31, Turkey: 32, Sweden: 36,
+  Paraguay: 37, Panama: 40, Scotland: 41, 'DR Congo': 43,
+  'Czech Republic': 44, Uzbekistan: 54, Qatar: 57, Tunisia: 58,
+  'Saudi Arabia': 59, Iraq: 60, 'South Africa': 61, 'Cape Verde': 63,
+  'Bosnia & Herzegovina': 64, Ghana: 65, Jordan: 68,
+  'Curaçao': 81, 'New Zealand': 84, Haiti: 87,
+};
+
 const VENUE_DATA = {
   'Estadio Azteca': {
     city: 'Mexico City', country: 'MX', lat: 19.3029, lng: -99.1505,
