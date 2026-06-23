@@ -58,7 +58,7 @@ async function loadData() {
     match_date, kickoff_time, tz_offset,
     home:home_team_id(name), away:away_team_id(name),
     group_letter, home_score, away_score, tv_channel,
-    prob_home, prob_draw, prob_away, is_complete
+    prob_home, prob_draw, prob_away, is_complete, round
   `).order('match_date').order('kickoff_time');
 
   // Fallback: if is_complete column doesn't exist yet, re-query without it
@@ -68,7 +68,7 @@ async function loadData() {
       match_date, kickoff_time, tz_offset,
       home:home_team_id(name), away:away_team_id(name),
       group_letter, home_score, away_score, tv_channel,
-      prob_home, prob_draw, prob_away
+      prob_home, prob_draw, prob_away, round
     `).order('match_date').order('kickoff_time');
     m = retry.data;
     hasIsComplete = false;
@@ -103,6 +103,7 @@ async function loadData() {
       probD:      r.prob_draw,
       prob2:      r.prob_away,
       isComplete,
+      round:      r.round || null,
     };
   });
 
