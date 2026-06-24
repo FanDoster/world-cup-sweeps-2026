@@ -1,0 +1,391 @@
+/* ── XP DESKTOP ── */
+#xp-desktop {
+  position: fixed;
+  inset: 0 0 40px 0;           /* leave room for taskbar */
+  background:
+    linear-gradient(to bottom,
+      #1a6aaf  0%,
+      #4d9fd4 42%,
+      #7ec8a0 58%,
+      #4a8f3a 72%,
+      #3d7a2e 100%);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── DESKTOP ICONS ── */
+#xp-icons {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 72px);
+  gap: 8px;
+  z-index: 1;
+}
+
+.xp-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  cursor: default;
+  width: 72px;
+}
+
+.xp-icon-img {
+  width: 48px;
+  height: 48px;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+}
+
+.xp-icon-label {
+  font-family: var(--font);
+  font-size: 11px;
+  color: #ffffff;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.9), -1px -1px 2px rgba(0,0,0,0.9);
+  line-height: 1.2;
+  word-break: break-word;
+  max-width: 72px;
+}
+
+.xp-icon:hover .xp-icon-img,
+.xp-icon.xp-selected .xp-icon-img {
+  background: rgba(49, 106, 197, 0.5);
+  border-color: rgba(255,255,255,0.6);
+}
+
+.xp-icon:hover .xp-icon-label,
+.xp-icon.xp-selected .xp-icon-label {
+  background: #316ac5;
+  color: #fff;
+}
+
+/* ── WINDOWS ── */
+.xp-window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  min-height: 120px;
+  /* Luna blue outer border + classic bevel */
+  border: 3px solid;
+  border-color: #5ba6e8 #1a52b0 #1a52b0 #5ba6e8;
+  outline: 1px solid var(--xp-border-outer);
+  box-shadow: 4px 4px 14px rgba(0,0,0,0.55);
+  z-index: 10;
+}
+
+.xp-window.xp-focused {
+  border-color: #6db8ff #1a52b0 #1a52b0 #6db8ff;
+}
+
+/* ── TITLE BAR ── */
+.xp-title-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 3px 0 6px;
+  background: linear-gradient(to bottom,
+    var(--xp-titlebar-start) 0%,
+    var(--xp-titlebar-end) 100%);
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.xp-window:not(.xp-focused) .xp-title-bar {
+  background: linear-gradient(to bottom, #7a96c2 0%, #5b7ab5 100%);
+}
+
+.xp-title-icon { font-size: 16px; line-height: 1; flex-shrink: 0; }
+
+.xp-title-text {
+  flex: 1;
+  color: #ffffff;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── CONTROL BUTTONS ── */
+.xp-controls {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.xp-btn-min,
+.xp-btn-max,
+.xp-btn-close {
+  width: 21px;
+  height: 21px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: var(--font);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+}
+
+.xp-btn-min,
+.xp-btn-max {
+  background: linear-gradient(to bottom, #5090d8 0%, #3060b8 100%);
+  border: 1px solid #1a3880;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+.xp-btn-min:hover,
+.xp-btn-max:hover {
+  background: linear-gradient(to bottom, #70aaf0 0%, #4080d0 100%);
+}
+
+.xp-btn-close {
+  background: linear-gradient(to bottom, #d84040 0%, #b02020 100%);
+  border: 1px solid #801010;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+.xp-btn-close:hover {
+  background: linear-gradient(to bottom, #f05050 0%, #c03030 100%);
+}
+
+/* ── WINDOW CONTENT ── */
+.xp-window-content {
+  flex: 1;
+  background: var(--xp-surface);
+  overflow: auto;
+  padding: 8px;
+  /* inset bevel */
+  border-top: 1px solid var(--xp-border-sh);
+  border-left: 1px solid var(--xp-border-sh);
+  border-bottom: 1px solid var(--xp-border-hi);
+  border-right: 1px solid var(--xp-border-hi);
+}
+
+/* section divs inside windows should always be visible */
+.xp-window-content .section-players,
+.xp-window-content .section-matches,
+.xp-window-content .section-groups,
+.xp-window-content .section-leaderboard,
+.xp-window-content .section-teams,
+.xp-window-content .section-myteams,
+.xp-window-content .section-predictions,
+.xp-window-content .section-map,
+.xp-window-content .section-shooter,
+.xp-window-content .section-profile,
+.xp-window-content .section-bracket {
+  display: block !important;
+}
+
+/* ── TASKBAR ── */
+#xp-taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--xp-taskbar-start), var(--xp-taskbar-end));
+  border-top: 1px solid #5b8ad8;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  z-index: 9999;
+}
+
+/* ── START BUTTON ── */
+#xp-start-btn {
+  height: 32px;
+  padding: 0 12px 0 8px;
+  background: linear-gradient(to bottom, #5aac28 0%, #3a8010 40%, #3a8010 60%, #5aac28 100%);
+  border: 1px solid #1a5008;
+  border-radius: 0 14px 14px 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 2px 2px 6px rgba(0,0,0,0.4);
+  flex-shrink: 0;
+}
+
+#xp-start-btn:hover {
+  background: linear-gradient(to bottom, #70cc38 0%, #50a020 40%, #50a020 60%, #70cc38 100%);
+}
+
+.xp-start-logo { font-size: 20px; font-style: normal; }
+
+/* ── TASKBAR WINDOW BUTTONS ── */
+#xp-taskbar-windows {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.xp-taskbar-btn {
+  height: 28px;
+  max-width: 160px;
+  min-width: 80px;
+  padding: 0 8px;
+  background: linear-gradient(to bottom, #4a7ac8 0%, #3060b0 100%);
+  border: 1px solid #1a3880;
+  border-radius: 2px;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+}
+
+.xp-taskbar-btn:hover {
+  background: linear-gradient(to bottom, #5a90e0 0%, #4070c8 100%);
+}
+
+.xp-taskbar-btn.xp-tb-active {
+  background: linear-gradient(to bottom, #2050a0 0%, #3060b0 100%);
+  border-color: #0a2460;
+  box-shadow: inset 1px 1px 3px rgba(0,0,0,0.4);
+}
+
+/* ── SYSTEM TRAY ── */
+#xp-system-tray {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(to bottom, #1a3a7a, #0e2458);
+  border: 1px solid #0a1a50;
+  border-radius: 0 0 0 0;
+  padding: 0 8px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+#xp-auth-tray {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.xp-tray-user {
+  color: #c8d8f0;
+  font-family: var(--font);
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.xp-tray-user:hover { color: #fff; text-decoration: underline; }
+
+.xp-tray-signout,
+.xp-tray-signin {
+  background: linear-gradient(to bottom, #3a60b0 0%, #2a4898 100%);
+  border: 1px solid #1a2870;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 10px;
+  padding: 2px 8px;
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.xp-tray-signout:hover,
+.xp-tray-signin:hover {
+  background: linear-gradient(to bottom, #5080d0 0%, #3060b8 100%);
+}
+
+#xp-clock {
+  color: #c8d8f0;
+  font-family: var(--font);
+  font-size: 11px;
+  text-align: center;
+  min-width: 40px;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  padding-left: 8px;
+}
+
+/* ── START MENU ── */
+#xp-start-menu {
+  position: fixed;
+  bottom: 40px;
+  left: 0;
+  width: 280px;
+  background: #fff;
+  border: 1px solid var(--xp-border-outer);
+  box-shadow: 4px 0 12px rgba(0,0,0,0.4);
+  z-index: 10000;
+  display: none;
+}
+
+.xp-start-header {
+  background: linear-gradient(to right, #2462c9, #4a90d9);
+  padding: 12px 16px;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: bold;
+  border-bottom: 2px solid var(--xp-border-outer);
+}
+
+.xp-start-items {
+  padding: 4px 0;
+}
+
+.xp-start-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+  color: #000;
+}
+
+.xp-start-item:hover {
+  background: #316ac5;
+  color: #fff;
+}
+
+.xp-start-separator {
+  height: 1px;
+  background: #d0ccc0;
+  margin: 4px 0;
+}
+
+/* ── HOME WINDOW HEADER ── */
+.xp-home-header { text-align: center; padding: 8px; }
+.xp-home-header svg { max-width: 380px; display: block; margin: 0 auto; }
