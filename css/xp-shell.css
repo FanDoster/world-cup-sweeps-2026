@@ -590,6 +590,15 @@
   align-items: center;
   gap: 6px;
 }
+.xp-tray-icon {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+  cursor: default;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+.xp-tray-icon:hover { opacity: 1; }
 
 .xp-tray-user {
   color: #c8d8f0;
