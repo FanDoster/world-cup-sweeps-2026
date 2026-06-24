@@ -216,6 +216,7 @@ function xpHideWelcome() {
   setTimeout(function() {
     var n = document.getElementById('msn-notification');
     if (!n || n.style.display === 'block') return;
+    msnPrefetchGif();
     var gameMsg = msnLastGameMessage();
     if (gameMsg) {
       var statusEl = document.getElementById('msn-notif-status');
@@ -456,21 +457,46 @@ function msnLastGameMessage() {
   return winner + ' nicked it past ' + loser + ' ' + score + ', heart in me mouth the whole time pet';
 }
 
-function msnSendWinnerGif(msgs, winnerName) {
-  var iso = (typeof teamIso !== 'undefined' && teamIso[winnerName]) ? teamIso[winnerName] : '';
-  var query = encodeURIComponent(winnerName + ' football');
-  fetch('https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=' + query + '&limit=8&rating=g')
+var msnGifPromise = null;
+
+function msnPrefetchGif() {
+  var game = msnGetLastGame();
+  if (!game || game.score1 === game.score2) return;
+  var winner = game.score1 > game.score2 ? game.team1 : game.team2;
+  var query = encodeURIComponent(winner + ' football');
+  msnGifPromise = fetch('https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=' + query + '&limit=8&rating=g')
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      var gifUrl = null;
       if (data && data.data && data.data.length) {
         var item = data.data[Math.floor(Math.random() * Math.min(6, data.data.length))];
         var img = item.images;
-        gifUrl = (img.downsized_medium || img.downsized || img.original).url;
+        return (img.downsized_medium || img.downsized || img.original).url;
       }
-      msnAppendGifMsg(msgs, gifUrl, winnerName, iso);
+      return null;
     })
-    .catch(function() { msnAppendGifMsg(msgs, null, winnerName, iso); });
+    .catch(function() { return null; });
+}
+
+function msnSendWinnerGif(msgs, winnerName) {
+  var iso = (typeof teamIso !== 'undefined' && teamIso[winnerName]) ? teamIso[winnerName] : '';
+  var done = function(gifUrl) { msnAppendGifMsg(msgs, gifUrl, winnerName, iso); };
+  if (msnGifPromise) {
+    msnGifPromise.then(done).catch(function() { done(null); });
+  } else {
+    var query = encodeURIComponent(winnerName + ' football');
+    fetch('https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=' + query + '&limit=8&rating=g')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var gifUrl = null;
+        if (data && data.data && data.data.length) {
+          var item = data.data[Math.floor(Math.random() * Math.min(6, data.data.length))];
+          var img = item.images;
+          gifUrl = (img.downsized_medium || img.downsized || img.original).url;
+        }
+        done(gifUrl);
+      })
+      .catch(function() { done(null); });
+  }
 }
 
 function msnAppendGifMsg(msgs, gifUrl, winnerName, iso) {
@@ -524,14 +550,14 @@ function msnOpenChat() {
       if (msgs) msgs.scrollTop = msgs.scrollHeight;
       new Audio('media/msn-message.mp3').play().catch(function(){});
 
-      // third message: winner GIF, 2s later
+      // third message: winner GIF
       setTimeout(function() {
         var game = msnGetLastGame();
         if (!game || game.score1 === game.score2) return;
         var winner = game.score1 > game.score2 ? game.team1 : game.team2;
         var m2 = document.getElementById('msn-messages');
         if (m2) msnSendWinnerGif(m2, winner);
-      }, 2000);
+      }, 800);
     }
   }, 1500);
 }
