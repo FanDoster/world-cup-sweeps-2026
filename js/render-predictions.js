@@ -129,20 +129,20 @@ async function renderPredictions() {
         // Home score cell
         var homeCellContent, awayCellContent;
         if (isLocked) {
-          homeCellContent = '<div class="xl-cell xl-num xl-cell-locked" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,\\\"—\\\",home_pred)\')">' + (ep ? ep.predicted_home_score : '—') + '</div>';
-          awayCellContent = '<div class="xl-cell xl-num xl-cell-locked" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,\\\"—\\\",away_pred)\')">' + (ep ? ep.predicted_away_score : '—') + '</div>';
+          homeCellContent = '<div class="xl-cell xl-num xl-cell-locked" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,&quot;—&quot;,home_pred)\')">' + (ep ? ep.predicted_home_score : '—') + '</div>';
+          awayCellContent = '<div class="xl-cell xl-num xl-cell-locked" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,&quot;—&quot;,away_pred)\')">' + (ep ? ep.predicted_away_score : '—') + '</div>';
         } else if (ep) {
-          homeCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,\\\"—\\\",home_pred)\')">' +
+          homeCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,&quot;—&quot;,home_pred)\')">' +
             '<input class="xl-score-input" type="number" id="ph-' + mid + '" min="0" max="20" value="' + ep.predicted_home_score + '" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
             '</div>';
-          awayCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,\\\"—\\\",away_pred)\')">' +
+          awayCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,&quot;—&quot;,away_pred)\')">' +
             '<input class="xl-score-input" type="number" id="pa-' + mid + '" min="0" max="20" value="' + ep.predicted_away_score + '" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
             '</div>';
         } else {
-          homeCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,\\\"—\\\",home_pred)\')">' +
+          homeCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,&quot;—&quot;,home_pred)\')">' +
             '<input class="xl-score-input" type="number" id="ph-' + mid + '" min="0" max="20" value="0" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
             '</div>';
-          awayCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,\\\"—\\\",away_pred)\')">' +
+          awayCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,&quot;—&quot;,away_pred)\')">' +
             '<input class="xl-score-input" type="number" id="pa-' + mid + '" min="0" max="20" value="0" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
             '</div>';
         }
@@ -150,13 +150,13 @@ async function renderPredictions() {
         // Joker cell
         var jokerCell;
         if (!jokersEnabled || isLocked) {
-          jokerCell = '<div class="xl-cell xl-num xl-cell-locked" style="width:55px" onclick="xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,\\\"\\\")\')">—</div>';
+          jokerCell = '<div class="xl-cell xl-num xl-cell-locked" style="width:55px" onclick="xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">—</div>';
         } else if (ep && ep.is_joker) {
-          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-on" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,\\\"\\\")\')">&#127923; 2&#215;</div>';
+          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-on" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">&#127923; 2&#215;</div>';
         } else if (dayHasJoker) {
-          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-unavail" style="width:55px" onclick="xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,\\\"\\\")\')">·</div>';
+          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-unavail" style="width:55px" onclick="xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">·</div>';
         } else {
-          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-off" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,\\\"\\\")\')">&#127923;</div>';
+          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-off" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">&#127923;</div>';
         }
 
         // Status cell
@@ -172,14 +172,14 @@ async function renderPredictions() {
         }
 
         // Match cell content
-        var matchCell = '<div class="xl-cell" style="flex:1;min-width:150px" onclick="xlPredSelectCell(\'B' + rowNum + '\',\'=\\\"' + m.team1 + ' vs ' + m.team2 + '\\\"\')">' +
+        var matchCell = '<div class="xl-cell" style="flex:1;min-width:150px" onclick="xlPredSelectCell(\'B' + rowNum + '\',\'=&quot;' + m.team1.replace(/'/g, "&#39;") + ' vs ' + m.team2.replace(/'/g, "&#39;") + '&quot;\')">' +
           escapeHtml(m.team1) + ' <span style="color:#888">vs</span> ' + escapeHtml(m.team2) +
           ' <span class="badge-mono" style="font-size:9px;color:#888">G' + m.group + '</span>' +
           '</div>';
 
         html += '<div class="xl-row ' + rowCls + '">' +
           '<div class="xl-row-num">' + rowNum + '</div>' +
-          '<div class="xl-cell" style="width:90px" onclick="xlPredSelectCell(\'A' + rowNum + '\',\'=\\\"' + formatLocalTime(m.date, m.time, m.tz) + '\\\"\')">' + formatLocalTime(m.date, m.time, m.tz) + '</div>' +
+          '<div class="xl-cell" style="width:90px" onclick="xlPredSelectCell(\'A' + rowNum + '\',\'=&quot;' + formatLocalTime(m.date, m.time, m.tz) + '&quot;\')">' + formatLocalTime(m.date, m.time, m.tz) + '</div>' +
           matchCell +
           homeCellContent +
           '<div class="xl-cell xl-num" style="width:30px;color:#888">&#8211;</div>' +
