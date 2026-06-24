@@ -45,7 +45,6 @@ function renderMatches() {
   var el = document.getElementById('oe-message-list');
   if (!el) return;
   var now = new Date();
-  var twoDays = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
 
   var all = matchData
     .map(function(m) { return Object.assign({}, m, { kickoff: toDate(m.date, m.time, m.tz) }); })
@@ -92,7 +91,6 @@ function renderMatches() {
   }
 
   var html = '';
-  var rowIndex = 0;
   for (var di = 0; di < byDateOrder.length; di++) {
     var date = byDateOrder[di];
     var dayMatches = byDate[date];
@@ -134,14 +132,13 @@ function renderMatches() {
       html += '<div class="oe-msg-row' +
         (isSelected ? ' oe-msg-selected' : '') +
         (isUnread ? ' oe-msg-unread' : '') +
-        '" onclick="oeSelectMessage(\'' + safeAttr(key) + '\')">' +
+        '" onclick="oeSelectMessage(\'' + safeAttr(m.team1) + '|' + safeAttr(m.team2) + '|' + m.date + '\')">' +
         '<div class="oe-msg-cell" style="width:20px">' + (hasPred ? '&#8226;' : '') + '</div>' +
         '<div class="oe-msg-cell" style="width:20px"><img src="' + flagUrl(i1) + '" style="width:16px;height:11px;object-fit:cover" alt=""></div>' +
         '<div class="oe-msg-cell oe-msg-from" style="width:200px">' + escapeHtml(fromText) + '</div>' +
         '<div class="oe-msg-cell oe-msg-subject" style="flex:1">' + subject + '</div>' +
         '<div class="oe-msg-cell" style="width:72px">' + localTime + '</div>' +
         '</div>';
-      rowIndex++;
     }
   }
 
@@ -248,7 +245,7 @@ function oeSelectMessage(key) {
   pane.innerHTML =
     '<div class="oe-reading-header">' +
       '<div class="oe-reading-field"><span class="oe-reading-lbl">From:</span><span class="oe-reading-val">' + escapeHtml(m.team1) + ' v ' + escapeHtml(m.team2) + '</span></div>' +
-      '<div class="oe-reading-field"><span class="oe-reading-lbl">Subject:</span><span class="oe-reading-val">Group ' + m.group + ' Match</span></div>' +
+      '<div class="oe-reading-field"><span class="oe-reading-lbl">Subject:</span><span class="oe-reading-val">' + (m.round ? m.round + ' Round' : 'Group ' + m.group + ' Match') + '</span></div>' +
       '<div class="oe-reading-field"><span class="oe-reading-lbl">Date:</span><span class="oe-reading-val">' + dateLabel + ' ' + localTime + '</span></div>' +
     '</div>' +
     '<div class="oe-reading-body">' +
