@@ -433,11 +433,104 @@ var msnGazzaReplies = [
   'a luv yee pet',
   'are yee daft?',
   'why aye man',
-  'divvent get is wrong pet but i cannae agree with that lyk'
+  'divvent get is wrong pet but i cannae agree with that lyk',
+  'howay man, stop messin aboot',
+  'by 'eck that\\'s a canny question that like',
+  'tell ya what this tournament\\'s been absolute quality man'
 ];
 var msnReplying = false;
 var msnLastReply = -1;
 var msnVideoSent = false;
+
+function msnGetNextGame() {
+  if (typeof matchData === 'undefined' || !matchData.length) return null;
+  var upcoming = matchData.filter(function(m) { return m.score1 === null && m.score2 === null; });
+  if (!upcoming.length) return null;
+  upcoming.sort(function(a, b) {
+    var da = a.date + ' ' + (a.time || ''), db = b.date + ' ' + (b.time || '');
+    return da < db ? -1 : da > db ? 1 : 0;
+  });
+  return upcoming[0];
+}
+
+function msnGetLeaderboard() {
+  if (typeof calcLeaderboard !== 'function') return null;
+  try { return calcLeaderboard(); } catch(e) { return null; }
+}
+
+function msnGetUserTeams() {
+  if (typeof currentProfile === 'undefined' || !currentProfile) return [];
+  var name = currentProfile.player_name;
+  if (typeof people === 'undefined' || !people[name]) return [];
+  return people[name].map(function(t) { return t.name || t; });
+}
+
+function msnOwnerOf(teamName) {
+  if (typeof teamOwner === 'undefined') return null;
+  return teamOwner[teamName] || null;
+}
+
+/* builds a live pool of contextual one-liners Gazza can drop */
+function msnContextPool() {
+  var pool = [];
+
+  /* leaderboard context */
+  var lb = msnGetLeaderboard();
+  if (lb && lb.length >= 2) {
+    var first = lb[0], second = lb[1];
+    var gap = first.total - second.total;
+    pool.push(first.name + ' is absolutely flying up the table man, proper running away with it like');
+    pool.push('by 'eck ' + first.name + '\\'s on fire this tournament - ' + first.total + ' points an\' all');
+    if (gap <= 2) {
+      pool.push('it\\'s dead tight at the top mind - ' + first.name + ' and ' + second.name + ' only ' + gap + ' point' + (gap === 1 ? '' : 's') + ' in it like');
+    } else {
+      pool.push(first.name + '\\'s got a right cushion on ' + second.name + ' now, ' + gap + ' points clear like');
+    }
+    if (lb.length >= 3) {
+      var last = lb[lb.length - 1];
+      pool.push('divvent tell ' + last.name + ' but they\\'re rooted to the bottom man, like');
+    }
+  }
+
+  /* next game context */
+  var next = msnGetNextGame();
+  if (next) {
+    var o1 = msnOwnerOf(next.team1), o2 = msnOwnerOf(next.team2);
+    var tag1 = o1 ? ' (' + o1 + '\\'s)' : '';
+    var tag2 = o2 ? ' (' + o2 + '\\'s)' : '';
+    pool.push('big game comin up like - ' + next.team1 + tag1 + ' vs ' + next.team2 + tag2 + ' - should be a cracker man');
+    pool.push('keep ya eye on ' + next.team1 + ' vs ' + next.team2 + ' pet, could be tasty that');
+    if (o1 && o2) {
+      pool.push(o1 + ' vs ' + o2 + ' next - gets personal now like, heh heh');
+    }
+  }
+
+  /* last game owner context */
+  var last = msnGetLastGame();
+  if (last) {
+    var diff = last.score1 - last.score2;
+    if (diff !== 0) {
+      var winner = diff > 0 ? last.team1 : last.team2;
+      var loser  = diff > 0 ? last.team2 : last.team1;
+      var ow = msnOwnerOf(winner), ol = msnOwnerOf(loser);
+      if (ow) pool.push(ow + ' must be doin\\'  backflips after that ' + winner + ' result man, fair play like');
+      if (ol) pool.push('gutted for ' + ol + ' mind, ' + loser + ' had nowt in that game like');
+    }
+  }
+
+  /* logged-in user's teams */
+  var myTeams = msnGetUserTeams();
+  if (myTeams.length) {
+    var pick = myTeams[Math.floor(Math.random() * myTeams.length)];
+    pool.push('how\\'s ' + pick + ' gettin on for ya like, still got a chance?');
+    pool.push('ya still got ' + pick + ' in it? canny team that, could gan all the way');
+    if (myTeams.length > 1) {
+      pool.push('nice havin a few teams in it like - ya got ' + myTeams[0] + ' an\\'  ' + myTeams[1] + ' still gannin?');
+    }
+  }
+
+  return pool;
+}
 
 function msnAppendGazzaVideo(msgs) {
   var gazzaMsg = document.createElement('div');
@@ -479,10 +572,12 @@ function msnSendMessage() {
       msnVideoSent = true;
       msnAppendGazzaVideo(msgs);
     } else {
+      /* blend static geordie phrases with live contextual lines */
+      var pool = msnGazzaReplies.concat(msnContextPool());
       var idx;
-      do { idx = Math.floor(Math.random() * msnGazzaReplies.length); } while (idx === msnLastReply);
+      do { idx = Math.floor(Math.random() * pool.length); } while (idx === msnLastReply && pool.length > 1);
       msnLastReply = idx;
-      var reply = msnGazzaReplies[idx];
+      var reply = pool[idx];
       var gazzaMsg = document.createElement('div');
       gazzaMsg.className = 'msn-chat-msg';
       gazzaMsg.innerHTML =
@@ -514,14 +609,18 @@ function msnLastGameMessage() {
   var s1 = m.score1, s2 = m.score2, t1 = m.team1, t2 = m.team2;
   var diff = s1 - s2;
   if (diff === 0) {
-    return 'nowt in it between ' + t1 + ' and ' + t2 + ' man, ' + s1 + ' each - canny game mind';
+    var o1 = msnOwnerOf(t1), o2 = msnOwnerOf(t2);
+    var ownerBit = (o1 && o2 && o1 !== o2) ? ' - both ' + o1 + ' an\' ' + o2 + ' get a point each like' : '';
+    return 'nowt in it between ' + t1 + ' and ' + t2 + ' man, ' + s1 + ' each - canny game mind' + ownerBit;
   }
   var winner = diff > 0 ? t1 : t2, loser = diff > 0 ? t2 : t1;
   var ws = diff > 0 ? s1 : s2, ls = diff > 0 ? s2 : s1;
   var margin = Math.abs(diff), score = ws + '-' + ls;
-  if (margin >= 3) return 'did ya see that?! ' + winner + ' absolutely mullered ' + loser + ' ' + score + ' man, what a game like';
-  if (margin === 2) return 'canny game that, ' + winner + ' beat ' + loser + ' ' + score + ' like, well deserved an\' all';
-  return winner + ' nicked it past ' + loser + ' ' + score + ', heart in me mouth the whole time pet';
+  var ow = msnOwnerOf(winner), ol = msnOwnerOf(loser);
+  var ownerBit = ow ? ' - that\\'s ' + ow + '\\'s team man!' : (ol ? ' - proper gutted for ' + ol + ' that like' : '');
+  if (margin >= 3) return 'did ya see that?! ' + winner + ' absolutely mullered ' + loser + ' ' + score + ' man, what a game like' + ownerBit;
+  if (margin === 2) return 'canny game that, ' + winner + ' beat ' + loser + ' ' + score + ' like, well deserved an\' all' + ownerBit;
+  return winner + ' nicked it past ' + loser + ' ' + score + ', heart in me mouth the whole time pet' + ownerBit;
 }
 
 var msnGifPromise = null;
@@ -612,6 +711,24 @@ function msnOpenChat() {
         var m2 = document.getElementById('msn-messages');
         if (m2) msnSendWinnerGif(m2, winner);
       }, 800);
+
+      // fourth message: contextual follow-up (leaderboard / next game / user teams)
+      setTimeout(function() {
+        var pool = msnContextPool();
+        if (!pool.length) return;
+        var line = pool[Math.floor(Math.random() * pool.length)];
+        var m3 = document.getElementById('msn-messages');
+        if (!m3) return;
+        var follow = document.createElement('div');
+        follow.className = 'msn-chat-msg';
+        follow.innerHTML =
+          '<span class="msn-chat-sender">~~gAzZa~~</span>' +
+          '<span class="msn-chat-says"> says:</span><br>' +
+          '<span class="msn-chat-text">' + escapeHtml(line) + '</span>';
+        m3.appendChild(follow);
+        m3.scrollTop = m3.scrollHeight;
+        new Audio('media/msn-message.mp3').play().catch(function(){});
+      }, 2600);
     }
   }, 1500);
 }
