@@ -1,174 +1,270 @@
 // ── PREDICTIONS ──
-async function renderPredictions() {
-  const el = document.getElementById('predictionsWrap');
-  if (!currentSession) { el.innerHTML = '<div class="pred-empty"><div class="pe-icon">🔮</div>Sign in to make predictions.</div>'; return; }
+var xlPredSheet = 'upcoming';
 
-  const now = new Date();
-  const upcoming = matchData
-    .filter(m => !m.isComplete)
-    .map(m => ({ ...m, kickoff: toDate(m.date, m.time, m.tz) }))
-    .sort((a, b) => a.kickoff - b.kickoff)
+function xlPredSelectCell(addr, formula) {
+  var nb = document.getElementById('xl-pred-namebox');
+  var ff = document.getElementById('xl-pred-formulafield');
+  if (nb) nb.textContent = addr;
+  if (ff) ff.textContent = formula;
+}
+
+function xlPredSwitchSheet(name) {
+  xlPredSheet = name;
+  var tabUp = document.getElementById('xl-pred-tab-upcoming');
+  var tabHist = document.getElementById('xl-pred-tab-history');
+  if (tabUp) tabUp.classList.toggle('xl-tab-active', name === 'upcoming');
+  if (tabHist) tabHist.classList.toggle('xl-tab-active', name === 'history');
+  renderPredictions();
+}
+
+async function renderPredictions() {
+  var el = document.getElementById('xl-pred-target');
+  if (!el) return;
+
+  if (!currentSession) {
+    el.innerHTML = '<div class="xl-pred-signin">Sign in to make predictions.</div>';
+    var statusLeft = document.getElementById('xl-pred-status-left');
+    if (statusLeft) statusLeft.textContent = 'Not signed in';
+    return;
+  }
+
+  var now = new Date();
+  var upcoming = matchData
+    .filter(function(m) { return !m.isComplete; })
+    .map(function(m) { return Object.assign({}, m, { kickoff: toDate(m.date, m.time, m.tz) }); })
+    .sort(function(a, b) { return a.kickoff - b.kickoff; })
     .slice(0, 20);
 
-  const { data: existing } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '')).eq('user_id', currentSession.user.id);
-  const predMap = {};
-  if (existing) existing.forEach(p => { predMap[p.match_id] = p; });
+  var { data: existing } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '')).eq('user_id', currentSession.user.id);
+  var predMap = {};
+  if (existing) existing.forEach(function(p) { predMap[p.match_id] = p; });
 
-  const { data: allMatches } = await sb.from('matches').select('id,match_date,kickoff_time,home_team_id(name),away_team_id(name)').order('match_date').order('kickoff_time');
-  if (!allMatches) { el.innerHTML = '<div class=\"pred-empty\">Unable to load match data. Try refreshing.</div>'; return; }
-  const matchIdMap = {};
-  if (allMatches) allMatches.forEach(m => {
-    matchIdMap[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
+  var { data: allMatches } = await sb.from('matches').select('id,match_date,kickoff_time,home_team_id(name),away_team_id(name)').order('match_date').order('kickoff_time');
+  if (!allMatches) { el.innerHTML = '<div class="xl-pred-signin">Unable to load match data.</div>'; return; }
+  var matchIdMap = {};
+  allMatches.forEach(function(m) {
+    matchIdMap[m.home_team_id.name + '|' + m.away_team_id.name + '|' + m.match_date] = m.id;
   });
 
-  let predicted = 0, open = 0, locked = 0;
-  for (const m of upcoming) {
-    const mid = matchIdMap[`${m.team1}|${m.team2}|${m.date}`];
-    if (mid && predMap[mid]) predicted++;
-    else if (m.kickoff - now < 5 * 60 * 1000) locked++;
-    else open++;
-  }
-
-  let html = `<div class="pred-summary">
-    <div class="pred-stat accent"><div class="ps-num">${predicted}</div><div class="ps-label">Predicted</div></div>
-    <div class="pred-stat"><div class="ps-num">${open}</div><div class="ps-label">Open</div></div>
-    <div class="pred-stat"><div class="ps-num">${locked}</div><div class="ps-label">Locked</div></div>
-  </div>`;
-
-  // Group by US venue date (day shows where the match is actually played)
-  const byDate = {};
-  for (const m of upcoming) {
-    if (!byDate[m.date]) byDate[m.date] = [];
-    byDate[m.date].push(m);
-  }
-
-  let hasOpen = false;
-  for (const [date, dayMatches] of Object.entries(byDate)) {
-    const headerLabel = getUSDateLabel(date);
-    // Check if any match in this day has a joker active
-    const dayHasJoker = dayMatches.some(m => {
-      const key = `${m.team1}|${m.team2}|${m.date}`;
-      const mid = matchIdMap[key];
-      const ep = mid ? predMap[mid] : null;
-      return ep && ep.is_joker;
+  // ── UPCOMING SHEET ──
+  if (xlPredSheet === 'upcoming') {
+    var predicted = 0, open = 0, locked = 0;
+    upcoming.forEach(function(m) {
+      var mid = matchIdMap[m.team1 + '|' + m.team2 + '|' + m.date];
+      if (mid && predMap[mid]) predicted++;
+      else if (m.kickoff - now < 5 * 60 * 1000) locked++;
+      else open++;
     });
-    const jokerNote = dayHasJoker ? '<span class="pdh-joker-note">🃏 Joker active</span>' : '';
-    html += `<div class="pred-day-header"><span>${headerLabel}</span><span class="pdh-count">${dayMatches.length} match${dayMatches.length > 1 ? 'es' : ''}</span>${jokerNote}</div>`;
 
-    for (const m of dayMatches) {
-    const key = `${m.team1}|${m.team2}|${m.date}`;
-    const mid = matchIdMap[key];
-    if (!mid) continue;
+    // Update status bar
+    var statusLeft = document.getElementById('xl-pred-status-left');
+    if (statusLeft) statusLeft.textContent = upcoming.length + ' matches';
+    var statusRight = document.getElementById('xl-pred-status-right');
+    if (statusRight) statusRight.textContent = 'Predicted: ' + predicted + '  |  Open: ' + open + '  |  Locked: ' + locked;
 
-    const ep = mid ? predMap[mid] : null;
-    const isLocked = m.kickoff - now < 5 * 60 * 1000;
-
-    if (ep && isLocked) {
-      const jokerCls = ep.is_joker ? ' joker-active' : '';
-      html += `<div class="pred-match-card${jokerCls}">
-        <div class="pmc-inner">
-          <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
-          <span class="pmc-status locked"><span${ep.is_joker ? ' class="joker-active-score"' : ''}>🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}</span>${ep.is_joker ? '<span class="joker-locked-badge">🃏 2×</span>' : ''}</span>
-        </div></div>`;
-    } else if (ep) {
-      const lockMs = m.kickoff - 5 * 60 * 1000;
-      const lockStr = getLockCountdown(lockMs);
-      hasOpen = true;
-      html += `<div class="pred-match-card${ep.is_joker ? ' joker-active' : ''}" id="pred-${mid}">
-        <div class="pmc-inner">
-          <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
-          <span class="pmc-status predicted" id="pred-display-${mid}"><span class="${ep.is_joker ? 'joker-active-score' : ''}">${ep.predicted_home_score}–${ep.predicted_away_score}</span></span>
-          ${jokersEnabled ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
-          <div class="pmc-score" id="pred-edit-${mid}" style="display:none">
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
-              <input type="number" id="ph-${mid}" min="0" max="20" value="${ep.predicted_home_score}">
-              <div class="pmc-step" onclick="stepScore('ph-${mid}',-1)">▾</div>
-            </div>
-            <span class="pmc-dash">–</span>
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('pa-${mid}',1)">▴</div>
-              <input type="number" id="pa-${mid}" min="0" max="20" value="${ep.predicted_away_score}">
-              <div class="pmc-step" onclick="stepScore('pa-${mid}',-1)">▾</div>
-            </div>
-          </div>
-          <button class="pmc-btn edit" id="pred-edit-btn-${mid}" onclick="editPrediction(${mid})">Edit</button>
-          <button class="pmc-btn save" id="pred-save-btn-${mid}" onclick="submitPrediction(${mid})" style="display:none">Save</button>
-        </div></div>`;
-    } else if (isLocked) {
-      html += `<div class="pred-match-card">
-        <div class="pmc-inner">
-          <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
-          <span class="pmc-status locked">Locked</span>
-        </div></div>`;
-    } else {
-      const lockMs = m.kickoff - 5 * 60 * 1000;
-      const lockStr = getLockCountdown(lockMs);
-      hasOpen = true;
-      html += `<div class="pred-match-card" id="pred-${mid}">
-        <div class="pmc-inner">
-          <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
-          <div class="pmc-score">
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
-              <input type="number" id="ph-${mid}" min="0" max="20" value="0">
-              <div class="pmc-step" onclick="stepScore('ph-${mid}',-1)">▾</div>
-            </div>
-            <span class="pmc-dash">–</span>
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('pa-${mid}',1)">▴</div>
-              <input type="number" id="pa-${mid}" min="0" max="20" value="0">
-              <div class="pmc-step" onclick="stepScore('pa-${mid}',-1)">▾</div>
-            </div>
-          </div>
-          <button class="pmc-btn predict" onclick="submitPrediction(${mid})">Predict</button>
-        </div></div>`;
+    if (upcoming.length === 0) {
+      el.innerHTML = '<div class="xl-pred-signin">No upcoming matches to predict.</div>';
+      return;
     }
+
+    // Group by date
+    var byDate = {}, byDateOrder = [];
+    upcoming.forEach(function(m) {
+      if (!byDate[m.date]) { byDate[m.date] = []; byDateOrder.push(m.date); }
+      byDate[m.date].push(m);
+    });
+
+    var html = '';
+    // Header row (row 1)
+    html += '<div class="xl-row xl-row-pred-header">' +
+      '<div class="xl-row-num">1</div>' +
+      '<div class="xl-cell" style="width:90px" onclick="xlPredSelectCell(\'A1\',\'=Date\')">Date</div>' +
+      '<div class="xl-cell" style="flex:1;min-width:150px" onclick="xlPredSelectCell(\'B1\',\'=Match\')">Match</div>' +
+      '<div class="xl-cell xl-num" style="width:60px" onclick="xlPredSelectCell(\'C1\',\'=Home\')">Home</div>' +
+      '<div class="xl-cell xl-num" style="width:30px"></div>' +
+      '<div class="xl-cell xl-num" style="width:60px" onclick="xlPredSelectCell(\'E1\',\'=Away\')">Away</div>' +
+      '<div class="xl-cell xl-num" style="width:55px" onclick="xlPredSelectCell(\'F1\',\'=Joker\')">Joker</div>' +
+      '<div class="xl-cell" style="width:80px" onclick="xlPredSelectCell(\'G1\',\'=Status\')">Status</div>' +
+      '</div>';
+
+    var rowNum = 2;
+    // Count joker usage per day for current user
+    var jokersByDate = {};
+    upcoming.forEach(function(m) {
+      var mid = matchIdMap[m.team1 + '|' + m.team2 + '|' + m.date];
+      var ep = mid ? predMap[mid] : null;
+      if (ep && ep.is_joker) jokersByDate[m.date] = mid;
+    });
+
+    for (var di = 0; di < byDateOrder.length; di++) {
+      var date = byDateOrder[di];
+      var dayMatches = byDate[date];
+      var dayHasJoker = !!jokersByDate[date];
+
+      // Date separator row
+      html += '<div class="xl-row xl-date-sep-row">' +
+        '<div class="xl-row-num">' + rowNum + '</div>' +
+        '<div class="xl-cell" style="width:90px;font-style:italic;color:#555">' + formatDateLabel(dayMatches[0].date, dayMatches[0].time, dayMatches[0].tz) + '</div>' +
+        '<div class="xl-cell" style="flex:1;min-width:150px;color:#555">' + dayMatches.length + ' match' + (dayMatches.length !== 1 ? 'es' : '') + (dayHasJoker ? ' — &#127923; Joker active' : '') + '</div>' +
+        '<div class="xl-cell" style="width:60px"></div>' +
+        '<div class="xl-cell" style="width:30px"></div>' +
+        '<div class="xl-cell" style="width:60px"></div>' +
+        '<div class="xl-cell" style="width:55px"></div>' +
+        '<div class="xl-cell" style="width:80px"></div>' +
+        '</div>';
+      rowNum++;
+
+      for (var mi = 0; mi < dayMatches.length; mi++) {
+        var m = dayMatches[mi];
+        var key = m.team1 + '|' + m.team2 + '|' + m.date;
+        var mid = matchIdMap[key];
+        if (!mid) { rowNum++; continue; }
+        var ep = predMap[mid];
+        var isLocked = m.kickoff - now < 5 * 60 * 1000;
+        var lockMs = m.kickoff - 5 * 60 * 1000;
+        var lockStr = getLockCountdown(lockMs);
+        var rowCls = mi % 2 === 0 ? 'xl-row-pred-even' : 'xl-row-pred-odd';
+        var rowAddr = 'C' + rowNum;
+
+        // Home score cell
+        var homeCellContent, awayCellContent;
+        if (isLocked) {
+          homeCellContent = '<div class="xl-cell xl-num xl-cell-locked" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,\\\"—\\\",home_pred)\')">' + (ep ? ep.predicted_home_score : '—') + '</div>';
+          awayCellContent = '<div class="xl-cell xl-num xl-cell-locked" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,\\\"—\\\",away_pred)\')">' + (ep ? ep.predicted_away_score : '—') + '</div>';
+        } else if (ep) {
+          homeCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,\\\"—\\\",home_pred)\')">' +
+            '<input class="xl-score-input" type="number" id="ph-' + mid + '" min="0" max="20" value="' + ep.predicted_home_score + '" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
+            '</div>';
+          awayCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,\\\"—\\\",away_pred)\')">' +
+            '<input class="xl-score-input" type="number" id="pa-' + mid + '" min="0" max="20" value="' + ep.predicted_away_score + '" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
+            '</div>';
+        } else {
+          homeCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,\\\"—\\\",home_pred)\')">' +
+            '<input class="xl-score-input" type="number" id="ph-' + mid + '" min="0" max="20" value="0" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
+            '</div>';
+          awayCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,\\\"—\\\",away_pred)\')">' +
+            '<input class="xl-score-input" type="number" id="pa-' + mid + '" min="0" max="20" value="0" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
+            '</div>';
+        }
+
+        // Joker cell
+        var jokerCell;
+        if (!jokersEnabled || isLocked) {
+          jokerCell = '<div class="xl-cell xl-num xl-cell-locked" style="width:55px" onclick="xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,\\\"\\\")\')">—</div>';
+        } else if (ep && ep.is_joker) {
+          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-on" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,\\\"\\\")\')">&#127923; 2&#215;</div>';
+        } else if (dayHasJoker) {
+          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-unavail" style="width:55px" onclick="xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,\\\"\\\")\')">·</div>';
+        } else {
+          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-off" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,\\\"\\\")\')">&#127923;</div>';
+        }
+
+        // Status cell
+        var statusCell;
+        if (isLocked && ep) {
+          statusCell = '<div class="xl-cell xl-status-locked" style="width:80px" onclick="xlPredSelectCell(\'G' + rowNum + '\',\'=VLOOKUP(match_id,preds,3,0)\')">&#128274; Saved</div>';
+        } else if (isLocked) {
+          statusCell = '<div class="xl-cell xl-status-locked" style="width:80px" onclick="xlPredSelectCell(\'G' + rowNum + '\',\'=VLOOKUP(match_id,preds,3,0)\')">&#128274; Locked</div>';
+        } else if (ep) {
+          statusCell = '<div class="xl-cell xl-status-saved" style="width:80px" onclick="xlPredSelectCell(\'G' + rowNum + '\',\'=VLOOKUP(match_id,preds,3,0)\')">&#10003; Saved</div>';
+        } else {
+          statusCell = '<div class="xl-cell xl-status-empty" style="width:80px" onclick="xlPredSelectCell(\'G' + rowNum + '\',\'=VLOOKUP(match_id,preds,3,0)\')">' + lockStr + '</div>';
+        }
+
+        // Match cell content
+        var matchCell = '<div class="xl-cell" style="flex:1;min-width:150px" onclick="xlPredSelectCell(\'B' + rowNum + '\',\'=\\\"' + m.team1 + ' vs ' + m.team2 + '\\\"\')">' +
+          escapeHtml(m.team1) + ' <span style="color:#888">vs</span> ' + escapeHtml(m.team2) +
+          ' <span class="badge-mono" style="font-size:9px;color:#888">G' + m.group + '</span>' +
+          '</div>';
+
+        html += '<div class="xl-row ' + rowCls + '">' +
+          '<div class="xl-row-num">' + rowNum + '</div>' +
+          '<div class="xl-cell" style="width:90px" onclick="xlPredSelectCell(\'A' + rowNum + '\',\'=\\\"' + formatLocalTime(m.date, m.time, m.tz) + '\\\"\')">' + formatLocalTime(m.date, m.time, m.tz) + '</div>' +
+          matchCell +
+          homeCellContent +
+          '<div class="xl-cell xl-num" style="width:30px;color:#888">&#8211;</div>' +
+          awayCellContent +
+          jokerCell +
+          statusCell +
+          '</div>';
+        rowNum++;
+      }
     }
+    el.innerHTML = html;
   }
-  if (!hasOpen && predicted === 0 && upcoming.length === 0) {
-    html += '<div class="pred-empty"><div class="pe-icon">🏁</div>No upcoming matches to predict.</div>';
-  }
 
-  const { data: history } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '')).eq('user_id', currentSession.user.id).order('created_at', { ascending: false }).limit(30);
-  if (history && history.length > 0) {
-    let historyHtml = '';
-    let exactCount = 0, correctCount = 0;
-    for (const p of history) {
-      const am = allMatches?.find(am => am.id === p.match_id);
-      if (!am) continue;
-      const m = matchData.find(m => m.team1 === am.home_team_id.name && m.team2 === am.away_team_id.name && m.date === am.match_date);
-      if (!m || !m.isComplete) continue;
+  // ── HISTORY SHEET ──
+  else if (xlPredSheet === 'history') {
+    var { data: history } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '')).eq('user_id', currentSession.user.id).order('created_at', { ascending: false }).limit(50);
 
-      const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2);
-      if (pts === 5) exactCount++; else if (pts >= 1) correctCount++;
-
-      const badge = predResultBadge(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2, p.is_joker);
-      historyHtml += `<div class="pred-history-card">
-        <div class="phc-result">${badge}</div>
-        <div class="phc-match">
-          <div class="phc-teams">${m.team1} vs ${m.team2} <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem">G${m.group}</span></div>
-          <div class="phc-scores">
-            Result <span class="actual">${m.score1}–${m.score2}</span> &nbsp;·&nbsp; Your pick <span class="pred">${p.predicted_home_score}–${p.predicted_away_score}</span>
-          </div>
-        </div>
-      </div>`;
+    var completedPreds = [];
+    if (history) {
+      for (var hi = 0; hi < history.length; hi++) {
+        var p = history[hi];
+        var am = allMatches.find(function(am) { return am.id === p.match_id; });
+        if (!am) continue;
+        var m = matchData.find(function(md) { return md.team1 === am.home_team_id.name && md.team2 === am.away_team_id.name && md.date === am.match_date; });
+        if (!m || !m.isComplete) continue;
+        completedPreds.push({ p: p, m: m });
+      }
     }
-    let statsHtml = '';
-    if (exactCount + correctCount > 0) {
-      statsHtml = `<div class="pred-summary" style="margin-top:16px">
-        <div class="pred-stat gold"><div class="ps-num">${exactCount}</div><div class="ps-label">Perfect 5★</div></div>
-        <div class="pred-stat accent"><div class="ps-num">${correctCount}</div><div class="ps-label">Scored</div></div>
-      </div>`;
-    }
-    html += `<div class="pred-section-title label-sm">Your History</div>${statsHtml}${historyHtml}`;
-  }
 
-  el.innerHTML = html;
+    var statusLeft2 = document.getElementById('xl-pred-status-left');
+    if (statusLeft2) statusLeft2.textContent = completedPreds.length + ' records';
+    var statusRight2 = document.getElementById('xl-pred-status-right');
+    if (statusRight2) {
+      var exact = completedPreds.filter(function(cp) { return calcPredPoints(cp.p.predicted_home_score, cp.p.predicted_away_score, cp.m.score1, cp.m.score2) === 5; }).length;
+      var scored = completedPreds.filter(function(cp) { var pts = calcPredPoints(cp.p.predicted_home_score, cp.p.predicted_away_score, cp.m.score1, cp.m.score2); return pts >= 1 && pts < 5; }).length;
+      statusRight2.textContent = 'Perfect 5&#9733;: ' + exact + '  |  Scored: ' + scored;
+    }
+
+    if (completedPreds.length === 0) {
+      el.innerHTML = '<div class="xl-pred-signin">No completed predictions yet.</div>';
+      return;
+    }
+
+    var histHtml = '';
+    // Header row
+    histHtml += '<div class="xl-row xl-row-pred-header">' +
+      '<div class="xl-row-num">1</div>' +
+      '<div class="xl-cell" style="width:90px">Date</div>' +
+      '<div class="xl-cell" style="flex:1;min-width:150px">Match</div>' +
+      '<div class="xl-cell xl-num" style="width:60px">Result</div>' +
+      '<div class="xl-cell xl-num" style="width:30px"></div>' +
+      '<div class="xl-cell xl-num" style="width:60px">Your Pick</div>' +
+      '<div class="xl-cell xl-num" style="width:55px">Joker</div>' +
+      '<div class="xl-cell xl-num" style="width:80px">Score</div>' +
+      '</div>';
+
+    for (var ci = 0; ci < completedPreds.length; ci++) {
+      var cp = completedPreds[ci];
+      var p = cp.p, m = cp.m;
+      var pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2);
+      if (p.is_joker) pts *= 2;
+      var scoreCls = pts >= 10 ? 'xl-badge-exact' : (pts >= 1 ? 'xl-badge-scored' : 'xl-badge-zero');
+      var scoreStr = pts >= 10 ? '&#9733;&#9733;&#9733;&#9733;&#9733; (10)' : pts >= 6 ? '&#9733;&#9733;&#9733; (6)' : pts >= 2 ? '&#9733; (2)' : pts === 5 ? '&#9733;&#9733;&#9733;&#9733;&#9733;' : pts === 3 ? '&#9733;&#9733;&#9733;' : pts === 1 ? '&#9733;' : '&#10007;';
+      // Recompute without joker for display
+      var basePts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2);
+      if (basePts === 5) scoreStr = '&#9733;&#9733;&#9733;&#9733;&#9733;' + (p.is_joker ? ' (10)' : '');
+      else if (basePts === 3) scoreStr = '&#9733;&#9733;&#9733;' + (p.is_joker ? ' (6)' : '');
+      else if (basePts === 1) scoreStr = '&#9733;' + (p.is_joker ? ' (2)' : '');
+      else scoreStr = '&#10007;';
+
+      var rowCls2 = ci % 2 === 0 ? 'xl-row-pred-even' : 'xl-row-pred-odd';
+      var rn = ci + 2;
+      histHtml += '<div class="xl-row ' + rowCls2 + '">' +
+        '<div class="xl-row-num">' + rn + '</div>' +
+        '<div class="xl-cell" style="width:90px">' + formatDateLabel(m.date, m.time, m.tz) + '</div>' +
+        '<div class="xl-cell" style="flex:1;min-width:150px">' + escapeHtml(m.team1) + ' <span style="color:#888">vs</span> ' + escapeHtml(m.team2) + '</div>' +
+        '<div class="xl-cell xl-num" style="width:60px;font-weight:bold">' + m.score1 + '&#8211;' + m.score2 + '</div>' +
+        '<div class="xl-cell xl-num" style="width:30px;color:#888">&#8594;</div>' +
+        '<div class="xl-cell xl-num" style="width:60px;color:#555">' + p.predicted_home_score + '&#8211;' + p.predicted_away_score + '</div>' +
+        '<div class="xl-cell xl-num" style="width:55px">' + (p.is_joker ? '&#127923;' : '—') + '</div>' +
+        '<div class="xl-cell xl-num ' + scoreCls + '" style="width:80px">' + scoreStr + '</div>' +
+        '</div>';
+    }
+    el.innerHTML = histHtml;
+  }
 }
 
 async function submitPrediction(matchId) {
