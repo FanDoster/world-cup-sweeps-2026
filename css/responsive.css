@@ -138,7 +138,7 @@
   .msn-messages { -webkit-overflow-scrolling: touch; overflow-y: scroll !important; }
   .msn-input-btn-wide { display: none; }
   .msn-input-section { margin: 0 2px 2px; }
-  .msn-input-field { min-height: 44px; }
+  .msn-input-field { min-height: 44px; font-size: 16px; }
   .msn-send-col { padding: 2px; gap: 2px; }
   .msn-send-btn { padding: 2px 5px; font-size: 10px; }
 
