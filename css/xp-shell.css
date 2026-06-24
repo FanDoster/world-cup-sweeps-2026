@@ -415,73 +415,86 @@
 }
 
 /* ── NOTIFICATION BALLOON ── */
+/*
+  Real XP balloon: unified white speech bubble, no separate header bar.
+  Bold blue title text sits inline inside the balloon.
+  Tiny × close button absolute top-right corner.
+  Two-layer CSS tail (border + fill) pointing down toward the tray.
+*/
 #xp-balloon {
   position: fixed;
   bottom: 48px;
-  right: 8px;
-  width: 200px;
+  right: 6px;
+  width: 220px;
   background: #fff;
-  border: 1px solid #7896B0;
-  border-radius: 6px;
-  box-shadow: 3px 3px 8px rgba(0,0,0,0.3);
+  border: 1px solid #317097;
+  border-radius: 8px;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.35);
   z-index: 9999;
   display: none;
+  overflow: visible;
+  position: fixed; /* repeated intentionally to override any cascade */
 }
-/* Tail border */
+/* Tail — border layer */
 #xp-balloon::before {
   content: '';
   position: absolute;
-  bottom: -10px;
-  right: 14px;
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
+  bottom: -12px;
+  right: 15px;
+  width: 0; height: 0;
+  border-left: 12px solid transparent;
+  border-top: 12px solid #317097;
   border-right: 0;
-  border-top: 10px solid #7896B0;
 }
-/* Tail fill */
+/* Tail — fill layer */
 #xp-balloon::after {
   content: '';
   position: absolute;
-  bottom: -8px;
-  right: 15px;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
+  bottom: -10px;
+  right: 16px;
+  width: 0; height: 0;
+  border-left: 10px solid transparent;
+  border-top: 10px solid #fff;
   border-right: 0;
-  border-top: 8px solid #fff;
 }
 #xp-balloon-title {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 6px 5px 8px;
+  padding: 7px 22px 5px 8px; /* right padding leaves room for × */
   font-family: var(--font);
   font-size: 11px;
   font-weight: bold;
-  color: #000;
-  border-bottom: 1px solid #d4d0c8;
+  color: #003399;  /* XP balloon title blue */
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
 }
 #xp-balloon-close {
-  margin-left: auto;
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 14px;
   background: none;
   border: 1px solid transparent;
-  color: #333;
-  font-size: 11px;
-  cursor: pointer;
-  padding: 1px 3px;
-  line-height: 1;
+  color: #555;
+  font-size: 10px;
   font-family: var(--font);
-  flex-shrink: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
 }
 #xp-balloon-close:hover {
-  background: #d9e8f8;
-  border-color: #7896B0;
+  background: #c0d8f0;
+  border-color: #4a7fb8;
+  color: #000;
 }
 #xp-balloon img {
   width: 100%;
   display: block;
-  border-radius: 0 0 5px 5px;
+  border-radius: 0 0 7px 7px;
 }
 
 /* ── START MENU ── */
