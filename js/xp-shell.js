@@ -359,6 +359,14 @@ function msnDismiss() {
 
 function msnOpenChat() {
   msnDismiss();
+  var inner = document.getElementById('msn-dp-user-inner');
+  if (inner) {
+    var name = (typeof currentProfile !== 'undefined' && currentProfile) ? currentProfile.player_name : null;
+    var pic = name ? (XP_ACCOUNT_PICS[name] || null) : null;
+    if (pic) {
+      inner.outerHTML = '<img id="msn-dp-user-inner" src="' + pic + '" class="msn-dp-img" alt="You">';
+    }
+  }
   openWindow('msn');
 }
 

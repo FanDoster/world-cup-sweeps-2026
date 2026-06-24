@@ -683,7 +683,7 @@
   </div>
 
   <!-- ══ MSN MESSENGER CHAT WINDOW ══ -->
-  <div id="xp-window-msn" class="xp-window" data-win="msn" data-no-explorer style="display:none;width:340px;top:80px;left:calc(50% - 170px)">
+  <div id="xp-window-msn" class="xp-window" data-win="msn" data-no-explorer style="display:none;width:440px;height:490px;top:60px;left:calc(50% - 220px)">
     <svg width="0" height="0" style="position:absolute">
       <defs>
         <filter id="gazza-ripple" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
@@ -696,7 +696,7 @@
         </filter>
       </defs>
     </svg>
-    <div class="title-bar msn-title-bar" onmousedown="startDrag(event,'msn')">
+    <div class="title-bar" onmousedown="startDrag(event,'msn')">
       <div class="title-bar-text">🦋 ~~gAzZa~~ - Conversation</div>
       <div class="title-bar-controls">
         <button aria-label="Minimize" onclick="minimizeWindow('msn')"></button>
@@ -704,36 +704,69 @@
         <button aria-label="Close" onclick="closeWindow('msn')"></button>
       </div>
     </div>
-    <div class="msn-contact-header">
-      <img src="img/gazza-crying.jpg" class="msn-contact-avatar" alt="Gazza">
-      <div class="msn-contact-info">
-        <div class="msn-contact-name">~~gAzZa~~</div>
-        <div class="msn-contact-online"><span class="msn-online-dot"></span> Online</div>
+    <div class="msn-menubar">
+      <span class="msn-menu-item">File</span>
+      <span class="msn-menu-item">Edit</span>
+      <span class="msn-menu-item">Actions</span>
+      <span class="msn-menu-item">Tools</span>
+      <span class="msn-menu-item">Help</span>
+    </div>
+    <div class="msn-toolbar">
+      <div class="msn-tb-actions">
+        <button class="msn-tb-btn"><span class="msn-tb-icon">👥</span><span>Invite</span></button>
+        <button class="msn-tb-btn"><span class="msn-tb-icon">📁</span><span>Send Files</span></button>
+        <button class="msn-tb-btn"><span class="msn-tb-icon">📹</span><span>Video</span></button>
+        <button class="msn-tb-btn"><span class="msn-tb-icon">🎤</span><span>Voice</span></button>
+        <button class="msn-tb-btn"><span class="msn-tb-icon">🎯</span><span>Activities</span></button>
+        <button class="msn-tb-btn"><span class="msn-tb-icon">🃏</span><span>Games</span></button>
+      </div>
+      <div class="msn-tb-logo"><em>msn</em>🦋</div>
+    </div>
+    <div class="msn-body">
+      <div class="msn-left">
+        <div class="msn-chat-history">
+          <div class="msn-to-line">To: <strong>~~gAzZa~~</strong></div>
+          <div class="msn-messages">
+            <div class="msn-chat-msg">
+              <span class="msn-chat-sender">~~gAzZa~~</span><span class="msn-chat-says"> says:</span><br>
+              <span class="msn-chat-text">orite m8
+                <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/winking-smile.png" class="msn-emote" alt=";)">
+                <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/note.png" class="msn-emote" alt="(8)">
+                <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/star.png" class="msn-emote" alt="(*)">
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="msn-input-section">
+          <div class="msn-input-toolbar">
+            <button class="msn-input-btn" title="Font" style="font-weight:bold;font-family:serif;font-size:14px">A</button>
+            <button class="msn-input-btn" title="Emoticons">☺</button>
+            <button class="msn-input-btn msn-input-btn-wide" title="Voice Clip">🔊 Voice Clip</button>
+            <button class="msn-input-btn" title="Wink">😉</button>
+            <button class="msn-input-btn" title="Background">🖼</button>
+            <button class="msn-input-btn" title="Ink">✏️</button>
+          </div>
+          <div class="msn-input-row">
+            <textarea class="msn-input-field"></textarea>
+            <div class="msn-send-col">
+              <button class="msn-send-btn">Send</button>
+              <button class="msn-send-btn">Search</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="msn-right">
+        <div class="msn-dp-panel">
+          <img src="img/gazza-crying.jpg" class="msn-dp-img" style="filter:url(#gazza-ripple)" alt="Gazza">
+          <button class="msn-dp-arrow">▼</button>
+        </div>
+        <div class="msn-dp-panel">
+          <div id="msn-dp-user-inner" class="msn-dp-default">👤</div>
+          <button class="msn-dp-arrow">▼</button>
+        </div>
       </div>
     </div>
-    <div class="msn-chat-history">
-      <div class="msn-chat-msg">
-        <span class="msn-chat-sender">~~gAzZa~~</span><span class="msn-chat-says"> says:</span><br>
-        <img src="img/gazza-crying.jpg" class="msn-chat-photo" style="filter:url(#gazza-ripple)" alt="Gazza"><br>
-        <span class="msn-chat-text">orite m8
-          <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/winking-smile.png" class="msn-emote" alt=";)">
-          <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/note.png" class="msn-emote" alt="(8)">
-          <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/star.png" class="msn-emote" alt="(*)">
-        </span>
-      </div>
-    </div>
-    <div class="msn-input-section">
-      <div class="msn-input-toolbar">
-        <button class="msn-input-btn" title="Font" style="font-weight:bold;font-family:serif">A</button>
-        <button class="msn-input-btn" title="Emoticons">☺</button>
-        <button class="msn-input-btn" title="Nudge">📳</button>
-        <button class="msn-input-btn" title="Share files">📎</button>
-      </div>
-      <textarea class="msn-input-field" placeholder=""></textarea>
-      <div class="msn-send-bar">
-        <button class="msn-send-btn">Send</button>
-      </div>
-    </div>
+    <div class="msn-statusbar">Click for new Emoticons and Theme Packs from Blue Mountain</div>
   </div>
 
   <!-- ══ TASKBAR ══ -->
