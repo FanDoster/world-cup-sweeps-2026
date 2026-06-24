@@ -46,25 +46,28 @@ function openWindow(name) {
   focusWindow(name);
   xpSyncTaskbarBtn(name);
 
-  /* restore animation: expand from taskbar button */
+  /* open/restore animation: expand from taskbar button (restore) or desktop icon (fresh open) */
+  var animSrc = null;
   if (wasMinimized) {
-    var btn = document.querySelector('.xp-taskbar-btn[data-win="' + name + '"]');
-    if (btn && btn.offsetParent) {
-      var wRect = el.getBoundingClientRect();
-      var bRect = btn.getBoundingClientRect();
-      el.style.transition = 'none';
-      el.style.opacity = '0';
-      el.style.transform = xpWinAnimTransform(wRect, bRect);
-      el.getBoundingClientRect(); /* force reflow */
-      el.style.transition = 'transform 180ms ease-out, opacity 180ms ease-out';
-      el.style.transform = '';
-      el.style.opacity   = '';
-      var cleanup = function() {
-        el.removeEventListener('transitionend', cleanup);
-        el.style.transition = '';
-      };
-      el.addEventListener('transitionend', cleanup);
-    }
+    animSrc = document.querySelector('.xp-taskbar-btn[data-win="' + name + '"]');
+  } else {
+    animSrc = document.querySelector('.xp-icon[data-window="' + name + '"]');
+  }
+  if (animSrc && animSrc.offsetParent) {
+    var wRect = el.getBoundingClientRect();
+    var sRect = animSrc.getBoundingClientRect();
+    el.style.transition = 'none';
+    el.style.opacity    = '0';
+    el.style.transform  = xpWinAnimTransform(wRect, sRect);
+    el.getBoundingClientRect(); /* force reflow */
+    el.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out';
+    el.style.transform  = '';
+    el.style.opacity    = '';
+    var cleanup = function() {
+      el.removeEventListener('transitionend', cleanup);
+      el.style.transition = '';
+    };
+    el.addEventListener('transitionend', cleanup);
   }
 }
 
