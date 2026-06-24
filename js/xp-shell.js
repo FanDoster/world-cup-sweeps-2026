@@ -424,6 +424,35 @@ function msnSendMessage() {
   }, 1000 + Math.floor(Math.random() * 1500));
 }
 
+function msnLastGameMessage() {
+  if (typeof matchData === 'undefined' || !matchData.length) return null;
+  var done = matchData.filter(function(m) { return m.score1 !== null && m.score2 !== null; });
+  if (!done.length) return null;
+  done.sort(function(a, b) {
+    var da = a.date + ' ' + (a.time || ''), db = b.date + ' ' + (b.time || '');
+    return da < db ? 1 : da > db ? -1 : 0;
+  });
+  var m = done[0];
+  var s1 = m.score1, s2 = m.score2, t1 = m.team1, t2 = m.team2;
+  var diff = s1 - s2;
+  if (diff === 0) {
+    return 'nowt in it between ' + t1 + ' and ' + t2 + ' man, ' + s1 + ' each - canny game mind';
+  }
+  var winner = diff > 0 ? t1 : t2;
+  var loser  = diff > 0 ? t2 : t1;
+  var ws = diff > 0 ? s1 : s2;
+  var ls = diff > 0 ? s2 : s1;
+  var margin = Math.abs(diff);
+  var score = ws + '-' + ls;
+  if (margin >= 3) {
+    return 'did ya see that?! ' + winner + ' absolutely mullered ' + loser + ' ' + score + ' man, what a game like';
+  } else if (margin === 2) {
+    return 'canny game that, ' + winner + ' beat ' + loser + ' ' + score + ' like, well deserved an\' all';
+  } else {
+    return winner + ' nicked it past ' + loser + ' ' + score + ', heart in me mouth the whole time pet';
+  }
+}
+
 function msnDismiss() {
   var n = document.getElementById('msn-notification');
   if (!n) return;
@@ -447,6 +476,11 @@ function msnOpenChat() {
   setTimeout(function() {
     var msg = document.getElementById('msn-msg-2');
     if (msg) {
+      var gameMsg = msnLastGameMessage();
+      if (gameMsg) {
+        var textEl = msg.querySelector('.msn-chat-text');
+        if (textEl) textEl.textContent = gameMsg;
+      }
       msg.style.display = 'block';
       var msgs = document.getElementById('msn-messages');
       if (msgs) msgs.scrollTop = msgs.scrollHeight;
