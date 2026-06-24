@@ -125,8 +125,6 @@
   .xp-window-content { padding: 6px; font-size: 12px; }
 
   /* ── MSN window on mobile ── */
-  /* Hide display picture side panel — not needed on small screens */
-  .msn-right { display: none !important; }
   /* Hide menu bar and status bar to reclaim vertical space */
   .msn-menubar, .msn-statusbar { display: none !important; }
   /* Toolbar: smaller icons, scroll if needed */
@@ -134,12 +132,14 @@
   .msn-tb-btn { padding: 2px 4px; }
   .msn-tb-icon { font-size: 16px; }
   .msn-tb-logo { font-size: 13px; }
+  /* Narrow the avatar panel rather than hiding it */
+  .msn-right { width: 72px; }
   /* Ensure body fills remaining space */
   .msn-body { padding: 2px; gap: 2px; }
-  /* Input row: stack textarea above send buttons */
-  .msn-input-row { flex-direction: column; }
-  .msn-send-col { flex-direction: row; border-left: none; border-top: 1px solid #d0d8e8; padding: 3px 4px; justify-content: flex-end; gap: 4px; }
-  .msn-input-field { min-height: 40px; }
+  /* Keep input row horizontal but ensure textarea has a visible height */
+  .msn-input-field { min-height: 46px; }
+  .msn-send-col { padding: 3px; gap: 3px; }
+  .msn-send-btn { padding: 3px 6px; font-size: 10px; }
 
   /* Grids */
   .people-grid { grid-template-columns: 1fr; }
