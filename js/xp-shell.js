@@ -16,7 +16,6 @@ var XP_WIN_LABELS = {
   myteams:     '⭐ My Teams',
   predictions: '🔮 Predictions',
   profile:     '👤 Profile',
-  bbc:         '🌐 BBC Sport - World Cup 2002',
   match:       '📧 Match'
 };
 
@@ -230,7 +229,6 @@ var XP_WIN_PATHS = {
   predictions: 'C:\\WorldCup2026\\Predictions',
   profile:     'C:\\WorldCup2026\\Profile',
   awards:      'C:\\WorldCup2026\\Awards',
-  bbc:         'http://news.bbc.co.uk/sport3/worldcup2002',
   match:       'C:\\WorldCup2026\\Matches'
 };
 

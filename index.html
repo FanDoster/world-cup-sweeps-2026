@@ -160,7 +160,7 @@
       <div class="xp-icon-img">👤</div>
       <div class="xp-icon-label">Profile</div>
     </div>
-    <div class="xp-icon xp-icon-web-shortcut" ondblclick="openWindow('bbc')">
+    <div class="xp-icon xp-icon-web-shortcut" ondblclick="window.open('http://news.bbc.co.uk/sport3/worldcup2002/','_blank')">
       <div class="xp-icon-img xp-web-shortcut-img">
         <div class="xp-bbc-logo"><span>B</span><span>B</span><span>C</span></div>
       </div>
@@ -640,49 +640,6 @@
       <div class="section-profile" id="sectionProfile">
         <div id="userProfileContent"></div>
       </div>
-    </div>
-  </div>
-
-  <!-- ══ BBC INTERNET EXPLORER WINDOW ══ -->
-  <div class="xp-window" id="xp-window-bbc" data-win="bbc" data-no-explorer
-       style="display:none; top:50px; left:60px; width:680px; height:500px;">
-    <div class="title-bar" onmousedown="startDrag(event,'bbc')">
-      <div class="title-bar-text"><span class="xp-title-icon">🌐</span> BBC Sport - World Cup 2002 - Microsoft Internet Explorer</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('bbc')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('bbc')"></button>
-        <button aria-label="Close" onclick="closeWindow('bbc')"></button>
-      </div>
-    </div>
-    <div class="ie-menubar">
-      <span class="ie-menu-item">File</span>
-      <span class="ie-menu-item">Edit</span>
-      <span class="ie-menu-item">View</span>
-      <span class="ie-menu-item">Favorites</span>
-      <span class="ie-menu-item">Tools</span>
-      <span class="ie-menu-item">Help</span>
-    </div>
-    <div class="ie-toolbar">
-      <button class="ie-tb-btn" disabled>&#9664; Back</button>
-      <button class="ie-tb-btn" disabled>Forward &#9654;</button>
-      <button class="ie-tb-btn" disabled>Stop</button>
-      <button class="ie-tb-btn" disabled>Refresh</button>
-      <button class="ie-tb-btn" disabled>Home</button>
-      <span class="ie-tb-sep"></span>
-      <button class="ie-tb-btn" disabled>&#128269; Search</button>
-      <button class="ie-tb-btn" disabled>&#11088; Favorites</button>
-    </div>
-    <div class="ie-addrbar">
-      <span class="ie-addr-label">Address</span>
-      <div class="ie-addr-field">http://news.bbc.co.uk/sport3/worldcup2002</div>
-      <button class="ie-go-btn">Go</button>
-    </div>
-    <div class="ie-content">
-      <iframe src="http://news.bbc.co.uk/sport3/worldcup2002/" class="ie-frame" title="BBC Sport World Cup 2002"></iframe>
-    </div>
-    <div class="ie-statusbar">
-      <span class="ie-status-text">Done</span>
-      <div class="ie-zones"><span>Internet</span></div>
     </div>
   </div>
 
