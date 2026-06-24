@@ -148,6 +148,16 @@
 
   /* Hide shooter on mobile */
   .xp-icon[data-window="shooter"] { display: none; }
+
+  /* Excel chrome: hide decorative layers on mobile */
+  .xl-menubar,
+  .xl-toolbar,
+  .xl-formula-bar,
+  .xl-col-headers,
+  .xl-row-num,
+  .xl-tab-nav { display: none !important; }
+  .xl-cell { font-size: 12px; }
+  .xl-wrap { min-height: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {}

@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="css/matches.css">
   <link rel="stylesheet" href="css/groups.css">
   <link rel="stylesheet" href="css/leaderboard.css">
+  <link rel="stylesheet" href="css/excel.css">
   <link rel="stylesheet" href="css/teams.css">
   <link rel="stylesheet" href="css/dispatch.css">
   <link rel="stylesheet" href="css/predictions.css">
@@ -311,30 +312,11 @@
     </div>
     <div class="xp-window-content">
       <div class="section-leaderboard" id="sectionLeaderboard">
-        <div class="lb-two-col">
-          <div class="lb-col">
-            <div class="lb-col-header">⚽ Match Results</div>
-            <div class="leaderboard-wrap card-base">
-              <table class="leaderboard-table" id="matchLeaderboard">
-                <thead><tr><th>#</th><th>Player</th><th class="wdl">W–D–L</th><th class="pts sortable" data-sort="pts" onclick="sortMatchLeaderboard('pts')">Pts <span class="sort-arrow" id="sortArrowMatchPts"></span></th></tr></thead>
-                <tbody></tbody>
-              </table>
-            </div>
-            <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">3 pts win · 1 pt draw</p>
-          </div>
-          <div class="lb-col">
-            <div class="lb-col-header">🔮 Predictions</div>
-            <div class="leaderboard-wrap card-base">
-              <table class="leaderboard-table" id="predLeaderboard">
-                <thead><tr><th>#</th><th>Player</th><th class="pts sortable" data-sort="predPts" onclick="sortPredLeaderboard('predPts')">Pts <span class="sort-arrow" id="sortArrowPredPts"></span></th><th class="sub-pts">Avg</th><th class="sub-pts">★</th><th class="sub-pts">🔥</th></tr></thead>
-                <tbody></tbody>
-              </table>
-            </div>
-            <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">1 pt correct winner · +2 per exact score (max 5) · 🃏 doubles</p>
-          </div>
+        <div id="xl-leaderboard-target"></div>
+        <div class="xl-awards-wrap">
+          <div id="awardsWrap"></div>
+          <div id="jokerStatsWrap"></div>
         </div>
-        <div id="awardsWrap"></div>
-        <div id="jokerStatsWrap"></div>
       </div>
     </div>
   </div>

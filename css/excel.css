@@ -1,0 +1,322 @@
+/* css/excel.css — Excel XP chrome. All classes prefixed .xl- */
+
+/* Remove window-content padding for the leaderboard so the Excel chrome
+   fills edge-to-edge; awards section below restores its own padding. */
+#xp-window-leaderboard .xp-window-content {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+#sectionLeaderboard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ── Outer wrapper ── */
+.xl-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 360px;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* ── Menu bar ── */
+.xl-menubar {
+  height: 22px;
+  background: #f0ede4;
+  border-bottom: 1px solid #b0a898;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+  flex-shrink: 0;
+  user-select: none;
+}
+.xl-menu-items {
+  display: flex;
+}
+.xl-menu-item {
+  padding: 0 6px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  cursor: default;
+  color: #000;
+}
+.xl-menu-item:hover {
+  background: #316ac5;
+  color: #fff;
+}
+.xl-help-box {
+  width: 160px;
+  height: 16px;
+  border: 1px solid #7b9ecc;
+  background: #fff;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  color: #808080;
+  padding: 0 4px;
+  outline: none;
+  cursor: default;
+}
+
+/* ── Toolbars ── */
+.xl-toolbar {
+  height: 26px;
+  background: #ece9d8;
+  border-bottom: 1px solid #b0a898;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  gap: 0;
+  flex-shrink: 0;
+}
+.xl-font-select,
+.xl-size-select,
+.xl-zoom-select {
+  height: 18px;
+  border: 1px solid;
+  border-color: #808080 #d4d0c8 #d4d0c8 #808080;
+  background: #fff;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0 4px;
+  color: #000;
+}
+.xl-font-select { width: 100px; }
+.xl-size-select { width: 36px; }
+.xl-zoom-select { width: 52px; }
+.xl-fmt-btn { font-weight: bold; min-width: 20px; padding: 0 3px; }
+.xl-fmt-btn.xl-italic { font-style: italic; font-weight: normal; }
+.xl-fmt-btn.xl-underline { text-decoration: underline; }
+
+/* ── Formula bar ── */
+.xl-formula-bar {
+  height: 24px;
+  background: #ece9d8;
+  border-bottom: 1px solid #b0a898;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  flex-shrink: 0;
+}
+.xl-name-box {
+  width: 80px;
+  height: 18px;
+  background: #fff;
+  border: 1px solid;
+  border-color: #7a7a7a #d4d0c8 #d4d0c8 #7a7a7a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 3px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.xl-name-val { flex: 1; text-align: center; font-size: 11px; }
+.xl-name-arrow { font-size: 8px; color: #555; }
+.xl-formula-sep {
+  width: 1px;
+  height: 20px;
+  background: #b0a898;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+.xl-fx-btn {
+  font-style: italic !important;
+  color: #000080 !important;
+  font-weight: bold !important;
+  width: 28px;
+  text-align: center;
+}
+.xl-formula-field {
+  flex: 1;
+  height: 18px;
+  background: #fff;
+  border: 1px solid;
+  border-color: #7a7a7a #d4d0c8 #d4d0c8 #7a7a7a;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  overflow: hidden;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+/* ── Grid wrapper ── */
+.xl-grid-wrap {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  min-height: 0;
+}
+
+/* ── Column headers ── */
+.xl-col-headers {
+  display: flex;
+  flex-shrink: 0;
+  background: #d4d0c8;
+  border-bottom: 1px solid #808080;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.xl-row-gutter-header {
+  width: 24px;
+  flex-shrink: 0;
+  border-right: 1px solid #808080;
+}
+.xl-col-header {
+  text-align: center;
+  border-right: 1px solid #808080;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* ── Data grid ── */
+.xl-row {
+  display: flex;
+  border-bottom: 1px solid #d0cdc4;
+  min-height: 18px;
+  flex-shrink: 0;
+}
+.xl-row-num {
+  width: 24px;
+  flex-shrink: 0;
+  background: #d4d0c8;
+  border-right: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 3px;
+  font-size: 11px;
+  user-select: none;
+}
+.xl-row-header .xl-cell { background: #dce6f1 !important; font-weight: bold; }
+.xl-row-gold    .xl-cell { background: #fffbe6 !important; }
+.xl-row-stripe  .xl-cell { background: #f0f5ff !important; }
+
+/* ── Cells ── */
+.xl-cell {
+  border-right: 1px solid #d0cdc4;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  cursor: cell;
+  overflow: hidden;
+  white-space: nowrap;
+  background: #fff;
+  box-sizing: border-box;
+  user-select: none;
+  flex-shrink: 0;
+}
+.xl-cell:hover { background: #eef4ff !important; }
+.xl-cell.xl-cell-selected {
+  outline: 2px solid #0055a8;
+  outline-offset: -2px;
+  z-index: 1;
+  position: relative;
+}
+.xl-cell.xl-hyperlink {
+  color: #0563c1;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.xl-cell.xl-num { justify-content: flex-end; }
+
+/* ── Sheet tab strip ── */
+.xl-sheet-tabs-wrap {
+  height: 22px;
+  background: #d4d0c8;
+  border-top: 1px solid #808080;
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+  padding-left: 2px;
+  overflow: hidden;
+}
+.xl-tab-nav {
+  display: flex;
+  align-items: center;
+  height: 18px;
+  border-right: 1px solid #808080;
+  padding: 0 2px;
+  margin-right: 4px;
+  flex-shrink: 0;
+  gap: 1px;
+}
+.xl-tab-nav-btn {
+  background: none;
+  border: none;
+  cursor: default;
+  font-size: 8px;
+  color: #000;
+  padding: 0 2px;
+  line-height: 1;
+  pointer-events: none;
+}
+.xl-tab {
+  padding: 2px 10px 0;
+  background: #c8c4b8;
+  border: 1px solid #808080;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  cursor: pointer;
+  font-size: 11px;
+  height: 19px;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  margin-right: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.xl-tab.xl-tab-active {
+  background: #fff;
+  font-weight: bold;
+  border-bottom: 1px solid #fff;
+  margin-bottom: -1px;
+}
+
+/* ── Status bar ── */
+.xl-status-bar {
+  height: 20px;
+  background: #d4d0c8;
+  border-top: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  flex-shrink: 0;
+  font-size: 11px;
+}
+.xl-status-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Awards / joker wrap below the spreadsheet */
+.xl-awards-wrap {
+  padding: 8px;
+  flex-shrink: 0;
+}
