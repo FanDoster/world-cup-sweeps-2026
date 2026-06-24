@@ -364,6 +364,22 @@ var msnGazzaReplies = [
 ];
 var msnReplying = false;
 var msnLastReply = -1;
+var msnVideoSent = false;
+
+function msnAppendGazzaVideo(msgs) {
+  var gazzaMsg = document.createElement('div');
+  gazzaMsg.className = 'msn-chat-msg';
+  gazzaMsg.innerHTML =
+    '<span class="msn-chat-sender">~~gAzZa~~</span>' +
+    '<span class="msn-chat-says"> has sent you a file:</span><br>' +
+    '<div class="msn-file-transfer">' +
+      '<div class="msn-file-name">&#128249; happening again.mp4</div>' +
+      '<video src="media/happening-again.mp4" controls playsinline class="msn-inline-video"></video>' +
+    '</div>';
+  msgs.appendChild(gazzaMsg);
+  msgs.scrollTop = msgs.scrollHeight;
+  new Audio('media/msn-message.mp3').play().catch(function(){});
+}
 
 function msnSendMessage() {
   var field = document.getElementById('msn-input-field');
@@ -386,19 +402,24 @@ function msnSendMessage() {
   msnReplying = true;
 
   setTimeout(function() {
-    var idx;
-    do { idx = Math.floor(Math.random() * msnGazzaReplies.length); } while (idx === msnLastReply);
-    msnLastReply = idx;
-    var reply = msnGazzaReplies[idx];
-    var gazzaMsg = document.createElement('div');
-    gazzaMsg.className = 'msn-chat-msg';
-    gazzaMsg.innerHTML =
-      '<span class="msn-chat-sender">~~gAzZa~~</span>' +
-      '<span class="msn-chat-says"> says:</span><br>' +
-      '<span class="msn-chat-text">' + escapeHtml(reply) + '</span>';
-    msgs.appendChild(gazzaMsg);
-    msgs.scrollTop = msgs.scrollHeight;
-    new Audio('media/msn-message.mp3').play().catch(function(){});
+    if (!msnVideoSent && Math.random() < 0.3) {
+      msnVideoSent = true;
+      msnAppendGazzaVideo(msgs);
+    } else {
+      var idx;
+      do { idx = Math.floor(Math.random() * msnGazzaReplies.length); } while (idx === msnLastReply);
+      msnLastReply = idx;
+      var reply = msnGazzaReplies[idx];
+      var gazzaMsg = document.createElement('div');
+      gazzaMsg.className = 'msn-chat-msg';
+      gazzaMsg.innerHTML =
+        '<span class="msn-chat-sender">~~gAzZa~~</span>' +
+        '<span class="msn-chat-says"> says:</span><br>' +
+        '<span class="msn-chat-text">' + escapeHtml(reply) + '</span>';
+      msgs.appendChild(gazzaMsg);
+      msgs.scrollTop = msgs.scrollHeight;
+      new Audio('media/msn-message.mp3').play().catch(function(){});
+    }
     msnReplying = false;
   }, 1000 + Math.floor(Math.random() * 1500));
 }
