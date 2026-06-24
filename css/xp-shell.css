@@ -647,65 +647,74 @@
   position: fixed;
   bottom: 44px;
   right: 8px;
-  width: 250px;
-  background: #fff;
-  border: 1px solid #c87830;
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.5);
+  width: 270px;
+  background: linear-gradient(to bottom, #bccfe8 0%, #d4e2f4 55%, #c8d8ee 100%);
+  border: 1px solid #8aaac8;
+  border-radius: 10px;
+  box-shadow: 2px 4px 12px rgba(0,0,0,0.35);
   z-index: 9999;
-  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-family: Tahoma, Arial, sans-serif;
   font-size: 11px;
   overflow: hidden;
+  cursor: pointer;
 }
 #msn-notification.msn-animating-in  { animation: msn-slide-in  0.35s ease-out forwards; }
 #msn-notification.msn-animating-out { animation: msn-slide-out 0.3s ease-in  forwards; }
 #msn-notif-bar {
-  background: linear-gradient(to bottom, #f8a030 0%, #e07010 40%, #c85800 100%);
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 3px 6px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  text-shadow: 0 1px rgba(0,0,0,0.35);
+  gap: 5px;
+  padding: 6px 8px 4px;
+  color: #1a3a5c;
+  font-size: 11px;
+  font-weight: bold;
 }
 #msn-notif-close {
   background: none;
   border: none;
-  color: #fff;
-  font-size: 13px;
+  color: #1a3a5c;
+  font-size: 14px;
   line-height: 1;
   cursor: pointer;
   padding: 0 2px;
-  opacity: 0.85;
+  margin-left: auto;
+  opacity: 0.7;
 }
 #msn-notif-close:hover { opacity: 1; }
 #msn-notif-body {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
-  cursor: pointer;
-  background: #fff;
+  gap: 10px;
+  padding: 4px 10px 8px;
 }
-#msn-notif-body:hover { background: #fff8f0; }
 #msn-notif-avatar {
-  width: 48px;
-  height: 48px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid #ccc;
+  border: 2px solid #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.25);
 }
 #msn-notif-name {
   font-weight: bold;
   font-size: 12px;
-  color: #c85800;
+  color: #0a1a2e;
 }
 #msn-notif-status {
   font-size: 11px;
-  color: #555;
-  margin-top: 2px;
+  color: #2a4a6a;
+  margin-top: 3px;
 }
+#msn-notif-footer {
+  text-align: right;
+  padding: 2px 10px 6px;
+  font-size: 11px;
+  color: #1555a0;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#msn-notif-footer:hover { color: #0033cc; }
 
 /* ── MSN MESSENGER CHAT WINDOW ── */
 .msn-title-bar {

@@ -667,18 +667,19 @@
   </div>
 
   <!-- ══ MSN MESSENGER NOTIFICATION ══ -->
-  <div id="msn-notification" style="display:none">
+  <div id="msn-notification" style="display:none" onclick="msnOpenChat()">
     <div id="msn-notif-bar">
-      <span>🦋 MSN Messenger</span>
+      <span>🦋</span><span>MSN Messenger</span>
       <button id="msn-notif-close" onclick="event.stopPropagation();msnDismiss()" title="Close">&#215;</button>
     </div>
-    <div id="msn-notif-body" onclick="msnOpenChat()">
+    <div id="msn-notif-body">
       <img src="img/gazza-crying.jpg" id="msn-notif-avatar" alt="Gazza">
       <div id="msn-notif-text">
         <div id="msn-notif-name">~~gAzZa~~</div>
         <div id="msn-notif-status">has sent you a message</div>
       </div>
     </div>
+    <div id="msn-notif-footer" onclick="event.stopPropagation();msnDismiss()">Options</div>
   </div>
 
   <!-- ══ MSN MESSENGER CHAT WINDOW ══ -->
