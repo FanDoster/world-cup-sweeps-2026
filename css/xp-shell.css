@@ -731,6 +731,24 @@
   background: #fff;
   min-height: 0;
 }
+/* IE "page cannot be displayed" error */
+.ie-cannot-display {
+  background: #fff;
+  padding: 20px 28px;
+  overflow-y: auto;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  color: #000;
+}
+.ie-error-icon { font-size: 40px; margin-bottom: 4px; }
+.ie-error-title { font-size: 16px; font-weight: bold; margin: 0 0 6px; color: #000; }
+.ie-error-sub { color: #444; margin: 0 0 10px; }
+.ie-error-hr { border: none; border-top: 1px solid #d4d0c8; margin: 10px 0; }
+.ie-error-body { margin: 0 0 6px; font-weight: bold; }
+.ie-error-list { margin: 0; padding-left: 22px; line-height: 1.8; }
+.ie-error-link { color: #00f; }
+.ie-error-link:hover { color: #00f; text-decoration: underline; }
+
 .ie-statusbar {
   height: 22px;
   background: #d4d0c8;
