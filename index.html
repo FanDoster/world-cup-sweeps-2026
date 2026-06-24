@@ -265,6 +265,12 @@
             <span class="oe-tb-sep"></span>
             <button class="oe-tb-btn">&#128229; Send/Receive</button>
           </div>
+          <div class="oe-mob-tabs">
+            <button class="oe-mob-tab oe-mob-tab-active" id="oe-mob-tab-upcoming" onclick="oeSetFolder('upcoming');oeSetMobTab('upcoming')">📥 Inbox</button>
+            <button class="oe-mob-tab" id="oe-mob-tab-completed" onclick="oeSetFolder('completed');oeSetMobTab('completed')">📤 Sent</button>
+            <button class="oe-mob-tab" id="oe-mob-tab-all" onclick="oeSetFolder('all');oeSetMobTab('all')">🌍 All</button>
+            <button class="oe-mob-tab" id="oe-mob-tab-mine" onclick="oeSetFolder('mine');oeSetMobTab('mine')">⭐ Mine</button>
+          </div>
           <div class="oe-body">
             <div class="oe-folders">
               <div class="oe-folder-root">&#128231; Outlook Express</div>

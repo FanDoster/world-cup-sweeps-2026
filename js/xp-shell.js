@@ -363,6 +363,7 @@ var msnGazzaReplies = [
   'divvent get is wrong pet but i cannae agree with that lyk'
 ];
 var msnReplying = false;
+var msnLastReply = -1;
 
 function msnSendMessage() {
   var field = document.getElementById('msn-input-field');
@@ -385,7 +386,10 @@ function msnSendMessage() {
   msnReplying = true;
 
   setTimeout(function() {
-    var reply = msnGazzaReplies[Math.floor(Math.random() * msnGazzaReplies.length)];
+    var idx;
+    do { idx = Math.floor(Math.random() * msnGazzaReplies.length); } while (idx === msnLastReply);
+    msnLastReply = idx;
+    var reply = msnGazzaReplies[idx];
     var gazzaMsg = document.createElement('div');
     gazzaMsg.className = 'msn-chat-msg';
     gazzaMsg.innerHTML =

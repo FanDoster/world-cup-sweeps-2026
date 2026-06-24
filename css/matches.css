@@ -673,8 +673,33 @@
   flex-shrink: 0;
   font-size: 11px;
 }
+/* Mobile folder tab bar — hidden on desktop */
+.oe-mob-tabs { display: none; }
+
 /* ── Mobile overrides ── */
 @media (max-width: 700px) {
+  .oe-mob-tabs {
+    display: flex;
+    flex-shrink: 0;
+    background: #ece9d8;
+    border-bottom: 1px solid #b0a898;
+  }
+  .oe-mob-tab {
+    flex: 1;
+    padding: 6px 2px;
+    font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+    font-size: 11px;
+    background: #ece9d8;
+    border: none;
+    border-right: 1px solid #b0a898;
+    cursor: pointer;
+    color: #000;
+    white-space: nowrap;
+  }
+  .oe-mob-tab:last-child { border-right: none; }
+  .oe-mob-tab.oe-mob-tab-active { background: #316ac5; color: #fff; font-weight: bold; }
+  .oe-mob-tab:hover:not(.oe-mob-tab-active) { background: #d4d0c8; }
+
   .oe-folders { display: none; }
   .oe-menubar, .oe-toolbar { display: none; }
   /* Fix flex chain so the message list actually scrolls */

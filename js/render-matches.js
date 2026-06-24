@@ -21,6 +21,13 @@ function oeSetFolder(folder) {
   renderMatches();
 }
 
+function oeSetMobTab(folder) {
+  ['upcoming','completed','all','mine'].forEach(function(f) {
+    var el = document.getElementById('oe-mob-tab-' + f);
+    if (el) el.classList.toggle('oe-mob-tab-active', f === folder);
+  });
+}
+
 function safeAttr(s) { return (s||'').replace(/'/g, "\\'").replace(/\|/g, ''); }
 
 function setMatchFilter(filter, tab) {
