@@ -336,7 +336,45 @@
     </div>
     <div class="xp-window-content">
       <div class="section-groups" id="sectionGroups">
-        <div class="groups-grid" id="groups"></div>
+        <!-- Mobile tab strip (hidden on desktop) -->
+        <div class="we-mobile-tabs" id="we-mobile-tabs"></div>
+        <!-- Explorer two-pane body -->
+        <div class="we-body">
+          <!-- Folder pane -->
+          <div class="we-folders">
+            <div class="we-folder-header">Folders <span class="we-folder-close-x">&#215;</span></div>
+            <div class="we-folder-section">
+              <div class="we-folder-tree-item">&#128421; My Computer</div>
+              <div class="we-folder-tree-item" style="padding-left:18px">&#128193; WorldCup2026</div>
+              <div class="we-folder-tree-item" style="padding-left:30px">&#128193; Players</div>
+              <div class="we-folder-tree-item" style="padding-left:30px">&#128193; Matches</div>
+              <div class="we-folder-tree-item" style="padding-left:30px;font-weight:bold;color:#000">&#9660; Groups</div>
+            </div>
+            <div id="we-folder-list">
+              <!-- Populated by weSelectGroup on init -->
+            </div>
+          </div>
+          <!-- Right pane -->
+          <div class="we-right">
+            <div class="we-col-header-row" id="we-col-header">
+              <div class="we-col-h" style="flex:1;min-width:140px">Name</div>
+              <div class="we-col-h we-num" style="width:32px">Pld</div>
+              <div class="we-col-h we-num" style="width:28px">W</div>
+              <div class="we-col-h we-num" style="width:28px">D</div>
+              <div class="we-col-h we-num" style="width:28px">L</div>
+              <div class="we-col-h we-num" style="width:34px">GF</div>
+              <div class="we-col-h we-num" style="width:34px">GA</div>
+              <div class="we-col-h we-num" style="width:38px">GD</div>
+              <div class="we-col-h we-num" style="width:38px">Pts</div>
+              <div class="we-col-h" style="width:80px">Owner</div>
+            </div>
+            <div class="we-detail-pane" id="we-detail-pane"></div>
+            <div class="we-status-bar" id="we-status-bar">
+              <span id="we-status-left">4 objects</span>
+              <span id="we-status-right"></span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
