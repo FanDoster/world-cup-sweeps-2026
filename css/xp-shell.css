@@ -8,7 +8,7 @@
   display: flex;
   flex-direction: column;
   font-family: var(--font);
-  background: #06144a;
+  background: #508FD9;
   transition: opacity 0.55s;
 }
 #xp-welcome.xp-welcome-out {
@@ -16,14 +16,18 @@
   pointer-events: none;
 }
 
-/* ── Top bar ── */
+/* ── Top bar — #084DA3 base with white shimmer stripe across centre ── */
 #xp-welcome-topbar {
   height: 62px;
   flex-shrink: 0;
-  background: linear-gradient(to bottom,
-    #1a3cb8 0%, #0e2898 60%, #0a2080 100%);
-  border-bottom: 3px solid #4a70d8;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.5);
+  background:
+    linear-gradient(90deg,
+      #084DA3 0%, #084DA3 15%,
+      #6fa8e8 40%, #ffffff 50%,
+      #6fa8e8 60%, #084DA3 85%,
+      #084DA3 100%);
+  border-bottom: 2px solid #3a6ab8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 /* ── Main body: two full-height panels ── */
@@ -31,8 +35,8 @@
   flex: 1;
   display: flex;
   align-items: stretch;          /* panels fill full height */
-  background: radial-gradient(ellipse 110% 90% at 62% 50%,
-    #1438b8 0%, #0a2070 45%, #060e3a 100%);
+  background: radial-gradient(19.48% 42.48% at 10% 22.48%,
+    #9CC0E9 0%, #508FD9 100%);
   overflow: hidden;
 }
 
@@ -56,13 +60,12 @@
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
 }
 
-/* ── Vertical divider ── */
+/* ── Vertical divider — blue→white→blue ── */
 #xp-welcome-divider {
   width: 1px;
   flex-shrink: 0;
-  background: linear-gradient(to bottom,
-    transparent 3%, rgba(255,255,255,0.3) 12%,
-    rgba(255,255,255,0.3) 88%, transparent 97%);
+  background: linear-gradient(180deg,
+    #508FD9 0%, #ffffff 47.4%, #508FD9 100%);
 }
 
 /* ── Users panel (right ~65%) ── */
@@ -136,14 +139,18 @@
   font-size: 12px;
 }
 
-/* ── Bottom bar ── */
+/* ── Bottom bar — mirrors top bar shimmer ── */
 #xp-welcome-bottombar {
   height: 62px;
   flex-shrink: 0;
-  background: linear-gradient(to top,
-    #1a3cb8 0%, #0e2898 60%, #0a2080 100%);
-  border-top: 3px solid #4a70d8;
-  box-shadow: 0 -3px 12px rgba(0,0,0,0.5);
+  background:
+    linear-gradient(90deg,
+      #084DA3 0%, #084DA3 15%,
+      #6fa8e8 40%, #ffffff 50%,
+      #6fa8e8 60%, #084DA3 85%,
+      #084DA3 100%);
+  border-top: 2px solid #3a6ab8;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.4);
   display: flex;
   align-items: center;
   padding: 0 40px;
@@ -154,8 +161,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(to bottom, #3a6ad0, #1a3898);
-  border: 1px solid #0a1870;
+  background: linear-gradient(to bottom, #2866c0, #084DA3);
+  border: 1px solid #053a80;
   border-radius: 16px;
   color: #fff;
   font-family: var(--font);
