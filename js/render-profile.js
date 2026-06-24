@@ -26,6 +26,39 @@ function closePredPanel() {
   if (commentsChannel) { sb.removeChannel(commentsChannel); commentsChannel = null; }
 }
 
+// Sweepstakes spoils for a finished match: who owns each team and the match
+// points it earned them (3 for a win, 1 each for a draw, 0 for a loss). The
+// current user's team is highlighted so "is one of these mine?" is obvious.
+function predPanelSpoils(t1, t2, m) {
+  const o1 = teamOwner[t1], o2 = teamOwner[t2];
+  let p1 = 0, p2 = 0, summary = '';
+  if (m.score1 > m.score2) { p1 = 3; summary = `${t1} win`; }
+  else if (m.score2 > m.score1) { p2 = 3; summary = `${t2} win`; }
+  else { p1 = 1; p2 = 1; summary = 'Draw'; }
+
+  const me = currentProfile ? currentProfile.player_name : null;
+  const row = (team, owner, pts) => {
+    const mine = owner && owner === me;
+    const color = owner ? ownerHexColors[owner] : null;
+    const chip = owner
+      ? `<span class="pp-owner" style="color:${color};border-color:${color}">${owner}${mine ? ' · you' : ''}</span>`
+      : `<span class="pp-owner pp-owner-none">Unowned</span>`;
+    const ptsCls = pts === 3 ? 'win' : pts === 1 ? 'draw' : 'loss';
+    return `<div class="pp-spoils-team${mine ? ' me' : ''}">
+      <img class="pp-spoils-flag" src="${flagUrl(teamIso[team])}" alt="">
+      <span class="pp-spoils-name">${team}</span>
+      ${chip}
+      <span class="pp-spoils-pts ${ptsCls}">+${pts}</span>
+    </div>`;
+  };
+
+  return `<div class="pp-spoils">
+    <div class="pp-spoils-title">Sweepstakes · ${m.score1}–${m.score2} ${summary}</div>
+    ${row(t1, o1, p1)}
+    ${row(t2, o2, p2)}
+  </div>`;
+}
+
 function renderPredPanel(key) {
   const el = document.getElementById('predPanel');
   const [t1, t2, date] = key.split('|');
@@ -93,9 +126,19 @@ function renderPredPanel(key) {
     </div>`;
   } else if (isLocked || isFinished) {
     if (yourPred && yourPred.home !== undefined) {
+      let earnedHtml = '';
+      if (isFinished && m.score1 !== null && m.score2 !== null) {
+        const base = calcPredPoints(yourPred.home, yourPred.away, m.score1, m.score2);
+        const earned = yourPred.j ? base * 2 : base;
+        const cls = base === 5 ? 'exact' : base >= 1 ? 'hit' : 'miss';
+        const label = base === 5 ? `${earned} pts · exact score ★`
+          : earned > 0 ? `${earned} pt${earned === 1 ? '' : 's'}`
+          : 'No points';
+        earnedHtml = `<span class="pp-pred-earned ${cls}">${label}${yourPred.j && base > 0 ? ' (🃏 2×)' : ''}</span>`;
+      }
       yourPredHtml = `<div class="pp-your-pred">
         <div class="pp-your-pred-title">Your Prediction</div>
-        <div class="pp-your-pred-locked">🔒 ${yourPred.home}–${yourPred.away}${yourPred.j ? ' 🃏' : ''}</div>
+        <div class="pp-your-pred-locked">🔒 ${yourPred.home}–${yourPred.away}${yourPred.j ? ' 🃏' : ''}${earnedHtml}</div>
       </div>`;
     } else {
       yourPredHtml = `<div class="pp-your-pred">
@@ -164,10 +207,11 @@ function renderPredPanel(key) {
       </div>
       <button class="pp-close" onclick="closePredPanel()">✕</button>
     </div>
+    ${isFinished ? predPanelSpoils(t1, t2, m) : ''}
     ${h2hHtml(t1, t2)}
     ${yourPredHtml}
     <table class="pp-table">
-      <thead><tr><th>Player</th><th>Prediction</th><th></th></tr></thead>
+      <thead><tr><th>Player</th><th>Prediction</th><th>${isFinished ? 'Pts' : ''}</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="pp-footer">${footerText}</div>
