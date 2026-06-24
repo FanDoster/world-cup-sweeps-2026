@@ -394,6 +394,7 @@ function msnSendMessage() {
       '<span class="msn-chat-text">' + escapeHtml(reply) + '</span>';
     msgs.appendChild(gazzaMsg);
     msgs.scrollTop = msgs.scrollHeight;
+    new Audio('media/msn-message.mp3').play().catch(function(){});
     msnReplying = false;
   }, 1000 + Math.floor(Math.random() * 1500));
 }
@@ -417,12 +418,14 @@ function msnOpenChat() {
     }
   }
   openWindow('msn');
+  new Audio('media/msn-message.mp3').play().catch(function(){});
   setTimeout(function() {
     var msg = document.getElementById('msn-msg-2');
     if (msg) {
       msg.style.display = 'block';
       var msgs = document.getElementById('msn-messages');
       if (msgs) msgs.scrollTop = msgs.scrollHeight;
+      new Audio('media/msn-message.mp3').play().catch(function(){});
     }
   }, 1500);
 }
