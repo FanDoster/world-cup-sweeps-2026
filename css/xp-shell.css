@@ -816,6 +816,7 @@
   font-size: 11px;
 }
 .msn-chat-sender { font-weight: bold; color: #1a4d8a; }
+.msn-chat-sender-user { color: #a00000; }
 .msn-chat-says { color: #555; }
 .msn-chat-text { color: #000; }
 .msn-emote {

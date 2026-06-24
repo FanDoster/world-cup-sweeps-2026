@@ -751,9 +751,9 @@
             <button class="msn-input-btn" title="Ink">✏️</button>
           </div>
           <div class="msn-input-row">
-            <textarea class="msn-input-field"></textarea>
+            <textarea class="msn-input-field" id="msn-input-field" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();msnSendMessage();}"></textarea>
             <div class="msn-send-col">
-              <button class="msn-send-btn">Send</button>
+              <button class="msn-send-btn" onclick="msnSendMessage()">Send</button>
               <button class="msn-send-btn">Search</button>
             </div>
           </div>

@@ -355,6 +355,49 @@ closeWindow = function(name) {
   }
 };
 
+var msnGazzaReplies = [
+  'why aye pal',
+  'a luv yee pet',
+  'are yee daft?',
+  'why aye man',
+  'divvent get is wrong pet but i cannae agree with that lyk'
+];
+var msnReplying = false;
+
+function msnSendMessage() {
+  var field = document.getElementById('msn-input-field');
+  var msgs = document.getElementById('msn-messages');
+  if (!field || !msgs) return;
+  var text = field.value.trim();
+  if (!text || msnReplying) return;
+
+  var name = (typeof currentProfile !== 'undefined' && currentProfile) ? currentProfile.player_name : 'You';
+
+  var userMsg = document.createElement('div');
+  userMsg.className = 'msn-chat-msg';
+  userMsg.innerHTML =
+    '<span class="msn-chat-sender msn-chat-sender-user">' + escapeHtml(name) + '</span>' +
+    '<span class="msn-chat-says"> says:</span><br>' +
+    '<span class="msn-chat-text">' + escapeHtml(text) + '</span>';
+  msgs.appendChild(userMsg);
+  msgs.scrollTop = msgs.scrollHeight;
+  field.value = '';
+  msnReplying = true;
+
+  setTimeout(function() {
+    var reply = msnGazzaReplies[Math.floor(Math.random() * msnGazzaReplies.length)];
+    var gazzaMsg = document.createElement('div');
+    gazzaMsg.className = 'msn-chat-msg';
+    gazzaMsg.innerHTML =
+      '<span class="msn-chat-sender">~~gAzZa~~</span>' +
+      '<span class="msn-chat-says"> says:</span><br>' +
+      '<span class="msn-chat-text">' + escapeHtml(reply) + '</span>';
+    msgs.appendChild(gazzaMsg);
+    msgs.scrollTop = msgs.scrollHeight;
+    msnReplying = false;
+  }, 1000 + Math.floor(Math.random() * 1500));
+}
+
 function msnDismiss() {
   var n = document.getElementById('msn-notification');
   if (!n) return;
