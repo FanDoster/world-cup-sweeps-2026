@@ -9,6 +9,10 @@ function switchTab(tab) {
   if (tab === 'bracket') renderBracket();
   if (tab === 'shooter') initShooter();
   if (tab !== 'shooter') pauseShooter();
+  if (tab === 'profile') {
+    var player = userProfilePlayer || (typeof currentProfile !== 'undefined' && currentProfile ? currentProfile.player_name : null);
+    if (player) renderUserProfile(player);
+  }
   var tabHash = (tab === 'profile' && typeof userProfilePlayer !== 'undefined' && userProfilePlayer)
     ? '#/users/' + encodeURIComponent(userProfilePlayer)
     : '#/' + tab;
