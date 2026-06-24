@@ -1,3 +1,225 @@
+/* ══════════════════════════════════════════════
+   XP WELCOME / LOADING SCREEN
+══════════════════════════════════════════════ */
+#xp-welcome {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font);
+  background: #082060;
+  transition: opacity 0.55s;
+}
+#xp-welcome.xp-welcome-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#xp-welcome-topbar {
+  height: 56px;
+  flex-shrink: 0;
+  background: linear-gradient(to right,
+    #0a1878 0%, #0e2498 40%, #0a1878 100%);
+  border-bottom: 2px solid #1a3aaa;
+}
+
+#xp-welcome-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 60px;
+  background: radial-gradient(ellipse 80% 70% at 55% 50%,
+    #0e2898 0%, #082060 55%, #040e38 100%);
+  gap: 0;
+  overflow: hidden;
+}
+
+/* ── Branding panel ── */
+#xp-welcome-brand {
+  width: 260px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-right: 40px;
+}
+
+#xp-welcome-flag {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3px;
+  margin-bottom: 14px;
+  transform: perspective(180px) rotateY(-10deg) rotateX(3deg);
+}
+#xp-welcome-flag > div { border-radius: 3px; }
+
+#xp-wm-windows {
+  display: block;
+  color: #fff;
+  font-size: 26px;
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+#xp-wm-xp {
+  display: block;
+  font-size: 48px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1;
+  background: linear-gradient(to bottom, #ffd060 0%, #f08010 45%, #b84000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+#xp-welcome-edition {
+  color: #8aaccc;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 300;
+  letter-spacing: 1px;
+  border-top: 1px solid rgba(255,255,255,0.18);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+/* ── Vertical divider ── */
+#xp-welcome-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 40px 0;
+  background: linear-gradient(to bottom,
+    transparent 0%, rgba(255,255,255,0.25) 20%,
+    rgba(255,255,255,0.25) 80%, transparent 100%);
+  flex-shrink: 0;
+}
+
+/* ── Users panel ── */
+#xp-welcome-users {
+  flex: 1;
+  padding-left: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+#xp-welcome-hint {
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  margin: 0;
+}
+
+#xp-welcome-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.xp-welcome-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 16px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  transition: background 0.12s, border-color 0.12s;
+  min-width: 80px;
+}
+.xp-welcome-tile:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.35);
+}
+
+.xp-welcome-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  font-weight: bold;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.35);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  flex-shrink: 0;
+}
+
+.xp-welcome-name {
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+}
+
+#xp-welcome-status {
+  color: rgba(255,255,255,0.45);
+  font-size: 11px;
+}
+
+/* ── Bottom bar ── */
+#xp-welcome-bottombar {
+  height: 60px;
+  flex-shrink: 0;
+  background: linear-gradient(to right,
+    #0a1878 0%, #0e2498 40%, #0a1878 100%);
+  border-top: 2px solid #1a3aaa;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  gap: 20px;
+}
+
+#xp-welcome-turnoff {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(to bottom, #3060b8, #1a3a80);
+  border: 1px solid #0a1870;
+  border-radius: 14px;
+  color: #fff;
+  font-family: var(--font);
+  font-size: 11px;
+  padding: 5px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+#xp-welcome-turnoff:hover {
+  background: linear-gradient(to bottom, #4878d0, #2850a0);
+}
+
+#xp-welcome-footer-text {
+  flex: 1;
+  text-align: center;
+  color: rgba(255,255,255,0.45);
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* Mobile: stack vertically, hide brand panel */
+@media (max-width: 700px) {
+  #xp-welcome-body { padding: 20px; flex-direction: column; justify-content: center; }
+  #xp-welcome-brand { width: auto; padding-right: 0; flex-direction: row; align-items: center; gap: 12px; }
+  #xp-welcome-flag { margin-bottom: 0; }
+  #xp-welcome-edition { display: none; }
+  #xp-welcome-divider { display: none; }
+  #xp-welcome-users { padding-left: 0; }
+  #xp-welcome-bottombar { padding: 0 16px; }
+  #xp-welcome-footer-text { display: none; }
+}
+
 /* ── XP DESKTOP ── */
 #xp-desktop {
   position: fixed;

@@ -34,6 +34,44 @@
 <body>
 
 <!-- ══════════════════════════════════════════════
+     XP WELCOME / LOADING SCREEN
+═══════════════════════════════════════════════ -->
+<div id="xp-welcome">
+  <div id="xp-welcome-topbar"></div>
+  <div id="xp-welcome-body">
+    <div id="xp-welcome-brand">
+      <div id="xp-welcome-flag">
+        <div style="background:#c84820"></div>
+        <div style="background:#4a9038"></div>
+        <div style="background:#2060a8"></div>
+        <div style="background:#d8a018"></div>
+      </div>
+      <div id="xp-welcome-wordmark">
+        <span id="xp-wm-windows">Windows</span>
+        <span id="xp-wm-xp">XP</span>
+      </div>
+      <div id="xp-welcome-edition">Professional</div>
+    </div>
+    <div id="xp-welcome-divider"></div>
+    <div id="xp-welcome-users">
+      <p id="xp-welcome-hint">To begin, click your user name</p>
+      <div id="xp-welcome-tiles"></div>
+      <p id="xp-welcome-status">Loading&hellip;</p>
+    </div>
+  </div>
+  <div id="xp-welcome-bottombar">
+    <button id="xp-welcome-turnoff" onclick="xpHideWelcome()" title="Dismiss">
+      <span>&#9711;</span> Turn off computer
+    </button>
+    <div id="xp-welcome-footer-text">
+      After you log on, you can add or change accounts.<br>
+      Just go to Control Panel and click User Accounts.
+    </div>
+    <div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
      XP DESKTOP
 ═══════════════════════════════════════════════ -->
 <div id="xp-desktop">

@@ -8,7 +8,7 @@ async function restoreSession() {
     const { data: { session } } = await sb.auth.getSession();
     currentSession = session;
     const { data: profile } = await sb.from('player_profiles').select('player_name, avatar_url').eq('id', user.id).single();
-    if (profile) { currentProfile = profile; avatarCache[profile.player_name] = profile.avatar_url || null; }
+    if (profile) { currentProfile = profile; avatarCache[profile.player_name] = profile.avatar_url || null; localStorage.setItem('xp_player_name', profile.player_name); }
   }
   updateAuthBar();
   if (currentSession) showJokerNotification();
@@ -73,7 +73,7 @@ async function doSignIn() {
   currentSession = data.session;
   const { data: profile } = await sb.from('player_profiles').select('player_name, avatar_url').eq('id', data.user.id).single();
   currentProfile = profile;
-  if (profile) avatarCache[profile.player_name] = profile.avatar_url || null;
+  if (profile) { avatarCache[profile.player_name] = profile.avatar_url || null; localStorage.setItem('xp_player_name', profile.player_name); }
   closeModals();
   updateAuthBar();
   showJokerNotification();
@@ -118,6 +118,7 @@ async function doSignUp() {
 
   currentSession = data.session;
   currentProfile = { player_name: playerName };
+  localStorage.setItem('xp_player_name', playerName);
   closeModals();
   updateAuthBar();
   showJokerNotification();
@@ -128,5 +129,6 @@ async function doSignOut() {
   await sb.auth.signOut();
   currentSession = null;
   currentProfile = null;
+  localStorage.removeItem('xp_player_name');
   updateAuthBar();
 }

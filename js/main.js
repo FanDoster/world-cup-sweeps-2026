@@ -22,6 +22,7 @@ restoreSession().then(async function() {
     renderWarDispatch();
     checkTeamResults();
     xpUpdateClock();
+    xpHideWelcome();
     handleHashRoute();
     // Open Matches by default if no hash navigates elsewhere.
     // Suppress startup sound for this automatic (non-user-gesture) open,

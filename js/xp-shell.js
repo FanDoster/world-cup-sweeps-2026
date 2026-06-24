@@ -164,6 +164,48 @@ function xpRemoveTaskbarBtn(name) {
 }
 
 /* ── CLICK TO FOCUS ── */
+/* ── XP WELCOME SCREEN ── */
+function xpBuildWelcomeTiles() {
+  var container = document.getElementById('xp-welcome-tiles');
+  if (!container) return;
+  var cachedName = localStorage.getItem('xp_player_name');
+  var players = typeof PLAYERS !== 'undefined' ? PLAYERS : ['Anton','Chris','Dan','Laurie','Pat','Steven'];
+  var colors  = typeof ownerHexColors !== 'undefined' ? ownerHexColors : {};
+  var toShow  = cachedName ? [cachedName] : players;
+
+  container.innerHTML = '';
+  toShow.forEach(function(name) {
+    var color = colors[name] || '#3a7bd5';
+    var tile  = document.createElement('div');
+    tile.className = 'xp-welcome-tile';
+    tile.innerHTML =
+      '<div class="xp-welcome-avatar" style="background:' + color + '">' + name[0] + '</div>' +
+      '<div class="xp-welcome-name">' + name + '</div>';
+    if (!cachedName) {
+      tile.addEventListener('click', function() {
+        xpHideWelcome();
+        var btn = document.querySelector('.xp-tray-signin');
+        if (btn) btn.click();
+      });
+    }
+    container.appendChild(tile);
+  });
+
+  var hint = document.getElementById('xp-welcome-hint');
+  if (hint) hint.textContent = cachedName
+    ? 'Welcome back, ' + cachedName
+    : 'To begin, click your user name';
+}
+
+function xpHideWelcome() {
+  var el = document.getElementById('xp-welcome');
+  if (!el || el.classList.contains('xp-welcome-out')) return;
+  el.classList.add('xp-welcome-out');
+  setTimeout(function() { el.style.display = 'none'; }, 600);
+}
+
+document.addEventListener('DOMContentLoaded', xpBuildWelcomeTiles);
+
 var XP_WIN_PATHS = {
   home:        'C:\\WorldCup2026',
   matches:     'C:\\WorldCup2026\\Matches',
