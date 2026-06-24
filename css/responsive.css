@@ -132,12 +132,22 @@
   .msn-tb-btn { padding: 2px 4px; }
   .msn-tb-icon { font-size: 16px; }
   .msn-tb-logo { font-size: 13px; }
-  /* Narrow the avatar panel rather than hiding it */
-  .msn-right { width: 72px; }
-  /* Ensure body fills remaining space */
-  .msn-body { padding: 2px; gap: 2px; }
-  /* Keep input row horizontal but ensure textarea has a visible height */
-  .msn-input-field { min-height: 46px; }
+  /* Avatar panel: cap height so it doesn't dominate, show as a row at top */
+  .msn-body { flex-direction: column; padding: 2px; gap: 2px; }
+  .msn-right {
+    width: 100% !important;
+    flex-direction: row;
+    height: 80px;
+    flex-shrink: 0;
+  }
+  .msn-dp-panel { flex: 1; }
+  /* Left panel fills remaining space */
+  .msn-left { flex: 1; min-height: 0; }
+  /* Messages area must scroll on touch */
+  .msn-messages { -webkit-overflow-scrolling: touch; overflow-y: scroll !important; }
+  /* Input section: always visible at bottom, fixed height */
+  .msn-input-section { flex-shrink: 0; }
+  .msn-input-field { min-height: 44px; }
   .msn-send-col { padding: 3px; gap: 3px; }
   .msn-send-btn { padding: 3px 6px; font-size: 10px; }
 
