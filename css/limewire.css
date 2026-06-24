@@ -25,38 +25,33 @@
 }
 .lw-menubar span:hover { background: #316ac5; color: #fff; }
 
-/* Green gradient header + search */
+/* White toolbar header with real logo */
 .lw-header {
-  background: linear-gradient(to right, #1a5f00 0%, #4da800 30%, #7ed400 50%, #4da800 70%, #1a5f00 100%);
+  background: linear-gradient(to bottom, #ffffff, #f0ede0);
+  border-bottom: 2px solid #6ab800;
   padding: 5px 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
-.lw-logo-text {
-  color: #fff;
-  font-family: "Arial Black", Arial, sans-serif;
-  font-size: 15px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-  white-space: nowrap;
+.lw-logo-img {
+  height: 22px;
+  width: auto;
   flex-shrink: 0;
 }
-.lw-logo-lime { color: #d4ff44; }
 .lw-search-area {
   flex: 1;
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
 }
 .lw-search-label {
-  color: #e8ffc8;
+  color: #333;
   font-family: Tahoma, Arial, sans-serif;
   font-size: 11px;
   white-space: nowrap;
-  text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
 }
 .lw-search-input {
   flex: 1;
@@ -68,20 +63,21 @@
   min-width: 0;
 }
 .lw-search-btn {
-  background: linear-gradient(to bottom, #ffe040, #c89000);
-  border: 1px solid #8b6000;
-  border-top-color: #ffd060;
-  border-left-color: #ffd060;
+  background: linear-gradient(to bottom, #a8e030, #6aaa00);
+  border: 1px solid #4a8800;
+  border-top-color: #c0ee50;
+  border-left-color: #c0ee50;
   padding: 2px 10px;
-  font-family: "Arial Black", Arial, sans-serif;
+  font-family: Tahoma, Arial, sans-serif;
   font-size: 11px;
-  font-weight: 900;
-  color: #1a1a00;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
   cursor: pointer;
   border-radius: 2px;
   white-space: nowrap;
 }
-.lw-search-btn:hover { background: linear-gradient(to bottom, #ffe860, #d8a800); }
+.lw-search-btn:hover { background: linear-gradient(to bottom, #b8f040, #7abb00); }
 
 /* Tab strip */
 .lw-tabs {

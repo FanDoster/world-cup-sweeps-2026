@@ -689,7 +689,15 @@ function lwRender() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  /* start download simulation */
   lwRender();
   lwTickId = setInterval(lwTick, 500);
+
+  /* pre-register as minimized so it appears in the taskbar from the start */
+  var lwEl = document.getElementById('xp-window-limewire');
+  if (lwEl) {
+    xpWindows['limewire'] = { el: lwEl, minimized: true, maximized: false };
+    xpSyncTaskbarBtn('limewire');
+  }
 });
 
