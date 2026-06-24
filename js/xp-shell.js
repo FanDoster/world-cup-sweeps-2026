@@ -20,6 +20,14 @@ var XP_WIN_LABELS = {
   msn:         '🦋 ~~gAzZa~~ - Conversation'
 };
 
+function xpWinAnimTransform(winRect, btnRect) {
+  var tx = (btnRect.left + btnRect.width  / 2) - (winRect.left + winRect.width  / 2);
+  var ty = (btnRect.top  + btnRect.height / 2) - (winRect.top  + winRect.height / 2);
+  var sx = btnRect.width  / winRect.width;
+  var sy = btnRect.height / winRect.height;
+  return 'translate(' + tx + 'px,' + ty + 'px) scale(' + sx + ',' + sy + ')';
+}
+
 function openWindow(name) {
   var el = document.getElementById('xp-window-' + name);
   if (!el) return;
@@ -27,19 +35,46 @@ function openWindow(name) {
     xpStartupPlayed = true;
     new Audio('media/startup.mp3').play().catch(function(){});
   }
+
+  var wasMinimized = xpWindows[name] && xpWindows[name].minimized;
   el.style.display = 'flex';
+
   if (!xpWindows[name]) {
     xpWindows[name] = { el: el, minimized: false, maximized: false };
   }
   xpWindows[name].minimized = false;
   focusWindow(name);
   xpSyncTaskbarBtn(name);
+
+  /* restore animation: expand from taskbar button */
+  if (wasMinimized) {
+    var btn = document.querySelector('.xp-taskbar-btn[data-win="' + name + '"]');
+    if (btn && btn.offsetParent) {
+      var wRect = el.getBoundingClientRect();
+      var bRect = btn.getBoundingClientRect();
+      el.style.transition = 'none';
+      el.style.opacity = '0';
+      el.style.transform = xpWinAnimTransform(wRect, bRect);
+      el.getBoundingClientRect(); /* force reflow */
+      el.style.transition = 'transform 180ms ease-out, opacity 180ms ease-out';
+      el.style.transform = '';
+      el.style.opacity   = '';
+      var cleanup = function() {
+        el.removeEventListener('transitionend', cleanup);
+        el.style.transition = '';
+      };
+      el.addEventListener('transitionend', cleanup);
+    }
+  }
 }
 
 function closeWindow(name) {
   var el = document.getElementById('xp-window-' + name);
   if (!el) return;
   el.style.display = 'none';
+  el.style.transform = '';
+  el.style.opacity = '';
+  el.style.transition = '';
   delete xpWindows[name];
   xpRemoveTaskbarBtn(name);
   if (name === 'shooter' && typeof pauseShooter === 'function') pauseShooter();
@@ -48,9 +83,36 @@ function closeWindow(name) {
 function minimizeWindow(name) {
   var el = document.getElementById('xp-window-' + name);
   if (!el) return;
-  el.style.display = 'none';
-  if (xpWindows[name]) xpWindows[name].minimized = true;
-  xpSyncTaskbarBtn(name);
+
+  var btn = document.querySelector('.xp-taskbar-btn[data-win="' + name + '"]');
+  if (!btn || !btn.offsetParent) {
+    /* mobile — no visible taskbar button, hide instantly */
+    el.style.display = 'none';
+    if (xpWindows[name]) xpWindows[name].minimized = true;
+    xpSyncTaskbarBtn(name);
+    return;
+  }
+
+  var wRect = el.getBoundingClientRect();
+  var bRect = btn.getBoundingClientRect();
+  var finished = false;
+  var done = function() {
+    if (finished) return;
+    finished = true;
+    el.removeEventListener('transitionend', done);
+    el.style.display    = 'none';
+    el.style.transition = '';
+    el.style.transform  = '';
+    el.style.opacity    = '';
+    if (xpWindows[name]) xpWindows[name].minimized = true;
+    xpSyncTaskbarBtn(name);
+  };
+
+  el.style.transition = 'transform 180ms ease-in, opacity 180ms ease-in';
+  el.style.transform  = xpWinAnimTransform(wRect, bRect);
+  el.style.opacity    = '0';
+  el.addEventListener('transitionend', done);
+  setTimeout(done, 220); /* fallback if transitionend never fires */
 }
 
 function maximizeWindow(name) {
