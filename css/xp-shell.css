@@ -524,30 +524,21 @@
 
 /* ── START BUTTON ── */
 #xp-start-btn {
-  height: 32px;
-  padding: 0 12px 0 8px;
-  background: linear-gradient(to bottom, #5aac28 0%, #3a8010 40%, #3a8010 60%, #5aac28 100%);
-  border: 1px solid #1a5008;
-  border-radius: 0 14px 14px 0;
+  width: 114px;
+  height: 38px;
+  padding: 0;
+  border: none;
+  background: url('../images/start-btn.png') no-repeat center top;
+  background-size: 100% 300%;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #fff;
-  font-family: var(--font);
-  font-size: 13px;
-  font-weight: bold;
-  font-style: italic;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 2px 2px 6px rgba(0,0,0,0.4);
   flex-shrink: 0;
 }
-
 #xp-start-btn:hover {
-  background: linear-gradient(to bottom, #70cc38 0%, #50a020 40%, #50a020 60%, #70cc38 100%);
+  background-position: center 50%;
 }
-
-.xp-start-logo { font-size: 20px; font-style: normal; }
+#xp-start-btn:active {
+  background-position: center 100%;
+}
 
 /* ── TASKBAR WINDOW BUTTONS ── */
 #xp-taskbar-windows {
@@ -687,39 +678,45 @@
   border-top: 9px solid #fff;
 }
 #xp-balloon-title {
-  padding: 6px 22px 6px 8px;
-  font-family: var(--font);
+  padding: 4px 22px 4px 8px;
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
   font-size: 11px;
   font-weight: bold;
-  color: #00006b;
+  color: #fff;
+  text-shadow: 1px 1px #0f1089;
   display: flex;
   align-items: center;
   gap: 5px;
   position: relative;
-  border-bottom: 1px solid #0a246a;
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(180deg,
+    rgba(9,151,255,1) 0%, rgba(0,83,238,1) 8%, rgba(0,80,238,1) 40%,
+    rgba(0,102,255,1) 88%, rgba(0,102,255,1) 93%, rgba(0,91,255,1) 95%,
+    rgba(0,61,215,1) 96%, rgba(0,61,215,1) 100%);
 }
 #xp-balloon-close {
   position: absolute;
-  top: 4px;
+  top: 3px;
   right: 4px;
-  width: 14px;
+  width: 15px;
   height: 14px;
-  background: none;
-  border: 1px solid transparent;
-  color: #555;
-  font-size: 10px;
-  font-family: var(--font);
+  background: linear-gradient(to bottom, #d84040 0%, #b02020 100%);
+  border: 1px solid rgba(0,0,0,0.4);
+  border-radius: 2px;
+  color: #fff;
+  font-size: 9px;
+  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   line-height: 1;
+  text-shadow: 1px 1px rgba(0,0,0,0.5);
 }
 #xp-balloon-close:hover {
-  background: #c0d8f0;
-  border-color: #4a7fb8;
-  color: #000;
+  background: linear-gradient(to bottom, #f05050 0%, #c03030 100%);
 }
 #xp-balloon img {
   width: 100%;
