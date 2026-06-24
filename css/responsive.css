@@ -115,8 +115,8 @@
     bottom: 40px;
   }
 
-  /* Prevent any window from spilling horizontally */
-  .xp-window { overflow-x: hidden !important; }
+  /* Clip window overflow on both axes so the flex height chain is enforced */
+  .xp-window { overflow: hidden !important; }
 
   /* Title bar text shouldn't overflow on narrow windows */
   .title-bar-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: calc(100vw - 80px); }
