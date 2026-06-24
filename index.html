@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="css/shooter.css">
   <link rel="stylesheet" href="css/profile-picture.css">
   <link rel="stylesheet" href="css/user-profile.css">
-  <link rel="stylesheet" href="css/bracket.css">
+  <link rel="stylesheet" href="css/xp-titlebar.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/update-notification.css">
 </head>
@@ -100,11 +100,7 @@
       <span class="xp-today-item-label">Battle Map</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item" onclick="switchTab('bracket')">
-      <span class="xp-today-item-icon">📊</span>
-      <span class="xp-today-item-label">Bracket</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
+
     <button class="xp-today-item xp-today-auth" onclick="switchTab('myteams')" style="display:none">
       <span class="xp-today-item-icon">⭐</span>
       <span class="xp-today-item-label">My Teams</span>
@@ -155,10 +151,7 @@
       <div class="xp-icon-img">🌐</div>
       <div class="xp-icon-label">Battle Map</div>
     </div>
-    <div class="xp-icon" data-window="bracket" ondblclick="switchTab('bracket')">
-      <div class="xp-icon-img">📊</div>
-      <div class="xp-icon-label">Bracket</div>
-    </div>
+
     <div class="xp-icon" data-window="shooter" ondblclick="switchTab('shooter')">
       <div class="xp-icon-img">🔫</div>
       <div class="xp-icon-label">Shooter</div>
@@ -166,6 +159,13 @@
     <div class="xp-icon" data-window="profile" ondblclick="switchTab('profile')">
       <div class="xp-icon-img">👤</div>
       <div class="xp-icon-label">Profile</div>
+    </div>
+    <div class="xp-icon xp-icon-web-shortcut" ondblclick="window.open('http://news.bbc.co.uk/sport3/worldcup2002','_blank')">
+      <div class="xp-icon-img xp-web-shortcut-img">
+        <img src="https://www.bbc.co.uk/favicon.ico" alt="BBC" onerror="this.style.display='none';this.parentNode.querySelector('.xp-web-fallback').style.display='block'">
+        <span class="xp-web-fallback" style="display:none">🌐</span>
+      </div>
+      <div class="xp-icon-label">BBC World Cup</div>
     </div>
     <!-- auth-gated: shown by updateAuthBar() when signed in -->
     <div class="xp-icon xp-icon-auth" data-window="myteams" ondblclick="switchTab('myteams')" style="display:none">
@@ -185,13 +185,12 @@
   <!-- ── World Cup 2026 (home) ── -->
   <div class="xp-window" id="xp-window-home" data-win="home"
        style="display:none; top:50px; left:280px; width:520px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'home')">
-      <span class="xp-title-icon">⚽</span>
-      <span class="xp-title-text">World Cup 2026</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('home')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('home')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('home')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'home')">
+      <div class="title-bar-text"><span class="xp-title-icon">⚽</span> World Cup 2026</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('home')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('home')"></button>
+        <button aria-label="Close" onclick="closeWindow('home')"></button>
       </div>
     </div>
     <div class="xp-window-content xp-home-header">
@@ -236,14 +235,13 @@
 
   <!-- ── Matches (open by default) ── -->
   <div class="xp-window" id="xp-window-matches" data-win="matches"
-       style="top:44px; left:180px; width:880px; height:600px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'matches')">
-      <span class="xp-title-icon">⏱️</span>
-      <span class="xp-title-text">Matches</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('matches')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('matches')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('matches')" title="Close">&#10005;</button>
+       style="display:none; top:44px; left:180px; width:880px; height:600px;">
+    <div class="title-bar" onmousedown="startDrag(event,'matches')">
+      <div class="title-bar-text"><span class="xp-title-icon">⏱️</span> Matches</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('matches')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('matches')"></button>
+        <button aria-label="Close" onclick="closeWindow('matches')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -306,13 +304,12 @@
   <!-- ── Players ── -->
   <div class="xp-window" id="xp-window-players" data-win="players"
        style="display:none; top:64px; left:200px; width:880px; height:600px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'players')">
-      <span class="xp-title-icon">🏆</span>
-      <span class="xp-title-text">Players</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('players')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('players')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('players')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'players')">
+      <div class="title-bar-text"><span class="xp-title-icon">🏆</span> Players</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('players')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('players')"></button>
+        <button aria-label="Close" onclick="closeWindow('players')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -325,13 +322,12 @@
   <!-- ── Groups ── -->
   <div class="xp-window" id="xp-window-groups" data-win="groups"
        style="display:none; top:84px; left:220px; width:960px; height:640px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'groups')">
-      <span class="xp-title-icon">📋</span>
-      <span class="xp-title-text">Groups</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('groups')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('groups')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('groups')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'groups')">
+      <div class="title-bar-text"><span class="xp-title-icon">📋</span> Groups</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('groups')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('groups')"></button>
+        <button aria-label="Close" onclick="closeWindow('groups')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -382,13 +378,12 @@
   <!-- ── Leaderboard ── -->
   <div class="xp-window" id="xp-window-leaderboard" data-win="leaderboard"
        style="display:none; top:74px; left:210px; width:920px; height:620px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'leaderboard')">
-      <span class="xp-title-icon">🏅</span>
-      <span class="xp-title-text">Leaderboard</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('leaderboard')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('leaderboard')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('leaderboard')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'leaderboard')">
+      <div class="title-bar-text"><span class="xp-title-icon">🏅</span> Leaderboard</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('leaderboard')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('leaderboard')"></button>
+        <button aria-label="Close" onclick="closeWindow('leaderboard')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -401,13 +396,12 @@
   <!-- ── Awards ── -->
   <div class="xp-window" id="xp-window-awards" data-win="awards"
        style="display:none; top:90px; left:230px; width:700px; height:520px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'awards')">
-      <span class="xp-title-icon">🏆</span>
-      <span class="xp-title-text">Tournament Awards</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('awards')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('awards')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('awards')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'awards')">
+      <div class="title-bar-text"><span class="xp-title-icon">🏆</span> Tournament Awards</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('awards')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('awards')"></button>
+        <button aria-label="Close" onclick="closeWindow('awards')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -419,13 +413,12 @@
   <!-- ── Teams ── -->
   <div class="xp-window" id="xp-window-teams" data-win="teams"
        style="display:none; top:90px; left:230px; width:880px; height:600px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'teams')">
-      <span class="xp-title-icon">🌍</span>
-      <span class="xp-title-text">Teams</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('teams')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('teams')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('teams')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'teams')">
+      <div class="title-bar-text"><span class="xp-title-icon">🌍</span> Teams</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('teams')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('teams')"></button>
+        <button aria-label="Close" onclick="closeWindow('teams')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -446,13 +439,12 @@
   <!-- ── Battle Map ── -->
   <div class="xp-window" id="xp-window-map" data-win="map"
        style="display:none; top:44px; left:160px; width:1040px; height:700px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'map')">
-      <span class="xp-title-icon">🌐</span>
-      <span class="xp-title-text">Battle Map</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('map')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('map')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('map')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'map')">
+      <div class="title-bar-text"><span class="xp-title-icon">🌐</span> Battle Map</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('map')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('map')"></button>
+        <button aria-label="Close" onclick="closeWindow('map')"></button>
       </div>
     </div>
     <div class="xp-window-content" style="padding:0; overflow:hidden;">
@@ -484,33 +476,16 @@
     </div>
   </div>
 
-  <!-- ── Bracket ── -->
-  <div class="xp-window" id="xp-window-bracket" data-win="bracket"
-       style="display:none; top:60px; left:170px; width:1100px; height:640px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'bracket')">
-      <span class="xp-title-icon">📊</span>
-      <span class="xp-title-text">Bracket</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('bracket')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('bracket')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('bracket')" title="Close">&#10005;</button>
-      </div>
-    </div>
-    <div class="xp-window-content">
-      <div class="section-bracket" id="sectionBracket"></div>
-    </div>
-  </div>
 
   <!-- ── Shooter ── -->
   <div class="xp-window" id="xp-window-shooter" data-win="shooter"
        style="display:none; top:54px; left:240px; width:720px; height:560px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'shooter')">
-      <span class="xp-title-icon">🔫</span>
-      <span class="xp-title-text">Shooter</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('shooter')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('shooter')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('shooter')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'shooter')">
+      <div class="title-bar-text"><span class="xp-title-icon">🔫</span> Shooter</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('shooter')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('shooter')"></button>
+        <button aria-label="Close" onclick="closeWindow('shooter')"></button>
       </div>
     </div>
     <div class="xp-window-content" style="padding:0; overflow:hidden; position:relative;">
@@ -528,13 +503,12 @@
   <!-- ── My Teams (auth-gated) ── -->
   <div class="xp-window" id="xp-window-myteams" data-win="myteams"
        style="display:none; top:80px; left:220px; width:880px; height:600px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'myteams')">
-      <span class="xp-title-icon">⭐</span>
-      <span class="xp-title-text">My Teams</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('myteams')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('myteams')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('myteams')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'myteams')">
+      <div class="title-bar-text"><span class="xp-title-icon">⭐</span> My Teams</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('myteams')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('myteams')"></button>
+        <button aria-label="Close" onclick="closeWindow('myteams')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -547,13 +521,12 @@
   <!-- ── Predictions (auth-gated) ── -->
   <div class="xp-window" id="xp-window-predictions" data-win="predictions"
        style="display:none; top:80px; left:220px; width:880px; height:640px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'predictions')">
-      <span class="xp-title-icon">🔮</span>
-      <span class="xp-title-text">Predictions</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('predictions')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('predictions')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('predictions')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'predictions')">
+      <div class="title-bar-text"><span class="xp-title-icon">🔮</span> Predictions</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('predictions')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('predictions')"></button>
+        <button aria-label="Close" onclick="closeWindow('predictions')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -660,13 +633,12 @@
   <!-- ── Profile ── -->
   <div class="xp-window" id="xp-window-profile" data-win="profile"
        style="display:none; top:70px; left:210px; width:900px; height:620px;">
-    <div class="xp-title-bar" onmousedown="startDrag(event,'profile')">
-      <span class="xp-title-icon">👤</span>
-      <span class="xp-title-text">Profile</span>
-      <div class="xp-controls">
-        <button class="xp-btn-min" onclick="minimizeWindow('profile')" title="Minimize">&#8211;</button>
-        <button class="xp-btn-max" onclick="maximizeWindow('profile')" title="Maximize">&#9633;</button>
-        <button class="xp-btn-close" onclick="closeWindow('profile')" title="Close">&#10005;</button>
+    <div class="title-bar" onmousedown="startDrag(event,'profile')">
+      <div class="title-bar-text"><span class="xp-title-icon">👤</span> Profile</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('profile')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('profile')"></button>
+        <button aria-label="Close" onclick="closeWindow('profile')"></button>
       </div>
     </div>
     <div class="xp-window-content">
@@ -720,7 +692,6 @@
       <div class="xp-start-separator"></div>
       <button class="xp-start-item" onclick="switchTab('teams');closeStartMenu()">🌍 Teams</button>
       <button class="xp-start-item" onclick="switchTab('map');closeStartMenu()">🌐 Battle Map</button>
-      <button class="xp-start-item" onclick="switchTab('bracket');closeStartMenu()">📊 Bracket</button>
       <button class="xp-start-item" onclick="switchTab('shooter');closeStartMenu()">🔫 Shooter</button>
       <div class="xp-start-separator"></div>
       <button class="xp-start-item xp-start-item-auth" onclick="switchTab('myteams');closeStartMenu()" style="display:none">⭐ My Teams</button>
@@ -844,7 +815,6 @@
 <script src="js/team-results.js"></script>
 <script src="js/profile-picture.js"></script>
 <script src="js/render-user-profile.js"></script>
-<script src="js/render-bracket.js"></script>
 <script src="js/xp-shell.js"></script>
 <script src="js/version.js"></script>
 <script src="js/version-refresh.js"></script>

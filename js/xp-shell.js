@@ -12,7 +12,6 @@ var XP_WIN_LABELS = {
   leaderboard: '🏅 Leaderboard',
   teams:       '🌍 Teams',
   map:         '🌐 Battle Map',
-  bracket:     '📊 Bracket',
   shooter:     '🔫 Shooter',
   myteams:     '⭐ My Teams',
   predictions: '🔮 Predictions',
@@ -227,7 +226,6 @@ var XP_WIN_PATHS = {
   leaderboard: 'C:\\WorldCup2026\\Leaderboard',
   teams:       'C:\\WorldCup2026\\Teams',
   map:         'C:\\WorldCup2026\\Battle Map',
-  bracket:     'C:\\WorldCup2026\\Bracket',
   shooter:     'C:\\WorldCup2026\\Shooter',
   myteams:     'C:\\WorldCup2026\\My Teams',
   predictions: 'C:\\WorldCup2026\\Predictions',
@@ -244,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /* inject Explorer toolbar + address bar below the title bar */
     var name = el.dataset.win;
-    var titleBar = el.querySelector('.xp-title-bar');
+    var titleBar = el.querySelector('.title-bar');
     if (!titleBar) return;
 
     var toolbar = document.createElement('div');

@@ -7,7 +7,6 @@ function switchTab(tab) {
   if (tab === 'awards') { renderAwards(calcMatchLeaderboard()); renderJokerStats(); }
   if (tab === 'myteams') renderMyTeams();
   if (tab === 'predictions') renderPredictions();
-  if (tab === 'bracket') renderBracket();
   if (tab === 'shooter') initShooter();
   if (tab !== 'shooter') pauseShooter();
   if (tab === 'profile') {
@@ -29,14 +28,6 @@ restoreSession().then(async function() {
     xpUpdateClock();
     xpHideWelcome();
     handleHashRoute();
-    // Open Matches by default if no hash navigates elsewhere.
-    // Suppress startup sound for this automatic (non-user-gesture) open,
-    // then reset so the first deliberate click plays it.
-    if (!location.hash || location.hash === '#/' || location.hash === '#/matches') {
-      xpStartupPlayed = true;
-      openWindow('matches');
-      xpStartupPlayed = false;
-    }
   });
 });
 setInterval(renderMatches, 60000);

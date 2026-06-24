@@ -266,6 +266,36 @@
   color: #fff;
 }
 
+/* ── WEB SHORTCUT ICON ── */
+.xp-icon-web-shortcut .xp-icon-img {
+  position: relative;
+}
+.xp-web-shortcut-img {
+  background: #fff;
+  border: 1px solid #999 !important;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.xp-web-shortcut-img img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  display: block;
+  margin: 7px auto 0;
+}
+/* IE shortcut arrow badge — bottom-left corner */
+.xp-web-shortcut-img::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='white' stroke='%23999' stroke-width='0.5'/%3E%3Cpath d='M3 11 L3 5 L9 5' stroke='%230000cc' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M8 5 L13 5 L13 10' stroke='%230000cc' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3Cpath d='M8 8 L13 3' stroke='%230000cc' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-size: cover;
+  pointer-events: none;
+}
+
 /* ── WINDOWS ── */
 .xp-window {
   position: absolute;
@@ -300,44 +330,30 @@
     5px 8px 24px rgba(0,0,0,0.75);
 }
 
-/* ── TITLE BAR ── */
-.xp-title-bar {
-  display: flex;
+/* ── TITLE BAR — override XP.css defaults for our window manager ── */
+.title-bar {
+  display: flex !important;
   align-items: center;
-  gap: 4px;
-  height: 30px;
-  padding: 3px 5px 3px 3px;
-  /* Authentic Luna gradient (botoxparty/XP.css) */
-  background: linear-gradient(
-    180deg,
-    rgba(9,151,255,1)   0%,
-    rgba(0,83,238,1)    8%,
-    rgba(0,80,238,1)   40%,
-    rgba(0,102,255,1)  88%,
-    rgba(0,102,255,1)  93%,
-    rgba(0,91,255,1)   95%,
-    rgba(0,61,215,1)   96%,
-    rgba(0,61,215,1)  100%
-  );
-  border-top: 1px solid #0831d9;
-  border-left: 1px solid #0831d9;
-  border-right: 1px solid #001ea0;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 7px;
   cursor: default;
   flex-shrink: 0;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.xp-window:not(.xp-focused) .xp-title-bar {
+/* Unfocused window title bar */
+.xp-window:not(.xp-focused) .title-bar {
   background: linear-gradient(180deg, #7a96c2 0%, #5474b4 50%, #4a68a8 100%);
   border-top-color: #5b7ab5;
   border-left-color: #5b7ab5;
   border-right-color: #4a6aa0;
 }
+.xp-window:not(.xp-focused) .title-bar-controls button {
+  background-color: #5474b4;
+  opacity: 0.75;
+}
 
-.xp-title-icon { font-size: 16px; line-height: 1; flex-shrink: 0; }
-
-.xp-title-text {
+/* Title bar text */
+.title-bar-text {
   flex: 1;
   color: #ffffff;
   font-family: "Trebuchet MS", Tahoma, sans-serif;
@@ -347,75 +363,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-left: 2px;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── CONTROL BUTTONS ── */
-.xp-controls {
-  display: flex;
-  gap: 2px;
-  flex-shrink: 0;
-}
-
-.xp-btn-min,
-.xp-btn-max,
-.xp-btn-close {
-  width: 21px;
-  height: 21px;
-  border: 0;
-  cursor: pointer;
-  font-size: 11px;
-  font-family: "Trebuchet MS", Tahoma, sans-serif;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  transition: none;
-  flex-shrink: 0;
-}
-
-.xp-btn-min,
-.xp-btn-max {
-  background: #c0cfe8;
-  color: #0a246a;
-  text-shadow: none;
-  box-shadow:
-    inset -1px -1px #0a246a,
-    inset 1px 1px rgba(255,255,255,0.95),
-    inset -2px -2px #0040b4,
-    inset 2px 2px #d8e6f8;
-}
-.xp-btn-min:hover,
-.xp-btn-max:hover { background: #ccdaf4; }
-.xp-btn-min:active,
-.xp-btn-max:active {
-  box-shadow:
-    inset -1px -1px rgba(255,255,255,0.95),
-    inset 1px 1px #0a246a,
-    inset -2px -2px #d8e6f8,
-    inset 2px 2px #0040b4;
-}
-
-.xp-btn-close {
-  background: linear-gradient(180deg, #e44030 0%, #c42820 100%);
-  color: #fff;
-  text-shadow: 0 1px rgba(0,0,0,0.5);
-  box-shadow:
-    inset -1px -1px #701010,
-    inset 1px 1px rgba(255,150,100,0.8),
-    inset -2px -2px #a02020,
-    inset 2px 2px rgba(255,200,180,0.5);
-}
-.xp-btn-close:hover { background: linear-gradient(180deg, #f05040 0%, #d83020 100%); }
-.xp-btn-close:active {
-  box-shadow:
-    inset -1px -1px rgba(255,150,100,0.8),
-    inset 1px 1px #701010,
-    inset -2px -2px rgba(255,200,180,0.5),
-    inset 2px 2px #a02020;
-}
+.xp-title-icon { font-size: 14px; line-height: 1; vertical-align: middle; margin-right: 3px; }
 
 /* ── EXPLORER TOOLBAR ── */
 .xp-explorer-toolbar {
