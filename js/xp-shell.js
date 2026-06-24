@@ -726,7 +726,7 @@ function msnPushNotif(preview) {
 
 function msnRestack() {
   var bottom = MSN_TASKBAR_H + MSN_TOAST_GAP;
-  for (var i = msnNotifStack.length - 1; i >= 0; i--) {
+  for (var i = 0; i < msnNotifStack.length; i++) {
     msnNotifStack[i].el.style.bottom = bottom + 'px';
     bottom += msnNotifStack[i].el.offsetHeight + MSN_TOAST_GAP;
   }
