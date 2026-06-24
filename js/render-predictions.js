@@ -172,7 +172,7 @@ async function renderPredictions() {
         }
 
         // Match cell content
-        var matchCell = '<div class="xl-cell" style="flex:1;min-width:150px" onclick="xlPredSelectCell(\'B' + rowNum + '\',\'=&quot;' + m.team1.replace(/'/g, "&#39;") + ' vs ' + m.team2.replace(/'/g, "&#39;") + '&quot;\')">' +
+        var matchCell = '<div class="xl-cell" style="flex:1;min-width:150px" onclick="xlPredSelectCell(\'B' + rowNum + '\',\'=&quot;' + m.team1.replace(/'/g, "\\'") + ' vs ' + m.team2.replace(/'/g, "\\'") + '&quot;\')">' +
           escapeHtml(m.team1) + ' <span style="color:#888">vs</span> ' + escapeHtml(m.team2) +
           ' <span class="badge-mono" style="font-size:9px;color:#888">G' + m.group + '</span>' +
           '</div>';
