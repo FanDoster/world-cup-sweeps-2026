@@ -2,13 +2,7 @@
 #xp-desktop {
   position: fixed;
   inset: 0 0 40px 0;           /* leave room for taskbar */
-  background:
-    linear-gradient(to bottom,
-      var(--xp-desktop-bg) 0%,
-      #4d9fd4 42%,
-      #7ec8a0 58%,
-      #4a8f3a 72%,
-      #3d7a2e 100%);
+  background: url('../img/bliss.jpg') center center / cover no-repeat;
   overflow: hidden;
   user-select: none;
 }
