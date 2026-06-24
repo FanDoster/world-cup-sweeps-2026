@@ -216,6 +216,11 @@ function xpHideWelcome() {
   setTimeout(function() {
     var n = document.getElementById('msn-notification');
     if (!n || n.style.display === 'block') return;
+    var gameMsg = msnLastGameMessage();
+    if (gameMsg) {
+      var statusEl = document.getElementById('msn-notif-status');
+      if (statusEl) statusEl.textContent = gameMsg;
+    }
     n.style.display = 'block';
     n.classList.add('msn-animating-in');
   }, 2500);
