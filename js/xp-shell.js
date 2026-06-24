@@ -2,6 +2,7 @@
 var xpWindows = {};
 var xpZTop = 100;
 var xpDragState = null;
+var xpStartupPlayed = false;
 
 var XP_WIN_LABELS = {
   home:        '⚽ World Cup 2026',
@@ -21,6 +22,10 @@ var XP_WIN_LABELS = {
 function openWindow(name) {
   var el = document.getElementById('xp-window-' + name);
   if (!el) return;
+  if (!xpStartupPlayed) {
+    xpStartupPlayed = true;
+    new Audio('media/startup.mp3').play().catch(function(){});
+  }
   el.style.display = 'flex';
   if (!xpWindows[name]) {
     xpWindows[name] = { el: el, minimized: false, maximized: false };
