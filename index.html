@@ -30,6 +30,7 @@
   <link rel="stylesheet" href="css/profile-picture.css">
   <link rel="stylesheet" href="css/user-profile.css">
   <link rel="stylesheet" href="css/xp-titlebar.css">
+  <link rel="stylesheet" href="css/limewire.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/update-notification.css">
 </head>
@@ -165,6 +166,10 @@
         <div class="xp-bbc-logo"><span>B</span><span>B</span><span>C</span></div>
       </div>
       <div class="xp-icon-label">BBC World Cup</div>
+    </div>
+    <div class="xp-icon" data-window="limewire" ondblclick="openWindow('limewire')">
+      <div class="xp-icon-img"><img src="img/limewire-tray.ico" style="width:32px;height:32px;image-rendering:pixelated" alt="LimeWire"></div>
+      <div class="xp-icon-label">LimeWire 4.12.3</div>
     </div>
     <!-- auth-gated: shown by updateAuthBar() when signed in -->
     <div class="xp-icon xp-icon-auth" data-window="myteams" ondblclick="switchTab('myteams')" style="display:none">
@@ -777,6 +782,72 @@
       </div>
     </div>
     <div class="msn-statusbar">Click for new Emoticons and Theme Packs from Blue Mountain</div>
+  </div>
+
+  <!-- ── LimeWire 4.12.3 ── -->
+  <div id="xp-window-limewire" class="xp-window" data-win="limewire" data-no-explorer
+       style="display:none;width:580px;height:400px;top:80px;left:100px">
+    <div class="title-bar" onmousedown="startDrag(event,'limewire')">
+      <div class="title-bar-text">
+        <img src="img/limewire-tray.ico" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px" alt="">
+        LimeWire 4.12.3
+      </div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('limewire')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('limewire')"></button>
+        <button aria-label="Close" onclick="closeWindow('limewire')"></button>
+      </div>
+    </div>
+    <div class="xp-window-content lw-content">
+      <div class="lw-menubar">
+        <span>File</span><span>View</span><span>Tools</span><span>Help</span>
+      </div>
+      <div class="lw-header">
+        <div class="lw-logo-text"><span class="lw-logo-lime">Lime</span>Wire</div>
+        <div class="lw-search-area">
+          <span class="lw-search-label">Search:</span>
+          <input class="lw-search-input" type="text" value="world cup songs" readonly>
+          <button class="lw-search-btn" onclick="return false">Search</button>
+        </div>
+      </div>
+      <div class="lw-tabs">
+        <button class="lw-tab" onclick="return false">Search</button>
+        <button class="lw-tab" onclick="return false">Library</button>
+        <button class="lw-tab lw-tab-active" onclick="return false">Monitor</button>
+        <button class="lw-tab" onclick="return false">Chat</button>
+        <button class="lw-tab" onclick="return false">My LimeWire</button>
+      </div>
+      <div class="lw-body">
+        <div class="lw-dl-toolbar">
+          <button class="lw-dl-btn" onclick="return false">Resume</button>
+          <button class="lw-dl-btn" onclick="return false">Pause</button>
+          <button class="lw-dl-btn" onclick="return false">Remove</button>
+          <button class="lw-dl-btn" onclick="return false">Open Folder</button>
+        </div>
+        <div class="lw-dl-wrap">
+          <table class="lw-dl-table">
+            <thead>
+              <tr>
+                <th>Filename</th>
+                <th>Size</th>
+                <th>Progress</th>
+                <th>Speed</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="lw-downloads-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="lw-statusbar">
+        <span class="lw-conn-light"></span>
+        <span id="lw-status-text">Connected to 1,247 hosts</span>
+        <span class="lw-status-sep">·</span>
+        <span>Sharing 87 files</span>
+        <span class="lw-status-sep">·</span>
+        <span id="lw-active-count">2 active downloads</span>
+      </div>
+    </div>
   </div>
 
   <!-- ══ TASKBAR ══ -->

@@ -17,7 +17,8 @@ var XP_WIN_LABELS = {
   predictions: '🔮 Predictions',
   profile:     '👤 Profile',
   match:       '📧 Match',
-  msn:         '🦋 ~~gAzZa~~ - Conversation'
+  msn:         '🦋 ~~gAzZa~~ - Conversation',
+  limewire:    '🍋 LimeWire 4.12.3'
 };
 
 function xpWinAnimTransform(winRect, btnRect) {
@@ -308,7 +309,8 @@ var XP_WIN_PATHS = {
   profile:     'C:\\WorldCup2026\\Profile',
   awards:      'C:\\WorldCup2026\\Awards',
   match:       'C:\\WorldCup2026\\Matches',
-  msn:         'C:\\Program Files\\MSN Messenger'
+  msn:         'C:\\Program Files\\MSN Messenger',
+  limewire:    'C:\\Program Files\\LimeWire'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -613,4 +615,81 @@ function msnOpenChat() {
     }
   }, 1500);
 }
+
+/* ═══════════════════════════════════════════════
+   LIMEWIRE DOWNLOAD SIMULATOR
+═══════════════════════════════════════════════ */
+var lwDownloads = [
+  { name: 'Three Lions (Footballs Coming Home) - Baddiel & Skinner.mp3', size: 3407872, done: 0,       speed: 3900, status: 'downloading' },
+  { name: 'World In Motion - New Order.mp3',                              size: 3981312, done: 0,       speed: 0,    status: 'queued' },
+  { name: 'Nessun Dorma - Pavarotti (Italia 90 Opening Ceremony).mp3',   size: 4403200, done: 0,       speed: 0,    status: 'queued' },
+  { name: 'Vindaloo - Fat Les (Official).mp3',                            size: 3041280, done: 3041280, speed: 0,    status: 'complete' },
+  { name: 'Hand of God 1986 - Maradona vs England Highlights.avi',        size: 9437184, done: 0,       speed: 0,    status: 'queued' },
+  { name: 'Gazza Tears Euro 96 (Paul Gascoigne).mp3',                     size: 1179648, done: 360448,  speed: 4700, status: 'downloading' }
+];
+var lwTickId = null;
+
+function lwActivateNext() {
+  for (var i = 0; i < lwDownloads.length; i++) {
+    if (lwDownloads[i].status === 'queued') {
+      lwDownloads[i].status = 'downloading';
+      lwDownloads[i].speed = 2800 + Math.floor(Math.random() * 2200);
+      break;
+    }
+  }
+}
+
+function lwTick() {
+  var active = 0;
+  var completed = false;
+  for (var i = 0; i < lwDownloads.length; i++) {
+    var d = lwDownloads[i];
+    if (d.status !== 'downloading') continue;
+    active++;
+    var fluctuate = 0.82 + Math.random() * 0.36;
+    d.done = Math.min(d.done + Math.floor(d.speed * fluctuate * 0.5), d.size);
+    if (d.done >= d.size) {
+      d.done = d.size;
+      d.status = 'complete';
+      d.speed = 0;
+      completed = true;
+      active--;
+    }
+  }
+  if (completed) setTimeout(lwActivateNext, 1200);
+  lwRender();
+}
+
+function lwRender() {
+  var tbody = document.getElementById('lw-downloads-tbody');
+  if (!tbody) return;
+  var html = '';
+  var activeCount = 0;
+  for (var i = 0; i < lwDownloads.length; i++) {
+    var d = lwDownloads[i];
+    var pct = d.size > 0 ? Math.round(d.done / d.size * 100) : 0;
+    var sizeStr = (d.size / 1048576).toFixed(1) + ' MB';
+    var speedStr = d.status === 'downloading' ? (d.speed / 1024).toFixed(1) + ' KB/s' : '-';
+    var statusLabel, statusCls;
+    if (d.status === 'complete')     { statusLabel = '&#10003; Complete';  statusCls = 'lw-status-done'; }
+    else if (d.status === 'downloading') { statusLabel = 'Downloading'; statusCls = 'lw-status-dl'; activeCount++; }
+    else                             { statusLabel = 'Queued';       statusCls = 'lw-status-q'; }
+    var fillCls = d.status === 'complete' ? 'lw-progress-fill lw-fill-done' : 'lw-progress-fill';
+    html += '<tr class="lw-dl-row">';
+    html += '<td class="lw-dl-name"><img src="img/limewire-tray.ico" width="12" height="12" style="image-rendering:pixelated" alt="">' + (typeof escapeHtml === 'function' ? escapeHtml(d.name) : d.name) + '</td>';
+    html += '<td class="lw-dl-size">' + sizeStr + '</td>';
+    html += '<td class="lw-dl-prog"><div class="lw-progress"><div class="' + fillCls + '" style="width:' + pct + '%"></div><span class="lw-prog-pct">' + pct + '%</span></div></td>';
+    html += '<td class="lw-dl-speed">' + speedStr + '</td>';
+    html += '<td class="lw-dl-status-col ' + statusCls + '">' + statusLabel + '</td>';
+    html += '</tr>';
+  }
+  tbody.innerHTML = html;
+  var countEl = document.getElementById('lw-active-count');
+  if (countEl) countEl.textContent = activeCount + ' active download' + (activeCount === 1 ? '' : 's');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  lwRender();
+  lwTickId = setInterval(lwTick, 500);
+});
 
