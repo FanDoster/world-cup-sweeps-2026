@@ -848,6 +848,35 @@
   border-radius: 2px;
   background: #000;
 }
+.msn-inline-gif {
+  display: block;
+  max-width: 240px;
+  max-height: 180px;
+  border-radius: 2px;
+  margin-top: 3px;
+}
+.msn-flag-sticker {
+  display: inline-block;
+  border: 1px solid #b0c8e8;
+  border-radius: 4px;
+  background: #eef4fc;
+  padding: 6px 8px;
+  text-align: center;
+  margin-top: 3px;
+}
+.msn-sticker-flag {
+  display: block;
+  width: 120px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+.msn-sticker-text {
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: bold;
+  color: #1a4d8a;
+  margin-top: 4px;
+}
 .msn-input-section {
   background: #fff;
   border: 2px inset #b0c8e8;

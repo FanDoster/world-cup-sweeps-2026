@@ -429,7 +429,7 @@ function msnSendMessage() {
   }, 1000 + Math.floor(Math.random() * 1500));
 }
 
-function msnLastGameMessage() {
+function msnGetLastGame() {
   if (typeof matchData === 'undefined' || !matchData.length) return null;
   var done = matchData.filter(function(m) { return m.score1 !== null && m.score2 !== null; });
   if (!done.length) return null;
@@ -437,25 +437,58 @@ function msnLastGameMessage() {
     var da = a.date + ' ' + (a.time || ''), db = b.date + ' ' + (b.time || '');
     return da < db ? 1 : da > db ? -1 : 0;
   });
-  var m = done[0];
+  return done[0];
+}
+
+function msnLastGameMessage() {
+  var m = msnGetLastGame();
+  if (!m) return null;
   var s1 = m.score1, s2 = m.score2, t1 = m.team1, t2 = m.team2;
   var diff = s1 - s2;
   if (diff === 0) {
     return 'nowt in it between ' + t1 + ' and ' + t2 + ' man, ' + s1 + ' each - canny game mind';
   }
-  var winner = diff > 0 ? t1 : t2;
-  var loser  = diff > 0 ? t2 : t1;
-  var ws = diff > 0 ? s1 : s2;
-  var ls = diff > 0 ? s2 : s1;
-  var margin = Math.abs(diff);
-  var score = ws + '-' + ls;
-  if (margin >= 3) {
-    return 'did ya see that?! ' + winner + ' absolutely mullered ' + loser + ' ' + score + ' man, what a game like';
-  } else if (margin === 2) {
-    return 'canny game that, ' + winner + ' beat ' + loser + ' ' + score + ' like, well deserved an\' all';
+  var winner = diff > 0 ? t1 : t2, loser = diff > 0 ? t2 : t1;
+  var ws = diff > 0 ? s1 : s2, ls = diff > 0 ? s2 : s1;
+  var margin = Math.abs(diff), score = ws + '-' + ls;
+  if (margin >= 3) return 'did ya see that?! ' + winner + ' absolutely mullered ' + loser + ' ' + score + ' man, what a game like';
+  if (margin === 2) return 'canny game that, ' + winner + ' beat ' + loser + ' ' + score + ' like, well deserved an\' all';
+  return winner + ' nicked it past ' + loser + ' ' + score + ', heart in me mouth the whole time pet';
+}
+
+function msnSendWinnerGif(msgs, winnerName) {
+  var iso = (typeof teamIso !== 'undefined' && teamIso[winnerName]) ? teamIso[winnerName] : '';
+  var query = encodeURIComponent(winnerName + ' football');
+  fetch('https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=' + query + '&limit=8&rating=g')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var gifUrl = null;
+      if (data && data.data && data.data.length) {
+        var item = data.data[Math.floor(Math.random() * Math.min(6, data.data.length))];
+        var img = item.images;
+        gifUrl = (img.downsized_medium || img.downsized || img.original).url;
+      }
+      msnAppendGifMsg(msgs, gifUrl, winnerName, iso);
+    })
+    .catch(function() { msnAppendGifMsg(msgs, null, winnerName, iso); });
+}
+
+function msnAppendGifMsg(msgs, gifUrl, winnerName, iso) {
+  var gazzaMsg = document.createElement('div');
+  gazzaMsg.className = 'msn-chat-msg';
+  var media;
+  if (gifUrl) {
+    media = '<img src="' + gifUrl + '" class="msn-inline-gif" alt="' + escapeHtml(winnerName) + '">';
   } else {
-    return winner + ' nicked it past ' + loser + ' ' + score + ', heart in me mouth the whole time pet';
+    media = '<div class="msn-flag-sticker">' +
+      (iso ? '<img class="msn-sticker-flag" src="https://flagcdn.com/w160/' + iso + '.png" alt="' + escapeHtml(winnerName) + '">' : '') +
+      '<div class="msn-sticker-text">&#127942; GET IN!! &#9917;</div>' +
+      '</div>';
   }
+  gazzaMsg.innerHTML = '<span class="msn-chat-sender">~~gAzZa~~</span><span class="msn-chat-says"> sends:</span><br>' + media;
+  msgs.appendChild(gazzaMsg);
+  msgs.scrollTop = msgs.scrollHeight;
+  new Audio('media/msn-message.mp3').play().catch(function(){});
 }
 
 function msnDismiss() {
@@ -490,6 +523,15 @@ function msnOpenChat() {
       var msgs = document.getElementById('msn-messages');
       if (msgs) msgs.scrollTop = msgs.scrollHeight;
       new Audio('media/msn-message.mp3').play().catch(function(){});
+
+      // third message: winner GIF, 2s later
+      setTimeout(function() {
+        var game = msnGetLastGame();
+        if (!game || game.score1 === game.score2) return;
+        var winner = game.score1 > game.score2 ? game.team1 : game.team2;
+        var m2 = document.getElementById('msn-messages');
+        if (m2) msnSendWinnerGif(m2, winner);
+      }, 2000);
     }
   }, 1500);
 }
