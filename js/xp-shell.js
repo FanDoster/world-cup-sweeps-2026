@@ -164,12 +164,50 @@ function xpRemoveTaskbarBtn(name) {
 }
 
 /* ── CLICK TO FOCUS ── */
+var XP_WIN_PATHS = {
+  home:        'C:\\WorldCup2026',
+  matches:     'C:\\WorldCup2026\\Matches',
+  players:     'C:\\WorldCup2026\\Players',
+  groups:      'C:\\WorldCup2026\\Groups',
+  leaderboard: 'C:\\WorldCup2026\\Leaderboard',
+  teams:       'C:\\WorldCup2026\\Teams',
+  map:         'C:\\WorldCup2026\\Battle Map',
+  bracket:     'C:\\WorldCup2026\\Bracket',
+  shooter:     'C:\\WorldCup2026\\Shooter',
+  myteams:     'C:\\WorldCup2026\\My Teams',
+  predictions: 'C:\\WorldCup2026\\Predictions',
+  profile:     'C:\\WorldCup2026\\Profile'
+};
+
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.xp-window').forEach(function(el) {
     el.addEventListener('mousedown', function() {
       var name = el.dataset.win;
       if (name) focusWindow(name);
     });
+
+    /* inject Explorer toolbar + address bar below the title bar */
+    var name = el.dataset.win;
+    var titleBar = el.querySelector('.xp-title-bar');
+    if (!titleBar) return;
+
+    var toolbar = document.createElement('div');
+    toolbar.className = 'xp-explorer-toolbar';
+    toolbar.innerHTML =
+      '<button class="xp-tb-btn" disabled title="Back">&#9664; Back</button>' +
+      '<button class="xp-tb-btn" disabled title="Forward">Forward &#9654;</button>' +
+      '<button class="xp-tb-btn" disabled title="Up">&#9650; Up</button>' +
+      '<span class="xp-tb-sep"></span>' +
+      '<button class="xp-tb-btn" disabled title="Search">&#128269; Search</button>';
+
+    var addrBar = document.createElement('div');
+    addrBar.className = 'xp-explorer-addr';
+    addrBar.innerHTML =
+      '<span class="xp-addr-label">Address</span>' +
+      '<span class="xp-addr-field">' + (XP_WIN_PATHS[name] || 'C:\\WorldCup2026') + '</span>';
+
+    titleBar.after(toolbar);
+    toolbar.after(addrBar);
   });
 });
 

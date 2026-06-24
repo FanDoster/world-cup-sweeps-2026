@@ -33,6 +33,9 @@
     display: flex !important;
   }
 
+  /* Hide Explorer toolbar and address bar — too cramped on mobile */
+  .xp-explorer-toolbar, .xp-explorer-addr { display: none !important; }
+
   /* Title bar — slimmer on mobile */
   .xp-title-bar { height: 26px; font-size: 10px; cursor: default; }
   .xp-title-text { font-size: 11px; }

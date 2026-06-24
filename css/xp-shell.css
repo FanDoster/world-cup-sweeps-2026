@@ -160,10 +160,97 @@
   background: linear-gradient(to bottom, #f05050 0%, #c03030 100%);
 }
 
+/* ── EXPLORER TOOLBAR ── */
+.xp-explorer-toolbar {
+  height: 28px;
+  background: linear-gradient(to bottom, #f0ede4 0%, #dcd8cc 100%);
+  border-bottom: 1px solid #b0a898;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 1px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.xp-tb-btn {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 22px;
+  padding: 0 6px;
+  background: none;
+  border: 1px solid transparent;
+  font-family: var(--font);
+  font-size: 11px;
+  color: #333;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.xp-tb-btn:disabled {
+  color: #aaa;
+  cursor: default;
+}
+
+.xp-tb-btn:not(:disabled):hover {
+  background: linear-gradient(to bottom, #fff8e4 0%, #f0e090 100%);
+  border-color: #c8a820;
+}
+
+.xp-tb-sep {
+  width: 1px;
+  height: 20px;
+  background: #b0a898;
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ── ADDRESS BAR ── */
+.xp-explorer-addr {
+  height: 24px;
+  background: #ece9d8;
+  border-bottom: 1px solid #b0a898;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.xp-addr-label {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: bold;
+  color: #000;
+  padding: 0 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background: #ece9d8;
+  border-right: 1px solid #b0a898;
+  flex-shrink: 0;
+}
+
+.xp-addr-field {
+  flex: 1;
+  height: 16px;
+  margin: 3px 4px;
+  background: #fff;
+  border: 1px solid;
+  border-color: #7a7a7a #d4d0c8 #d4d0c8 #7a7a7a;
+  font-family: var(--font);
+  font-size: 11px;
+  color: #000;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 /* ── WINDOW CONTENT ── */
 .xp-window-content {
   flex: 1;
-  background: var(--xp-surface);
+  background: #fff;
   overflow: auto;
   padding: 8px;
   /* inset bevel */
