@@ -132,13 +132,19 @@
   .msn-tb-btn { padding: 2px 4px; }
   .msn-tb-icon { font-size: 16px; }
   .msn-tb-logo { font-size: 13px; }
-  /* Keep side-by-side layout, narrow the avatar column */
-  .msn-body { padding: 2px; gap: 2px; }
+  /* Side-by-side layout, narrow the avatar column */
+  .msn-body { padding: 2px; gap: 2px; overflow: hidden; }
   .msn-right { width: 80px; }
-  /* Messages must scroll on touch */
+  /* Grid layout on the left panel: chat fills top, input pinned to bottom */
+  .msn-left {
+    display: grid !important;
+    grid-template-rows: 1fr auto;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .msn-chat-history { overflow: hidden; min-height: 0; }
   .msn-messages { -webkit-overflow-scrolling: touch; overflow-y: scroll !important; }
-  /* Input section always visible — never squashed */
-  .msn-input-section { flex-shrink: 0; }
+  .msn-input-section { min-height: 80px; }
   /* Hide Voice Clip button to save toolbar space */
   .msn-input-btn-wide { display: none; }
   .msn-input-field { min-height: 44px; }

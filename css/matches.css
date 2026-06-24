@@ -701,7 +701,7 @@
   .oe-mob-tab:hover:not(.oe-mob-tab-active) { background: #d4d0c8; }
 
   .oe-folders { display: none; }
-  .oe-menubar, .oe-toolbar { display: none; }
+  .oe-menubar, .oe-toolbar, .oe-status-bar { display: none; }
   /* Fix flex chain so the message list actually scrolls */
   #xp-window-matches .xp-window-content {
     padding: 0 !important;
@@ -716,6 +716,6 @@
     min-height: 0;
     overflow: hidden;
   }
-  .oe-msg-list-wrap { -webkit-overflow-scrolling: touch; }
+  .oe-msg-list-wrap { -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
 }
 
