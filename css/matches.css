@@ -702,20 +702,6 @@
 
   .oe-folders { display: none; }
   .oe-menubar, .oe-toolbar, .oe-status-bar { display: none; }
-  /* Fix flex chain so the message list actually scrolls */
-  #xp-window-matches .xp-window-content {
-    padding: 0 !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column;
-  }
-  #xp-window-matches .section-matches {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .oe-msg-list-wrap { -webkit-overflow-scrolling: touch; padding-bottom: 10px; }
+  .oe-msg-list-wrap { -webkit-overflow-scrolling: touch; }
 }
 

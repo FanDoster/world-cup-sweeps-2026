@@ -125,31 +125,84 @@
   .xp-window-content { padding: 6px; font-size: 12px; }
 
   /* ── MSN window on mobile ── */
-  /* Hide menu bar and status bar to reclaim vertical space */
   .msn-menubar, .msn-statusbar { display: none !important; }
-  /* Toolbar: smaller icons, scroll if needed */
   .msn-toolbar { overflow-x: auto; padding: 2px 4px; }
   .msn-tb-btn { padding: 2px 4px; }
   .msn-tb-icon { font-size: 16px; }
   .msn-tb-logo { font-size: 13px; }
-  /* Side-by-side layout, narrow the avatar column */
   .msn-body { padding: 2px; gap: 2px; overflow: hidden; }
   .msn-right { width: 80px; }
-  /* Grid layout on the left panel: chat fills top, input pinned to bottom */
-  .msn-left {
-    display: grid !important;
-    grid-template-rows: 1fr auto;
-    overflow: hidden;
-    min-height: 0;
+  /* Absolute-position the input section so it's always visible at the bottom,
+     regardless of how the flex chain above resolves */
+  #xp-window-msn .msn-left {
+    position: relative !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    display: block !important;
   }
-  .msn-chat-history { overflow: hidden; min-height: 0; }
+  #xp-window-msn .msn-chat-history {
+    position: absolute !important;
+    top: 0; left: 0; right: 0;
+    bottom: 90px !important;
+    overflow: hidden !important;
+  }
+  #xp-window-msn .msn-input-section {
+    position: absolute !important;
+    bottom: 0; left: 0; right: 0;
+    height: 90px !important;
+    overflow: hidden;
+  }
   .msn-messages { -webkit-overflow-scrolling: touch; overflow-y: scroll !important; }
-  .msn-input-section { min-height: 80px; }
-  /* Hide Voice Clip button to save toolbar space */
   .msn-input-btn-wide { display: none; }
   .msn-input-field { min-height: 44px; }
   .msn-send-col { padding: 2px; gap: 2px; }
   .msn-send-btn { padding: 2px 5px; font-size: 10px; }
+
+  /* ── Matches window scroll chain — responsive.css loads last so these
+     IDs beat the display:block!important in xp-shell.css ── */
+  #xp-window-matches .xp-window-content {
+    padding: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  #xp-window-matches #sectionMatches {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  #xp-window-matches .oe-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  #xp-window-matches .oe-body {
+    display: flex !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  #xp-window-matches .oe-right {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  #xp-window-matches .oe-msg-list-wrap {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0 !important;
+    padding-bottom: 10px;
+  }
 
   /* Grids */
   .people-grid { grid-template-columns: 1fr; }
