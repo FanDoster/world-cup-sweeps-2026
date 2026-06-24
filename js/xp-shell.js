@@ -459,44 +459,30 @@ function msnLastGameMessage() {
 
 var msnGifPromise = null;
 
-function msnPrefetchGif() {
-  var game = msnGetLastGame();
-  if (!game || game.score1 === game.score2) return;
-  var winner = game.score1 > game.score2 ? game.team1 : game.team2;
-  var query = encodeURIComponent(winner + ' football');
-  msnGifPromise = fetch('https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=' + query + '&limit=8&rating=g')
+function msnFetchGifUrl(query) {
+  return fetch('https://api.tenor.com/v1/search?q=' + encodeURIComponent(query) + '&key=LIVDSRZULELA&limit=8&media_filter=minimal&contentfilter=medium')
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      if (data && data.data && data.data.length) {
-        var item = data.data[Math.floor(Math.random() * Math.min(6, data.data.length))];
-        var img = item.images;
-        return (img.downsized_medium || img.downsized || img.original).url;
+      if (data && data.results && data.results.length) {
+        var item = data.results[Math.floor(Math.random() * Math.min(6, data.results.length))];
+        return item.media[0].gif.url;
       }
       return null;
     })
     .catch(function() { return null; });
 }
 
+function msnPrefetchGif() {
+  var game = msnGetLastGame();
+  if (!game || game.score1 === game.score2) return;
+  var winner = game.score1 > game.score2 ? game.team1 : game.team2;
+  msnGifPromise = msnFetchGifUrl(winner + ' football');
+}
+
 function msnSendWinnerGif(msgs, winnerName) {
   var iso = (typeof teamIso !== 'undefined' && teamIso[winnerName]) ? teamIso[winnerName] : '';
   var done = function(gifUrl) { msnAppendGifMsg(msgs, gifUrl, winnerName, iso); };
-  if (msnGifPromise) {
-    msnGifPromise.then(done).catch(function() { done(null); });
-  } else {
-    var query = encodeURIComponent(winnerName + ' football');
-    fetch('https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=' + query + '&limit=8&rating=g')
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        var gifUrl = null;
-        if (data && data.data && data.data.length) {
-          var item = data.data[Math.floor(Math.random() * Math.min(6, data.data.length))];
-          var img = item.images;
-          gifUrl = (img.downsized_medium || img.downsized || img.original).url;
-        }
-        done(gifUrl);
-      })
-      .catch(function() { done(null); });
-  }
+  (msnGifPromise || msnFetchGifUrl(winnerName + ' football')).then(done).catch(function() { done(null); });
 }
 
 function msnAppendGifMsg(msgs, gifUrl, winnerName, iso) {
