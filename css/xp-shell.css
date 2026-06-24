@@ -649,7 +649,7 @@
   right: 8px;
   width: 250px;
   background: #fff;
-  border: 1px solid #4a7a4a;
+  border: 1px solid #c87830;
   box-shadow: 2px 3px 10px rgba(0,0,0,0.5);
   z-index: 9999;
   font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
@@ -659,7 +659,7 @@
 #msn-notification.msn-animating-in  { animation: msn-slide-in  0.35s ease-out forwards; }
 #msn-notification.msn-animating-out { animation: msn-slide-out 0.3s ease-in  forwards; }
 #msn-notif-bar {
-  background: linear-gradient(to bottom, #5ba85b 0%, #3a7a3a 50%, #2e662e 100%);
+  background: linear-gradient(to bottom, #f8a030 0%, #e07010 40%, #c85800 100%);
   color: #fff;
   font-size: 11px;
   font-weight: bold;
@@ -667,7 +667,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  text-shadow: 0 1px rgba(0,0,0,0.4);
+  text-shadow: 0 1px rgba(0,0,0,0.35);
 }
 #msn-notif-close {
   background: none;
@@ -688,7 +688,7 @@
   cursor: pointer;
   background: #fff;
 }
-#msn-notif-body:hover { background: #eef6ee; }
+#msn-notif-body:hover { background: #fff8f0; }
 #msn-notif-avatar {
   width: 48px;
   height: 48px;
@@ -699,7 +699,7 @@
 #msn-notif-name {
   font-weight: bold;
   font-size: 12px;
-  color: #1a4d1a;
+  color: #c85800;
 }
 #msn-notif-status {
   font-size: 11px;
