@@ -318,6 +318,7 @@ var _origOpenWindow = openWindow;
 openWindow = function(name) {
   _origOpenWindow(name);
   if (XP_IS_MOBILE()) {
+    closeStartMenu();
     document.querySelectorAll('.xp-window').forEach(function(w) {
       w.classList.remove('xp-mob-open');
     });
