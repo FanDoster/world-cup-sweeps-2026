@@ -105,8 +105,6 @@ function renderMatches() {
       var localTime = formatLocalTime(m.date, m.time, m.tz);
       var i1 = teamIso[m.team1];
       var i2 = teamIso[m.team2];
-      var o1 = teamOwner[m.team1];
-      var o2 = teamOwner[m.team2];
 
       // Pred dot: does current user have a prediction?
       var mid = matchIdByTeamDate[key];
@@ -152,8 +150,10 @@ function oeSelectMessage(key) {
   oeSelectedKey = key;
 
   // Update selected row highlight
+  var keyParts = key.split('|');
+  var escapedKey = (keyParts[0] ? safeAttr(keyParts[0]) : '') + '|' + (keyParts[1] ? safeAttr(keyParts[1]) : '') + '|' + (keyParts[2] || '');
   document.querySelectorAll('#oe-message-list .oe-msg-row').forEach(function(row) {
-    row.classList.toggle('oe-msg-selected', row.getAttribute('onclick') === 'oeSelectMessage(\'' + safeAttr(key) + '\')');
+    row.classList.toggle('oe-msg-selected', row.getAttribute('onclick') === 'oeSelectMessage(\'' + escapedKey + '\')');
   });
 
   var pane = document.getElementById('oe-reading-pane');
@@ -232,7 +232,7 @@ function oeSelectMessage(key) {
   // Predict button
   var predictBtn = '';
   if (!isLocked && !isFinished && typeof currentSession !== 'undefined' && currentSession) {
-    predictBtn = '<div style="margin-top:10px"><button class="oe-predict-btn" onclick="showPredPanel(\'' + safeAttr(key) + '\')">&#128270; Predict</button></div>';
+    predictBtn = '<div style="margin-top:10px"><button class="oe-predict-btn" onclick="showPredPanel(\'' + escapedKey + '\')">&#128270; Predict</button></div>';
   }
 
   // Owner badges
