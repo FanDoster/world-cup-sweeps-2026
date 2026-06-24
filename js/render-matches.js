@@ -130,7 +130,6 @@ function renderMatches() {
       else subject = 'Kick-off ' + localTime;
 
       var fromText = m.team1 + ' v ' + m.team2;
-      if (o1) fromText += ' <span style="background:' + (ownerColors[o1] ? '' : '') + ';font-size:9px;padding:0 3px;border-radius:2px">' + o1 + '</span>';
 
       html += '<div class="oe-msg-row' +
         (isSelected ? ' oe-msg-selected' : '') +
