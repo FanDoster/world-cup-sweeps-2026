@@ -132,24 +132,18 @@
   .msn-tb-btn { padding: 2px 4px; }
   .msn-tb-icon { font-size: 16px; }
   .msn-tb-logo { font-size: 13px; }
-  /* Avatar panel: cap height so it doesn't dominate, show as a row at top */
-  .msn-body { flex-direction: column; padding: 2px; gap: 2px; }
-  .msn-right {
-    width: 100% !important;
-    flex-direction: row;
-    height: 80px;
-    flex-shrink: 0;
-  }
-  .msn-dp-panel { flex: 1; }
-  /* Left panel fills remaining space */
-  .msn-left { flex: 1; min-height: 0; }
-  /* Messages area must scroll on touch */
+  /* Keep side-by-side layout, narrow the avatar column */
+  .msn-body { padding: 2px; gap: 2px; }
+  .msn-right { width: 80px; }
+  /* Messages must scroll on touch */
   .msn-messages { -webkit-overflow-scrolling: touch; overflow-y: scroll !important; }
-  /* Input section: always visible at bottom, fixed height */
+  /* Input section always visible — never squashed */
   .msn-input-section { flex-shrink: 0; }
+  /* Hide Voice Clip button to save toolbar space */
+  .msn-input-btn-wide { display: none; }
   .msn-input-field { min-height: 44px; }
-  .msn-send-col { padding: 3px; gap: 3px; }
-  .msn-send-btn { padding: 3px 6px; font-size: 10px; }
+  .msn-send-col { padding: 2px; gap: 2px; }
+  .msn-send-btn { padding: 2px 5px; font-size: 10px; }
 
   /* Grids */
   .people-grid { grid-template-columns: 1fr; }
