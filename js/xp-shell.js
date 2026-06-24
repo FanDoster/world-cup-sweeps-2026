@@ -280,16 +280,17 @@ function xpHideWelcome() {
   el.classList.add('xp-welcome-out');
   setTimeout(function() { el.style.display = 'none'; }, 600);
   setTimeout(function() {
-    var n = document.getElementById('msn-notification');
-    if (!n || n.style.display === 'block') return;
     msnPrefetchGif();
-    var gameMsg = msnLastGameMessage();
-    if (gameMsg) {
-      var statusEl = document.getElementById('msn-notif-status');
-      if (statusEl) statusEl.textContent = gameMsg;
-    }
-    n.style.display = 'block';
-    n.classList.add('msn-animating-in');
+    var gameMsg = msnLastGameMessage() || 'now then pet, how\'s it gannin?';
+    msnPushNotif(gameMsg);
+
+    /* second toast a few seconds later — a contextual follow-up */
+    setTimeout(function() {
+      var pool = msnContextPool();
+      if (pool.length) {
+        msnPushNotif(pool[Math.floor(Math.random() * pool.length)]);
+      }
+    }, 3500);
   }, 2500);
 }
 
@@ -670,13 +671,83 @@ function msnAppendGifMsg(msgs, gifUrl, winnerName, iso) {
   new Audio('media/msn-message.mp3').play().catch(function(){});
 }
 
-function msnDismiss() {
-  var n = document.getElementById('msn-notification');
-  if (!n) return;
-  n.classList.remove('msn-animating-in');
-  n.classList.add('msn-animating-out');
-  setTimeout(function() { n.style.display = 'none'; n.classList.remove('msn-animating-out'); }, 320);
+/* ── STACKING TOAST MANAGER ── */
+var msnNotifStack = [];
+var MSN_TOAST_GAP = 4;
+var MSN_TASKBAR_H = 40;
+
+function msnPushNotif(preview) {
+  var el = document.createElement('div');
+  el.className = 'msn-toast';
+  el.innerHTML =
+    '<div class="msn-toast-titlebar">' +
+      '<span>🦋</span><span>MSN Messenger</span>' +
+      '<button class="msn-toast-close" title="Dismiss">&#215;</button>' +
+    '</div>' +
+    '<div class="msn-toast-body">' +
+      '<img class="msn-toast-avatar" src="img/gazza-crying.jpg" alt="Gazza">' +
+      '<div>' +
+        '<div class="msn-toast-name">~~gAzZa~~</div>' +
+        '<div class="msn-toast-preview">' + escapeHtml(preview) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="msn-toast-footer">Click here to view your messages</div>';
+
+  var entry = { el: el, timer: null };
+
+  /* start off-screen and invisible so the layout is computed before animating */
+  el.style.bottom = '-110px';
+  el.style.opacity = '0';
+  document.body.appendChild(el);
+
+  el.querySelector('.msn-toast-close').addEventListener('click', function(e) {
+    e.stopPropagation();
+    msnDismissToast(entry);
+  });
+  el.addEventListener('click', function() {
+    msnDismissAll();
+    msnOpenChat();
+  });
+
+  /* force layout at initial position, then slide into place */
+  el.offsetHeight;
+  msnNotifStack.push(entry);
+  el.style.opacity = '1';
+  msnRestack();
+
+  entry.timer = setTimeout(function() { msnDismissToast(entry); }, 8000);
+  new Audio('media/msn-message.mp3').play().catch(function(){});
+  return entry;
 }
+
+function msnRestack() {
+  var bottom = MSN_TASKBAR_H + MSN_TOAST_GAP;
+  for (var i = msnNotifStack.length - 1; i >= 0; i--) {
+    msnNotifStack[i].el.style.bottom = bottom + 'px';
+    bottom += msnNotifStack[i].el.offsetHeight + MSN_TOAST_GAP;
+  }
+}
+
+function msnDismissToast(entry) {
+  if (!entry || !entry.el || entry.dismissing) return;
+  entry.dismissing = true;
+  clearTimeout(entry.timer);
+  entry.el.style.opacity = '0';
+  entry.el.style.bottom = '-110px';
+  var el = entry.el;
+  setTimeout(function() {
+    if (el.parentNode) el.parentNode.removeChild(el);
+    msnNotifStack = msnNotifStack.filter(function(e) { return e !== entry; });
+    msnRestack();
+  }, 300);
+}
+
+function msnDismissAll() {
+  msnNotifStack.slice().forEach(msnDismissToast);
+}
+
+/* legacy shim */
+function msnDismiss() { msnDismissAll(); }
 
 function msnOpenChat() {
   msnDismiss();

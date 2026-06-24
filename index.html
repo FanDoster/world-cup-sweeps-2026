@@ -677,21 +677,7 @@
     <div class="xp-window-content oe-msg-win-body" id="match-win-body"></div>
   </div>
 
-  <!-- ══ MSN MESSENGER NOTIFICATION ══ -->
-  <div id="msn-notification" style="display:none" onclick="msnOpenChat()">
-    <div id="msn-notif-bar">
-      <span>🦋</span><span>MSN Messenger</span>
-      <button id="msn-notif-close" onclick="event.stopPropagation();msnDismiss()" title="Close">&#215;</button>
-    </div>
-    <div id="msn-notif-body">
-      <img src="img/gazza-crying.jpg" id="msn-notif-avatar" alt="Gazza">
-      <div id="msn-notif-text">
-        <div id="msn-notif-name">~~gAzZa~~</div>
-        <div id="msn-notif-status">has sent you a message</div>
-      </div>
-    </div>
-    <div id="msn-notif-footer" onclick="event.stopPropagation();msnDismiss()">Options</div>
-  </div>
+  <!-- MSN toasts are created dynamically by msnPushNotif() -->
 
   <!-- ══ MSN MESSENGER CHAT WINDOW ══ -->
   <div id="xp-window-msn" class="xp-window" data-win="msn" data-no-explorer style="display:none;width:440px;height:490px;top:60px;left:calc(50% - 220px)">
