@@ -1,27 +1,3 @@
-// ── SORT STATE (independent per leaderboard) ──
-let matchSort = { col: 'pts', dir: 'desc' };
-let predSort = { col: 'predPts', dir: 'desc' };
-
-function sortMatchLeaderboard(col) {
-  if (matchSort.col === col) {
-    matchSort.dir = matchSort.dir === 'desc' ? 'asc' : 'desc';
-  } else {
-    matchSort.col = col;
-    matchSort.dir = 'desc';
-  }
-  renderMatchLeaderboard();
-}
-
-function sortPredLeaderboard(col) {
-  if (predSort.col === col) {
-    predSort.dir = predSort.dir === 'desc' ? 'asc' : 'desc';
-  } else {
-    predSort.col = col;
-    predSort.dir = 'desc';
-  }
-  renderPredLeaderboard();
-}
-
 // ── MATCH RESULTS LEADERBOARD ──
 function calcMatchLeaderboard() {
   const scores = {};
@@ -40,37 +16,8 @@ function calcMatchLeaderboard() {
   }
 
   const standings = Object.entries(scores).map(([name, s]) => ({ name, ...s }));
-
-  const { col, dir } = matchSort;
-  const m = dir === 'desc' ? 1 : -1;
-  standings.sort((a, b) => {
-    if (col === 'pts') return (b.pts - a.pts) * m || (b.w - a.w) * m;
-    return (b.pts - a.pts) * m || (b.w - a.w) * m;
-  });
-
+  standings.sort((a, b) => (b.pts - a.pts) || (b.w - a.w));
   return standings;
-}
-
-function renderMatchLeaderboard() {
-  const standings = calcMatchLeaderboard();
-  const tbody = document.querySelector('#matchLeaderboard tbody');
-  if (!tbody) return;
-  tbody.innerHTML = standings.map((p, i) => `
-    <tr>
-      <td class="rank rank-${i+1}">${i+1}</td>
-      <td class="player-cell" style="cursor:pointer" onclick="showUserProfile('${p.name}')">${typeof avatarHtml === 'function' ? avatarHtml(p.name, 22) : ''} ${playerDisplayName(p.name)}</td>
-      <td class="wdl">${p.w}–${p.d}–${p.l}</td>
-      <td class="pts">${p.pts}</td>
-    </tr>
-  `).join('');
-
-  // Sort arrow
-  const arrow = (col) => {
-    if (matchSort.col !== col) return '';
-    return matchSort.dir === 'desc' ? '▼' : '▲';
-  };
-  const el = document.getElementById('sortArrowMatchPts');
-  if (el) el.textContent = arrow('pts');
 }
 
 // ── PREDICTIONS LEADERBOARD ──
@@ -85,37 +32,8 @@ function calcPredLeaderboard() {
     avg: s.settled > 0 ? (s.pts / s.settled).toFixed(2) : '0.00'
   }));
 
-  const { col, dir } = predSort;
-  const m = dir === 'desc' ? 1 : -1;
-  standings.sort((a, b) => {
-    if (col === 'predPts') return (b.predPts - a.predPts) * m;
-    return (b.predPts - a.predPts) * m;
-  });
-
+  standings.sort((a, b) => b.predPts - a.predPts);
   return standings;
-}
-
-function renderPredLeaderboard() {
-  const standings = calcPredLeaderboard();
-  const tbody = document.querySelector('#predLeaderboard tbody');
-  if (!tbody) return;
-  tbody.innerHTML = standings.map((p, i) => `
-    <tr>
-      <td class="rank rank-${i+1}">${i+1}</td>
-      <td class="player-cell" style="cursor:pointer" onclick="showUserProfile('${p.name}')">${typeof avatarHtml === 'function' ? avatarHtml(p.name, 22) : ''} ${playerDisplayName(p.name)}</td>
-      <td class="pts">${p.predPts}</td>
-      <td class="sub-pts">${p.avg}</td>
-      <td class="sub-pts">${p.exact}</td>
-      <td class="sub-pts">${p.bestStreak}</td>
-    </tr>
-  `).join('');
-
-  const arrow = (col) => {
-    if (predSort.col !== col) return '';
-    return predSort.dir === 'desc' ? '▼' : '▲';
-  };
-  const el = document.getElementById('sortArrowPredPts');
-  if (el) el.textContent = arrow('predPts');
 }
 
 // ── EXCEL XP: cell selection handler ──
