@@ -248,18 +248,57 @@
     </div>
     <div class="xp-window-content">
       <div class="section-matches" id="sectionMatches">
-        <div class="matches-toolbar">
-          <div class="filter-bar" id="matchTeamFilterBar">
-            <button type="button" class="filter-btn active" data-filter="all" onclick="setMatchTeamFilter('all')">All Teams</button>
-            <button type="button" class="filter-btn" data-filter="mine" onclick="setMatchTeamFilter('mine')">My Teams</button>
+        <div class="oe-wrap">
+          <div class="oe-menubar">
+            <span class="oe-menu-item">File</span>
+            <span class="oe-menu-item">Edit</span>
+            <span class="oe-menu-item">View</span>
+            <span class="oe-menu-item">Tools</span>
+            <span class="oe-menu-item">Message</span>
+            <span class="oe-menu-item">Help</span>
           </div>
-          <div class="filter-bar" id="matchFilterBar">
-            <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'matches')">Upcoming</button>
-            <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'matches')">Completed</button>
-            <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'matches')">All</button>
+          <div class="oe-toolbar">
+            <button class="oe-tb-btn">📧 New Mail</button>
+            <button class="oe-tb-btn">&#x21A9; Reply</button>
+            <button class="oe-tb-btn">&#x21A9; Reply All</button>
+            <button class="oe-tb-btn">&#x2192; Forward</button>
+            <span class="oe-tb-sep"></span>
+            <button class="oe-tb-btn">&#128424; Print</button>
+            <button class="oe-tb-btn">&#128465; Delete</button>
+            <span class="oe-tb-sep"></span>
+            <button class="oe-tb-btn">&#128229; Send/Receive</button>
+          </div>
+          <div class="oe-body">
+            <div class="oe-folders">
+              <div class="oe-folder-root">&#128231; Outlook Express</div>
+              <div class="oe-folder-group-label">Local Folders</div>
+              <div class="oe-folder-item oe-folder-active" id="oe-folder-upcoming" onclick="oeSetFolder('upcoming')">&#128229; Inbox <span class="oe-unread-badge" id="oe-unread-count">—</span></div>
+              <div class="oe-folder-item" id="oe-folder-completed" onclick="oeSetFolder('completed')">&#128228; Sent Items</div>
+              <div class="oe-folder-item" id="oe-folder-all" onclick="oeSetFolder('all')">&#127758; All Matches</div>
+              <div class="oe-folder-item" id="oe-folder-mine" onclick="oeSetFolder('mine')">&#11088; My Teams</div>
+            </div>
+            <div class="oe-right">
+              <div class="oe-msg-list-wrap">
+                <div class="oe-msg-col-headers">
+                  <div class="oe-msg-col" style="width:20px">!</div>
+                  <div class="oe-msg-col" style="width:20px">&#9993;</div>
+                  <div class="oe-msg-col" style="width:200px">From</div>
+                  <div class="oe-msg-col" style="flex:1">Subject</div>
+                  <div class="oe-msg-col" style="width:72px">Received</div>
+                </div>
+                <div id="oe-message-list"></div>
+              </div>
+              <div class="oe-splitter"></div>
+              <div class="oe-reading-pane" id="oe-reading-pane">
+                <div class="oe-reading-placeholder">Select a message to read it.</div>
+              </div>
+              <div class="oe-status-bar">
+                <span id="oe-status-left">Loading…</span>
+                <span id="oe-status-right"></span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="matches-grid" id="matches"></div>
       </div>
     </div>
   </div>
