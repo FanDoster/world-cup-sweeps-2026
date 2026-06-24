@@ -38,7 +38,7 @@
   --radius:            0px;
   --radius-sm:         0px;
   --radius-xs:         0px;
-  --font:              Tahoma, 'MS Sans Serif', Arial, sans-serif;
+  --font:              "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
   --font-mono:         'Courier New', Courier, monospace;
   --ticker-dim:        rgba(0,0,0,0.3);
   --ticker-mid:        rgba(0,0,0,0.55);
