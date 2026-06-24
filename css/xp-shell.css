@@ -363,8 +363,7 @@
 .xp-btn-close {
   width: 21px;
   height: 21px;
-  border: none;
-  border-radius: 3px;
+  border: 0;
   cursor: pointer;
   font-size: 11px;
   font-family: "Trebuchet MS", Tahoma, sans-serif;
@@ -372,23 +371,50 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  text-shadow: 1px 1px #0f1089;
-  background-color: #0050ee;
-  transition: background 80ms;
+  padding: 0;
+  transition: none;
+  flex-shrink: 0;
 }
 
+.xp-btn-min,
+.xp-btn-max {
+  background: #c0cfe8;
+  color: #0a246a;
+  text-shadow: none;
+  box-shadow:
+    inset -1px -1px #0a246a,
+    inset 1px 1px rgba(255,255,255,0.95),
+    inset -2px -2px #0040b4,
+    inset 2px 2px #d8e6f8;
+}
 .xp-btn-min:hover,
-.xp-btn-max:hover {
-  background-color: #1a6aff;
+.xp-btn-max:hover { background: #ccdaf4; }
+.xp-btn-min:active,
+.xp-btn-max:active {
+  box-shadow:
+    inset -1px -1px rgba(255,255,255,0.95),
+    inset 1px 1px #0a246a,
+    inset -2px -2px #d8e6f8,
+    inset 2px 2px #0040b4;
 }
 
 .xp-btn-close {
-  background: linear-gradient(to bottom, #d84040 0%, #b02020 100%);
+  background: linear-gradient(180deg, #e44030 0%, #c42820 100%);
+  color: #fff;
+  text-shadow: 0 1px rgba(0,0,0,0.5);
+  box-shadow:
+    inset -1px -1px #701010,
+    inset 1px 1px rgba(255,150,100,0.8),
+    inset -2px -2px #a02020,
+    inset 2px 2px rgba(255,200,180,0.5);
 }
-
-.xp-btn-close:hover {
-  background: linear-gradient(to bottom, #f05050 0%, #c03030 100%);
+.xp-btn-close:hover { background: linear-gradient(180deg, #f05040 0%, #d83020 100%); }
+.xp-btn-close:active {
+  box-shadow:
+    inset -1px -1px rgba(255,150,100,0.8),
+    inset 1px 1px #701010,
+    inset -2px -2px rgba(255,200,180,0.5),
+    inset 2px 2px #a02020;
 }
 
 /* ── EXPLORER TOOLBAR ── */
