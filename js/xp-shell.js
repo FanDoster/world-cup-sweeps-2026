@@ -16,7 +16,8 @@ var XP_WIN_LABELS = {
   myteams:     '⭐ My Teams',
   predictions: '🔮 Predictions',
   profile:     '👤 Profile',
-  match:       '📧 Match'
+  match:       '📧 Match',
+  msn:         '🦋 ~~gAzZa~~ - Conversation'
 };
 
 function openWindow(name) {
@@ -229,7 +230,8 @@ var XP_WIN_PATHS = {
   predictions: 'C:\\WorldCup2026\\Predictions',
   profile:     'C:\\WorldCup2026\\Profile',
   awards:      'C:\\WorldCup2026\\Awards',
-  match:       'C:\\WorldCup2026\\Matches'
+  match:       'C:\\WorldCup2026\\Matches',
+  msn:         'C:\\Program Files\\MSN Messenger'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -347,13 +349,23 @@ closeWindow = function(name) {
   }
 };
 
-function xpDismissBalloon() {
-  var b = document.getElementById('xp-balloon');
-  if (b) b.style.display = 'none';
+function msnDismiss() {
+  var n = document.getElementById('msn-notification');
+  if (!n) return;
+  n.classList.remove('msn-animating-in');
+  n.classList.add('msn-animating-out');
+  setTimeout(function() { n.style.display = 'none'; n.classList.remove('msn-animating-out'); }, 320);
 }
 
-// Show the Gazza notification balloon 3s after page load
+function msnOpenChat() {
+  msnDismiss();
+  openWindow('msn');
+}
+
+// Show MSN notification 3s after page load
 setTimeout(function() {
-  var b = document.getElementById('xp-balloon');
-  if (b) b.style.display = 'block';
+  var n = document.getElementById('msn-notification');
+  if (!n) return;
+  n.style.display = 'block';
+  n.classList.add('msn-animating-in');
 }, 3000);

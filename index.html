@@ -666,8 +666,23 @@
     <div class="xp-window-content oe-msg-win-body" id="match-win-body"></div>
   </div>
 
-  <!-- ══ GAZZA NOTIFICATION BALLOON ══ -->
-  <div id="xp-balloon">
+  <!-- ══ MSN MESSENGER NOTIFICATION ══ -->
+  <div id="msn-notification" style="display:none">
+    <div id="msn-notif-bar">
+      <span>🦋 MSN Messenger</span>
+      <button id="msn-notif-close" onclick="event.stopPropagation();msnDismiss()" title="Close">&#215;</button>
+    </div>
+    <div id="msn-notif-body" onclick="msnOpenChat()">
+      <img src="img/gazza-crying.jpg" id="msn-notif-avatar" alt="Gazza">
+      <div id="msn-notif-text">
+        <div id="msn-notif-name">~~gAzZa~~</div>
+        <div id="msn-notif-status">has just signed in</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MSN MESSENGER CHAT WINDOW ══ -->
+  <div id="xp-window-msn" class="xp-window" data-win="msn" data-no-explorer style="display:none;width:340px;top:80px;left:calc(50% - 170px)">
     <svg width="0" height="0" style="position:absolute">
       <defs>
         <filter id="gazza-ripple" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
@@ -680,11 +695,44 @@
         </filter>
       </defs>
     </svg>
-    <div id="xp-balloon-title">
-      <span>⚽</span> World Cup 2026
-      <button id="xp-balloon-close" onclick="xpDismissBalloon()" title="Dismiss">&#215;</button>
+    <div class="title-bar msn-title-bar" onmousedown="startDrag(event,'msn')">
+      <div class="title-bar-text">🦋 ~~gAzZa~~ - Conversation</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('msn')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('msn')"></button>
+        <button aria-label="Close" onclick="closeWindow('msn')"></button>
+      </div>
     </div>
-    <img src="img/gazza-crying.jpg" alt="Gazza crying" style="filter:url(#gazza-ripple);display:block;width:100%;border-radius:0 0 7px 7px;">
+    <div class="msn-contact-header">
+      <img src="img/gazza-crying.jpg" class="msn-contact-avatar" alt="Gazza">
+      <div class="msn-contact-info">
+        <div class="msn-contact-name">~~gAzZa~~</div>
+        <div class="msn-contact-online"><span class="msn-online-dot"></span> Online</div>
+      </div>
+    </div>
+    <div class="msn-chat-history">
+      <div class="msn-chat-msg">
+        <span class="msn-chat-sender">~~gAzZa~~</span><span class="msn-chat-says"> says:</span><br>
+        <img src="img/gazza-crying.jpg" class="msn-chat-photo" style="filter:url(#gazza-ripple)" alt="Gazza"><br>
+        <span class="msn-chat-text">orite m8
+          <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/winking-smile.png" class="msn-emote" alt=";)">
+          <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/note.png" class="msn-emote" alt="(8)">
+          <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/star.png" class="msn-emote" alt="(*)">
+        </span>
+      </div>
+    </div>
+    <div class="msn-input-section">
+      <div class="msn-input-toolbar">
+        <button class="msn-input-btn" title="Font" style="font-weight:bold;font-family:serif">A</button>
+        <button class="msn-input-btn" title="Emoticons">☺</button>
+        <button class="msn-input-btn" title="Nudge">📳</button>
+        <button class="msn-input-btn" title="Share files">📎</button>
+      </div>
+      <textarea class="msn-input-field" placeholder=""></textarea>
+      <div class="msn-send-bar">
+        <button class="msn-send-btn">Send</button>
+      </div>
+    </div>
   </div>
 
   <!-- ══ TASKBAR ══ -->

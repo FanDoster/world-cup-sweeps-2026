@@ -633,91 +633,214 @@
 
 /* ── NOTIFICATION BALLOON ── */
 /*
-  Authentic XP Luna balloon: white body, #0a246a border (XP deep navy),
-  8px border-radius, symmetric downward tail pointing at the tray icon.
-  Title + thin separator + image. Tiny × close button top-right.
+  MSN Messenger "contact signed in" toast — slides up from above the taskbar.
 */
-#xp-balloon {
+@keyframes msn-slide-in {
+  from { transform: translateY(110%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes msn-slide-out {
+  from { transform: translateY(0);    opacity: 1; }
+  to   { transform: translateY(110%); opacity: 0; }
+}
+#msn-notification {
   position: fixed;
-  bottom: 48px;
-  right: 6px;
-  width: 230px;
+  bottom: 44px;
+  right: 8px;
+  width: 250px;
   background: #fff;
-  border: 1px solid #0a246a;
-  border-radius: 8px;
-  box-shadow: 3px 4px 12px rgba(0,0,0,0.45);
+  border: 1px solid #4a7a4a;
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.5);
   z-index: 9999;
-  display: none;
-  overflow: visible;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  overflow: hidden;
 }
-/* Tail — border layer (symmetric isosceles triangle pointing straight down) */
-#xp-balloon::before {
-  content: '';
-  position: absolute;
-  bottom: -11px;
-  right: 18px;
-  width: 0; height: 0;
-  border-left: 9px solid transparent;
-  border-right: 9px solid transparent;
-  border-top: 11px solid #0a246a;
-}
-/* Tail — white fill layer (1px inside the border triangle) */
-#xp-balloon::after {
-  content: '';
-  position: absolute;
-  bottom: -9px;
-  right: 19px;
-  width: 0; height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 9px solid #fff;
-}
-#xp-balloon-title {
-  padding: 4px 22px 4px 8px;
-  font-family: "Trebuchet MS", Tahoma, sans-serif;
+#msn-notification.msn-animating-in  { animation: msn-slide-in  0.35s ease-out forwards; }
+#msn-notification.msn-animating-out { animation: msn-slide-out 0.3s ease-in  forwards; }
+#msn-notif-bar {
+  background: linear-gradient(to bottom, #5ba85b 0%, #3a7a3a 50%, #2e662e 100%);
+  color: #fff;
   font-size: 11px;
   font-weight: bold;
-  color: #fff;
-  text-shadow: 1px 1px #0f1089;
+  padding: 3px 6px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  position: relative;
-  border-radius: 7px 7px 0 0;
-  background: linear-gradient(180deg,
-    rgba(9,151,255,1) 0%, rgba(0,83,238,1) 8%, rgba(0,80,238,1) 40%,
-    rgba(0,102,255,1) 88%, rgba(0,102,255,1) 93%, rgba(0,91,255,1) 95%,
-    rgba(0,61,215,1) 96%, rgba(0,61,215,1) 100%);
+  justify-content: space-between;
+  text-shadow: 0 1px rgba(0,0,0,0.4);
 }
-#xp-balloon-close {
-  position: absolute;
-  top: 3px;
-  right: 4px;
-  width: 15px;
-  height: 14px;
-  background: linear-gradient(to bottom, #d84040 0%, #b02020 100%);
-  border: 1px solid rgba(0,0,0,0.4);
-  border-radius: 2px;
+#msn-notif-close {
+  background: none;
+  border: none;
   color: #fff;
-  font-size: 9px;
-  font-family: "Trebuchet MS", Tahoma, sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.85;
+}
+#msn-notif-close:hover { opacity: 1; }
+#msn-notif-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  cursor: pointer;
+  background: #fff;
+}
+#msn-notif-body:hover { background: #eef6ee; }
+#msn-notif-avatar {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #ccc;
+}
+#msn-notif-name {
   font-weight: bold;
+  font-size: 12px;
+  color: #1a4d1a;
+}
+#msn-notif-status {
+  font-size: 11px;
+  color: #555;
+  margin-top: 2px;
+}
+
+/* ── MSN MESSENGER CHAT WINDOW ── */
+.msn-title-bar {
+  background: linear-gradient(to right, #3a7a3a, #5ba85b) !important;
+}
+.msn-contact-header {
+  background: linear-gradient(135deg, #dcedc8, #c5e1a5);
+  border-bottom: 1px solid #8fba5a;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  flex-shrink: 0;
+}
+.msn-contact-avatar {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border: 1px solid #7a9e5a;
+  flex-shrink: 0;
+}
+.msn-contact-name {
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: #1a4d1a;
+}
+.msn-contact-online {
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  color: #2e7d32;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 3px;
+}
+.msn-online-dot {
+  width: 8px;
+  height: 8px;
+  background: #4caf50;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 3px #4caf50;
+}
+.msn-chat-history {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  border-bottom: 1px solid #c8d8b8;
+  padding: 8px 10px;
+  min-height: 0;
+}
+.msn-chat-msg {
+  line-height: 1.5;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+}
+.msn-chat-sender {
+  font-weight: bold;
+  color: #1a4d8a;
+}
+.msn-chat-says { color: #555; }
+.msn-chat-photo {
+  display: block;
+  max-width: 200px;
+  margin: 6px 0;
+  border: 1px solid #ccc;
+}
+.msn-chat-text {
+  display: inline;
+  color: #000;
+}
+.msn-emote {
+  width: 19px;
+  height: 19px;
+  vertical-align: middle;
+  margin: 0 1px;
+}
+.msn-input-section {
+  background: #f0f4ec;
+  border-top: 1px solid #c8d8b8;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+.msn-input-toolbar {
+  display: flex;
+  gap: 2px;
+  padding: 3px 6px;
+  border-bottom: 1px solid #c8d8b8;
+  background: #e8f0e0;
+}
+.msn-input-btn {
+  background: none;
+  border: 1px solid transparent;
+  font-size: 13px;
+  width: 22px;
+  height: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  line-height: 1;
-  text-shadow: 1px 1px rgba(0,0,0,0.5);
+  color: #333;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
 }
-#xp-balloon-close:hover {
-  background: linear-gradient(to bottom, #f05050 0%, #c03030 100%);
+.msn-input-btn:hover { border-color: #7aab5a; background: #d4e8c4; }
+.msn-input-field {
+  flex: 1;
+  min-height: 52px;
+  resize: none;
+  border: none;
+  background: #fff;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  padding: 4px 6px;
+  outline: none;
 }
-#xp-balloon img {
-  width: 100%;
-  display: block;
-  border-radius: 0 0 7px 7px;
+.msn-send-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 3px 6px;
+  background: #e8f0e0;
+  border-top: 1px solid #c8d8b8;
 }
+.msn-send-btn {
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  padding: 2px 14px;
+  background: linear-gradient(to bottom, #f0f8f0, #d4e8c4);
+  border: 1px solid #7aab5a;
+  cursor: pointer;
+  color: #1a3a1a;
+}
+.msn-send-btn:hover { background: linear-gradient(to bottom, #e0f0e0, #bfdc9f); }
 
 /* ── START MENU ── */
 #xp-start-menu {
