@@ -147,6 +147,12 @@ function renderMatches() {
 }
 
 function oeSelectMessage(key) {
+  // On mobile the reading pane is hidden; route to the modal instead
+  if (window.innerWidth <= 700) {
+    showPredPanel(key);
+    return;
+  }
+
   oeSelectedKey = key;
 
   // Update selected row highlight
