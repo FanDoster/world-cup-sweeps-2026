@@ -600,12 +600,9 @@
 }
 .xp-tray-icon:hover { opacity: 1; }
 .xp-tray-msn {
-  font-size: 14px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
   cursor: pointer;
-  width: auto;
+  width: auto !important;
+  height: 18px !important;
   image-rendering: auto;
 }
 
