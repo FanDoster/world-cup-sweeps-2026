@@ -627,6 +627,7 @@
 .oe-reading-score { font-size: 18px; font-weight: bold; margin: 0 6px; }
 .oe-reading-prob { margin: 6px 0; }
 .oe-reading-dots { margin: 6px 0; }
+.oe-reading-pred-table { margin: 8px 0; }
 .oe-predict-btn {
   margin-top: 10px;
   padding: 4px 12px;

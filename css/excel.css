@@ -15,6 +15,13 @@
   overflow: hidden;
   height: 100%;
 }
+#xl-leaderboard-target {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
 
 /* ── Outer wrapper ── */
 .xl-wrap {
@@ -23,7 +30,7 @@
   flex: 1;
   min-height: 360px;
   font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   overflow: hidden;
   background: #fff;
 }

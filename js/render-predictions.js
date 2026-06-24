@@ -105,7 +105,7 @@ async function renderPredictions() {
       html += '<div class="xl-row xl-date-sep-row">' +
         '<div class="xl-row-num">' + rowNum + '</div>' +
         '<div class="xl-cell" style="width:90px;font-style:italic;color:#555">' + formatDateLabel(dayMatches[0].date, dayMatches[0].time, dayMatches[0].tz) + '</div>' +
-        '<div class="xl-cell" style="flex:1;min-width:150px;color:#555">' + dayMatches.length + ' match' + (dayMatches.length !== 1 ? 'es' : '') + (dayHasJoker ? ' — &#127923; Joker active' : '') + '</div>' +
+        '<div class="xl-cell" style="flex:1;min-width:150px;color:#555">' + dayMatches.length + ' match' + (dayMatches.length !== 1 ? 'es' : '') + (dayHasJoker ? ' — &#127183; Joker active' : '') + '</div>' +
         '<div class="xl-cell" style="width:60px"></div>' +
         '<div class="xl-cell" style="width:30px"></div>' +
         '<div class="xl-cell" style="width:60px"></div>' +
@@ -133,17 +133,17 @@ async function renderPredictions() {
           awayCellContent = '<div class="xl-cell xl-num xl-cell-locked" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,&quot;—&quot;,away_pred)\')">' + (ep ? ep.predicted_away_score : '—') + '</div>';
         } else if (ep) {
           homeCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,&quot;—&quot;,home_pred)\')">' +
-            '<input class="xl-score-input" type="number" id="ph-' + mid + '" min="0" max="20" value="' + ep.predicted_home_score + '" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
+            '<input class="xl-score-input" type="number" id="ph-' + mid + '" min="0" max="20" value="' + ep.predicted_home_score + '" onfocus="this.select()" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
             '</div>';
           awayCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,&quot;—&quot;,away_pred)\')">' +
-            '<input class="xl-score-input" type="number" id="pa-' + mid + '" min="0" max="20" value="' + ep.predicted_away_score + '" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
+            '<input class="xl-score-input" type="number" id="pa-' + mid + '" min="0" max="20" value="' + ep.predicted_away_score + '" onfocus="this.select()" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
             '</div>';
         } else {
           homeCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'' + rowAddr + '\',\'=IF(locked,&quot;—&quot;,home_pred)\')">' +
-            '<input class="xl-score-input" type="number" id="ph-' + mid + '" min="0" max="20" value="0" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
+            '<input class="xl-score-input" type="number" id="ph-' + mid + '" min="0" max="20" value="0" onfocus="this.select()" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
             '</div>';
           awayCellContent = '<div class="xl-cell xl-num xl-cell-score" style="width:60px" onclick="xlPredSelectCell(\'E' + rowNum + '\',\'=IF(locked,&quot;—&quot;,away_pred)\')">' +
-            '<input class="xl-score-input" type="number" id="pa-' + mid + '" min="0" max="20" value="0" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
+            '<input class="xl-score-input" type="number" id="pa-' + mid + '" min="0" max="20" value="0" onfocus="this.select()" onchange="submitPrediction(' + mid + ')" onkeydown="if(event.key===\'Enter\'||event.key===\'Tab\'){event.preventDefault();submitPrediction(' + mid + ')}">' +
             '</div>';
         }
 
@@ -152,11 +152,11 @@ async function renderPredictions() {
         if (!jokersEnabled || isLocked) {
           jokerCell = '<div class="xl-cell xl-num xl-cell-locked" style="width:55px" onclick="xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">—</div>';
         } else if (ep && ep.is_joker) {
-          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-on" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">&#127923; 2&#215;</div>';
+          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-on" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">&#127183; 2&#215;</div>';
         } else if (dayHasJoker) {
           jokerCell = '<div class="xl-cell xl-num xl-cell-joker-unavail" style="width:55px" onclick="xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">·</div>';
         } else {
-          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-off" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">&#127923;</div>';
+          jokerCell = '<div class="xl-cell xl-num xl-cell-joker-off" style="width:55px" onclick="toggleJoker(' + mid + ');xlPredSelectCell(\'F' + rowNum + '\',\'=IF(joker_used,2,&quot;&quot;)\')">&#127183;</div>';
         }
 
         // Status cell
@@ -166,7 +166,7 @@ async function renderPredictions() {
         } else if (isLocked) {
           statusCell = '<div class="xl-cell xl-status-locked" style="width:80px" onclick="xlPredSelectCell(\'G' + rowNum + '\',\'=VLOOKUP(match_id,preds,3,0)\')">&#128274; Locked</div>';
         } else if (ep) {
-          statusCell = '<div class="xl-cell xl-status-saved" style="width:80px" onclick="xlPredSelectCell(\'G' + rowNum + '\',\'=VLOOKUP(match_id,preds,3,0)\')">&#10003; Saved</div>';
+          statusCell = '<div class="xl-cell xl-status-saved" style="width:80px" onclick="xlPredSelectCell(\'G' + rowNum + '\',\'=VLOOKUP(match_id,preds,3,0)\')">&#10003; <span style="color:#888;font-size:10px">' + lockStr + '</span></div>';
         } else {
           statusCell = '<div class="xl-cell xl-status-empty" style="width:80px" onclick="xlPredSelectCell(\'G' + rowNum + '\',\'=VLOOKUP(match_id,preds,3,0)\')">' + lockStr + '</div>';
         }
@@ -259,7 +259,7 @@ async function renderPredictions() {
         '<div class="xl-cell xl-num" style="width:60px;font-weight:bold">' + m.score1 + '&#8211;' + m.score2 + '</div>' +
         '<div class="xl-cell xl-num" style="width:30px;color:#888">&#8594;</div>' +
         '<div class="xl-cell xl-num" style="width:60px;color:#555">' + p.predicted_home_score + '&#8211;' + p.predicted_away_score + '</div>' +
-        '<div class="xl-cell xl-num" style="width:55px">' + (p.is_joker ? '&#127923;' : '—') + '</div>' +
+        '<div class="xl-cell xl-num" style="width:55px">' + (p.is_joker ? '&#127183;' : '—') + '</div>' +
         '<div class="xl-cell xl-num ' + scoreCls + '" style="width:80px">' + scoreStr + '</div>' +
         '</div>';
     }

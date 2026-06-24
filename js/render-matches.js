@@ -203,7 +203,7 @@ function oeSelectMessage(key) {
       '</div></div>';
   }
 
-  // Pred dots
+  // Prediction panel
   var mid = matchIdByTeamDate[key];
   var dotsHtml = '';
   if (mid) {
@@ -211,20 +211,55 @@ function oeSelectMessage(key) {
     var predByPlayer = {};
     preds.forEach(function(p) { predByPlayer[p.player_name] = p; });
     var showScores = isLocked || isFinished;
-    var dots = '';
-    for (var pi = 0; pi < PLAYERS.length; pi++) {
-      var p = PLAYERS[pi];
-      var pred = predByPlayer[p];
-      if (pred && showScores) {
-        var icon = isFinished ? predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j) : '';
-        dots += '<span class="pred-dot has-pred" title="' + p + ': ' + pred.home + '&#8211;' + pred.away + '">' + p[0] + icon + '</span>';
-      } else if (pred) {
-        dots += '<span class="pred-dot has-pred" title="' + p + ' predicted">' + p[0] + '&#10003;</span>';
-      } else {
-        dots += '<span class="pred-dot no-pred" title="' + p + ' hasn\'t predicted">' + p[0] + '&#10007;</span>';
+
+    if (showScores) {
+      // Full prediction table — show everyone's predicted score and result badge
+      var rows = '';
+      for (var pi = 0; pi < PLAYERS.length; pi++) {
+        var p = PLAYERS[pi];
+        var pred = predByPlayer[p];
+        var dot = '<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:' +
+          ((typeof ownerHexColors !== 'undefined' && ownerHexColors[p]) || '#888') +
+          ';margin-right:4px;vertical-align:middle"></span>';
+        if (pred && pred.home !== undefined) {
+          var scoreStr = pred.home + ' &#8211; ' + pred.away;
+          var jokerMark = pred.j ? ' &#127183;' : '';
+          var badge = isFinished ? predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j) : '';
+          rows += '<tr>' +
+            '<td style="padding:2px 6px 2px 2px;white-space:nowrap">' + dot + escapeHtml(p) + '</td>' +
+            '<td style="padding:2px 8px 2px 2px;text-align:center;font-weight:700">' + scoreStr + jokerMark + '</td>' +
+            '<td style="padding:2px 0">' + badge + '</td>' +
+            '</tr>';
+        } else if (pred) {
+          rows += '<tr style="opacity:0.55">' +
+            '<td style="padding:2px 6px 2px 2px;white-space:nowrap">' + dot + escapeHtml(p) + '</td>' +
+            '<td style="padding:2px 8px 2px 2px;text-align:center;color:#888">&#10003;</td>' +
+            '<td></td>' +
+            '</tr>';
+        } else {
+          rows += '<tr style="opacity:0.35">' +
+            '<td style="padding:2px 6px 2px 2px;white-space:nowrap">' + dot + escapeHtml(p) + '</td>' +
+            '<td style="padding:2px 8px 2px 2px;text-align:center;color:#aaa">&#8212;</td>' +
+            '<td></td>' +
+            '</tr>';
+        }
       }
+      dotsHtml = '<div class="oe-reading-pred-table"><table style="border-collapse:collapse;font-size:11px;width:100%">' +
+        rows + '</table></div>';
+    } else {
+      // Pre-lock: just show has/hasn't predicted dots
+      var dots = '';
+      for (var pi = 0; pi < PLAYERS.length; pi++) {
+        var p = PLAYERS[pi];
+        var pred = predByPlayer[p];
+        if (pred) {
+          dots += '<span class="pred-dot has-pred" title="' + p + ' predicted">' + p[0] + '&#10003;</span>';
+        } else {
+          dots += '<span class="pred-dot no-pred" title="' + p + ' hasn\'t predicted">' + p[0] + '&#10007;</span>';
+        }
+      }
+      dotsHtml = '<div class="oe-reading-dots"><div class="match-pred-dots">' + dots + '</div></div>';
     }
-    dotsHtml = '<div class="oe-reading-dots"><div class="match-pred-dots">' + dots + '</div></div>';
   }
 
   // Channel
