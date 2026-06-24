@@ -38,6 +38,63 @@
 ═══════════════════════════════════════════════ -->
 <div id="xp-desktop">
 
+  <!-- Today screen (mobile only) -->
+  <div id="xp-today">
+    <button class="xp-today-item" ondblclick="openWindow('matches')">
+      <span class="xp-today-item-icon">⏱️</span>
+      <span class="xp-today-item-label">Matches</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item" ondblclick="openWindow('players')">
+      <span class="xp-today-item-icon">🏆</span>
+      <span class="xp-today-item-label">Players</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item" ondblclick="openWindow('groups')">
+      <span class="xp-today-item-icon">📋</span>
+      <span class="xp-today-item-label">Groups</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item" ondblclick="openWindow('leaderboard')">
+      <span class="xp-today-item-icon">🏅</span>
+      <span class="xp-today-item-label">Leaderboard</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item" ondblclick="openWindow('teams')">
+      <span class="xp-today-item-icon">🌍</span>
+      <span class="xp-today-item-label">Teams</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item" ondblclick="openWindow('map')">
+      <span class="xp-today-item-icon">🌐</span>
+      <span class="xp-today-item-label">Battle Map</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item" ondblclick="openWindow('bracket')">
+      <span class="xp-today-item-icon">📊</span>
+      <span class="xp-today-item-label">Bracket</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item xp-today-auth" ondblclick="openWindow('myteams')" style="display:none">
+      <span class="xp-today-item-icon">⭐</span>
+      <span class="xp-today-item-label">My Teams</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item xp-today-auth" ondblclick="openWindow('predictions')" style="display:none">
+      <span class="xp-today-item-icon">🔮</span>
+      <span class="xp-today-item-label">Predictions</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+    <button class="xp-today-item" ondblclick="openWindow('profile')">
+      <span class="xp-today-item-icon">👤</span>
+      <span class="xp-today-item-label">Profile</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
+  </div>
+
+  <!-- Mobile top bar (Pocket PC style) -->
+  <div id="xp-mob-topbar">World Cup 2026</div>
+
   <!-- ── DESKTOP ICONS ── -->
   <div id="xp-icons">
     <div class="xp-icon" data-window="home" ondblclick="openWindow('home')">

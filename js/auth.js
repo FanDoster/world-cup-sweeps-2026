@@ -39,6 +39,11 @@ function updateAuthBar() {
     el.style.display = authed ? 'flex' : 'none';
   });
 
+  // Today screen auth items (mobile)
+  document.querySelectorAll('.xp-today-auth').forEach(function(el) {
+    el.style.display = authed ? 'flex' : 'none';
+  });
+
   // Start menu user name
   var startUser = document.getElementById('xp-start-user-name');
   if (startUser) {

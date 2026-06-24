@@ -214,3 +214,38 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.xp-icon').forEach(function(i) { i.classList.remove('xp-selected'); });
   });
 });
+
+/* ── MOBILE: open/close hooks ── */
+var XP_IS_MOBILE = function() { return window.innerWidth <= 700; };
+
+var _origOpenWindow = openWindow;
+openWindow = function(name) {
+  _origOpenWindow(name);
+  if (XP_IS_MOBILE()) {
+    document.querySelectorAll('.xp-window').forEach(function(w) {
+      w.classList.remove('xp-mob-open');
+    });
+    var el = document.getElementById('xp-window-' + name);
+    if (el) el.classList.add('xp-mob-open');
+    var topbar = document.getElementById('xp-mob-topbar');
+    if (topbar) topbar.textContent = (XP_WIN_LABELS[name] || name).replace(/^.+ /, '');
+    var today = document.getElementById('xp-today');
+    if (today) today.style.display = 'none';
+  }
+};
+
+var _origCloseWindow = closeWindow;
+closeWindow = function(name) {
+  _origCloseWindow(name);
+  if (XP_IS_MOBILE()) {
+    var el = document.getElementById('xp-window-' + name);
+    if (el) el.classList.remove('xp-mob-open');
+    var anyOpen = document.querySelector('.xp-window.xp-mob-open');
+    if (!anyOpen) {
+      var today = document.getElementById('xp-today');
+      if (today) today.style.display = 'block';
+      var topbar = document.getElementById('xp-mob-topbar');
+      if (topbar) topbar.textContent = 'World Cup 2026';
+    }
+  }
+};
