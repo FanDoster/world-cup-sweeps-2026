@@ -430,14 +430,18 @@ closeWindow = function(name) {
 };
 
 var msnGazzaReplies = [
-  'why aye pal',
+  'wey aye man',
   'a luv yee pet',
-  'are yee daft?',
-  'why aye man',
-  'divvent get is wrong pet but i cannae agree with that lyk',
-  'howay man, stop messin aboot',
-  'by 'eck that\\'s a canny question that like',
-  'tell ya what this tournament\\'s been absolute quality man'
+  'are ye daft like?',
+  'howay man',
+  'divvent get iz wrong pet but a canna agree with that like',
+  'hadaway man, stop messin aboot',
+  'alreet like, canny question that pet',
+  'tell ye what this tournament\'s been absolute quality man',
+  'wey aye marra, proper mint that',
+  'howay, ye\'re not wrong like',
+  'a canna believe it man, what a tournament',
+  'wey man, that\'s geet canny that like'
 ];
 var msnReplying = false;
 var msnLastReply = -1;
@@ -481,15 +485,15 @@ function msnContextPool() {
     var first = lb[0], second = lb[1];
     var gap = first.total - second.total;
     pool.push(first.name + ' is absolutely flying up the table man, proper running away with it like');
-    pool.push('by 'eck ' + first.name + '\\'s on fire this tournament - ' + first.total + ' points an\' all');
+    pool.push('wey aye, ' + first.name + '\'s on fire this tournament - ' + first.total + ' points an\' all');
     if (gap <= 2) {
-      pool.push('it\\'s dead tight at the top mind - ' + first.name + ' and ' + second.name + ' only ' + gap + ' point' + (gap === 1 ? '' : 's') + ' in it like');
+      pool.push('it\'s dead tight at the top mind - ' + first.name + ' and ' + second.name + ' only ' + gap + ' point' + (gap === 1 ? '' : 's') + ' in it like');
     } else {
-      pool.push(first.name + '\\'s got a right cushion on ' + second.name + ' now, ' + gap + ' points clear like');
+      pool.push(first.name + '\'s got a right cushion on ' + second.name + ' now, ' + gap + ' points clear like');
     }
     if (lb.length >= 3) {
       var last = lb[lb.length - 1];
-      pool.push('divvent tell ' + last.name + ' but they\\'re rooted to the bottom man, like');
+      pool.push('divvent tell ' + last.name + ' but they\'re rooted to the bottom man, like');
     }
   }
 
@@ -497,8 +501,8 @@ function msnContextPool() {
   var next = msnGetNextGame();
   if (next) {
     var o1 = msnOwnerOf(next.team1), o2 = msnOwnerOf(next.team2);
-    var tag1 = o1 ? ' (' + o1 + '\\'s)' : '';
-    var tag2 = o2 ? ' (' + o2 + '\\'s)' : '';
+    var tag1 = o1 ? ' (' + o1 + '\'s)' : '';
+    var tag2 = o2 ? ' (' + o2 + '\'s)' : '';
     pool.push('big game comin up like - ' + next.team1 + tag1 + ' vs ' + next.team2 + tag2 + ' - should be a cracker man');
     pool.push('keep ya eye on ' + next.team1 + ' vs ' + next.team2 + ' pet, could be tasty that');
     if (o1 && o2) {
@@ -514,7 +518,7 @@ function msnContextPool() {
       var winner = diff > 0 ? last.team1 : last.team2;
       var loser  = diff > 0 ? last.team2 : last.team1;
       var ow = msnOwnerOf(winner), ol = msnOwnerOf(loser);
-      if (ow) pool.push(ow + ' must be doin\\'  backflips after that ' + winner + ' result man, fair play like');
+      if (ow) pool.push(ow + ' must be doin\'  backflips after that ' + winner + ' result man, fair play like');
       if (ol) pool.push('gutted for ' + ol + ' mind, ' + loser + ' had nowt in that game like');
     }
   }
@@ -523,10 +527,10 @@ function msnContextPool() {
   var myTeams = msnGetUserTeams();
   if (myTeams.length) {
     var pick = myTeams[Math.floor(Math.random() * myTeams.length)];
-    pool.push('how\\'s ' + pick + ' gettin on for ya like, still got a chance?');
+    pool.push('how\'s ' + pick + ' gettin on for ya like, still got a chance?');
     pool.push('ya still got ' + pick + ' in it? canny team that, could gan all the way');
     if (myTeams.length > 1) {
-      pool.push('nice havin a few teams in it like - ya got ' + myTeams[0] + ' an\\'  ' + myTeams[1] + ' still gannin?');
+      pool.push('nice havin a few teams in it like - ya got ' + myTeams[0] + ' an\'  ' + myTeams[1] + ' still gannin?');
     }
   }
 
@@ -618,7 +622,7 @@ function msnLastGameMessage() {
   var ws = diff > 0 ? s1 : s2, ls = diff > 0 ? s2 : s1;
   var margin = Math.abs(diff), score = ws + '-' + ls;
   var ow = msnOwnerOf(winner), ol = msnOwnerOf(loser);
-  var ownerBit = ow ? ' - that\\'s ' + ow + '\\'s team man!' : (ol ? ' - proper gutted for ' + ol + ' that like' : '');
+  var ownerBit = ow ? ' - that\'s ' + ow + '\'s team man!' : (ol ? ' - proper gutted for ' + ol + ' that like' : '');
   if (margin >= 3) return 'did ya see that?! ' + winner + ' absolutely mullered ' + loser + ' ' + score + ' man, what a game like' + ownerBit;
   if (margin === 2) return 'canny game that, ' + winner + ' beat ' + loser + ' ' + score + ' like, well deserved an\' all' + ownerBit;
   return winner + ' nicked it past ' + loser + ' ' + score + ', heart in me mouth the whole time pet' + ownerBit;
