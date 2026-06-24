@@ -374,5 +374,13 @@ function msnOpenChat() {
     }
   }
   openWindow('msn');
+  setTimeout(function() {
+    var msg = document.getElementById('msn-msg-2');
+    if (msg) {
+      msg.style.display = 'block';
+      var msgs = document.getElementById('msn-messages');
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+    }
+  }, 1500);
 }
 
