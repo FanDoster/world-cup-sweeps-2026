@@ -325,3 +325,118 @@
   padding: 8px;
   flex-shrink: 0;
 }
+
+/* ── PREDICTIONS WINDOW: Excel skin ── */
+#xp-window-predictions .xp-window-content {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+#sectionPredictions {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* ── Score cell in edit mode ── */
+.xl-score-input {
+  width: 100%;
+  height: 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
+  font-size: 11px;
+  text-align: center;
+  padding: 0;
+  color: #000080;
+}
+.xl-score-input::-webkit-inner-spin-button,
+.xl-score-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+.xl-score-input[type=number] { -moz-appearance: textfield; }
+
+/* Score cells get blue outline when focused */
+.xl-cell-score:focus-within {
+  outline: 2px solid #316ac5;
+  outline-offset: -2px;
+  z-index: 1;
+  position: relative;
+}
+
+/* Locked score cell */
+.xl-cell-locked {
+  color: #999;
+  background: #f5f5f5 !important;
+  cursor: default !important;
+}
+
+/* Joker cell states */
+.xl-cell-joker-on {
+  color: #b8860b;
+  font-weight: bold;
+  background: #fff8dc !important;
+  cursor: pointer;
+}
+.xl-cell-joker-off {
+  color: #ccc;
+  cursor: pointer;
+}
+.xl-cell-joker-off:hover { color: #b8860b; }
+.xl-cell-joker-unavail {
+  color: #ddd;
+  cursor: default !important;
+}
+
+/* Status cell colors */
+.xl-status-saved { color: #22aa44; }
+.xl-status-unsaved { color: #cc6600; }
+.xl-status-locked { color: #cc2222; }
+.xl-status-empty { color: #999; }
+
+/* Date group separator row */
+.xl-date-sep-row .xl-cell {
+  background: #ece9d8 !important;
+  font-style: italic;
+  color: #555;
+  font-weight: normal;
+}
+
+/* Header row */
+.xl-row-pred-header .xl-cell {
+  background: #dce6f1 !important;
+  font-weight: bold;
+}
+
+/* Alternating row tint */
+.xl-row-pred-even .xl-cell { background: #fafaf8 !important; }
+.xl-row-pred-odd .xl-cell { background: #fff !important; }
+
+/* Selected row */
+.xl-row-pred-selected .xl-cell { background: #dce8ff !important; }
+.xl-row-pred-selected:hover .xl-cell { background: #cde0ff !important; }
+
+/* History badge cells */
+.xl-badge-exact  { color: #22aa44; font-weight: bold; }
+.xl-badge-scored { color: #316ac5; font-weight: bold; }
+.xl-badge-zero   { color: #cc2222; }
+
+/* Not signed in placeholder */
+.xl-pred-signin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: #666;
+  font-style: italic;
+  font-size: 11px;
+  padding: 40px;
+}
+
+/* Mobile: hide toolbars */
+@media (max-width: 700px) {
+  #xp-window-predictions .xl-toolbar { display: none; }
+  #xp-window-predictions .xl-formula-bar { display: none; }
+}

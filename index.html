@@ -558,7 +558,101 @@
     </div>
     <div class="xp-window-content">
       <div class="section-predictions" id="sectionPredictions">
-        <div class="predictions-wrap" id="predictionsWrap"></div>
+        <div class="xl-wrap">
+          <!-- Menu bar -->
+          <div class="xl-menubar">
+            <div class="xl-menu-items">
+              <span class="xl-menu-item">File</span>
+              <span class="xl-menu-item">Edit</span>
+              <span class="xl-menu-item">View</span>
+              <span class="xl-menu-item">Insert</span>
+              <span class="xl-menu-item">Format</span>
+              <span class="xl-menu-item">Tools</span>
+              <span class="xl-menu-item">Data</span>
+              <span class="xl-menu-item">Window</span>
+              <span class="xl-menu-item">Help</span>
+            </div>
+            <input class="xl-help-box" type="text" value="Type a question for help" readonly>
+          </div>
+          <!-- Standard toolbar -->
+          <div class="xl-toolbar">
+            <button class="xp-tb-btn xl-tb-btn" disabled title="New">&#128196;</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Open">&#128193;</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Save">&#128190;</button>
+            <span class="xp-tb-sep"></span>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Print">&#128424;</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Preview">&#128269;</button>
+            <span class="xp-tb-sep"></span>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Cut">&#9986;</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Copy">&#128203;</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Paste">&#128196;</button>
+            <span class="xp-tb-sep"></span>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Undo">&#8630;</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled title="Redo">&#8631;</button>
+            <span class="xp-tb-sep"></span>
+            <span style="font-size:11px;padding:0 4px">&#931; AutoSum</span>
+          </div>
+          <!-- Formatting toolbar -->
+          <div class="xl-toolbar">
+            <select class="xl-font-select" disabled><option>Tahoma</option></select>
+            <select class="xl-size-select" disabled><option>11</option></select>
+            <button class="xp-tb-btn xl-tb-btn xl-fmt-btn" disabled>B</button>
+            <button class="xp-tb-btn xl-tb-btn xl-fmt-btn xl-italic" disabled>I</button>
+            <button class="xp-tb-btn xl-tb-btn xl-fmt-btn xl-underline" disabled>U</button>
+            <span class="xp-tb-sep"></span>
+            <button class="xp-tb-btn xl-tb-btn" disabled>&#9664;</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled>&#9646;</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled>&#9654;</button>
+            <span class="xp-tb-sep"></span>
+            <button class="xp-tb-btn xl-tb-btn" disabled>%</button>
+            <button class="xp-tb-btn xl-tb-btn" disabled>,</button>
+          </div>
+          <!-- Formula bar -->
+          <div class="xl-formula-bar">
+            <div class="xl-name-box">
+              <span class="xl-name-val" id="xl-pred-namebox">A1</span>
+              <span class="xl-name-arrow">&#9660;</span>
+            </div>
+            <span class="xl-formula-sep"></span>
+            <button class="xp-tb-btn xl-tb-btn xl-fx-btn" disabled>fx</button>
+            <div class="xl-formula-field" id="xl-pred-formulafield">=predictions!A1</div>
+          </div>
+          <!-- Column headers -->
+          <div class="xl-col-headers">
+            <div class="xl-row-gutter-header"></div>
+            <div class="xl-col-header" style="width:90px">A</div>
+            <div class="xl-col-header" style="flex:1;min-width:150px">B</div>
+            <div class="xl-col-header" style="width:60px">C</div>
+            <div class="xl-col-header" style="width:30px">D</div>
+            <div class="xl-col-header" style="width:60px">E</div>
+            <div class="xl-col-header" style="width:55px">F</div>
+            <div class="xl-col-header" style="width:80px">G</div>
+          </div>
+          <!-- Data grid target -->
+          <div class="xl-grid-wrap">
+            <div id="xl-pred-target"></div>
+          </div>
+          <!-- Sheet tabs -->
+          <div class="xl-sheet-tabs-wrap">
+            <div class="xl-tab-nav">
+              <button class="xl-tab-nav-btn">|&#9664;</button>
+              <button class="xl-tab-nav-btn">&#9664;</button>
+              <button class="xl-tab-nav-btn">&#9654;</button>
+              <button class="xl-tab-nav-btn">&#9654;|</button>
+            </div>
+            <div class="xl-sheet-tabs">
+              <div class="xl-tab xl-tab-active" id="xl-pred-tab-upcoming" onclick="xlPredSwitchSheet('upcoming')">Upcoming</div>
+              <div class="xl-tab" id="xl-pred-tab-history" onclick="xlPredSwitchSheet('history')">History</div>
+            </div>
+          </div>
+          <!-- Status bar -->
+          <div class="xl-status-bar">
+            <span id="xl-pred-status-left">Ready</span>
+            <div class="xl-status-right">
+              <span id="xl-pred-status-right"></span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
