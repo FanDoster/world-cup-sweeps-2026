@@ -40,52 +40,52 @@
 
   <!-- Today screen (mobile only) -->
   <div id="xp-today">
-    <button class="xp-today-item" ondblclick="openWindow('matches')">
+    <button class="xp-today-item" onclick="switchTab('matches')">
       <span class="xp-today-item-icon">⏱️</span>
       <span class="xp-today-item-label">Matches</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item" ondblclick="openWindow('players')">
+    <button class="xp-today-item" onclick="switchTab('players')">
       <span class="xp-today-item-icon">🏆</span>
       <span class="xp-today-item-label">Players</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item" ondblclick="openWindow('groups')">
+    <button class="xp-today-item" onclick="switchTab('groups')">
       <span class="xp-today-item-icon">📋</span>
       <span class="xp-today-item-label">Groups</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item" ondblclick="openWindow('leaderboard')">
+    <button class="xp-today-item" onclick="switchTab('leaderboard')">
       <span class="xp-today-item-icon">🏅</span>
       <span class="xp-today-item-label">Leaderboard</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item" ondblclick="openWindow('teams')">
+    <button class="xp-today-item" onclick="switchTab('teams')">
       <span class="xp-today-item-icon">🌍</span>
       <span class="xp-today-item-label">Teams</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item" ondblclick="openWindow('map')">
+    <button class="xp-today-item" onclick="switchTab('map')">
       <span class="xp-today-item-icon">🌐</span>
       <span class="xp-today-item-label">Battle Map</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item" ondblclick="openWindow('bracket')">
+    <button class="xp-today-item" onclick="switchTab('bracket')">
       <span class="xp-today-item-icon">📊</span>
       <span class="xp-today-item-label">Bracket</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item xp-today-auth" ondblclick="openWindow('myteams')" style="display:none">
+    <button class="xp-today-item xp-today-auth" onclick="switchTab('myteams')" style="display:none">
       <span class="xp-today-item-icon">⭐</span>
       <span class="xp-today-item-label">My Teams</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item xp-today-auth" ondblclick="openWindow('predictions')" style="display:none">
+    <button class="xp-today-item xp-today-auth" onclick="switchTab('predictions')" style="display:none">
       <span class="xp-today-item-icon">🔮</span>
       <span class="xp-today-item-label">Predictions</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
-    <button class="xp-today-item" ondblclick="openWindow('profile')">
+    <button class="xp-today-item" onclick="switchTab('profile')">
       <span class="xp-today-item-icon">👤</span>
       <span class="xp-today-item-label">Profile</span>
       <span class="xp-today-item-arrow">›</span>
@@ -101,48 +101,48 @@
       <div class="xp-icon-img">⚽</div>
       <div class="xp-icon-label">World Cup 2026</div>
     </div>
-    <div class="xp-icon" data-window="matches" ondblclick="openWindow('matches')">
+    <div class="xp-icon" data-window="matches" ondblclick="switchTab('matches')">
       <div class="xp-icon-img">⏱️</div>
       <div class="xp-icon-label">Matches</div>
     </div>
-    <div class="xp-icon" data-window="players" ondblclick="openWindow('players')">
+    <div class="xp-icon" data-window="players" ondblclick="switchTab('players')">
       <div class="xp-icon-img">🏆</div>
       <div class="xp-icon-label">Players</div>
     </div>
-    <div class="xp-icon" data-window="groups" ondblclick="openWindow('groups')">
+    <div class="xp-icon" data-window="groups" ondblclick="switchTab('groups')">
       <div class="xp-icon-img">📋</div>
       <div class="xp-icon-label">Groups</div>
     </div>
-    <div class="xp-icon" data-window="leaderboard" ondblclick="openWindow('leaderboard')">
+    <div class="xp-icon" data-window="leaderboard" ondblclick="switchTab('leaderboard')">
       <div class="xp-icon-img">🏅</div>
       <div class="xp-icon-label">Leaderboard</div>
     </div>
-    <div class="xp-icon" data-window="teams" ondblclick="openWindow('teams')">
+    <div class="xp-icon" data-window="teams" ondblclick="switchTab('teams')">
       <div class="xp-icon-img">🌍</div>
       <div class="xp-icon-label">Teams</div>
     </div>
-    <div class="xp-icon" data-window="map" ondblclick="openWindow('map')">
+    <div class="xp-icon" data-window="map" ondblclick="switchTab('map')">
       <div class="xp-icon-img">🌐</div>
       <div class="xp-icon-label">Battle Map</div>
     </div>
-    <div class="xp-icon" data-window="bracket" ondblclick="openWindow('bracket')">
+    <div class="xp-icon" data-window="bracket" ondblclick="switchTab('bracket')">
       <div class="xp-icon-img">📊</div>
       <div class="xp-icon-label">Bracket</div>
     </div>
-    <div class="xp-icon" data-window="shooter" ondblclick="openWindow('shooter')">
+    <div class="xp-icon" data-window="shooter" ondblclick="switchTab('shooter')">
       <div class="xp-icon-img">🔫</div>
       <div class="xp-icon-label">Shooter</div>
     </div>
-    <div class="xp-icon" data-window="profile" ondblclick="openWindow('profile')">
+    <div class="xp-icon" data-window="profile" ondblclick="switchTab('profile')">
       <div class="xp-icon-img">👤</div>
       <div class="xp-icon-label">Profile</div>
     </div>
     <!-- auth-gated: shown by updateAuthBar() when signed in -->
-    <div class="xp-icon xp-icon-auth" data-window="myteams" ondblclick="openWindow('myteams')" style="display:none">
+    <div class="xp-icon xp-icon-auth" data-window="myteams" ondblclick="switchTab('myteams')" style="display:none">
       <div class="xp-icon-img">⭐</div>
       <div class="xp-icon-label">My Teams</div>
     </div>
-    <div class="xp-icon xp-icon-auth" data-window="predictions" ondblclick="openWindow('predictions')" style="display:none">
+    <div class="xp-icon xp-icon-auth" data-window="predictions" ondblclick="switchTab('predictions')" style="display:none">
       <div class="xp-icon-img">🔮</div>
       <div class="xp-icon-label">Predictions</div>
     </div>
@@ -513,19 +513,19 @@
       <span id="xp-start-user-name">World Cup 2026</span>
     </div>
     <div class="xp-start-items">
-      <button class="xp-start-item" onclick="openWindow('matches');closeStartMenu()">⏱️ Matches</button>
-      <button class="xp-start-item" onclick="openWindow('players');closeStartMenu()">🏆 Players</button>
-      <button class="xp-start-item" onclick="openWindow('groups');closeStartMenu()">📋 Groups</button>
-      <button class="xp-start-item" onclick="openWindow('leaderboard');closeStartMenu()">🏅 Leaderboard</button>
+      <button class="xp-start-item" onclick="switchTab('matches');closeStartMenu()">⏱️ Matches</button>
+      <button class="xp-start-item" onclick="switchTab('players');closeStartMenu()">🏆 Players</button>
+      <button class="xp-start-item" onclick="switchTab('groups');closeStartMenu()">📋 Groups</button>
+      <button class="xp-start-item" onclick="switchTab('leaderboard');closeStartMenu()">🏅 Leaderboard</button>
       <div class="xp-start-separator"></div>
-      <button class="xp-start-item" onclick="openWindow('teams');closeStartMenu()">🌍 Teams</button>
-      <button class="xp-start-item" onclick="openWindow('map');closeStartMenu()">🌐 Battle Map</button>
-      <button class="xp-start-item" onclick="openWindow('bracket');closeStartMenu()">📊 Bracket</button>
-      <button class="xp-start-item" onclick="openWindow('shooter');closeStartMenu()">🔫 Shooter</button>
+      <button class="xp-start-item" onclick="switchTab('teams');closeStartMenu()">🌍 Teams</button>
+      <button class="xp-start-item" onclick="switchTab('map');closeStartMenu()">🌐 Battle Map</button>
+      <button class="xp-start-item" onclick="switchTab('bracket');closeStartMenu()">📊 Bracket</button>
+      <button class="xp-start-item" onclick="switchTab('shooter');closeStartMenu()">🔫 Shooter</button>
       <div class="xp-start-separator"></div>
-      <button class="xp-start-item xp-start-item-auth" onclick="openWindow('myteams');closeStartMenu()" style="display:none">⭐ My Teams</button>
-      <button class="xp-start-item xp-start-item-auth" onclick="openWindow('predictions');closeStartMenu()" style="display:none">🔮 Predictions</button>
-      <button class="xp-start-item" onclick="openWindow('profile');closeStartMenu()">👤 Profile</button>
+      <button class="xp-start-item xp-start-item-auth" onclick="switchTab('myteams');closeStartMenu()" style="display:none">⭐ My Teams</button>
+      <button class="xp-start-item xp-start-item-auth" onclick="switchTab('predictions');closeStartMenu()" style="display:none">🔮 Predictions</button>
+      <button class="xp-start-item" onclick="switchTab('profile');closeStartMenu()">👤 Profile</button>
       <div class="xp-start-separator"></div>
       <button class="xp-start-item" onclick="openWindow('home');closeStartMenu()">⚽ About</button>
     </div>
