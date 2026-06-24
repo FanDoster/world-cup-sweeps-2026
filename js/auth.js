@@ -15,20 +15,34 @@ async function restoreSession() {
 }
 
 function updateAuthBar() {
-  const bar = document.getElementById('authBar');
-  const tabBar = document.getElementById('tabBar');
-  // Remove existing auth tabs
-  tabBar.querySelectorAll('.auth-tab').forEach(el => el.remove());
+  var tray = document.getElementById('xp-auth-tray');
+  if (tray) {
+    if (currentSession && currentProfile) {
+      tray.innerHTML = '<a class="xp-tray-user" onclick="openWindow(\'profile\')">'
+        + avatarHtml(currentProfile.player_name, 16)
+        + ' ' + currentProfile.player_name + '</a>'
+        + ' <button class="xp-tray-signout" onclick="doSignOut()">Sign out</button>';
+    } else {
+      tray.innerHTML = '<button class="xp-tray-signin" onclick="showSignIn()">Sign in</button>';
+    }
+  }
 
-  if (currentSession && currentProfile) {
-    bar.innerHTML = `<a class="signed-in-link" onclick="showUserProfile('${currentProfile.player_name}')"><span class="signed-in"><span class="avatar-auth">${avatarHtml(currentProfile.player_name, 24)}</span> ${currentProfile.player_name}</span></a>
-      <button class="sign-out-btn" onclick="doSignOut()">Sign out</button>`;
-    // Inject logged-in tabs
-    tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="myteams" onclick="switchTab('myteams')"><span class="emoji">⭐</span><span class="tab-label"> My Teams</span></button>`);
-    tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="predictions" onclick="switchTab('predictions')"><span class="emoji">🔮</span><span class="tab-label"> Predictions</span></button>`);
-  } else {
-    bar.innerHTML = `<button onclick="showSignIn()">Sign in</button>
-      <button onclick="showSignUp()">Create account</button>`;
+  var authed = !!(currentSession && currentProfile);
+
+  // Desktop icons
+  document.querySelectorAll('.xp-icon-auth').forEach(function(el) {
+    el.style.display = authed ? 'flex' : 'none';
+  });
+
+  // Start menu auth items
+  document.querySelectorAll('.xp-start-item-auth').forEach(function(el) {
+    el.style.display = authed ? 'flex' : 'none';
+  });
+
+  // Start menu user name
+  var startUser = document.getElementById('xp-start-user-name');
+  if (startUser) {
+    startUser.textContent = (authed && currentProfile) ? currentProfile.player_name : 'World Cup 2026';
   }
 }
 
