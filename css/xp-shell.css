@@ -333,6 +333,54 @@
   padding-left: 8px;
 }
 
+/* ── NOTIFICATION BALLOON ── */
+#xp-balloon {
+  position: fixed;
+  bottom: 44px;
+  right: 6px;
+  width: 180px;
+  background: #fff;
+  border: 1px solid #0a246a;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+  z-index: 9999;
+  display: none;
+}
+#xp-balloon::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: 14px;
+  border-left: 8px solid transparent;
+  border-right: 0 solid transparent;
+  border-top: 8px solid #0a246a;
+}
+#xp-balloon-title {
+  background: linear-gradient(to bottom, #4a90d9 0%, #1a52b0 100%);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 24px 3px 6px;
+  position: relative;
+}
+#xp-balloon-close {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+}
+#xp-balloon-close:hover { color: #ffcc00; }
+#xp-balloon img {
+  width: 100%;
+  display: block;
+}
+
 /* ── START MENU ── */
 #xp-start-menu {
   position: fixed;

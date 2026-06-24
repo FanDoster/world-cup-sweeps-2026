@@ -254,3 +254,14 @@ closeWindow = function(name) {
     }
   }
 };
+
+function xpDismissBalloon() {
+  var b = document.getElementById('xp-balloon');
+  if (b) b.style.display = 'none';
+}
+
+// Show the Gazza notification balloon 3s after page load
+setTimeout(function() {
+  var b = document.getElementById('xp-balloon');
+  if (b) b.style.display = 'block';
+}, 3000);

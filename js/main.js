@@ -23,9 +23,13 @@ restoreSession().then(async function() {
     checkTeamResults();
     xpUpdateClock();
     handleHashRoute();
-    // Open Matches by default if no hash navigates elsewhere
+    // Open Matches by default if no hash navigates elsewhere.
+    // Suppress startup sound for this automatic (non-user-gesture) open,
+    // then reset so the first deliberate click plays it.
     if (!location.hash || location.hash === '#/' || location.hash === '#/matches') {
+      xpStartupPlayed = true;
       openWindow('matches');
+      xpStartupPlayed = false;
     }
   });
 });
