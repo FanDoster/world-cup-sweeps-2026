@@ -1,3 +1,6 @@
+/* Hidden on desktop — shown only by the mobile media query */
+#xp-today, #xp-mob-topbar { display: none; }
+
 /* ── WINDOWS MOBILE / POCKET PC SKIN (≤700px) ── */
 @media (max-width: 700px) {
 
@@ -57,6 +60,7 @@
 
   /* Today screen — shown when no window is open */
   #xp-today {
+    display: block;
     position: fixed;
     top: 30px;
     left: 0;
