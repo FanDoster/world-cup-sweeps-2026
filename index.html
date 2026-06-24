@@ -4,16 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>World Cup 2026 Sweepstakes</title>
-  <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#10b981">
+  <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#2462c9">
   <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
   <link rel="manifest" href="favicon/site.webmanifest">
-  <meta name="theme-color" content="#070b10">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#2462c9">
   <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/xp-shell.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/matches.css">
   <link rel="stylesheet" href="css/groups.css">
@@ -33,22 +32,93 @@
   <link rel="stylesheet" href="css/update-notification.css">
 </head>
 <body>
-  <div class="container">
-    <header>
+
+<!-- ══════════════════════════════════════════════
+     XP DESKTOP
+═══════════════════════════════════════════════ -->
+<div id="xp-desktop">
+
+  <!-- ── DESKTOP ICONS ── -->
+  <div id="xp-icons">
+    <div class="xp-icon" data-window="home" ondblclick="openWindow('home')">
+      <div class="xp-icon-img">⚽</div>
+      <div class="xp-icon-label">World Cup 2026</div>
+    </div>
+    <div class="xp-icon" data-window="matches" ondblclick="openWindow('matches')">
+      <div class="xp-icon-img">⏱️</div>
+      <div class="xp-icon-label">Matches</div>
+    </div>
+    <div class="xp-icon" data-window="players" ondblclick="openWindow('players')">
+      <div class="xp-icon-img">🏆</div>
+      <div class="xp-icon-label">Players</div>
+    </div>
+    <div class="xp-icon" data-window="groups" ondblclick="openWindow('groups')">
+      <div class="xp-icon-img">📋</div>
+      <div class="xp-icon-label">Groups</div>
+    </div>
+    <div class="xp-icon" data-window="leaderboard" ondblclick="openWindow('leaderboard')">
+      <div class="xp-icon-img">🏅</div>
+      <div class="xp-icon-label">Leaderboard</div>
+    </div>
+    <div class="xp-icon" data-window="teams" ondblclick="openWindow('teams')">
+      <div class="xp-icon-img">🌍</div>
+      <div class="xp-icon-label">Teams</div>
+    </div>
+    <div class="xp-icon" data-window="map" ondblclick="openWindow('map')">
+      <div class="xp-icon-img">🌐</div>
+      <div class="xp-icon-label">Battle Map</div>
+    </div>
+    <div class="xp-icon" data-window="bracket" ondblclick="openWindow('bracket')">
+      <div class="xp-icon-img">📊</div>
+      <div class="xp-icon-label">Bracket</div>
+    </div>
+    <div class="xp-icon" data-window="shooter" ondblclick="openWindow('shooter')">
+      <div class="xp-icon-img">🔫</div>
+      <div class="xp-icon-label">Shooter</div>
+    </div>
+    <div class="xp-icon" data-window="profile" ondblclick="openWindow('profile')">
+      <div class="xp-icon-img">👤</div>
+      <div class="xp-icon-label">Profile</div>
+    </div>
+    <!-- auth-gated: shown by updateAuthBar() when signed in -->
+    <div class="xp-icon xp-icon-auth" data-window="myteams" ondblclick="openWindow('myteams')" style="display:none">
+      <div class="xp-icon-img">⭐</div>
+      <div class="xp-icon-label">My Teams</div>
+    </div>
+    <div class="xp-icon xp-icon-auth" data-window="predictions" ondblclick="openWindow('predictions')" style="display:none">
+      <div class="xp-icon-img">🔮</div>
+      <div class="xp-icon-label">Predictions</div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       WINDOWS
+  ════════════════════════════════════════════ -->
+
+  <!-- ── World Cup 2026 (home) ── -->
+  <div class="xp-window" id="xp-window-home" data-win="home"
+       style="display:none; top:50px; left:280px; width:520px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'home')">
+      <span class="xp-title-icon">⚽</span>
+      <span class="xp-title-text">World Cup 2026</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('home')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('home')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('home')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content xp-home-header">
+      <div id="warDispatch" class="war-dispatch"></div>
       <svg width="100%" viewBox="0 0 320 255" role="img" aria-label="World Cup 2026 — Canada, USA, Mexico">
         <defs>
           <clipPath id="cC"><text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif">C</text></clipPath>
           <clipPath id="cU"><text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif">U</text></clipPath>
           <clipPath id="cM"><text x="0" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif">M</text></clipPath>
         </defs>
-
-        <!-- Arched title -->
         <path id="archPath" d="M 10,75 Q 160,10 310,75" fill="none"/>
         <text font-size="13" font-weight="800" letter-spacing="5" fill="#888" font-family="system-ui,sans-serif">
           <textPath href="#archPath" startOffset="50%" text-anchor="middle">&#9733;  WORLD CUP 2026  &#9733;</textPath>
         </text>
-
-        <!-- C — Canada -->
         <g transform="translate(0,72)">
           <text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="#111" stroke-width="14" stroke-linejoin="round">C</text>
           <g clip-path="url(#cC)">
@@ -56,8 +126,6 @@
           </g>
           <text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="4.5">C</text>
         </g>
-
-        <!-- U — USA -->
         <g transform="translate(102,72)">
           <text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="#111" stroke-width="14" stroke-linejoin="round">U</text>
           <g clip-path="url(#cU)">
@@ -65,8 +133,6 @@
           </g>
           <text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="4.5">U</text>
         </g>
-
-        <!-- M — Mexico -->
         <g transform="translate(205,72)">
           <text x="0" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="#111" stroke-width="14" stroke-linejoin="round">M</text>
           <g clip-path="url(#cM)">
@@ -74,12 +140,11 @@
           </g>
           <text x="0" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="4.5">M</text>
         </g>
-
-        <!-- CANADA · USA · MEXICO strip — textLength pins width so lines never overlap -->
         <line x1="10" y1="242" x2="72" y2="242" stroke="#555" stroke-width="1"/>
         <text x="160" y="246" font-size="11" font-weight="700" textLength="160" lengthAdjust="spacing" fill="#999" font-family="system-ui,sans-serif" text-anchor="middle">CANADA · USA · MEXICO</text>
         <line x1="248" y1="242" x2="310" y2="242" stroke="#555" stroke-width="1"/>
       </svg>
+      <!-- Gazza SVG filter -->
       <svg width="0" height="0" style="position:absolute">
         <defs>
           <filter id="gazza-ripple" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
@@ -92,245 +157,440 @@
           </filter>
         </defs>
       </svg>
-      <img src="img/gazza-crying.jpg" alt="Gazza crying" style="width:100%;display:block;margin:0 auto;filter:url(#gazza-ripple);">
-      <div class="auth-bar" id="authBar">
-        <button onclick="showSignIn()">Sign in</button>
-        <button onclick="showSignUp()">Create account</button>
-      </div>
-    </header>
-
-    <div id="warDispatch" class="war-dispatch"></div>
-
-    <div class="tab-bar" id="tabBar">
-      <button type="button" class="tab-btn" data-tab="players" onclick="switchTab('players')"><span class="emoji">🏆</span><span class="tab-label"> Players</span></button>
-      <button type="button" class="tab-btn active" data-tab="matches" onclick="switchTab('matches')"><span class="emoji">⏱</span><span class="tab-label"> Matches</span></button>
-      <button type="button" class="tab-btn" data-tab="groups" onclick="switchTab('groups')"><span class="emoji">📋</span><span class="tab-label"> Groups</span></button>
-      <button type="button" class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')"><span class="emoji">🏅</span><span class="tab-label"> Leaderboard</span></button>
-      <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span><span class="tab-label"> Teams</span></button>
-      <button type="button" class="tab-btn" data-tab="map" onclick="switchTab('map')"><span class="emoji">🌐</span><span class="tab-label"> Battle Map</span></button>
-      <button type="button" class="tab-btn" data-tab="bracket" onclick="switchTab('bracket')"><span class="emoji">📊</span><span class="tab-label"> Bracket</span></button>
-      <button type="button" class="tab-btn shooter-tab" data-tab="shooter" onclick="switchTab('shooter')"><span class="emoji">🔫</span><span class="tab-label"> Shooter</span></button>
-      <button type="button" class="tab-btn" data-tab="profile" onclick="switchTab('profile')"><span class="emoji">👤</span><span class="tab-label"> Profile</span></button>
+      <img src="img/gazza-crying.jpg" alt="Gazza crying" style="width:100%;display:block;filter:url(#gazza-ripple);">
     </div>
+  </div>
 
-    <div class="section-players" id="sectionPlayers">
-    <div class="people-grid" id="people"></div>
-    </div>
-
-    <div class="section-matches active" id="sectionMatches">
-    <div class="matches-toolbar">
-      <div class="filter-bar" id="matchTeamFilterBar">
-        <button type="button" class="filter-btn active" data-filter="all" onclick="setMatchTeamFilter('all')">All Teams</button>
-        <button type="button" class="filter-btn" data-filter="mine" onclick="setMatchTeamFilter('mine')">My Teams</button>
-      </div>
-      <div class="filter-bar" id="matchFilterBar">
-        <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'matches')">Upcoming</button>
-        <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'matches')">Completed</button>
-        <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'matches')">All</button>
+  <!-- ── Matches (open by default) ── -->
+  <div class="xp-window" id="xp-window-matches" data-win="matches"
+       style="top:44px; left:180px; width:880px; height:600px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'matches')">
+      <span class="xp-title-icon">⏱️</span>
+      <span class="xp-title-text">Matches</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('matches')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('matches')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('matches')" title="Close">&#10005;</button>
       </div>
     </div>
-    <div class="matches-grid" id="matches"></div>
-    </div>
-
-    <div class="section-groups" id="sectionGroups">
-    <div class="groups-grid" id="groups"></div>
-    </div>
-
-    <div class="section-leaderboard" id="sectionLeaderboard">
-      <div class="lb-two-col">
-        <div class="lb-col">
-          <div class="lb-col-header">⚽ Match Results</div>
-          <div class="leaderboard-wrap card-base">
-            <table class="leaderboard-table" id="matchLeaderboard">
-              <thead><tr><th>#</th><th>Player</th><th class="wdl">W–D–L</th><th class="pts sortable" data-sort="pts" onclick="sortMatchLeaderboard('pts')">Pts <span class="sort-arrow" id="sortArrowMatchPts"></span></th></tr></thead>
-              <tbody></tbody>
-            </table>
+    <div class="xp-window-content">
+      <div class="section-matches" id="sectionMatches">
+        <div class="matches-toolbar">
+          <div class="filter-bar" id="matchTeamFilterBar">
+            <button type="button" class="filter-btn active" data-filter="all" onclick="setMatchTeamFilter('all')">All Teams</button>
+            <button type="button" class="filter-btn" data-filter="mine" onclick="setMatchTeamFilter('mine')">My Teams</button>
           </div>
-          <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">3 pts win · 1 pt draw</p>
-        </div>
-        <div class="lb-col">
-          <div class="lb-col-header">🔮 Predictions</div>
-          <div class="leaderboard-wrap card-base">
-            <table class="leaderboard-table" id="predLeaderboard">
-              <thead><tr><th>#</th><th>Player</th><th class="pts sortable" data-sort="predPts" onclick="sortPredLeaderboard('predPts')">Pts <span class="sort-arrow" id="sortArrowPredPts"></span></th><th class="sub-pts">Avg</th><th class="sub-pts">★</th><th class="sub-pts">🔥</th></tr></thead>
-              <tbody></tbody>
-            </table>
+          <div class="filter-bar" id="matchFilterBar">
+            <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'matches')">Upcoming</button>
+            <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'matches')">Completed</button>
+            <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'matches')">All</button>
           </div>
-          <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">1 pt correct winner · +2 per exact score (max 5) · 🃏 doubles</p>
         </div>
+        <div class="matches-grid" id="matches"></div>
       </div>
-      <div id="awardsWrap"></div>
-      <div id="jokerStatsWrap"></div>
     </div>
+  </div>
 
-    <div class="section-teams" id="sectionTeams">
-      <div class="team-chips" id="teamChips"></div>
-      <div class="teams-toolbar">
-        <div class="filter-bar" id="teamFilterBar">
-          <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'teams')">Upcoming</button>
-          <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'teams')">Completed</button>
-          <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'teams')">All</button>
-        </div>
+  <!-- ── Players ── -->
+  <div class="xp-window" id="xp-window-players" data-win="players"
+       style="display:none; top:64px; left:200px; width:880px; height:600px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'players')">
+      <span class="xp-title-icon">🏆</span>
+      <span class="xp-title-text">Players</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('players')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('players')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('players')" title="Close">&#10005;</button>
       </div>
-      <div id="teamSchedule"></div>
     </div>
+    <div class="xp-window-content">
+      <div class="section-players" id="sectionPlayers">
+        <div class="people-grid" id="people"></div>
+      </div>
+    </div>
+  </div>
 
-    <div class="section-map" id="sectionMap">
-      <div class="globe-row" style="display:flex;align-items:stretch;flex:1;min-height:70vh">
-        <div class="globe-wrap" id="globeWrap">
-          <svg id="globeSvg"></svg>
-          <button class="globe-reset" id="globeReset" onclick="resetGlobe()" title="Reset view">↺</button>
-        </div>
-        <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeVenuePanel()"></div>
-        <div class="venue-panel" id="venuePanel">
-          <div class="vp-header">
-            <div>
-              <div class="vp-name" id="vpName"></div>
-              <div class="vp-city" id="vpCity"></div>
+  <!-- ── Groups ── -->
+  <div class="xp-window" id="xp-window-groups" data-win="groups"
+       style="display:none; top:84px; left:220px; width:960px; height:640px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'groups')">
+      <span class="xp-title-icon">📋</span>
+      <span class="xp-title-text">Groups</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('groups')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('groups')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('groups')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content">
+      <div class="section-groups" id="sectionGroups">
+        <div class="groups-grid" id="groups"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Leaderboard ── -->
+  <div class="xp-window" id="xp-window-leaderboard" data-win="leaderboard"
+       style="display:none; top:74px; left:210px; width:920px; height:620px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'leaderboard')">
+      <span class="xp-title-icon">🏅</span>
+      <span class="xp-title-text">Leaderboard</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('leaderboard')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('leaderboard')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('leaderboard')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content">
+      <div class="section-leaderboard" id="sectionLeaderboard">
+        <div class="lb-two-col">
+          <div class="lb-col">
+            <div class="lb-col-header">⚽ Match Results</div>
+            <div class="leaderboard-wrap card-base">
+              <table class="leaderboard-table" id="matchLeaderboard">
+                <thead><tr><th>#</th><th>Player</th><th class="wdl">W–D–L</th><th class="pts sortable" data-sort="pts" onclick="sortMatchLeaderboard('pts')">Pts <span class="sort-arrow" id="sortArrowMatchPts"></span></th></tr></thead>
+                <tbody></tbody>
+              </table>
             </div>
-            <button class="vp-close" onclick="closeVenuePanel()">✕</button>
+            <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">3 pts win · 1 pt draw</p>
           </div>
-          <div class="vp-matches" id="vpMatches"></div>
+          <div class="lb-col">
+            <div class="lb-col-header">🔮 Predictions</div>
+            <div class="leaderboard-wrap card-base">
+              <table class="leaderboard-table" id="predLeaderboard">
+                <thead><tr><th>#</th><th>Player</th><th class="pts sortable" data-sort="predPts" onclick="sortPredLeaderboard('predPts')">Pts <span class="sort-arrow" id="sortArrowPredPts"></span></th><th class="sub-pts">Avg</th><th class="sub-pts">★</th><th class="sub-pts">🔥</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">1 pt correct winner · +2 per exact score (max 5) · 🃏 doubles</p>
+          </div>
         </div>
-      </div>
-      <div class="territory-standings" id="territoryStandings" style="display:none">
-        <div class="ts-title">The Territories</div>
-        <div id="tsChampion"></div>
-        <div class="ts-scores" id="tsScores"></div>
-        <div class="ts-grid" id="tsGrid"></div>
+        <div id="awardsWrap"></div>
+        <div id="jokerStatsWrap"></div>
       </div>
     </div>
-
-    <div class="section-shooter" id="sectionShooter">
-      <canvas id="shooter-canvas"></canvas>
-      <video id="wave-clear-gif" autoplay muted playsinline loop></video>
-      <video id="game-over-gif" autoplay muted playsinline loop></video>
-      <div id="wave-clear-top" class="wave-clear-text"></div>
-      <div id="wave-clear-bottom" class="wave-clear-text"></div>
-      <div id="game-over-overlay"></div>
-    </div>
-
-    <div class="section-myteams" id="sectionMyTeams">
-      <div class="myteams-grid" id="myTeamsGrid"></div>
-    </div>
-
-    <div class="section-predictions" id="sectionPredictions">
-      <div class="predictions-wrap" id="predictionsWrap"></div>
-    </div>
-
-    <div class="section-profile" id="sectionProfile">
-      <div id="userProfileContent"></div>
-    </div>
-
-    <div class="section-bracket" id="sectionBracket"></div>
-
-    <!-- Sign In Modal -->
-    <div class="auth-modal-overlay" id="signInModal">
-      <div class="auth-modal">
-        <h2>Sign in</h2>
-        <div class="error-msg" id="signInError"></div>
-        <label>Email</label>
-        <input type="email" id="signInEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()">
-        <label>Password</label>
-        <input type="password" id="signInPassword" placeholder="Your password" onkeydown="if(event.key==='Enter')doSignIn()">
-        <div class="btn-row">
-          <button class="btn-ghost" onclick="closeModals()">Cancel</button>
-          <button class="btn-primary" onclick="doSignIn()">Sign in</button>
-        </div>
-        <div class="switch-link">No account? <a onclick="showSignUp()">Create one</a></div>
-      </div>
-    </div>
-    <!-- Sign Up Modal -->
-    <div class="auth-modal-overlay" id="signUpModal">
-      <div class="auth-modal">
-        <h2>Create account</h2>
-        <div class="error-msg" id="signUpError"></div>
-        <label>Your name</label>
-        <select id="signUpPlayer">
-          <option value="">Choose your sweepstakes name…</option>
-          <option>Anton</option><option>Chris</option><option>Dan</option>
-          <option>Laurie</option><option>Pat</option><option>Steven</option>
-        </select>
-        <label>Email</label>
-        <input type="email" id="signUpEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignUp()">
-        <label>Password</label>
-        <input type="password" id="signUpPassword" placeholder="6+ characters" onkeydown="if(event.key==='Enter')doSignUp()">
-        <label>Invite code</label>
-        <input type="text" id="signUpCode" placeholder="Enter sweepstakes code" onkeydown="if(event.key==='Enter')doSignUp()">
-        <div class="btn-row">
-          <button class="btn-ghost" onclick="closeModals()">Cancel</button>
-          <button class="btn-primary" onclick="doSignUp()">Create account</button>
-        </div>
-        <div class="switch-link">Already have an account? <a onclick="showSignIn()">Sign in</a></div>
-      </div>
-    </div>
-
-    <!-- Joker Reset Notification -->
-    <div class="auth-modal-overlay" id="jokerResetModal">
-      <div class="auth-modal">
-        <div style="font-size:3rem;text-align:center;line-height:1;margin-bottom:12px">🃏</div>
-        <h2 style="text-align:center">Jokers Reset</h2>
-        <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.5;margin-bottom:18px">All jokers have been wiped from previous matchdays. Please re-apply your jokers on upcoming matches before they kick off.</p>
-        <div class="btn-row">
-          <button class="btn-primary" onclick="dismissJokerNotification()">Got it</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Team Result Notification -->
-    <div class="auth-modal-overlay" id="teamResultModal">
-      <div class="auth-modal" style="text-align:center">
-        <canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:200"></canvas>
-        <div class="result-emoji" id="resultEmoji" style="font-size:3.5rem;line-height:1;margin-bottom:8px"></div>
-        <h2 style="text-align:center;margin-bottom:4px" id="resultTitle"></h2>
-        <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:4px" id="resultSubtitle"></p>
-        <div id="resultDetails" style="text-align:left;margin-bottom:18px;font-size:0.88rem;color:var(--text-secondary);line-height:1.6"></div>
-        <div class="btn-row">
-          <button class="btn-primary" onclick="dismissTeamResults()">Got it</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Player Profile Modal -->
-    <div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
-      <div class="profile-card" id="profileCard"></div>
-    </div>
-
-    <!-- Match Predictions Panel -->
-    <div class="pred-panel-overlay" id="predPanelOverlay" onclick="if(event.target===this)closePredPanel()">
-      <div class="pred-panel" id="predPanel"></div>
-    </div>
-
-    <footer>⚽ World Cup 2026 Sweepstakes</footer>
   </div>
 
-  <script src="h2h-data.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/topojson-server@3/dist/topojson-server.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/utils.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/data.js"></script>
-  <script src="js/render-matches.js"></script>
-  <script src="js/render-groups.js"></script>
-  <script src="js/render-leaderboard.js"></script>
-  <script src="js/render-predictions.js"></script>
-  <script src="js/render-teams.js"></script>
-  <script src="js/render-myteams.js"></script>
-  <script src="js/render-profile.js"></script>
-  <script src="js/globe.js"></script>
-  <script src="js/shooter.js"></script>
-  <script src="js/team-results.js"></script>
-  <script src="js/profile-picture.js"></script>
-  <script src="js/render-user-profile.js"></script>
-  <script src="js/render-bracket.js"></script>
-  <script src="js/version.js"></script>
-  <script src="js/version-refresh.js"></script>
-  <script src="js/main.js"></script>
-  <div id="joker-video-overlay" onclick="closeJokerVideo()">
-    <video id="joker-video" src="media/joker.mp4" preload="auto" playsinline></video>
+  <!-- ── Teams ── -->
+  <div class="xp-window" id="xp-window-teams" data-win="teams"
+       style="display:none; top:90px; left:230px; width:880px; height:600px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'teams')">
+      <span class="xp-title-icon">🌍</span>
+      <span class="xp-title-text">Teams</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('teams')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('teams')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('teams')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content">
+      <div class="section-teams" id="sectionTeams">
+        <div class="team-chips" id="teamChips"></div>
+        <div class="teams-toolbar">
+          <div class="filter-bar" id="teamFilterBar">
+            <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'teams')">Upcoming</button>
+            <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'teams')">Completed</button>
+            <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'teams')">All</button>
+          </div>
+        </div>
+        <div id="teamSchedule"></div>
+      </div>
+    </div>
   </div>
+
+  <!-- ── Battle Map ── -->
+  <div class="xp-window" id="xp-window-map" data-win="map"
+       style="display:none; top:44px; left:160px; width:1040px; height:700px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'map')">
+      <span class="xp-title-icon">🌐</span>
+      <span class="xp-title-text">Battle Map</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('map')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('map')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('map')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content" style="padding:0; overflow:hidden;">
+      <div class="section-map" id="sectionMap">
+        <div class="globe-row" style="display:flex;align-items:stretch;flex:1;min-height:60vh">
+          <div class="globe-wrap" id="globeWrap">
+            <svg id="globeSvg"></svg>
+            <button class="globe-reset" id="globeReset" onclick="resetGlobe()" title="Reset view">&#8635;</button>
+          </div>
+          <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeVenuePanel()"></div>
+          <div class="venue-panel" id="venuePanel">
+            <div class="vp-header">
+              <div>
+                <div class="vp-name" id="vpName"></div>
+                <div class="vp-city" id="vpCity"></div>
+              </div>
+              <button class="vp-close" onclick="closeVenuePanel()">&#10005;</button>
+            </div>
+            <div class="vp-matches" id="vpMatches"></div>
+          </div>
+        </div>
+        <div class="territory-standings" id="territoryStandings" style="display:none">
+          <div class="ts-title">The Territories</div>
+          <div id="tsChampion"></div>
+          <div class="ts-scores" id="tsScores"></div>
+          <div class="ts-grid" id="tsGrid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bracket ── -->
+  <div class="xp-window" id="xp-window-bracket" data-win="bracket"
+       style="display:none; top:60px; left:170px; width:1100px; height:640px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'bracket')">
+      <span class="xp-title-icon">📊</span>
+      <span class="xp-title-text">Bracket</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('bracket')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('bracket')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('bracket')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content">
+      <div class="section-bracket" id="sectionBracket"></div>
+    </div>
+  </div>
+
+  <!-- ── Shooter ── -->
+  <div class="xp-window" id="xp-window-shooter" data-win="shooter"
+       style="display:none; top:54px; left:240px; width:720px; height:560px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'shooter')">
+      <span class="xp-title-icon">🔫</span>
+      <span class="xp-title-text">Shooter</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('shooter')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('shooter')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('shooter')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content" style="padding:0; overflow:hidden; position:relative;">
+      <div class="section-shooter" id="sectionShooter">
+        <canvas id="shooter-canvas"></canvas>
+        <video id="wave-clear-gif" autoplay muted playsinline loop></video>
+        <video id="game-over-gif" autoplay muted playsinline loop></video>
+        <div id="wave-clear-top" class="wave-clear-text"></div>
+        <div id="wave-clear-bottom" class="wave-clear-text"></div>
+        <div id="game-over-overlay"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── My Teams (auth-gated) ── -->
+  <div class="xp-window" id="xp-window-myteams" data-win="myteams"
+       style="display:none; top:80px; left:220px; width:880px; height:600px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'myteams')">
+      <span class="xp-title-icon">⭐</span>
+      <span class="xp-title-text">My Teams</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('myteams')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('myteams')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('myteams')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content">
+      <div class="section-myteams" id="sectionMyTeams">
+        <div class="myteams-grid" id="myTeamsGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Predictions (auth-gated) ── -->
+  <div class="xp-window" id="xp-window-predictions" data-win="predictions"
+       style="display:none; top:80px; left:220px; width:880px; height:640px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'predictions')">
+      <span class="xp-title-icon">🔮</span>
+      <span class="xp-title-text">Predictions</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('predictions')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('predictions')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('predictions')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content">
+      <div class="section-predictions" id="sectionPredictions">
+        <div class="predictions-wrap" id="predictionsWrap"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Profile ── -->
+  <div class="xp-window" id="xp-window-profile" data-win="profile"
+       style="display:none; top:70px; left:210px; width:900px; height:620px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'profile')">
+      <span class="xp-title-icon">👤</span>
+      <span class="xp-title-text">Profile</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('profile')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('profile')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('profile')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content">
+      <div class="section-profile" id="sectionProfile">
+        <div id="userProfileContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TASKBAR ══ -->
+  <div id="xp-taskbar">
+    <button id="xp-start-btn" onclick="toggleStartMenu()">
+      <span class="xp-start-logo">&#11088;</span>
+      <span class="xp-start-text">start</span>
+    </button>
+    <div id="xp-taskbar-windows"></div>
+    <div id="xp-system-tray">
+      <div id="xp-auth-tray"></div>
+      <div id="xp-clock">00:00</div>
+    </div>
+  </div>
+
+  <!-- ══ START MENU ══ -->
+  <div id="xp-start-menu">
+    <div class="xp-start-header">
+      <span id="xp-start-user-name">World Cup 2026</span>
+    </div>
+    <div class="xp-start-items">
+      <button class="xp-start-item" onclick="openWindow('matches');closeStartMenu()">⏱️ Matches</button>
+      <button class="xp-start-item" onclick="openWindow('players');closeStartMenu()">🏆 Players</button>
+      <button class="xp-start-item" onclick="openWindow('groups');closeStartMenu()">📋 Groups</button>
+      <button class="xp-start-item" onclick="openWindow('leaderboard');closeStartMenu()">🏅 Leaderboard</button>
+      <div class="xp-start-separator"></div>
+      <button class="xp-start-item" onclick="openWindow('teams');closeStartMenu()">🌍 Teams</button>
+      <button class="xp-start-item" onclick="openWindow('map');closeStartMenu()">🌐 Battle Map</button>
+      <button class="xp-start-item" onclick="openWindow('bracket');closeStartMenu()">📊 Bracket</button>
+      <button class="xp-start-item" onclick="openWindow('shooter');closeStartMenu()">🔫 Shooter</button>
+      <div class="xp-start-separator"></div>
+      <button class="xp-start-item xp-start-item-auth" onclick="openWindow('myteams');closeStartMenu()" style="display:none">⭐ My Teams</button>
+      <button class="xp-start-item xp-start-item-auth" onclick="openWindow('predictions');closeStartMenu()" style="display:none">🔮 Predictions</button>
+      <button class="xp-start-item" onclick="openWindow('profile');closeStartMenu()">👤 Profile</button>
+      <div class="xp-start-separator"></div>
+      <button class="xp-start-item" onclick="openWindow('home');closeStartMenu()">⚽ About</button>
+    </div>
+  </div>
+
+</div><!-- #xp-desktop -->
+
+<!-- ════════════════════════════════════════════
+     MODALS — outside desktop, overlay everything
+════════════════════════════════════════════ -->
+
+<!-- Sign In Modal -->
+<div class="auth-modal-overlay" id="signInModal">
+  <div class="auth-modal">
+    <h2>Sign in</h2>
+    <div class="error-msg" id="signInError"></div>
+    <label>Email</label>
+    <input type="email" id="signInEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()">
+    <label>Password</label>
+    <input type="password" id="signInPassword" placeholder="Your password" onkeydown="if(event.key==='Enter')doSignIn()">
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="closeModals()">Cancel</button>
+      <button class="btn-primary" onclick="doSignIn()">Sign in</button>
+    </div>
+    <div class="switch-link">No account? <a onclick="showSignUp()">Create one</a></div>
+  </div>
+</div>
+
+<!-- Sign Up Modal -->
+<div class="auth-modal-overlay" id="signUpModal">
+  <div class="auth-modal">
+    <h2>Create account</h2>
+    <div class="error-msg" id="signUpError"></div>
+    <label>Your name</label>
+    <select id="signUpPlayer">
+      <option value="">Choose your sweepstakes name…</option>
+      <option>Anton</option><option>Chris</option><option>Dan</option>
+      <option>Laurie</option><option>Pat</option><option>Steven</option>
+    </select>
+    <label>Email</label>
+    <input type="email" id="signUpEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignUp()">
+    <label>Password</label>
+    <input type="password" id="signUpPassword" placeholder="6+ characters" onkeydown="if(event.key==='Enter')doSignUp()">
+    <label>Invite code</label>
+    <input type="text" id="signUpCode" placeholder="Enter sweepstakes code" onkeydown="if(event.key==='Enter')doSignUp()">
+    <div class="btn-row">
+      <button class="btn-ghost" onclick="closeModals()">Cancel</button>
+      <button class="btn-primary" onclick="doSignUp()">Create account</button>
+    </div>
+    <div class="switch-link">Already have an account? <a onclick="showSignIn()">Sign in</a></div>
+  </div>
+</div>
+
+<!-- Joker Reset Notification -->
+<div class="auth-modal-overlay" id="jokerResetModal">
+  <div class="auth-modal">
+    <div style="font-size:3rem;text-align:center;line-height:1;margin-bottom:12px">🃏</div>
+    <h2 style="text-align:center">Jokers Reset</h2>
+    <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.5;margin-bottom:18px">All jokers have been wiped from previous matchdays. Please re-apply your jokers on upcoming matches before they kick off.</p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="dismissJokerNotification()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Team Result Notification -->
+<div class="auth-modal-overlay" id="teamResultModal">
+  <div class="auth-modal" style="text-align:center">
+    <canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:200"></canvas>
+    <div class="result-emoji" id="resultEmoji" style="font-size:3.5rem;line-height:1;margin-bottom:8px"></div>
+    <h2 style="text-align:center;margin-bottom:4px" id="resultTitle"></h2>
+    <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:4px" id="resultSubtitle"></p>
+    <div id="resultDetails" style="text-align:left;margin-bottom:18px;font-size:0.88rem;color:var(--text-secondary);line-height:1.6"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="dismissTeamResults()">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- Player Profile Modal -->
+<div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
+  <div class="profile-card" id="profileCard"></div>
+</div>
+
+<!-- Match Predictions Panel -->
+<div class="pred-panel-overlay" id="predPanelOverlay" onclick="if(event.target===this)closePredPanel()">
+  <div class="pred-panel" id="predPanel"></div>
+</div>
+
+<!-- Joker Video Overlay -->
+<div id="joker-video-overlay" onclick="closeJokerVideo()">
+  <video id="joker-video" src="media/joker.mp4" preload="auto" playsinline></video>
+</div>
+
+<!-- ════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════ -->
+<script src="h2h-data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-server@3/dist/topojson-server.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script src="js/render-matches.js"></script>
+<script src="js/render-groups.js"></script>
+<script src="js/render-leaderboard.js"></script>
+<script src="js/render-predictions.js"></script>
+<script src="js/render-teams.js"></script>
+<script src="js/render-myteams.js"></script>
+<script src="js/render-profile.js"></script>
+<script src="js/globe.js"></script>
+<script src="js/shooter.js"></script>
+<script src="js/team-results.js"></script>
+<script src="js/profile-picture.js"></script>
+<script src="js/render-user-profile.js"></script>
+<script src="js/render-bracket.js"></script>
+<script src="js/xp-shell.js"></script>
+<script src="js/version.js"></script>
+<script src="js/version-refresh.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
