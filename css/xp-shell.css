@@ -124,6 +124,13 @@
   box-shadow: 0 3px 12px rgba(0,0,0,0.55);
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);
   flex-shrink: 0;
+  overflow: hidden;
+}
+.xp-welcome-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .xp-welcome-name {

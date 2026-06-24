@@ -165,6 +165,15 @@ function xpRemoveTaskbarBtn(name) {
 
 /* ── CLICK TO FOCUS ── */
 /* ── XP WELCOME SCREEN ── */
+var XP_ACCOUNT_PICS = {
+  Anton:  'images/xp-accounts/anton.jpg',
+  Chris:  'images/xp-accounts/chris.jpg',
+  Dan:    'images/xp-accounts/dan.jpg',
+  Laurie: 'images/xp-accounts/laurie.jpg',
+  Pat:    'images/xp-accounts/pat.jpg',
+  Steven: 'images/xp-accounts/steven.jpg'
+};
+
 function xpBuildWelcomeTiles() {
   var container = document.getElementById('xp-welcome-tiles');
   if (!container) return;
@@ -176,10 +185,14 @@ function xpBuildWelcomeTiles() {
   container.innerHTML = '';
   toShow.forEach(function(name) {
     var color = colors[name] || '#3a7bd5';
+    var pic   = XP_ACCOUNT_PICS[name];
+    var avatarInner = pic
+      ? '<img src="' + pic + '" alt="' + name + '" class="xp-welcome-avatar-img">'
+      : name[0];
     var tile  = document.createElement('div');
     tile.className = 'xp-welcome-tile';
     tile.innerHTML =
-      '<div class="xp-welcome-avatar" style="background:' + color + '">' + name[0] + '</div>' +
+      '<div class="xp-welcome-avatar" style="' + (pic ? '' : 'background:' + color) + '">' + avatarInner + '</div>' +
       '<div class="xp-welcome-name">' + name + '</div>';
     if (!cachedName) {
       tile.addEventListener('click', function() {
