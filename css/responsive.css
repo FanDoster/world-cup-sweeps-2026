@@ -115,8 +115,31 @@
     bottom: 40px;
   }
 
+  /* Prevent any window from spilling horizontally */
+  .xp-window { overflow-x: hidden !important; }
+
+  /* Title bar text shouldn't overflow on narrow windows */
+  .title-bar-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: calc(100vw - 80px); }
+
   /* Content legibility inside windows on mobile */
   .xp-window-content { padding: 6px; font-size: 12px; }
+
+  /* ── MSN window on mobile ── */
+  /* Hide display picture side panel — not needed on small screens */
+  .msn-right { display: none !important; }
+  /* Hide menu bar and status bar to reclaim vertical space */
+  .msn-menubar, .msn-statusbar { display: none !important; }
+  /* Toolbar: smaller icons, scroll if needed */
+  .msn-toolbar { overflow-x: auto; padding: 2px 4px; }
+  .msn-tb-btn { padding: 2px 4px; }
+  .msn-tb-icon { font-size: 16px; }
+  .msn-tb-logo { font-size: 13px; }
+  /* Ensure body fills remaining space */
+  .msn-body { padding: 2px; gap: 2px; }
+  /* Input row: stack textarea above send buttons */
+  .msn-input-row { flex-direction: column; }
+  .msn-send-col { flex-direction: row; border-left: none; border-top: 1px solid #d0d8e8; padding: 3px 4px; justify-content: flex-end; gap: 4px; }
+  .msn-input-field { min-height: 40px; }
 
   /* Grids */
   .people-grid { grid-template-columns: 1fr; }
