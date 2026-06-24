@@ -309,9 +309,6 @@ function renderLeaderboard() {
     '</div>' +
 
     '</div>'; // .xl-wrap
-
-  renderAwards(calcMatchLeaderboard());
-  renderJokerStats();
 }
 
 // ── TOURNAMENT AWARDS ──

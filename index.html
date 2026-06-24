@@ -143,6 +143,10 @@
       <div class="xp-icon-img">🏅</div>
       <div class="xp-icon-label">Leaderboard</div>
     </div>
+    <div class="xp-icon" data-window="awards" ondblclick="switchTab('awards')">
+      <div class="xp-icon-img">🏆</div>
+      <div class="xp-icon-label">Awards</div>
+    </div>
     <div class="xp-icon" data-window="teams" ondblclick="switchTab('teams')">
       <div class="xp-icon-img">🌍</div>
       <div class="xp-icon-label">Teams</div>
@@ -313,11 +317,25 @@
     <div class="xp-window-content">
       <div class="section-leaderboard" id="sectionLeaderboard">
         <div id="xl-leaderboard-target"></div>
-        <div class="xl-awards-wrap">
-          <div id="awardsWrap"></div>
-          <div id="jokerStatsWrap"></div>
-        </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ── Awards ── -->
+  <div class="xp-window" id="xp-window-awards" data-win="awards"
+       style="display:none; top:90px; left:230px; width:700px; height:520px;">
+    <div class="xp-title-bar" onmousedown="startDrag(event,'awards')">
+      <span class="xp-title-icon">🏆</span>
+      <span class="xp-title-text">Tournament Awards</span>
+      <div class="xp-controls">
+        <button class="xp-btn-min" onclick="minimizeWindow('awards')" title="Minimize">&#8211;</button>
+        <button class="xp-btn-max" onclick="maximizeWindow('awards')" title="Maximize">&#9633;</button>
+        <button class="xp-btn-close" onclick="closeWindow('awards')" title="Close">&#10005;</button>
+      </div>
+    </div>
+    <div class="xp-window-content">
+      <div id="awardsWrap"></div>
+      <div id="jokerStatsWrap"></div>
     </div>
   </div>
 

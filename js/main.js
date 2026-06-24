@@ -4,6 +4,7 @@ function switchTab(tab) {
   if (tab === 'map') { initGlobe(); renderTerritoryStandings(); }
   if (tab !== 'map') stopAutoRotate();
   if (tab === 'leaderboard') renderLeaderboard();
+  if (tab === 'awards') { renderAwards(calcMatchLeaderboard()); renderJokerStats(); }
   if (tab === 'myteams') renderMyTeams();
   if (tab === 'predictions') renderPredictions();
   if (tab === 'bracket') renderBracket();

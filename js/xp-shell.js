@@ -231,7 +231,8 @@ var XP_WIN_PATHS = {
   shooter:     'C:\\WorldCup2026\\Shooter',
   myteams:     'C:\\WorldCup2026\\My Teams',
   predictions: 'C:\\WorldCup2026\\Predictions',
-  profile:     'C:\\WorldCup2026\\Profile'
+  profile:     'C:\\WorldCup2026\\Profile',
+  awards:      'C:\\WorldCup2026\\Awards'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
