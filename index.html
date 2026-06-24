@@ -747,23 +747,6 @@
             </div>
           </div>
         </div>
-        <div class="msn-input-section">
-          <div class="msn-input-toolbar">
-            <button class="msn-input-btn" title="Font" style="font-weight:bold;font-family:serif;font-size:14px">A</button>
-            <button class="msn-input-btn" title="Emoticons">☺</button>
-            <button class="msn-input-btn msn-input-btn-wide" title="Voice Clip">🔊 Voice Clip</button>
-            <button class="msn-input-btn" title="Wink">😉</button>
-            <button class="msn-input-btn" title="Background">🖼</button>
-            <button class="msn-input-btn" title="Ink">✏️</button>
-          </div>
-          <div class="msn-input-row">
-            <textarea class="msn-input-field" id="msn-input-field" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();msnSendMessage();}"></textarea>
-            <div class="msn-send-col">
-              <button class="msn-send-btn" onclick="msnSendMessage()">Send</button>
-              <button class="msn-send-btn">Search</button>
-            </div>
-          </div>
-        </div>
       </div>
       <div class="msn-right">
         <div class="msn-dp-panel">
@@ -773,6 +756,23 @@
         <div class="msn-dp-panel">
           <div id="msn-dp-user-inner" class="msn-dp-default">👤</div>
           <button class="msn-dp-arrow">▼</button>
+        </div>
+      </div>
+    </div>
+    <div class="msn-input-section">
+      <div class="msn-input-toolbar">
+        <button class="msn-input-btn" title="Font" style="font-weight:bold;font-family:serif;font-size:14px">A</button>
+        <button class="msn-input-btn" title="Emoticons">☺</button>
+        <button class="msn-input-btn msn-input-btn-wide" title="Voice Clip">🔊 Voice Clip</button>
+        <button class="msn-input-btn" title="Wink">😉</button>
+        <button class="msn-input-btn" title="Background">🖼</button>
+        <button class="msn-input-btn" title="Ink">✏️</button>
+      </div>
+      <div class="msn-input-row">
+        <textarea class="msn-input-field" id="msn-input-field" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();msnSendMessage();}"></textarea>
+        <div class="msn-send-col">
+          <button class="msn-send-btn" onclick="msnSendMessage()">Send</button>
+          <button class="msn-send-btn">Search</button>
         </div>
       </div>
     </div>

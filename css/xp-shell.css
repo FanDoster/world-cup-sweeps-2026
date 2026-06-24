@@ -851,10 +851,10 @@
 .msn-input-section {
   background: #fff;
   border: 2px inset #b0c8e8;
-  border-top: none;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  margin: 0 4px 4px;
 }
 .msn-input-toolbar {
   display: flex;

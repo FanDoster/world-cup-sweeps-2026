@@ -24,7 +24,8 @@
     top: 30px !important;
     left: 0 !important;
     width: 100vw !important;
-    height: calc(100vh - 70px) !important;  /* 30px top bar + 40px taskbar */
+    height: calc(100vh - 70px) !important;  /* fallback */
+    height: calc(100svh - 70px) !important; /* iOS Safari: svh excludes browser chrome */
     display: none !important;
     z-index: 50 !important;
     border: none !important;
@@ -72,6 +73,7 @@
     left: 0;
     width: 100vw;
     height: calc(100vh - 70px);
+    height: calc(100svh - 70px);
     background: var(--xp-surface);
     overflow-y: auto;
     z-index: 40;
@@ -132,29 +134,10 @@
   .msn-tb-logo { font-size: 13px; }
   .msn-body { padding: 2px; gap: 2px; overflow: hidden; }
   .msn-right { width: 80px; }
-  /* Absolute-position the input section so it's always visible at the bottom,
-     regardless of how the flex chain above resolves */
-  #xp-window-msn .msn-left {
-    position: relative !important;
-    flex: 1 !important;
-    min-width: 0 !important;
-    overflow: hidden !important;
-    display: block !important;
-  }
-  #xp-window-msn .msn-chat-history {
-    position: absolute !important;
-    top: 0; left: 0; right: 0;
-    bottom: 90px !important;
-    overflow: hidden !important;
-  }
-  #xp-window-msn .msn-input-section {
-    position: absolute !important;
-    bottom: 0; left: 0; right: 0;
-    height: 90px !important;
-    overflow: hidden;
-  }
+  /* msn-input-section is a direct window flex child — no tricks needed */
   .msn-messages { -webkit-overflow-scrolling: touch; overflow-y: scroll !important; }
   .msn-input-btn-wide { display: none; }
+  .msn-input-section { margin: 0 2px 2px; }
   .msn-input-field { min-height: 44px; }
   .msn-send-col { padding: 2px; gap: 2px; }
   .msn-send-btn { padding: 2px 5px; font-size: 10px; }
