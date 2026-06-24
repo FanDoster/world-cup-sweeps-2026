@@ -15,7 +15,8 @@ var XP_WIN_LABELS = {
   shooter:     '🔫 Shooter',
   myteams:     '⭐ My Teams',
   predictions: '🔮 Predictions',
-  profile:     '👤 Profile'
+  profile:     '👤 Profile',
+  bbc:         '🌐 BBC Sport - World Cup 2002'
 };
 
 function openWindow(name) {
@@ -179,27 +180,24 @@ function xpBuildWelcomeTiles() {
   var cachedName = localStorage.getItem('xp_player_name');
   var players = typeof PLAYERS !== 'undefined' ? PLAYERS : ['Anton','Chris','Dan','Laurie','Pat','Steven'];
   var colors  = typeof ownerHexColors !== 'undefined' ? ownerHexColors : {};
-  var toShow  = cachedName ? [cachedName] : players;
 
   container.innerHTML = '';
-  toShow.forEach(function(name) {
+  players.forEach(function(name) {
     var color = colors[name] || '#3a7bd5';
     var pic   = XP_ACCOUNT_PICS[name];
     var avatarInner = pic
       ? '<img src="' + pic + '" alt="' + name + '" class="xp-welcome-avatar-img">'
       : name[0];
     var tile  = document.createElement('div');
-    tile.className = 'xp-welcome-tile';
+    tile.className = 'xp-welcome-tile' + (cachedName === name ? ' xp-welcome-tile-me' : '');
     tile.innerHTML =
       '<div class="xp-welcome-avatar" style="' + (pic ? '' : 'background:' + color) + '">' + avatarInner + '</div>' +
       '<div class="xp-welcome-name">' + name + '</div>';
-    if (!cachedName) {
-      tile.addEventListener('click', function() {
-        xpHideWelcome();
-        var btn = document.querySelector('.xp-tray-signin');
-        if (btn) btn.click();
-      });
-    }
+    tile.addEventListener('click', function() {
+      xpHideWelcome();
+      var btn = document.querySelector('.xp-tray-signin');
+      if (btn) btn.click();
+    });
     container.appendChild(tile);
   });
 
@@ -230,7 +228,8 @@ var XP_WIN_PATHS = {
   myteams:     'C:\\WorldCup2026\\My Teams',
   predictions: 'C:\\WorldCup2026\\Predictions',
   profile:     'C:\\WorldCup2026\\Profile',
-  awards:      'C:\\WorldCup2026\\Awards'
+  awards:      'C:\\WorldCup2026\\Awards',
+  bbc:         'http://news.bbc.co.uk/sport3/worldcup2002'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -243,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
     /* inject Explorer toolbar + address bar below the title bar */
     var name = el.dataset.win;
     var titleBar = el.querySelector('.title-bar');
-    if (!titleBar) return;
+    if (!titleBar || el.hasAttribute('data-no-explorer')) return;
 
     var toolbar = document.createElement('div');
     toolbar.className = 'xp-explorer-toolbar';

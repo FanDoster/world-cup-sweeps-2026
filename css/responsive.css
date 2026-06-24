@@ -4,6 +4,9 @@
 /* ── WINDOWS MOBILE / POCKET PC SKIN (≤700px) ── */
 @media (max-width: 700px) {
 
+  /* System tray + clock always anchored to the right of the taskbar */
+  #xp-system-tray { margin-left: auto; }
+
   /* Desktop fills full viewport — taskbar still at bottom */
   #xp-desktop {
     inset: 30px 0 40px 0;   /* top bar 30px, taskbar 40px */
