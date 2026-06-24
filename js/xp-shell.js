@@ -465,7 +465,8 @@ function msnFetchGifUrl(query) {
     .then(function(data) {
       if (data && data.results && data.results.length) {
         var item = data.results[Math.floor(Math.random() * Math.min(6, data.results.length))];
-        return item.media[0].gif.url;
+        var m = item.media[0];
+        return (m.tinygif || m.gif).url;
       }
       return null;
     })
