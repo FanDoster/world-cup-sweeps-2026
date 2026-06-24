@@ -215,7 +215,7 @@ async function renderPredictions() {
     if (statusRight2) {
       var exact = completedPreds.filter(function(cp) { return calcPredPoints(cp.p.predicted_home_score, cp.p.predicted_away_score, cp.m.score1, cp.m.score2) === 5; }).length;
       var scored = completedPreds.filter(function(cp) { var pts = calcPredPoints(cp.p.predicted_home_score, cp.p.predicted_away_score, cp.m.score1, cp.m.score2); return pts >= 1 && pts < 5; }).length;
-      statusRight2.textContent = 'Perfect 5&#9733;: ' + exact + '  |  Scored: ' + scored;
+      statusRight2.innerHTML = 'Perfect 5&#9733;: ' + exact + '  |  Scored: ' + scored;
     }
 
     if (completedPreds.length === 0) {
@@ -241,10 +241,10 @@ async function renderPredictions() {
       var p = cp.p, m = cp.m;
       var pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2);
       if (p.is_joker) pts *= 2;
-      var scoreCls = pts >= 10 ? 'xl-badge-exact' : (pts >= 1 ? 'xl-badge-scored' : 'xl-badge-zero');
-      var scoreStr = pts >= 10 ? '&#9733;&#9733;&#9733;&#9733;&#9733; (10)' : pts >= 6 ? '&#9733;&#9733;&#9733; (6)' : pts >= 2 ? '&#9733; (2)' : pts === 5 ? '&#9733;&#9733;&#9733;&#9733;&#9733;' : pts === 3 ? '&#9733;&#9733;&#9733;' : pts === 1 ? '&#9733;' : '&#10007;';
       // Recompute without joker for display
       var basePts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2);
+      var scoreCls = basePts === 5 ? 'xl-badge-exact' : (pts >= 1 ? 'xl-badge-scored' : 'xl-badge-zero');
+      var scoreStr;
       if (basePts === 5) scoreStr = '&#9733;&#9733;&#9733;&#9733;&#9733;' + (p.is_joker ? ' (10)' : '');
       else if (basePts === 3) scoreStr = '&#9733;&#9733;&#9733;' + (p.is_joker ? ' (6)' : '');
       else if (basePts === 1) scoreStr = '&#9733;' + (p.is_joker ? ' (2)' : '');
