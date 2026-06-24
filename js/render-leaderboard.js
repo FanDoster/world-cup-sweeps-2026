@@ -118,10 +118,280 @@ function renderPredLeaderboard() {
   if (el) el.textContent = arrow('predPts');
 }
 
+// ── EXCEL XP: cell selection handler ──
+function xlSelectCell(el, addr, formula) {
+  document.querySelectorAll('.xl-cell.xl-cell-selected').forEach(function(c) {
+    c.classList.remove('xl-cell-selected');
+  });
+  if (el) el.classList.add('xl-cell-selected');
+  var nameVal = document.getElementById('xl-name-val');
+  if (nameVal) nameVal.textContent = addr;
+  var fField = document.getElementById('xl-formula-field');
+  if (fField) fField.textContent = formula;
+  var sumEl = document.getElementById('xl-sum');
+  if (sumEl) {
+    var num = parseFloat(String(formula).replace(/^=/, ''));
+    sumEl.textContent = (!isNaN(num) && formula !== addr) ? 'Sum: ' + num : '';
+  }
+}
+
+// ── EXCEL XP: sheet tab switcher ──
+function xlSwitchSheet(name) {
+  document.querySelectorAll('.xl-tab').forEach(function(t) {
+    t.classList.toggle('xl-tab-active', t.dataset.sheet === name);
+  });
+  var built = xlBuildSheet(name);
+  var colHeaders = document.getElementById('xl-col-headers');
+  var grid = document.getElementById('xl-grid');
+  if (colHeaders) colHeaders.innerHTML = built.headers;
+  if (grid) grid.innerHTML = built.rows;
+  xlSelectCell(null, 'A1', '');
+}
+
+// ── EXCEL XP: sheet builder dispatcher ──
+function xlBuildSheet(name) {
+  if (name === 'match') return xlSheetMatch();
+  if (name === 'pred')  return xlSheetPred();
+  return xlSheetLeaderboard();
+}
+
+// ── EXCEL XP: Leaderboard sheet (combined match + pred pts) ──
+function xlSheetLeaderboard() {
+  var matchRows = calcMatchLeaderboard();
+  var predStats = getPredStatsByPlayer();
+  var rows = matchRows.map(function(m) {
+    var pp = predStats[m.name] ? predStats[m.name].pts : 0;
+    return { name: m.name, matchPts: m.pts, predPts: pp, total: m.pts + pp };
+  });
+  rows.sort(function(a, b) { return b.total - a.total || b.matchPts - a.matchPts; });
+
+  var cols = [
+    { key: 'A', label: '#',         width: 30  },
+    { key: 'B', label: 'Player',    width: 120 },
+    { key: 'C', label: 'Match Pts', width: 80  },
+    { key: 'D', label: 'Pred Pts',  width: 80  },
+    { key: 'E', label: 'Total',     width: 80  }
+  ];
+
+  var headers = '<div class="xl-row-gutter-header"></div>' +
+    cols.map(function(c) {
+      return '<div class="xl-col-header" style="width:' + c.width + 'px">' + c.key + '</div>';
+    }).join('');
+
+  var headerRow = '<div class="xl-row xl-row-header">' +
+    '<div class="xl-row-num">1</div>' +
+    cols.map(function(c) {
+      return '<div class="xl-cell" style="width:' + c.width + 'px" onclick="xlSelectCell(this,\'' +
+        c.key + '1\',\'' + escapeHtml(c.label) + '\')">' + escapeHtml(c.label) + '</div>';
+    }).join('') +
+    '</div>';
+
+  var dataRows = rows.map(function(p, i) {
+    var r = i + 2;
+    var rowCls = i === 0 ? 'xl-row-gold' : (r % 2 === 0 ? '' : 'xl-row-stripe');
+    var rankFml = '=RANK(E' + r + ',$E$2:$E$7,0)';
+    var totFml  = '=C' + r + '+D' + r;
+    return '<div class="xl-row ' + rowCls + '">' +
+      '<div class="xl-row-num">' + r + '</div>' +
+      '<div class="xl-cell xl-num" style="width:30px" onclick="xlSelectCell(this,\'A' + r + '\',\'' + escapeHtml(rankFml) + '\')">' + (i + 1) + '</div>' +
+      '<div class="xl-cell xl-hyperlink" style="width:120px" onclick="event.stopPropagation();showUserProfile(\'' + escapeHtml(p.name) + '\')">' + escapeHtml(playerDisplayName(p.name)) + '</div>' +
+      '<div class="xl-cell xl-num" style="width:80px" onclick="xlSelectCell(this,\'C' + r + '\',\'=' + p.matchPts + '\')">' + p.matchPts + '</div>' +
+      '<div class="xl-cell xl-num" style="width:80px" onclick="xlSelectCell(this,\'D' + r + '\',\'=' + p.predPts + '\')">' + p.predPts + '</div>' +
+      '<div class="xl-cell xl-num" style="width:80px" onclick="xlSelectCell(this,\'E' + r + '\',\'' + escapeHtml(totFml) + '\')">' + p.total + '</div>' +
+      '</div>';
+  }).join('');
+
+  return { headers: headers, rows: headerRow + dataRows };
+}
+
+// ── EXCEL XP: Match Results sheet (W/D/L/Pts) ──
+function xlSheetMatch() {
+  var rows = calcMatchLeaderboard();
+
+  var cols = [
+    { key: 'A', label: '#',      width: 30  },
+    { key: 'B', label: 'Player', width: 120 },
+    { key: 'C', label: 'W',      width: 50  },
+    { key: 'D', label: 'D',      width: 50  },
+    { key: 'E', label: 'L',      width: 50  },
+    { key: 'F', label: 'Pts',    width: 60  }
+  ];
+
+  var headers = '<div class="xl-row-gutter-header"></div>' +
+    cols.map(function(c) {
+      return '<div class="xl-col-header" style="width:' + c.width + 'px">' + c.key + '</div>';
+    }).join('');
+
+  var headerRow = '<div class="xl-row xl-row-header">' +
+    '<div class="xl-row-num">1</div>' +
+    cols.map(function(c) {
+      return '<div class="xl-cell" style="width:' + c.width + 'px" onclick="xlSelectCell(this,\'' +
+        c.key + '1\',\'' + escapeHtml(c.label) + '\')">' + escapeHtml(c.label) + '</div>';
+    }).join('') +
+    '</div>';
+
+  var dataRows = rows.map(function(p, i) {
+    var r = i + 2;
+    var rowCls = i === 0 ? 'xl-row-gold' : (r % 2 === 0 ? '' : 'xl-row-stripe');
+    var rankFml = '=RANK(F' + r + ',$F$2:$F$7,0)';
+    return '<div class="xl-row ' + rowCls + '">' +
+      '<div class="xl-row-num">' + r + '</div>' +
+      '<div class="xl-cell xl-num" style="width:30px" onclick="xlSelectCell(this,\'A' + r + '\',\'' + escapeHtml(rankFml) + '\')">' + (i + 1) + '</div>' +
+      '<div class="xl-cell xl-hyperlink" style="width:120px" onclick="event.stopPropagation();showUserProfile(\'' + escapeHtml(p.name) + '\')">' + escapeHtml(playerDisplayName(p.name)) + '</div>' +
+      '<div class="xl-cell xl-num" style="width:50px" onclick="xlSelectCell(this,\'C' + r + '\',\'=' + p.w + '\')">' + p.w + '</div>' +
+      '<div class="xl-cell xl-num" style="width:50px" onclick="xlSelectCell(this,\'D' + r + '\',\'=' + p.d + '\')">' + p.d + '</div>' +
+      '<div class="xl-cell xl-num" style="width:50px" onclick="xlSelectCell(this,\'E' + r + '\',\'=' + p.l + '\')">' + p.l + '</div>' +
+      '<div class="xl-cell xl-num" style="width:60px" onclick="xlSelectCell(this,\'F' + r + '\',\'=' + p.pts + '\')">' + p.pts + '</div>' +
+      '</div>';
+  }).join('');
+
+  return { headers: headers, rows: headerRow + dataRows };
+}
+
+// ── EXCEL XP: Predictions sheet ──
+function xlSheetPred() {
+  var rows = calcPredLeaderboard();
+
+  var cols = [
+    { key: 'A', label: '#',            width: 30  },
+    { key: 'B', label: 'Player',       width: 120 },
+    { key: 'C', label: 'Pred Pts',     width: 70  },
+    { key: 'D', label: 'Avg/Game',     width: 70  },
+    { key: 'E', label: 'Exact',        width: 60  },
+    { key: 'F', label: 'Best Streak',  width: 80  }
+  ];
+
+  var headers = '<div class="xl-row-gutter-header"></div>' +
+    cols.map(function(c) {
+      return '<div class="xl-col-header" style="width:' + c.width + 'px">' + c.key + '</div>';
+    }).join('');
+
+  var headerRow = '<div class="xl-row xl-row-header">' +
+    '<div class="xl-row-num">1</div>' +
+    cols.map(function(c) {
+      return '<div class="xl-cell" style="width:' + c.width + 'px" onclick="xlSelectCell(this,\'' +
+        c.key + '1\',\'' + escapeHtml(c.label) + '\')">' + escapeHtml(c.label) + '</div>';
+    }).join('') +
+    '</div>';
+
+  var dataRows = rows.map(function(p, i) {
+    var r = i + 2;
+    var rowCls = i === 0 ? 'xl-row-gold' : (r % 2 === 0 ? '' : 'xl-row-stripe');
+    var rankFml = '=RANK(C' + r + ',$C$2:$C$7,0)';
+    var avgFml  = '=C' + r + '/COUNTA($B$2:$B$7)';
+    return '<div class="xl-row ' + rowCls + '">' +
+      '<div class="xl-row-num">' + r + '</div>' +
+      '<div class="xl-cell xl-num" style="width:30px" onclick="xlSelectCell(this,\'A' + r + '\',\'' + escapeHtml(rankFml) + '\')">' + (i + 1) + '</div>' +
+      '<div class="xl-cell xl-hyperlink" style="width:120px" onclick="event.stopPropagation();showUserProfile(\'' + escapeHtml(p.name) + '\')">' + escapeHtml(playerDisplayName(p.name)) + '</div>' +
+      '<div class="xl-cell xl-num" style="width:70px" onclick="xlSelectCell(this,\'C' + r + '\',\'=' + p.predPts + '\')">' + p.predPts + '</div>' +
+      '<div class="xl-cell xl-num" style="width:70px" onclick="xlSelectCell(this,\'D' + r + '\',\'' + escapeHtml(avgFml) + '\')">' + p.avg + '</div>' +
+      '<div class="xl-cell xl-num" style="width:60px" onclick="xlSelectCell(this,\'E' + r + '\',\'=' + p.exact + '\')">' + p.exact + '</div>' +
+      '<div class="xl-cell xl-num" style="width:80px" onclick="xlSelectCell(this,\'F' + r + '\',\'=' + p.bestStreak + '\')">' + p.bestStreak + '</div>' +
+      '</div>';
+  }).join('');
+
+  return { headers: headers, rows: headerRow + dataRows };
+}
+
 // ── COMBINED RENDER (called from switchTab) ──
 function renderLeaderboard() {
-  renderMatchLeaderboard();
-  renderPredLeaderboard();
+  var target = document.getElementById('xl-leaderboard-target');
+  if (!target) return;
+
+  var initial = xlBuildSheet('leaderboard');
+
+  target.innerHTML =
+    '<div class="xl-wrap">' +
+
+    // ── Menu bar ──
+    '<div class="xl-menubar">' +
+    '<div class="xl-menu-items">' +
+    ['File','Edit','View','Insert','Format','Tools','Data','Window','Help'].map(function(item) {
+      return '<span class="xl-menu-item">' + item + '</span>';
+    }).join('') +
+    '</div>' +
+    '<input class="xl-help-box" type="text" value="Type a question for help" readonly>' +
+    '</div>' +
+
+    // ── Standard toolbar ──
+    '<div class="xl-toolbar xl-toolbar-standard">' +
+    '<button class="xp-tb-btn" disabled>&#128196;</button>' +
+    '<button class="xp-tb-btn" disabled>&#128194;</button>' +
+    '<button class="xp-tb-btn" disabled>&#128190;</button>' +
+    '<span class="xp-tb-sep"></span>' +
+    '<button class="xp-tb-btn" disabled>&#128438;</button>' +
+    '<button class="xp-tb-btn" disabled>&#128269;</button>' +
+    '<span class="xp-tb-sep"></span>' +
+    '<button class="xp-tb-btn" disabled>&#9986;</button>' +
+    '<button class="xp-tb-btn" disabled>&#128203;</button>' +
+    '<button class="xp-tb-btn" disabled>&#128204;</button>' +
+    '<span class="xp-tb-sep"></span>' +
+    '<button class="xp-tb-btn" disabled>&#8617;</button>' +
+    '<button class="xp-tb-btn" disabled>&#8618;</button>' +
+    '<span class="xp-tb-sep"></span>' +
+    '<button class="xp-tb-btn" disabled>&Sigma;</button>' +
+    '<span class="xp-tb-sep"></span>' +
+    '<select class="xl-zoom-select" disabled><option>100%</option></select>' +
+    '</div>' +
+
+    // ── Formatting toolbar ──
+    '<div class="xl-toolbar xl-toolbar-fmt">' +
+    '<select class="xl-font-select" disabled><option>Arial</option></select>' +
+    '<select class="xl-size-select" disabled><option>10</option></select>' +
+    '<span class="xp-tb-sep"></span>' +
+    '<button class="xp-tb-btn xl-fmt-btn" disabled>B</button>' +
+    '<button class="xp-tb-btn xl-fmt-btn xl-italic" disabled>I</button>' +
+    '<button class="xp-tb-btn xl-fmt-btn xl-underline" disabled>U</button>' +
+    '<span class="xp-tb-sep"></span>' +
+    '<button class="xp-tb-btn" disabled>&#8676;</button>' +
+    '<button class="xp-tb-btn" disabled>&#8803;</button>' +
+    '<button class="xp-tb-btn" disabled>&#8677;</button>' +
+    '<span class="xp-tb-sep"></span>' +
+    '<button class="xp-tb-btn" disabled>$</button>' +
+    '<button class="xp-tb-btn" disabled>%</button>' +
+    '<button class="xp-tb-btn" disabled>,</button>' +
+    '</div>' +
+
+    // ── Formula bar ──
+    '<div class="xl-formula-bar">' +
+    '<div class="xl-name-box">' +
+    '<span class="xl-name-val" id="xl-name-val">A1</span>' +
+    '<span class="xl-name-arrow">&#9660;</span>' +
+    '</div>' +
+    '<div class="xl-formula-sep"></div>' +
+    '<button class="xp-tb-btn xl-fx-btn" disabled>fx</button>' +
+    '<div class="xl-formula-field" id="xl-formula-field"></div>' +
+    '</div>' +
+
+    // ── Grid wrapper ──
+    '<div class="xl-grid-wrap">' +
+    '<div class="xl-col-headers" id="xl-col-headers">' + initial.headers + '</div>' +
+    '<div class="xl-grid" id="xl-grid">' + initial.rows + '</div>' +
+    '</div>' +
+
+    // ── Sheet tabs ──
+    '<div class="xl-sheet-tabs-wrap">' +
+    '<div class="xl-tab-nav">' +
+    '<button class="xl-tab-nav-btn" disabled>&#9664;&#9664;</button>' +
+    '<button class="xl-tab-nav-btn" disabled>&#9664;</button>' +
+    '<button class="xl-tab-nav-btn" disabled>&#9654;</button>' +
+    '<button class="xl-tab-nav-btn" disabled>&#9654;&#9654;</button>' +
+    '</div>' +
+    '<div class="xl-sheet-tabs">' +
+    '<div class="xl-tab xl-tab-active" data-sheet="leaderboard" onclick="xlSwitchSheet(\'leaderboard\')">&#128202; Leaderboard</div>' +
+    '<div class="xl-tab" data-sheet="match" onclick="xlSwitchSheet(\'match\')">&#9917; Match Results</div>' +
+    '<div class="xl-tab" data-sheet="pred" onclick="xlSwitchSheet(\'pred\')">&#128302; Predictions</div>' +
+    '</div>' +
+    '</div>' +
+
+    // ── Status bar ──
+    '<div class="xl-status-bar">' +
+    '<span class="xl-status-ready">Ready</span>' +
+    '<span class="xl-status-right"><span id="xl-sum"></span>NUM</span>' +
+    '</div>' +
+
+    '</div>'; // .xl-wrap
+
   renderAwards(calcMatchLeaderboard());
   renderJokerStats();
 }
