@@ -519,9 +519,9 @@
   overflow: hidden;
   min-height: 0;
 }
-/* ── Message list ── */
+/* ── Message list (full height — no reading pane) ── */
 .oe-msg-list-wrap {
-  flex: 0 0 58%;
+  flex: 1;
   overflow-y: auto;
   min-height: 0;
 }
@@ -628,6 +628,24 @@
 .oe-reading-prob { margin: 6px 0; }
 .oe-reading-dots { margin: 6px 0; }
 .oe-reading-pred-table { margin: 8px 0; }
+/* ── Match message window ── */
+.oe-msg-win-toolbar {
+  height: 28px;
+  background: #ece9d8;
+  border-bottom: 1px solid #b0a898;
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  gap: 1px;
+  flex-shrink: 0;
+}
+.oe-msg-win-header {
+  background: #ece9d8;
+  border-bottom: 1px solid #d4d0c8;
+  padding: 6px 12px;
+  flex-shrink: 0;
+}
+.oe-msg-win-body { padding: 10px 14px; overflow-y: auto; }
 .oe-predict-btn {
   margin-top: 10px;
   padding: 4px 12px;
@@ -659,8 +677,5 @@
 @media (max-width: 700px) {
   .oe-folders { display: none; }
   .oe-menubar, .oe-toolbar { display: none; }
-  .oe-reading-pane { display: none; }
-  .oe-splitter { display: none; }
-  .oe-msg-list-wrap { flex: 1; }
 }
 

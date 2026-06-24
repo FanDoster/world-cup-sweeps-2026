@@ -142,8 +142,14 @@ function renderMatches() {
 
   el.innerHTML = html;
 
-  // Re-select previously selected row (preserve reading pane)
-  if (oeSelectedKey) oeSelectMessage(oeSelectedKey);
+  // Restore selected-row highlight (no need to re-open the match window)
+  if (oeSelectedKey) {
+    var keyParts = oeSelectedKey.split('|');
+    var escapedKey = (keyParts[0] ? safeAttr(keyParts[0]) : '') + '|' + (keyParts[1] ? safeAttr(keyParts[1]) : '') + '|' + (keyParts[2] || '');
+    document.querySelectorAll('#oe-message-list .oe-msg-row').forEach(function(row) {
+      row.classList.toggle('oe-msg-selected', row.getAttribute('onclick') === 'oeSelectMessage(\'' + escapedKey + '\')');
+    });
+  }
 }
 
 function oeSelectMessage(key) {
@@ -162,8 +168,10 @@ function oeSelectMessage(key) {
     row.classList.toggle('oe-msg-selected', row.getAttribute('onclick') === 'oeSelectMessage(\'' + escapedKey + '\')');
   });
 
-  var pane = document.getElementById('oe-reading-pane');
-  if (!pane) return;
+  var titleEl  = document.getElementById('match-win-title');
+  var headerEl = document.getElementById('match-win-header');
+  var bodyEl   = document.getElementById('match-win-body');
+  if (!bodyEl) return;
 
   // Find the match
   var m = null;
@@ -171,7 +179,7 @@ function oeSelectMessage(key) {
     var mk = matchData[i].team1 + '|' + matchData[i].team2 + '|' + matchData[i].date;
     if (mk === key) { m = matchData[i]; break; }
   }
-  if (!m) { pane.innerHTML = '<div class="oe-reading-placeholder">Match not found.</div>'; return; }
+  if (!m) { bodyEl.innerHTML = '<div style="padding:20px;color:#888;font-style:italic">Match not found.</div>'; openWindow('match'); return; }
 
   var i1 = teamIso[m.team1];
   var i2 = teamIso[m.team2];
@@ -276,25 +284,31 @@ function oeSelectMessage(key) {
     predictBtn = '<div style="margin-top:10px"><button class="oe-predict-btn" onclick="showPredPanel(\'' + escapedKey + '\')">&#128270; Predict</button></div>';
   }
 
-  // Owner badges
+  // Owner / team line
   var fromLine = '<img class="oe-reading-flag" src="' + flagUrl(i1) + '" alt=""> ' + escapeHtml(m.team1) +
     (o1 ? ' <span class="match-owner ' + ownerColors[o1] + '">' + o1 + '</span>' : '') +
     ' <span style="color:#888;font-size:16px">&#8211;</span> ' +
     '<img class="oe-reading-flag" src="' + flagUrl(i2) + '" alt=""> ' + escapeHtml(m.team2) +
     (o2 ? ' <span class="match-owner ' + ownerColors[o2] + '">' + o2 + '</span>' : '');
 
-  pane.innerHTML =
-    '<div class="oe-reading-header">' +
-      '<div class="oe-reading-field"><span class="oe-reading-lbl">From:</span><span class="oe-reading-val">' + escapeHtml(m.team1) + ' v ' + escapeHtml(m.team2) + '</span></div>' +
-      '<div class="oe-reading-field"><span class="oe-reading-lbl">Subject:</span><span class="oe-reading-val">' + (m.round ? m.round + ' Round' : 'Group ' + m.group + ' Match') + '</span></div>' +
-      '<div class="oe-reading-field"><span class="oe-reading-lbl">Date:</span><span class="oe-reading-val">' + dateLabel + ' ' + localTime + '</span></div>' +
-    '</div>' +
-    '<div class="oe-reading-body">' +
-      '<div class="oe-reading-teams">' + fromLine + '</div>' +
-      '<div style="margin-bottom:8px">' + scoreHtml + '</div>' +
-      probHtml +
-      dotsHtml +
-      channelHtml +
-      predictBtn +
-    '</div>';
+  // Title bar
+  if (titleEl) titleEl.innerHTML = '<span class="xp-title-icon">📧</span> ' +
+    escapeHtml(m.team1) + ' v ' + escapeHtml(m.team2) + ' - Microsoft Outlook Express';
+
+  // Header fields
+  if (headerEl) headerEl.innerHTML =
+    '<div class="oe-reading-field"><span class="oe-reading-lbl">From:</span><span class="oe-reading-val">' + escapeHtml(m.team1) + ' v ' + escapeHtml(m.team2) + '</span></div>' +
+    '<div class="oe-reading-field"><span class="oe-reading-lbl">Subject:</span><span class="oe-reading-val">' + (m.round ? m.round + ' Round' : 'Group ' + m.group + ' Match') + '</span></div>' +
+    '<div class="oe-reading-field"><span class="oe-reading-lbl">Date:</span><span class="oe-reading-val">' + dateLabel + ' ' + localTime + '</span></div>';
+
+  // Body
+  bodyEl.innerHTML =
+    '<div class="oe-reading-teams">' + fromLine + '</div>' +
+    '<div style="margin-bottom:8px">' + scoreHtml + '</div>' +
+    probHtml +
+    dotsHtml +
+    channelHtml +
+    predictBtn;
+
+  openWindow('match');
 }

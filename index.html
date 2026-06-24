@@ -285,10 +285,6 @@
                 </div>
                 <div id="oe-message-list"></div>
               </div>
-              <div class="oe-splitter"></div>
-              <div class="oe-reading-pane" id="oe-reading-pane">
-                <div class="oe-reading-placeholder">Select a message to read it.</div>
-              </div>
               <div class="oe-status-bar">
                 <span id="oe-status-left">Loading…</span>
                 <span id="oe-status-right"></span>
@@ -688,6 +684,29 @@
       <span class="ie-status-text">Done</span>
       <div class="ie-zones"><span>Internet</span></div>
     </div>
+  </div>
+
+  <!-- ══ MATCH MESSAGE WINDOW ══ -->
+  <div class="xp-window" id="xp-window-match" data-win="match" data-no-explorer
+       style="display:none; top:80px; left:350px; width:560px; height:460px;">
+    <div class="title-bar" onmousedown="startDrag(event,'match')">
+      <div class="title-bar-text" id="match-win-title"><span class="xp-title-icon">📧</span> Match - Microsoft Outlook Express</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('match')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('match')"></button>
+        <button aria-label="Close" onclick="closeWindow('match')"></button>
+      </div>
+    </div>
+    <div class="oe-msg-win-toolbar">
+      <button class="oe-tb-btn" disabled>&#8617; Reply</button>
+      <button class="oe-tb-btn" disabled>Reply All</button>
+      <button class="oe-tb-btn" disabled>&#8680; Forward</button>
+      <span class="oe-tb-sep"></span>
+      <button class="oe-tb-btn" disabled>&#9664; Previous</button>
+      <button class="oe-tb-btn" disabled>Next &#9654;</button>
+    </div>
+    <div class="oe-msg-win-header" id="match-win-header"></div>
+    <div class="xp-window-content oe-msg-win-body" id="match-win-body"></div>
   </div>
 
   <!-- ══ GAZZA NOTIFICATION BALLOON ══ -->
