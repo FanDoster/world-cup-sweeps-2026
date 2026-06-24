@@ -213,6 +213,12 @@ function xpHideWelcome() {
   if (!el || el.classList.contains('xp-welcome-out')) return;
   el.classList.add('xp-welcome-out');
   setTimeout(function() { el.style.display = 'none'; }, 600);
+  setTimeout(function() {
+    var n = document.getElementById('msn-notification');
+    if (!n || n.style.display === 'block') return;
+    n.style.display = 'block';
+    n.classList.add('msn-animating-in');
+  }, 2500);
 }
 
 document.addEventListener('DOMContentLoaded', xpBuildWelcomeTiles);
@@ -370,10 +376,3 @@ function msnOpenChat() {
   openWindow('msn');
 }
 
-// Show MSN notification 3s after page load
-setTimeout(function() {
-  var n = document.getElementById('msn-notification');
-  if (!n) return;
-  n.style.display = 'block';
-  n.classList.add('msn-animating-in');
-}, 3000);
