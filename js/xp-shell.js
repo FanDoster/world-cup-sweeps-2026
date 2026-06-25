@@ -467,7 +467,7 @@ function msnGetUserTeams() {
   if (typeof currentProfile === 'undefined' || !currentProfile) return [];
   var name = currentProfile.player_name;
   if (typeof people === 'undefined' || !people[name]) return [];
-  return people[name].map(function(t) { return t.name || t; });
+  return people[name].map(function(t) { return t.team || t.name || t; });
 }
 
 function msnOwnerOf(teamName) {
