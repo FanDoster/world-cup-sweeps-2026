@@ -15,8 +15,8 @@
         #1a6aaf 0%, #4d9fd4 42%, #7ec8a0 58%, #4a8f3a 72%, #3d7a2e 100%);
   }
 
-  /* Hide desktop icons — today screen replaces them */
-  #xp-icons { display: none; }
+  /* Hide desktop icons and sticky notes — today screen replaces them */
+  #xp-icons, #xp-stickies { display: none; }
 
   /* All windows fill the viewport between the two bars */
   .xp-window {

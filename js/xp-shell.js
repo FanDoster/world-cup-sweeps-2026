@@ -893,3 +893,182 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// ── STICKY NOTES ──────────────────────────────────────────────────────────────
+
+const STICKY_INIT_POS = [
+  {top: 12,  left: 205}, {top: 22,  left: 435}, {top:  8,  left: 665},
+  {top: 205, left: 205}, {top: 215, left: 435}, {top: 200, left: 665},
+  {top: 398, left: 205}, {top: 408, left: 435}, {top: 390, left: 665},
+  {top: 12,  left: 895}, {top: 205, left: 895}, {top: 398, left: 895},
+  {top: 12, left: 1125}, {top: 205, left: 1125}, {top: 398, left: 1125},
+  {top: 12, left: 1355},
+];
+
+const stickyDismissed = {};
+const stickyCustomPos = {};
+
+function calcGuaranteedR32Matches() {
+  if (typeof matchData === 'undefined' || !matchData.length) return [];
+  if (typeof R32_SLOTS === 'undefined' || typeof sortGroupStandings === 'undefined') return [];
+
+  const groupMatches = {};
+  for (const m of matchData) {
+    if (!m.group) continue;
+    if (!groupMatches[m.group]) groupMatches[m.group] = [];
+    groupMatches[m.group].push(m);
+  }
+
+  const completedGroups = {};
+  for (const [letter, matches] of Object.entries(groupMatches)) {
+    if (!matches.every(m => m.isComplete)) continue;
+    const rec = {};
+    for (const m of matches) {
+      if (!rec[m.team1]) rec[m.team1] = { team: m.team1, pts: 0, gd: 0, gf: 0, h2h: {} };
+      if (!rec[m.team2]) rec[m.team2] = { team: m.team2, pts: 0, gd: 0, gf: 0, h2h: {} };
+    }
+    for (const m of matches) {
+      const s1 = m.score1, s2 = m.score2;
+      const t1 = rec[m.team1], t2 = rec[m.team2];
+      t1.gf += s1; t1.gd += (s1 - s2);
+      t2.gf += s2; t2.gd += (s2 - s1);
+      if (!t1.h2h[m.team2]) t1.h2h[m.team2] = { pts: 0, gd: 0, gf: 0 };
+      if (!t2.h2h[m.team1]) t2.h2h[m.team1] = { pts: 0, gd: 0, gf: 0 };
+      if (s1 > s2) {
+        t1.pts += 3;
+        t1.h2h[m.team2].pts += 3; t1.h2h[m.team2].gd += (s1 - s2); t1.h2h[m.team2].gf += s1;
+        t2.h2h[m.team1].gd += (s2 - s1); t2.h2h[m.team1].gf += s2;
+      } else if (s2 > s1) {
+        t2.pts += 3;
+        t2.h2h[m.team1].pts += 3; t2.h2h[m.team1].gd += (s2 - s1); t2.h2h[m.team1].gf += s2;
+        t1.h2h[m.team2].gd += (s1 - s2); t1.h2h[m.team2].gf += s1;
+      } else {
+        t1.pts += 1; t2.pts += 1;
+        t1.h2h[m.team2].pts += 1; t1.h2h[m.team2].gf += s1;
+        t2.h2h[m.team1].pts += 1; t2.h2h[m.team1].gf += s2;
+      }
+    }
+    completedGroups[letter] = sortGroupStandings(Object.values(rec));
+  }
+
+  // Third-place assignment — only determinable once all 12 groups are done
+  const thirdQualMap = {};
+  const completedCount = Object.keys(completedGroups).length;
+  const totalGroups = Object.keys(groupMatches).length;
+  if (completedCount === totalGroups && totalGroups === 12) {
+    const allThirds = Object.entries(completedGroups).map(([letter, teams]) => ({
+      ...teams[2], group: letter
+    }));
+    allThirds.sort((a, b) => {
+      if (b.pts !== a.pts) return b.pts - a.pts;
+      if (b.gd  !== a.gd)  return b.gd  - a.gd;
+      if (b.gf  !== a.gf)  return b.gf  - a.gf;
+      return (FIFA_RANK[a.team] || 999) - (FIFA_RANK[b.team] || 999);
+    });
+    const thirdsLeft = allThirds.slice(0, 8);
+    for (const slot of R32_SLOTS) {
+      if (slot.away !== '3rd') continue;
+      const idx = thirdsLeft.findIndex(t => slot.thirdPool.includes(t.group));
+      if (idx !== -1) thirdQualMap[slot.match] = thirdsLeft.splice(idx, 1)[0].team;
+    }
+  }
+
+  const resolvePos = (pos, matchNum) => {
+    if (pos === '3rd') return thirdQualMap[matchNum] || null;
+    const group = pos[1];
+    if (!completedGroups[group]) return null;
+    return pos[0] === '1' ? completedGroups[group][0].team : completedGroups[group][1].team;
+  };
+
+  const confirmed = [];
+  for (const slot of R32_SLOTS) {
+    const homeTeam = resolvePos(slot.home, slot.match);
+    const awayTeam = resolvePos(slot.away, slot.match);
+    if (homeTeam && awayTeam) confirmed.push({ match: slot.match, date: slot.date, homeTeam, awayTeam });
+  }
+  return confirmed;
+}
+
+function renderStickyNotes() {
+  const container = document.getElementById('xp-stickies');
+  if (!container) return;
+
+  // Preserve drag positions before innerHTML wipe
+  container.querySelectorAll('.xp-sticky[data-match]').forEach(el => {
+    const mid = el.getAttribute('data-match');
+    if (mid) stickyCustomPos[mid] = { top: el.style.top, left: el.style.left };
+  });
+
+  const matches = calcGuaranteedR32Matches();
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  let html = '';
+  let posIdx = 0;
+  for (const mc of matches) {
+    if (stickyDismissed[mc.match]) continue;
+    const saved = stickyCustomPos[mc.match];
+    const def   = STICKY_INIT_POS[posIdx] || { top: 20 + posIdx * 195, left: 200 };
+    posIdx++;
+    const topVal  = saved ? saved.top  : def.top  + 'px';
+    const leftVal = saved ? saved.left : def.left + 'px';
+
+    const homeIso   = (typeof teamIso    !== 'undefined' && teamIso[mc.homeTeam])   || '';
+    const awayIso   = (typeof teamIso    !== 'undefined' && teamIso[mc.awayTeam])   || '';
+    const homeOwner = (typeof teamOwner  !== 'undefined' && teamOwner[mc.homeTeam]) || '';
+    const awayOwner = (typeof teamOwner  !== 'undefined' && teamOwner[mc.awayTeam]) || '';
+    const homeColor = homeOwner ? (ownerHexColors[homeOwner] || '#888') : '';
+    const awayColor = awayOwner ? (ownerHexColors[awayOwner] || '#888') : '';
+
+    const [, mm, dd] = mc.date.split('-');
+    const dateLabel = parseInt(dd) + ' ' + MONTHS[parseInt(mm) - 1];
+    const mid = mc.match;
+    const homeName = typeof escapeHtml === 'function' ? escapeHtml(mc.homeTeam) : mc.homeTeam;
+    const awayName = typeof escapeHtml === 'function' ? escapeHtml(mc.awayTeam) : mc.awayTeam;
+
+    html += `<div class="xp-sticky" id="xp-sticky-${mid}" data-match="${mid}" style="top:${topVal};left:${leftVal}">`;
+    html += `<div class="xp-sticky-head" onmousedown="stickyDragStart(event,this.parentNode)">`;
+    html += `<span class="xp-sticky-matchno">Match ${mid}</span>`;
+    html += `<span class="xp-sticky-meta">${dateLabel}</span>`;
+    html += `<span class="xp-sticky-close" onmousedown="event.stopPropagation()" onclick="stickyDismiss(${mid})">&#215;</span>`;
+    html += `</div><div class="xp-sticky-body">`;
+    html += `<div class="xp-sticky-team">`;
+    if (homeIso) html += `<img class="xp-sticky-flag" src="${flagUrl(homeIso)}" alt="">`;
+    html += `<span class="xp-sticky-tname">${homeName}</span>`;
+    if (homeOwner) html += `<span class="xp-sticky-owner" style="background:${homeColor}">${homeOwner}</span>`;
+    html += `</div><div class="xp-sticky-vs">vs</div><div class="xp-sticky-team">`;
+    if (awayIso) html += `<img class="xp-sticky-flag" src="${flagUrl(awayIso)}" alt="">`;
+    html += `<span class="xp-sticky-tname">${awayName}</span>`;
+    if (awayOwner) html += `<span class="xp-sticky-owner" style="background:${awayColor}">${awayOwner}</span>`;
+    html += `</div></div></div>`;
+  }
+  container.innerHTML = html;
+}
+
+function stickyDismiss(matchNum) {
+  stickyDismissed[matchNum] = true;
+  const el = document.getElementById('xp-sticky-' + matchNum);
+  if (el) el.remove();
+}
+
+function stickyDragStart(e, el) {
+  if (e.button !== 0) return;
+  e.preventDefault();
+  const desktop = document.getElementById('xp-desktop');
+  const deskRect = desktop.getBoundingClientRect();
+  const startX = e.clientX - deskRect.left - (parseInt(el.style.left) || 0);
+  const startY = e.clientY - deskRect.top  - (parseInt(el.style.top)  || 0);
+  el.style.zIndex = 30;
+  const onMove = ev => {
+    el.style.left = (ev.clientX - deskRect.left - startX) + 'px';
+    el.style.top  = (ev.clientY - deskRect.top  - startY) + 'px';
+  };
+  const onUp = () => {
+    el.style.zIndex = '';
+    const mid = el.getAttribute('data-match');
+    if (mid) stickyCustomPos[mid] = { top: el.style.top, left: el.style.left };
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup',  onUp);
+  };
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup',  onUp);
+}
+
