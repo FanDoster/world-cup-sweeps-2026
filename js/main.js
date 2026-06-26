@@ -26,6 +26,7 @@ restoreSession().then(async function() {
     renderWarDispatch();
     checkTeamResults();
     renderStickyNotes();
+    renderR32Window();
     xpUpdateClock();
     xpHideWelcome();
     handleHashRoute();
@@ -33,4 +34,4 @@ restoreSession().then(async function() {
 });
 setInterval(renderMatches, 60000);
 setInterval(function() { if (typeof selectedTeam !== 'undefined' && selectedTeam) renderTeamSchedule(); }, 60000);
-setInterval(function() { loadData().then(function() { renderWarDispatch(); checkTeamResults(); renderStickyNotes(); }); }, 180000);
+setInterval(function() { loadData().then(function() { renderWarDispatch(); checkTeamResults(); renderStickyNotes(); renderR32Window(); }); }, 180000);

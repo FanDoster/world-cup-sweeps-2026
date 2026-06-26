@@ -18,7 +18,8 @@ var XP_WIN_LABELS = {
   profile:     '👤 Profile',
   match:       '📧 Match',
   msn:         '🦋 ~~gAzZa~~ - Conversation',
-  limewire:    '🍋 LimeWire 4.12.3'
+  limewire:    '🍋 LimeWire 4.12.3',
+  r32:         '🎯 R32 Draw'
 };
 
 function xpWinAnimTransform(winRect, btnRect) {
@@ -311,7 +312,8 @@ var XP_WIN_PATHS = {
   awards:      'C:\\WorldCup2026\\Awards',
   match:       'C:\\WorldCup2026\\Matches',
   msn:         'C:\\Program Files\\MSN Messenger',
-  limewire:    'C:\\Program Files\\LimeWire'
+  limewire:    'C:\\Program Files\\LimeWire',
+  r32:         'C:\\WorldCup2026\\R32 Draw'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -1041,6 +1043,54 @@ function renderStickyNotes() {
     html += `</div></div></div>`;
   }
   container.innerHTML = html;
+}
+
+function renderR32Window() {
+  const el = document.getElementById('xp-r32-content');
+  if (!el) return;
+
+  const confirmed = calcGuaranteedR32Matches();
+  const total = (typeof R32_SLOTS !== 'undefined') ? R32_SLOTS.length : 16;
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const pct = Math.round(confirmed.length / total * 100);
+
+  let html = `<div class="r32-header">`;
+  html += `<div class="r32-count-row"><span class="r32-count">${confirmed.length} / ${total} confirmed</span></div>`;
+  html += `<div class="r32-bar"><div class="r32-bar-fill" style="width:${pct}%"></div></div>`;
+  html += `</div>`;
+
+  if (confirmed.length === 0) {
+    html += `<div class="r32-empty">Group stage still underway — check back as groups complete.</div>`;
+  } else {
+    for (const mc of confirmed) {
+      const homeIso   = (typeof teamIso !== 'undefined' && teamIso[mc.homeTeam])   || '';
+      const awayIso   = (typeof teamIso !== 'undefined' && teamIso[mc.awayTeam])   || '';
+      const homeOwner = (typeof teamOwner !== 'undefined' && teamOwner[mc.homeTeam]) || '';
+      const awayOwner = (typeof teamOwner !== 'undefined' && teamOwner[mc.awayTeam]) || '';
+      const homeColor = homeOwner ? (ownerHexColors[homeOwner] || '#888') : '';
+      const awayColor = awayOwner ? (ownerHexColors[awayOwner] || '#888') : '';
+      const [, mm, dd] = mc.date.split('-');
+      const dateLabel = parseInt(dd) + ' ' + MONTHS[parseInt(mm) - 1];
+      const homeName = typeof escapeHtml === 'function' ? escapeHtml(mc.homeTeam) : mc.homeTeam;
+      const awayName = typeof escapeHtml === 'function' ? escapeHtml(mc.awayTeam) : mc.awayTeam;
+
+      html += `<div class="r32-match">`;
+      html += `<div class="r32-match-meta">Match ${mc.match} &middot; ${dateLabel}</div>`;
+      html += `<div class="r32-team">`;
+      if (homeIso) html += `<img class="r32-flag" src="${flagUrl(homeIso)}" alt="">`;
+      html += `<span class="r32-tname">${homeName}</span>`;
+      if (homeOwner) html += `<span class="r32-owner" style="background:${homeColor}">${homeOwner}</span>`;
+      html += `</div>`;
+      html += `<div class="r32-vs">vs</div>`;
+      html += `<div class="r32-team">`;
+      if (awayIso) html += `<img class="r32-flag" src="${flagUrl(awayIso)}" alt="">`;
+      html += `<span class="r32-tname">${awayName}</span>`;
+      if (awayOwner) html += `<span class="r32-owner" style="background:${awayColor}">${awayOwner}</span>`;
+      html += `</div></div>`;
+    }
+  }
+
+  el.innerHTML = html;
 }
 
 function stickyDismiss(matchNum) {

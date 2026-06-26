@@ -117,6 +117,11 @@
       <span class="xp-today-item-label">Predictions</span>
       <span class="xp-today-item-arrow">›</span>
     </button>
+    <button class="xp-today-item" onclick="openWindow('r32')">
+      <span class="xp-today-item-icon">🎯</span>
+      <span class="xp-today-item-label">R32 Draw</span>
+      <span class="xp-today-item-arrow">›</span>
+    </button>
     <button class="xp-today-item" onclick="switchTab('profile')">
       <span class="xp-today-item-icon">👤</span>
       <span class="xp-today-item-label">Profile</span>
@@ -175,6 +180,10 @@
     <div class="xp-icon" data-window="limewire" ondblclick="openWindow('limewire')">
       <div class="xp-icon-img"><img src="img/limewire-tray.ico" style="width:32px;height:32px;image-rendering:pixelated" alt="LimeWire"></div>
       <div class="xp-icon-label">LimeWire 4.12.3</div>
+    </div>
+    <div class="xp-icon" data-window="r32" ondblclick="openWindow('r32')">
+      <div class="xp-icon-img">🎯</div>
+      <div class="xp-icon-label">R32 Draw</div>
     </div>
     <!-- auth-gated: shown by updateAuthBar() when signed in -->
     <div class="xp-icon xp-icon-auth" data-window="myteams" ondblclick="switchTab('myteams')" style="display:none">
@@ -841,6 +850,22 @@
         <span class="lw-status-sep">·</span>
         <span id="lw-active-count">2 active downloads</span>
       </div>
+    </div>
+  </div>
+
+  <!-- ── R32 Draw ── -->
+  <div id="xp-window-r32" class="xp-window" data-win="r32" data-no-explorer
+       style="display:none;width:340px;height:500px;top:60px;left:340px">
+    <div class="title-bar" onmousedown="startDrag(event,'r32')">
+      <div class="title-bar-text">🎯 R32 Draw</div>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize" onclick="minimizeWindow('r32')"></button>
+        <button aria-label="Maximize" onclick="maximizeWindow('r32')"></button>
+        <button aria-label="Close" onclick="closeWindow('r32')"></button>
+      </div>
+    </div>
+    <div class="xp-window-content" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+      <div id="xp-r32-content"></div>
     </div>
   </div>
 
