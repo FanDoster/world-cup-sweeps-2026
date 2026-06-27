@@ -8,46 +8,27 @@ async function restoreSession() {
     const { data: { session } } = await sb.auth.getSession();
     currentSession = session;
     const { data: profile } = await sb.from('player_profiles').select('player_name, avatar_url').eq('id', user.id).single();
-    if (profile) { currentProfile = profile; avatarCache[profile.player_name] = profile.avatar_url || null; localStorage.setItem('xp_player_name', profile.player_name); }
+    if (profile) { currentProfile = profile; avatarCache[profile.player_name] = profile.avatar_url || null; }
   }
   updateAuthBar();
   if (currentSession) showJokerNotification();
 }
 
 function updateAuthBar() {
-  var tray = document.getElementById('xp-auth-tray');
-  if (tray) {
-    if (currentSession && currentProfile) {
-      tray.innerHTML = '<a class="xp-tray-user" onclick="openWindow(\'profile\')">'
-        + avatarHtml(currentProfile.player_name, 16)
-        + ' ' + currentProfile.player_name + '</a>'
-        + ' <button class="xp-tray-signout" onclick="doSignOut()">Sign out</button>';
-    } else {
-      tray.innerHTML = '<button class="xp-tray-signin" onclick="showSignIn()">Sign in</button>';
-    }
-  }
+  const bar = document.getElementById('authBar');
+  const tabBar = document.getElementById('tabBar');
+  // Remove existing auth tabs
+  tabBar.querySelectorAll('.auth-tab').forEach(el => el.remove());
 
-  var authed = !!(currentSession && currentProfile);
-
-  // Desktop icons
-  document.querySelectorAll('.xp-icon-auth').forEach(function(el) {
-    el.style.display = authed ? 'flex' : 'none';
-  });
-
-  // Start menu auth items
-  document.querySelectorAll('.xp-start-item-auth').forEach(function(el) {
-    el.style.display = authed ? 'flex' : 'none';
-  });
-
-  // Today screen auth items (mobile)
-  document.querySelectorAll('.xp-today-auth').forEach(function(el) {
-    el.style.display = authed ? 'flex' : 'none';
-  });
-
-  // Start menu user name
-  var startUser = document.getElementById('xp-start-user-name');
-  if (startUser) {
-    startUser.textContent = (authed && currentProfile) ? currentProfile.player_name : 'World Cup 2026';
+  if (currentSession && currentProfile) {
+    bar.innerHTML = `<a class="signed-in-link" onclick="showUserProfile('${currentProfile.player_name}')"><span class="signed-in"><span class="avatar-auth">${avatarHtml(currentProfile.player_name, 24)}</span> ${currentProfile.player_name}</span></a>
+      <button class="sign-out-btn" onclick="doSignOut()">Sign out</button>`;
+    // Inject logged-in tabs
+    tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="myteams" onclick="switchTab('myteams')"><span class="emoji">⭐</span><span class="tab-label"> My Teams</span></button>`);
+    tabBar.insertAdjacentHTML('beforeend', `<button class="tab-btn auth-tab" data-tab="predictions" onclick="switchTab('predictions')"><span class="emoji">🔮</span><span class="tab-label"> Predictions</span></button>`);
+  } else {
+    bar.innerHTML = `<button onclick="showSignIn()">Sign in</button>
+      <button onclick="showSignUp()">Create account</button>`;
   }
 }
 
@@ -73,7 +54,7 @@ async function doSignIn() {
   currentSession = data.session;
   const { data: profile } = await sb.from('player_profiles').select('player_name, avatar_url').eq('id', data.user.id).single();
   currentProfile = profile;
-  if (profile) { avatarCache[profile.player_name] = profile.avatar_url || null; localStorage.setItem('xp_player_name', profile.player_name); }
+  if (profile) avatarCache[profile.player_name] = profile.avatar_url || null;
   closeModals();
   updateAuthBar();
   showJokerNotification();
@@ -118,7 +99,6 @@ async function doSignUp() {
 
   currentSession = data.session;
   currentProfile = { player_name: playerName };
-  localStorage.setItem('xp_player_name', playerName);
   closeModals();
   updateAuthBar();
   showJokerNotification();
@@ -129,6 +109,5 @@ async function doSignOut() {
   await sb.auth.signOut();
   currentSession = null;
   currentProfile = null;
-  localStorage.removeItem('xp_player_name');
   updateAuthBar();
 }

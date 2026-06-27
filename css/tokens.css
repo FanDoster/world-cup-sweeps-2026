@@ -1,78 +1,69 @@
-/* ── XP DESIGN TOKENS ── */
+/* ── DESIGN TOKENS ── */
 :root {
-  /* desktop environment */
-  --xp-desktop-bg:     #1a6aaf;
-  --xp-titlebar-start: #4a90d9;
-  --xp-titlebar-mid:   #2462c9;
-  --xp-titlebar-end:   #1a52b0;
-  --xp-surface:        #ece9d8;
-  --xp-card:           #ffffff;
-  --xp-border-hi:      #ffffff;
-  --xp-border-sh:      #848284;
-  --xp-border-outer:   #0a246a;
-  --xp-taskbar-start:  #2d5ba8;
-  --xp-taskbar-end:    #1f3a6e;
-  --xp-start-green:    #3a7a18;
-
-  /* mapped tokens (used by existing CSS files) */
-  --bg:                var(--xp-surface);
-  --surface:           var(--xp-surface);
-  --card:              var(--xp-card);
-  --card-hover:        #f5f3ec;
-  --border:            var(--xp-border-sh);
-  --border-subtle:     #c8c4b8;
-  --border-alpha:      rgba(0,0,0,0.15);
-  --border-alpha-mid:  rgba(0,0,0,0.2);
-  --text:              #000000;
-  --text-secondary:    #444444;
-  --text-muted:        #808080;
-  --accent:            #2462c9;
-  --accent-dim:        #1a52b0;
-  --accent-glow:       rgba(36,98,201,0.15);
-  --gold:              #cc8800;
-  --gold-dim:          #aa7000;
-  --silver:            #808080;
-  --bronze:            #8b5a00;
-  --live:              #cc0000;
-  --live-glow:         rgba(204,0,0,0.18);
-  --radius:            0px;
-  --radius-sm:         0px;
-  --radius-xs:         0px;
-  --font:              "Pixelated MS Sans Serif", Tahoma, Arial, sans-serif;
-  --font-mono:         'Courier New', Courier, monospace;
-  --ticker-dim:        rgba(0,0,0,0.3);
-  --ticker-mid:        rgba(0,0,0,0.55);
-  --ticker-full:       rgba(0,0,0,0.75);
+  --bg:            #070b10;
+  --surface:       #0e1620;
+  --card:          #131d2a;
+  --card-hover:    #182638;
+  --border:        #1e2e40;
+  --border-subtle: #162433;
+  --text:          #e4ebf3;
+  --text-secondary:#7d8ea0;
+  --text-muted:    #4b5b6e;
+  --accent:        #10b981;
+  --accent-dim:    #0d9668;
+  --accent-glow:   rgba(16,185,129,0.12);
+  --gold:          #f59e0b;
+  --gold-dim:      #d97706;
+  --silver:        #94a3b8;
+  --bronze:        #d08c4a;
+  --live:          #ef4444;
+  --live-glow:     rgba(239,68,68,0.18);
+  --radius:        12px;
+  --radius-sm:     8px;
+  --radius-xs:     5px;
+  --font:          -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:     'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  /* ticker colour scale */
+  --ticker-dim:        rgba(255,255,255,0.3);
+  --ticker-mid:        rgba(255,255,255,0.55);
+  --ticker-full:       rgba(255,255,255,0.75);
+  /* semi-transparent borders used on dark surfaces */
+  --border-alpha:      rgba(255,255,255,0.08);
+  --border-alpha-mid:  rgba(255,255,255,0.12);
+  /* third-party brand colours */
   --color-polymarket:  #2E5CFF;
   --color-stats-green: #15803d;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: var(--xp-desktop-bg);
+  background: var(--bg);
   color: var(--text);
   font-family: var(--font);
-  font-size: 11px;
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.container { max-width: none; margin: 0; padding: 0; }
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
 
+/* ── UTILITY CLASSES ── */
 .card-base {
-  background: var(--xp-card);
-  border: 1px solid var(--xp-border-sh);
-  border-radius: 0;
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
 }
-
 .badge-mono {
   font-family: var(--font-mono);
-  background: #f0f0f0;
-  border-radius: 0;
-  color: var(--text-secondary);
-  border: 1px solid var(--xp-border-sh);
+  background: var(--surface);
+  border-radius: 4px;
+  color: var(--text-muted);
 }
-
 .label-sm {
   font-size: 0.78rem;
   font-weight: 700;

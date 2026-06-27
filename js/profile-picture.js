@@ -132,19 +132,16 @@ async function removeAvatar() {
 function avatarHtml(playerName, size) {
   size = size || 32;
   var url = avatarCache[playerName];
-  var xpPic = (typeof XP_ACCOUNT_PICS !== 'undefined') ? XP_ACCOUNT_PICS[playerName] : null;
   var initials = playerName.charAt(0).toUpperCase();
   var hex = (ownerHexColors[playerName]) || '#888';
-  var fallbackSpan = '<span style="display:none;width:' + size + 'px;height:' + size + 'px;border-radius:50%;' +
-    'background:' + hex + ';color:#fff;align-items:center;justify-content:center;' +
-    'font-weight:700;font-size:' + Math.round(size * 0.45) + 'px">' + initials + '</span>';
 
-  var imgSrc = url || xpPic;
-  if (imgSrc) {
+  if (url) {
     return '<span class="avatar-wrap" style="display:inline-flex;width:' + size + 'px;height:' + size + 'px;flex-shrink:0">' +
-      '<img src="' + imgSrc + '" alt="" style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;object-fit:cover"' +
+      '<img src="' + url + '" alt="" style="width:' + size + 'px;height:' + size + 'px;border-radius:50%;object-fit:cover"' +
       ' onerror="var s=this.nextElementSibling;this.style.display=\'none\';s.style.display=\'flex\'">' +
-      fallbackSpan +
+      '<span style="display:none;width:' + size + 'px;height:' + size + 'px;border-radius:50%;' +
+      'background:' + hex + ';color:#fff;align-items:center;justify-content:center;' +
+      'font-weight:700;font-size:' + Math.round(size * 0.45) + 'px">' + initials + '</span>' +
       '</span>';
   }
   return '<span style="display:inline-flex;width:' + size + 'px;height:' + size + 'px;border-radius:50%;flex-shrink:0;' +

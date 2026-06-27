@@ -4,21 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>World Cup 2026 Sweepstakes</title>
-  <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#2462c9">
+  <link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#10b981">
   <link rel="icon" type="image/x-icon" href="favicon/favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
   <link rel="manifest" href="favicon/site.webmanifest">
-  <meta name="theme-color" content="#2462c9">
-  <link rel="stylesheet" href="css/xp-fonts.css">
+  <meta name="theme-color" content="#070b10">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/xp-shell.css">
   <link rel="stylesheet" href="css/layout.css">
   <link rel="stylesheet" href="css/matches.css">
   <link rel="stylesheet" href="css/groups.css">
   <link rel="stylesheet" href="css/leaderboard.css">
-  <link rel="stylesheet" href="css/excel.css">
   <link rel="stylesheet" href="css/teams.css">
   <link rel="stylesheet" href="css/dispatch.css">
   <link rel="stylesheet" href="css/predictions.css">
@@ -29,203 +28,27 @@
   <link rel="stylesheet" href="css/shooter.css">
   <link rel="stylesheet" href="css/profile-picture.css">
   <link rel="stylesheet" href="css/user-profile.css">
-  <link rel="stylesheet" href="css/xp-titlebar.css">
-  <link rel="stylesheet" href="css/limewire.css">
+  <link rel="stylesheet" href="css/bracket.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/update-notification.css">
 </head>
 <body>
-
-<!-- ══════════════════════════════════════════════
-     XP WELCOME / LOADING SCREEN
-═══════════════════════════════════════════════ -->
-<div id="xp-welcome">
-  <div id="xp-welcome-topbar"></div>
-  <div id="xp-welcome-body">
-    <div id="xp-welcome-brand">
-      <img id="xp-welcome-logo" src="img/winxp-logo.png" alt="Windows XP">
-    </div>
-    <div id="xp-welcome-divider"></div>
-    <div id="xp-welcome-users">
-      <p id="xp-welcome-hint">To begin, click your user name</p>
-      <div id="xp-welcome-tiles"></div>
-      <p id="xp-welcome-status">Loading&hellip;</p>
-    </div>
-  </div>
-  <div id="xp-welcome-bottombar">
-    <button id="xp-welcome-turnoff" onclick="xpHideWelcome()" title="Dismiss">
-      <span>&#9711;</span> Turn off computer
-    </button>
-    <div id="xp-welcome-footer-text">
-      After you log on, you can add or change accounts.<br>
-      Just go to Control Panel and click User Accounts.
-    </div>
-    <div></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-     XP DESKTOP
-═══════════════════════════════════════════════ -->
-<div id="xp-desktop">
-
-  <!-- Today screen (mobile only) -->
-  <div id="xp-today">
-    <button class="xp-today-item" onclick="switchTab('matches')">
-      <span class="xp-today-item-icon">⏱️</span>
-      <span class="xp-today-item-label">Matches</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item" onclick="switchTab('players')">
-      <span class="xp-today-item-icon">🏆</span>
-      <span class="xp-today-item-label">Players</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item" onclick="switchTab('groups')">
-      <span class="xp-today-item-icon">📋</span>
-      <span class="xp-today-item-label">Groups</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item" onclick="switchTab('leaderboard')">
-      <span class="xp-today-item-icon">🏅</span>
-      <span class="xp-today-item-label">Leaderboard</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item" onclick="switchTab('teams')">
-      <span class="xp-today-item-icon">🌍</span>
-      <span class="xp-today-item-label">Teams</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item" onclick="switchTab('map')">
-      <span class="xp-today-item-icon">🌐</span>
-      <span class="xp-today-item-label">Battle Map</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-
-    <button class="xp-today-item" onclick="openWindow('limewire')">
-      <span class="xp-today-item-icon"><img src="img/limewire-tray.ico" style="width:24px;height:24px;image-rendering:pixelated;vertical-align:middle" alt="LimeWire"></span>
-      <span class="xp-today-item-label">LimeWire 4.12.3</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item xp-today-auth" onclick="switchTab('myteams')" style="display:none">
-      <span class="xp-today-item-icon">⭐</span>
-      <span class="xp-today-item-label">My Teams</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item xp-today-auth" onclick="switchTab('predictions')" style="display:none">
-      <span class="xp-today-item-icon">🔮</span>
-      <span class="xp-today-item-label">Predictions</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item" onclick="openWindow('r32')">
-      <span class="xp-today-item-icon">🎯</span>
-      <span class="xp-today-item-label">R32 Draw</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-    <button class="xp-today-item" onclick="switchTab('profile')">
-      <span class="xp-today-item-icon">👤</span>
-      <span class="xp-today-item-label">Profile</span>
-      <span class="xp-today-item-arrow">›</span>
-    </button>
-  </div>
-
-  <!-- Mobile top bar (Pocket PC style) -->
-  <div id="xp-mob-topbar">World Cup 2026</div>
-
-  <!-- ── DESKTOP ICONS ── -->
-  <div id="xp-icons">
-    <div class="xp-icon" data-window="matches" ondblclick="switchTab('matches')">
-      <div class="xp-icon-img">⏱️</div>
-      <div class="xp-icon-label">Matches</div>
-    </div>
-    <div class="xp-icon" data-window="players" ondblclick="switchTab('players')">
-      <div class="xp-icon-img">🏆</div>
-      <div class="xp-icon-label">Players</div>
-    </div>
-    <div class="xp-icon" data-window="groups" ondblclick="switchTab('groups')">
-      <div class="xp-icon-img">📋</div>
-      <div class="xp-icon-label">Groups</div>
-    </div>
-    <div class="xp-icon" data-window="leaderboard" ondblclick="switchTab('leaderboard')">
-      <div class="xp-icon-img">🏅</div>
-      <div class="xp-icon-label">Leaderboard</div>
-    </div>
-    <div class="xp-icon" data-window="awards" ondblclick="switchTab('awards')">
-      <div class="xp-icon-img">🏆</div>
-      <div class="xp-icon-label">Awards</div>
-    </div>
-    <div class="xp-icon" data-window="teams" ondblclick="switchTab('teams')">
-      <div class="xp-icon-img">🌍</div>
-      <div class="xp-icon-label">Teams</div>
-    </div>
-    <div class="xp-icon" data-window="map" ondblclick="switchTab('map')">
-      <div class="xp-icon-img">🌐</div>
-      <div class="xp-icon-label">Battle Map</div>
-    </div>
-
-    <div class="xp-icon" data-window="shooter" ondblclick="switchTab('shooter')">
-      <div class="xp-icon-img">🔫</div>
-      <div class="xp-icon-label">Shooter</div>
-    </div>
-    <div class="xp-icon" data-window="profile" ondblclick="switchTab('profile')">
-      <div class="xp-icon-img">👤</div>
-      <div class="xp-icon-label">Profile</div>
-    </div>
-    <div class="xp-icon xp-icon-web-shortcut" ondblclick="window.open('http://news.bbc.co.uk/sport3/worldcup2002/','_blank')">
-      <div class="xp-icon-img xp-web-shortcut-img">
-        <div class="xp-bbc-logo"><span>B</span><span>B</span><span>C</span></div>
-      </div>
-      <div class="xp-icon-label">BBC World Cup</div>
-    </div>
-    <div class="xp-icon" data-window="limewire" ondblclick="openWindow('limewire')">
-      <div class="xp-icon-img"><img src="img/limewire-tray.ico" style="width:32px;height:32px;image-rendering:pixelated" alt="LimeWire"></div>
-      <div class="xp-icon-label">LimeWire 4.12.3</div>
-    </div>
-    <div class="xp-icon" data-window="r32" ondblclick="openWindow('r32')">
-      <div class="xp-icon-img">🎯</div>
-      <div class="xp-icon-label">R32 Draw</div>
-    </div>
-    <!-- auth-gated: shown by updateAuthBar() when signed in -->
-    <div class="xp-icon xp-icon-auth" data-window="myteams" ondblclick="switchTab('myteams')" style="display:none">
-      <div class="xp-icon-img">⭐</div>
-      <div class="xp-icon-label">My Teams</div>
-    </div>
-    <div class="xp-icon xp-icon-auth" data-window="predictions" ondblclick="switchTab('predictions')" style="display:none">
-      <div class="xp-icon-img">🔮</div>
-      <div class="xp-icon-label">Predictions</div>
-    </div>
-  </div>
-
-  <!-- ── R32 STICKY NOTES (populated by renderStickyNotes()) ── -->
-  <div id="xp-stickies"></div>
-
-  <!-- ════════════════════════════════════════════
-       WINDOWS
-  ════════════════════════════════════════════ -->
-
-  <!-- ── World Cup 2026 (home) ── -->
-  <div class="xp-window" id="xp-window-home" data-win="home"
-       style="display:none; top:50px; left:280px; width:520px;">
-    <div class="title-bar" onmousedown="startDrag(event,'home')">
-      <div class="title-bar-text"><span class="xp-title-icon">⚽</span> World Cup 2026</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('home')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('home')"></button>
-        <button aria-label="Close" onclick="closeWindow('home')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content xp-home-header">
-      <div id="warDispatch" class="war-dispatch"></div>
+  <div class="container">
+    <header>
       <svg width="100%" viewBox="0 0 320 255" role="img" aria-label="World Cup 2026 — Canada, USA, Mexico">
         <defs>
           <clipPath id="cC"><text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif">C</text></clipPath>
           <clipPath id="cU"><text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif">U</text></clipPath>
           <clipPath id="cM"><text x="0" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif">M</text></clipPath>
         </defs>
+
+        <!-- Arched title -->
         <path id="archPath" d="M 10,75 Q 160,10 310,75" fill="none"/>
         <text font-size="13" font-weight="800" letter-spacing="5" fill="#888" font-family="system-ui,sans-serif">
           <textPath href="#archPath" startOffset="50%" text-anchor="middle">&#9733;  WORLD CUP 2026  &#9733;</textPath>
         </text>
+
+        <!-- C — Canada -->
         <g transform="translate(0,72)">
           <text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="#111" stroke-width="14" stroke-linejoin="round">C</text>
           <g clip-path="url(#cC)">
@@ -233,6 +56,8 @@
           </g>
           <text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="4.5">C</text>
         </g>
+
+        <!-- U — USA -->
         <g transform="translate(102,72)">
           <text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="#111" stroke-width="14" stroke-linejoin="round">U</text>
           <g clip-path="url(#cU)">
@@ -240,6 +65,8 @@
           </g>
           <text x="2" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="4.5">U</text>
         </g>
+
+        <!-- M — Mexico -->
         <g transform="translate(205,72)">
           <text x="0" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="#111" stroke-width="14" stroke-linejoin="round">M</text>
           <g clip-path="url(#cM)">
@@ -247,780 +74,263 @@
           </g>
           <text x="0" y="148" font-size="145" font-weight="900" font-family="Impact,'Arial Black',sans-serif" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="4.5">M</text>
         </g>
+
+        <!-- CANADA · USA · MEXICO strip — textLength pins width so lines never overlap -->
         <line x1="10" y1="242" x2="72" y2="242" stroke="#555" stroke-width="1"/>
         <text x="160" y="246" font-size="11" font-weight="700" textLength="160" lengthAdjust="spacing" fill="#999" font-family="system-ui,sans-serif" text-anchor="middle">CANADA · USA · MEXICO</text>
         <line x1="248" y1="242" x2="310" y2="242" stroke="#555" stroke-width="1"/>
       </svg>
-    </div>
-  </div>
+      <svg width="0" height="0" style="position:absolute">
+        <defs>
+          <filter id="gazza-ripple" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="3" seed="5" result="noise">
+              <animate attributeName="baseFrequency"
+                values="0.012 0.018;0.018 0.028;0.01 0.022;0.016 0.02;0.012 0.018"
+                dur="6s" repeatCount="indefinite"/>
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+        </defs>
+      </svg>
+      <img src="img/gazza-crying.jpg" alt="Gazza crying" style="width:100%;display:block;margin:0 auto;filter:url(#gazza-ripple);">
+      <div class="auth-bar" id="authBar">
+        <button onclick="showSignIn()">Sign in</button>
+        <button onclick="showSignUp()">Create account</button>
+      </div>
+    </header>
 
-  <!-- ── Matches (open by default) ── -->
-  <div class="xp-window" id="xp-window-matches" data-win="matches"
-       style="display:none; top:44px; left:180px; width:880px; height:600px;">
-    <div class="title-bar" onmousedown="startDrag(event,'matches')">
-      <div class="title-bar-text"><span class="xp-title-icon">⏱️</span> Matches</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('matches')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('matches')"></button>
-        <button aria-label="Close" onclick="closeWindow('matches')"></button>
+    <div id="warDispatch" class="war-dispatch"></div>
+
+    <div class="tab-bar" id="tabBar">
+      <button type="button" class="tab-btn" data-tab="players" onclick="switchTab('players')"><span class="emoji">🏆</span><span class="tab-label"> Players</span></button>
+      <button type="button" class="tab-btn active" data-tab="matches" onclick="switchTab('matches')"><span class="emoji">⏱</span><span class="tab-label"> Matches</span></button>
+      <button type="button" class="tab-btn" data-tab="groups" onclick="switchTab('groups')"><span class="emoji">📋</span><span class="tab-label"> Groups</span></button>
+      <button type="button" class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')"><span class="emoji">🏅</span><span class="tab-label"> Leaderboard</span></button>
+      <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span><span class="tab-label"> Teams</span></button>
+      <button type="button" class="tab-btn" data-tab="map" onclick="switchTab('map')"><span class="emoji">🌐</span><span class="tab-label"> Battle Map</span></button>
+      <button type="button" class="tab-btn" data-tab="bracket" onclick="switchTab('bracket')"><span class="emoji">📊</span><span class="tab-label"> Bracket</span></button>
+      <button type="button" class="tab-btn shooter-tab" data-tab="shooter" onclick="switchTab('shooter')"><span class="emoji">🔫</span><span class="tab-label"> Shooter</span></button>
+      <button type="button" class="tab-btn" data-tab="profile" onclick="switchTab('profile')"><span class="emoji">👤</span><span class="tab-label"> Profile</span></button>
+    </div>
+
+    <div class="section-players" id="sectionPlayers">
+    <div class="people-grid" id="people"></div>
+    </div>
+
+    <div class="section-matches active" id="sectionMatches">
+    <div class="matches-toolbar">
+      <div class="filter-bar" id="matchTeamFilterBar">
+        <button type="button" class="filter-btn active" data-filter="all" onclick="setMatchTeamFilter('all')">All Teams</button>
+        <button type="button" class="filter-btn" data-filter="mine" onclick="setMatchTeamFilter('mine')">My Teams</button>
+      </div>
+      <div class="filter-bar" id="matchFilterBar">
+        <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'matches')">Upcoming</button>
+        <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'matches')">Completed</button>
+        <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'matches')">All</button>
       </div>
     </div>
-    <div class="xp-window-content">
-      <div class="section-matches" id="sectionMatches">
-        <div class="oe-wrap">
-          <div class="oe-menubar">
-            <span class="oe-menu-item">File</span>
-            <span class="oe-menu-item">Edit</span>
-            <span class="oe-menu-item">View</span>
-            <span class="oe-menu-item">Tools</span>
-            <span class="oe-menu-item">Message</span>
-            <span class="oe-menu-item">Help</span>
+    <div class="matches-grid" id="matches"></div>
+    </div>
+
+    <div class="section-groups" id="sectionGroups">
+    <div class="groups-grid" id="groups"></div>
+    </div>
+
+    <div class="section-leaderboard" id="sectionLeaderboard">
+      <div class="lb-two-col">
+        <div class="lb-col">
+          <div class="lb-col-header">⚽ Match Results</div>
+          <div class="leaderboard-wrap card-base">
+            <table class="leaderboard-table" id="matchLeaderboard">
+              <thead><tr><th>#</th><th>Player</th><th class="wdl">W–D–L</th><th class="pts sortable" data-sort="pts" onclick="sortMatchLeaderboard('pts')">Pts <span class="sort-arrow" id="sortArrowMatchPts"></span></th></tr></thead>
+              <tbody></tbody>
+            </table>
           </div>
-          <div class="oe-toolbar">
-            <button class="oe-tb-btn">📧 New Mail</button>
-            <button class="oe-tb-btn">&#x21A9; Reply</button>
-            <button class="oe-tb-btn">&#x21A9; Reply All</button>
-            <button class="oe-tb-btn">&#x2192; Forward</button>
-            <span class="oe-tb-sep"></span>
-            <button class="oe-tb-btn">&#128424; Print</button>
-            <button class="oe-tb-btn">&#128465; Delete</button>
-            <span class="oe-tb-sep"></span>
-            <button class="oe-tb-btn">&#128229; Send/Receive</button>
+          <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">3 pts win · 1 pt draw</p>
+        </div>
+        <div class="lb-col">
+          <div class="lb-col-header">🔮 Predictions</div>
+          <div class="leaderboard-wrap card-base">
+            <table class="leaderboard-table" id="predLeaderboard">
+              <thead><tr><th>#</th><th>Player</th><th class="pts sortable" data-sort="predPts" onclick="sortPredLeaderboard('predPts')">Pts <span class="sort-arrow" id="sortArrowPredPts"></span></th><th class="sub-pts">Avg</th><th class="sub-pts">★</th><th class="sub-pts">🔥</th></tr></thead>
+              <tbody></tbody>
+            </table>
           </div>
-          <div class="oe-mob-tabs">
-            <button class="oe-mob-tab oe-mob-tab-active" id="oe-mob-tab-upcoming" onclick="oeSetFolder('upcoming');oeSetMobTab('upcoming')">📥 Inbox</button>
-            <button class="oe-mob-tab" id="oe-mob-tab-completed" onclick="oeSetFolder('completed');oeSetMobTab('completed')">📤 Sent</button>
-            <button class="oe-mob-tab" id="oe-mob-tab-all" onclick="oeSetFolder('all');oeSetMobTab('all')">🌍 All</button>
-            <button class="oe-mob-tab" id="oe-mob-tab-mine" onclick="oeSetFolder('mine');oeSetMobTab('mine')">⭐ Mine</button>
-          </div>
-          <div class="oe-body">
-            <div class="oe-folders">
-              <div class="oe-folder-root">&#128231; Outlook Express</div>
-              <div class="oe-folder-group-label">Local Folders</div>
-              <div class="oe-folder-item oe-folder-active" id="oe-folder-upcoming" onclick="oeSetFolder('upcoming')">&#128229; Inbox <span class="oe-unread-badge" id="oe-unread-count">—</span></div>
-              <div class="oe-folder-item" id="oe-folder-completed" onclick="oeSetFolder('completed')">&#128228; Sent Items</div>
-              <div class="oe-folder-item" id="oe-folder-all" onclick="oeSetFolder('all')">&#127758; All Matches</div>
-              <div class="oe-folder-item" id="oe-folder-mine" onclick="oeSetFolder('mine')">&#11088; My Teams</div>
-            </div>
-            <div class="oe-right">
-              <div class="oe-msg-list-wrap">
-                <div class="oe-msg-col-headers">
-                  <div class="oe-msg-col" style="width:20px">!</div>
-                  <div class="oe-msg-col" style="width:20px">&#9993;</div>
-                  <div class="oe-msg-col" style="width:200px">From</div>
-                  <div class="oe-msg-col" style="flex:1">Subject</div>
-                  <div class="oe-msg-col" style="width:72px">Received</div>
-                </div>
-                <div id="oe-message-list"></div>
-              </div>
-              <div class="oe-status-bar">
-                <span id="oe-status-left">Loading…</span>
-                <span id="oe-status-right"></span>
-              </div>
-            </div>
-          </div>
+          <p style="color:var(--text-muted);font-size:0.7rem;margin-top:8px;text-align:center;letter-spacing:0.02em">1 pt correct winner · +2 per exact score (max 5) · 🃏 doubles</p>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- ── Players ── -->
-  <div class="xp-window" id="xp-window-players" data-win="players"
-       style="display:none; top:64px; left:200px; width:880px; height:600px;">
-    <div class="title-bar" onmousedown="startDrag(event,'players')">
-      <div class="title-bar-text"><span class="xp-title-icon">🏆</span> Players</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('players')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('players')"></button>
-        <button aria-label="Close" onclick="closeWindow('players')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content">
-      <div class="section-players" id="sectionPlayers">
-        <div class="people-grid" id="people"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Groups ── -->
-  <div class="xp-window" id="xp-window-groups" data-win="groups"
-       style="display:none; top:84px; left:220px; width:960px; height:640px;">
-    <div class="title-bar" onmousedown="startDrag(event,'groups')">
-      <div class="title-bar-text"><span class="xp-title-icon">📋</span> Groups</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('groups')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('groups')"></button>
-        <button aria-label="Close" onclick="closeWindow('groups')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content">
-      <div class="section-groups" id="sectionGroups">
-        <!-- Mobile tab strip (hidden on desktop) -->
-        <div class="we-mobile-tabs" id="we-mobile-tabs"></div>
-        <!-- Explorer two-pane body -->
-        <div class="we-body">
-          <!-- Folder pane -->
-          <div class="we-folders">
-            <div class="we-folder-header">Folders <span class="we-folder-close-x">&#215;</span></div>
-            <div class="we-folder-section">
-              <div class="we-folder-tree-item">&#128421; My Computer</div>
-              <div class="we-folder-tree-item" style="padding-left:18px">&#128193; WorldCup2026</div>
-              <div class="we-folder-tree-item" style="padding-left:30px">&#128193; Players</div>
-              <div class="we-folder-tree-item" style="padding-left:30px">&#128193; Matches</div>
-              <div class="we-folder-tree-item" style="padding-left:30px;font-weight:bold;color:#000">&#9660; Groups</div>
-            </div>
-            <div id="we-folder-list">
-              <!-- Populated by weSelectGroup on init -->
-            </div>
-          </div>
-          <!-- Right pane -->
-          <div class="we-right">
-            <div class="we-col-header-row" id="we-col-header">
-              <div class="we-col-h" style="flex:1;min-width:140px">Name</div>
-              <div class="we-col-h we-num" style="width:32px">Pld</div>
-              <div class="we-col-h we-num" style="width:28px">W</div>
-              <div class="we-col-h we-num" style="width:28px">D</div>
-              <div class="we-col-h we-num" style="width:28px">L</div>
-              <div class="we-col-h we-num" style="width:34px">GF</div>
-              <div class="we-col-h we-num" style="width:34px">GA</div>
-              <div class="we-col-h we-num" style="width:38px">GD</div>
-              <div class="we-col-h we-num" style="width:38px">Pts</div>
-              <div class="we-col-h" style="width:80px">Owner</div>
-            </div>
-            <div class="we-detail-pane" id="we-detail-pane"></div>
-            <div class="we-status-bar" id="we-status-bar">
-              <span id="we-status-left">4 objects</span>
-              <span id="we-status-right"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Leaderboard ── -->
-  <div class="xp-window" id="xp-window-leaderboard" data-win="leaderboard"
-       style="display:none; top:74px; left:210px; width:920px; height:620px;">
-    <div class="title-bar" onmousedown="startDrag(event,'leaderboard')">
-      <div class="title-bar-text"><span class="xp-title-icon">🏅</span> Leaderboard</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('leaderboard')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('leaderboard')"></button>
-        <button aria-label="Close" onclick="closeWindow('leaderboard')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content">
-      <div class="section-leaderboard" id="sectionLeaderboard">
-        <div id="xl-leaderboard-target"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── Awards ── -->
-  <div class="xp-window" id="xp-window-awards" data-win="awards"
-       style="display:none; top:90px; left:230px; width:700px; height:520px;">
-    <div class="title-bar" onmousedown="startDrag(event,'awards')">
-      <div class="title-bar-text"><span class="xp-title-icon">🏆</span> Tournament Awards</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('awards')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('awards')"></button>
-        <button aria-label="Close" onclick="closeWindow('awards')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content">
       <div id="awardsWrap"></div>
       <div id="jokerStatsWrap"></div>
     </div>
-  </div>
 
-  <!-- ── Teams ── -->
-  <div class="xp-window" id="xp-window-teams" data-win="teams"
-       style="display:none; top:90px; left:230px; width:880px; height:600px;">
-    <div class="title-bar" onmousedown="startDrag(event,'teams')">
-      <div class="title-bar-text"><span class="xp-title-icon">🌍</span> Teams</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('teams')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('teams')"></button>
-        <button aria-label="Close" onclick="closeWindow('teams')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content">
-      <div class="section-teams" id="sectionTeams">
-        <div class="team-chips" id="teamChips"></div>
-        <div class="teams-toolbar">
-          <div class="filter-bar" id="teamFilterBar">
-            <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'teams')">Upcoming</button>
-            <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'teams')">Completed</button>
-            <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'teams')">All</button>
-          </div>
+    <div class="section-teams" id="sectionTeams">
+      <div class="team-chips" id="teamChips"></div>
+      <div class="teams-toolbar">
+        <div class="filter-bar" id="teamFilterBar">
+          <button type="button" class="filter-btn active" data-filter="upcoming" onclick="setMatchFilter('upcoming', 'teams')">Upcoming</button>
+          <button type="button" class="filter-btn" data-filter="completed" onclick="setMatchFilter('completed', 'teams')">Completed</button>
+          <button type="button" class="filter-btn" data-filter="all" onclick="setMatchFilter('all', 'teams')">All</button>
         </div>
-        <div id="teamSchedule"></div>
       </div>
+      <div id="teamSchedule"></div>
     </div>
-  </div>
 
-  <!-- ── Battle Map ── -->
-  <div class="xp-window" id="xp-window-map" data-win="map"
-       style="display:none; top:44px; left:160px; width:1040px; height:700px;">
-    <div class="title-bar" onmousedown="startDrag(event,'map')">
-      <div class="title-bar-text"><span class="xp-title-icon">🌐</span> Battle Map</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('map')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('map')"></button>
-        <button aria-label="Close" onclick="closeWindow('map')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content" style="padding:0; overflow:hidden;">
-      <div class="section-map" id="sectionMap">
-        <div class="globe-row" style="display:flex;align-items:stretch;flex:1;min-height:60vh">
-          <div class="globe-wrap" id="globeWrap">
-            <svg id="globeSvg"></svg>
-            <button class="globe-reset" id="globeReset" onclick="resetGlobe()" title="Reset view">&#8635;</button>
-          </div>
-          <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeVenuePanel()"></div>
-          <div class="venue-panel" id="venuePanel">
-            <div class="vp-header">
-              <div>
-                <div class="vp-name" id="vpName"></div>
-                <div class="vp-city" id="vpCity"></div>
-              </div>
-              <button class="vp-close" onclick="closeVenuePanel()">&#10005;</button>
+    <div class="section-map" id="sectionMap">
+      <div class="globe-row" style="display:flex;align-items:stretch;flex:1;min-height:70vh">
+        <div class="globe-wrap" id="globeWrap">
+          <svg id="globeSvg"></svg>
+          <button class="globe-reset" id="globeReset" onclick="resetGlobe()" title="Reset view">↺</button>
+        </div>
+        <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeVenuePanel()"></div>
+        <div class="venue-panel" id="venuePanel">
+          <div class="vp-header">
+            <div>
+              <div class="vp-name" id="vpName"></div>
+              <div class="vp-city" id="vpCity"></div>
             </div>
-            <div class="vp-matches" id="vpMatches"></div>
+            <button class="vp-close" onclick="closeVenuePanel()">✕</button>
           </div>
-        </div>
-        <div class="territory-standings" id="territoryStandings" style="display:none">
-          <div class="ts-title">The Territories</div>
-          <div id="tsChampion"></div>
-          <div class="ts-scores" id="tsScores"></div>
-          <div class="ts-grid" id="tsGrid"></div>
+          <div class="vp-matches" id="vpMatches"></div>
         </div>
       </div>
+      <div class="territory-standings" id="territoryStandings" style="display:none">
+        <div class="ts-title">The Territories</div>
+        <div id="tsChampion"></div>
+        <div class="ts-scores" id="tsScores"></div>
+        <div class="ts-grid" id="tsGrid"></div>
+      </div>
     </div>
-  </div>
 
+    <div class="section-shooter" id="sectionShooter">
+      <canvas id="shooter-canvas"></canvas>
+      <video id="wave-clear-gif" autoplay muted playsinline loop></video>
+      <video id="game-over-gif" autoplay muted playsinline loop></video>
+      <div id="wave-clear-top" class="wave-clear-text"></div>
+      <div id="wave-clear-bottom" class="wave-clear-text"></div>
+      <div id="game-over-overlay"></div>
+    </div>
 
-  <!-- ── Shooter ── -->
-  <div class="xp-window" id="xp-window-shooter" data-win="shooter"
-       style="display:none; top:54px; left:240px; width:720px; height:560px;">
-    <div class="title-bar" onmousedown="startDrag(event,'shooter')">
-      <div class="title-bar-text"><span class="xp-title-icon">🔫</span> Shooter</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('shooter')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('shooter')"></button>
-        <button aria-label="Close" onclick="closeWindow('shooter')"></button>
-      </div>
+    <div class="section-myteams" id="sectionMyTeams">
+      <div class="myteams-grid" id="myTeamsGrid"></div>
     </div>
-    <div class="xp-window-content" style="padding:0; overflow:hidden; position:relative;">
-      <div class="section-shooter" id="sectionShooter">
-        <canvas id="shooter-canvas"></canvas>
-        <video id="wave-clear-gif" autoplay muted playsinline loop></video>
-        <video id="game-over-gif" autoplay muted playsinline loop></video>
-        <div id="wave-clear-top" class="wave-clear-text"></div>
-        <div id="wave-clear-bottom" class="wave-clear-text"></div>
-        <div id="game-over-overlay"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ── My Teams (auth-gated) ── -->
-  <div class="xp-window" id="xp-window-myteams" data-win="myteams"
-       style="display:none; top:80px; left:220px; width:880px; height:600px;">
-    <div class="title-bar" onmousedown="startDrag(event,'myteams')">
-      <div class="title-bar-text"><span class="xp-title-icon">⭐</span> My Teams</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('myteams')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('myteams')"></button>
-        <button aria-label="Close" onclick="closeWindow('myteams')"></button>
-      </div>
+    <div class="section-predictions" id="sectionPredictions">
+      <div class="predictions-wrap" id="predictionsWrap"></div>
     </div>
-    <div class="xp-window-content">
-      <div class="section-myteams" id="sectionMyTeams">
-        <div class="myteams-grid" id="myTeamsGrid"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- ── Predictions (auth-gated) ── -->
-  <div class="xp-window" id="xp-window-predictions" data-win="predictions"
-       style="display:none; top:80px; left:220px; width:880px; height:640px;">
-    <div class="title-bar" onmousedown="startDrag(event,'predictions')">
-      <div class="title-bar-text"><span class="xp-title-icon">🔮</span> Predictions</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('predictions')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('predictions')"></button>
-        <button aria-label="Close" onclick="closeWindow('predictions')"></button>
+    <div class="section-profile" id="sectionProfile">
+      <div id="userProfileContent"></div>
+    </div>
+
+    <div class="section-bracket" id="sectionBracket"></div>
+
+    <!-- Sign In Modal -->
+    <div class="auth-modal-overlay" id="signInModal">
+      <div class="auth-modal">
+        <h2>Sign in</h2>
+        <div class="error-msg" id="signInError"></div>
+        <label>Email</label>
+        <input type="email" id="signInEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()">
+        <label>Password</label>
+        <input type="password" id="signInPassword" placeholder="Your password" onkeydown="if(event.key==='Enter')doSignIn()">
+        <div class="btn-row">
+          <button class="btn-ghost" onclick="closeModals()">Cancel</button>
+          <button class="btn-primary" onclick="doSignIn()">Sign in</button>
+        </div>
+        <div class="switch-link">No account? <a onclick="showSignUp()">Create one</a></div>
       </div>
     </div>
-    <div class="xp-window-content">
-      <div class="section-predictions" id="sectionPredictions">
-        <div class="xl-wrap">
-          <!-- Menu bar -->
-          <div class="xl-menubar">
-            <div class="xl-menu-items">
-              <span class="xl-menu-item">File</span>
-              <span class="xl-menu-item">Edit</span>
-              <span class="xl-menu-item">View</span>
-              <span class="xl-menu-item">Insert</span>
-              <span class="xl-menu-item">Format</span>
-              <span class="xl-menu-item">Tools</span>
-              <span class="xl-menu-item">Data</span>
-              <span class="xl-menu-item">Window</span>
-              <span class="xl-menu-item">Help</span>
-            </div>
-            <input class="xl-help-box" type="text" value="Type a question for help" readonly>
-          </div>
-          <!-- Standard toolbar -->
-          <div class="xl-toolbar">
-            <button class="xp-tb-btn xl-tb-btn" disabled title="New">&#128196;</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Open">&#128193;</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Save">&#128190;</button>
-            <span class="xp-tb-sep"></span>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Print">&#128424;</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Preview">&#128269;</button>
-            <span class="xp-tb-sep"></span>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Cut">&#9986;</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Copy">&#128203;</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Paste">&#128196;</button>
-            <span class="xp-tb-sep"></span>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Undo">&#8630;</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled title="Redo">&#8631;</button>
-            <span class="xp-tb-sep"></span>
-            <span style="font-size:11px;padding:0 4px">&#931; AutoSum</span>
-          </div>
-          <!-- Formatting toolbar -->
-          <div class="xl-toolbar">
-            <select class="xl-font-select" disabled><option>Tahoma</option></select>
-            <select class="xl-size-select" disabled><option>11</option></select>
-            <button class="xp-tb-btn xl-tb-btn xl-fmt-btn" disabled>B</button>
-            <button class="xp-tb-btn xl-tb-btn xl-fmt-btn xl-italic" disabled>I</button>
-            <button class="xp-tb-btn xl-tb-btn xl-fmt-btn xl-underline" disabled>U</button>
-            <span class="xp-tb-sep"></span>
-            <button class="xp-tb-btn xl-tb-btn" disabled>&#9664;</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled>&#9646;</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled>&#9654;</button>
-            <span class="xp-tb-sep"></span>
-            <button class="xp-tb-btn xl-tb-btn" disabled>%</button>
-            <button class="xp-tb-btn xl-tb-btn" disabled>,</button>
-          </div>
-          <!-- Formula bar -->
-          <div class="xl-formula-bar">
-            <div class="xl-name-box">
-              <span class="xl-name-val" id="xl-pred-namebox">A1</span>
-              <span class="xl-name-arrow">&#9660;</span>
-            </div>
-            <span class="xl-formula-sep"></span>
-            <button class="xp-tb-btn xl-tb-btn xl-fx-btn" disabled>fx</button>
-            <div class="xl-formula-field" id="xl-pred-formulafield">=predictions!A1</div>
-          </div>
-          <!-- Column headers -->
-          <div class="xl-col-headers">
-            <div class="xl-row-gutter-header"></div>
-            <div class="xl-col-header" style="width:90px">A</div>
-            <div class="xl-col-header" style="flex:1;min-width:150px">B</div>
-            <div class="xl-col-header" style="width:60px">C</div>
-            <div class="xl-col-header" style="width:30px">D</div>
-            <div class="xl-col-header" style="width:60px">E</div>
-            <div class="xl-col-header" style="width:55px">F</div>
-            <div class="xl-col-header" style="width:80px">G</div>
-          </div>
-          <!-- Data grid target -->
-          <div class="xl-grid-wrap">
-            <div id="xl-pred-target"></div>
-          </div>
-          <!-- Sheet tabs -->
-          <div class="xl-sheet-tabs-wrap">
-            <div class="xl-tab-nav">
-              <button class="xl-tab-nav-btn">|&#9664;</button>
-              <button class="xl-tab-nav-btn">&#9664;</button>
-              <button class="xl-tab-nav-btn">&#9654;</button>
-              <button class="xl-tab-nav-btn">&#9654;|</button>
-            </div>
-            <div class="xl-sheet-tabs">
-              <div class="xl-tab xl-tab-active" id="xl-pred-tab-upcoming" onclick="xlPredSwitchSheet('upcoming')">Upcoming</div>
-              <div class="xl-tab" id="xl-pred-tab-history" onclick="xlPredSwitchSheet('history')">History</div>
-            </div>
-          </div>
-          <!-- Status bar -->
-          <div class="xl-status-bar">
-            <span id="xl-pred-status-left">Ready</span>
-            <div class="xl-status-right">
-              <span id="xl-pred-status-right"></span>
-            </div>
-          </div>
+    <!-- Sign Up Modal -->
+    <div class="auth-modal-overlay" id="signUpModal">
+      <div class="auth-modal">
+        <h2>Create account</h2>
+        <div class="error-msg" id="signUpError"></div>
+        <label>Your name</label>
+        <select id="signUpPlayer">
+          <option value="">Choose your sweepstakes name…</option>
+          <option>Anton</option><option>Chris</option><option>Dan</option>
+          <option>Laurie</option><option>Pat</option><option>Steven</option>
+        </select>
+        <label>Email</label>
+        <input type="email" id="signUpEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignUp()">
+        <label>Password</label>
+        <input type="password" id="signUpPassword" placeholder="6+ characters" onkeydown="if(event.key==='Enter')doSignUp()">
+        <label>Invite code</label>
+        <input type="text" id="signUpCode" placeholder="Enter sweepstakes code" onkeydown="if(event.key==='Enter')doSignUp()">
+        <div class="btn-row">
+          <button class="btn-ghost" onclick="closeModals()">Cancel</button>
+          <button class="btn-primary" onclick="doSignUp()">Create account</button>
+        </div>
+        <div class="switch-link">Already have an account? <a onclick="showSignIn()">Sign in</a></div>
+      </div>
+    </div>
+
+    <!-- Joker Reset Notification -->
+    <div class="auth-modal-overlay" id="jokerResetModal">
+      <div class="auth-modal">
+        <div style="font-size:3rem;text-align:center;line-height:1;margin-bottom:12px">🃏</div>
+        <h2 style="text-align:center">Jokers Reset</h2>
+        <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.5;margin-bottom:18px">All jokers have been wiped from previous matchdays. Please re-apply your jokers on upcoming matches before they kick off.</p>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="dismissJokerNotification()">Got it</button>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- ── Profile ── -->
-  <div class="xp-window" id="xp-window-profile" data-win="profile"
-       style="display:none; top:70px; left:210px; width:900px; height:620px;">
-    <div class="title-bar" onmousedown="startDrag(event,'profile')">
-      <div class="title-bar-text"><span class="xp-title-icon">👤</span> Profile</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('profile')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('profile')"></button>
-        <button aria-label="Close" onclick="closeWindow('profile')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content">
-      <div class="section-profile" id="sectionProfile">
-        <div id="userProfileContent"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ MATCH MESSAGE WINDOW ══ -->
-  <div class="xp-window" id="xp-window-match" data-win="match" data-no-explorer
-       style="display:none; top:80px; left:350px; width:560px; height:460px;">
-    <div class="title-bar" onmousedown="startDrag(event,'match')">
-      <div class="title-bar-text" id="match-win-title"><span class="xp-title-icon">📧</span> Match - Microsoft Outlook Express</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('match')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('match')"></button>
-        <button aria-label="Close" onclick="closeWindow('match')"></button>
-      </div>
-    </div>
-    <div class="oe-msg-win-toolbar">
-      <button class="oe-tb-btn" disabled>&#8617; Reply</button>
-      <button class="oe-tb-btn" disabled>Reply All</button>
-      <button class="oe-tb-btn" disabled>&#8680; Forward</button>
-      <span class="oe-tb-sep"></span>
-      <button class="oe-tb-btn" disabled>&#9664; Previous</button>
-      <button class="oe-tb-btn" disabled>Next &#9654;</button>
-    </div>
-    <div class="oe-msg-win-header" id="match-win-header"></div>
-    <div class="xp-window-content oe-msg-win-body" id="match-win-body"></div>
-  </div>
-
-  <!-- MSN toasts are created dynamically by msnPushNotif() -->
-
-  <!-- ══ MSN MESSENGER CHAT WINDOW ══ -->
-  <div id="xp-window-msn" class="xp-window" data-win="msn" data-no-explorer style="display:none;width:440px;height:490px;top:60px;left:calc(50% - 220px)">
-    <svg width="0" height="0" style="position:absolute">
-      <defs>
-        <filter id="gazza-ripple" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
-          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="3" seed="5" result="noise">
-            <animate attributeName="baseFrequency"
-              values="0.012 0.018;0.018 0.028;0.01 0.022;0.016 0.02;0.012 0.018"
-              dur="6s" repeatCount="indefinite"/>
-          </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G"/>
-        </filter>
-      </defs>
-    </svg>
-    <div class="title-bar" onmousedown="startDrag(event,'msn')">
-      <div class="title-bar-text">🦋 ~~gAzZa~~ - Conversation</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('msn')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('msn')"></button>
-        <button aria-label="Close" onclick="closeWindow('msn')"></button>
-      </div>
-    </div>
-    <div class="msn-menubar">
-      <span class="msn-menu-item">File</span>
-      <span class="msn-menu-item">Edit</span>
-      <span class="msn-menu-item">Actions</span>
-      <span class="msn-menu-item">Tools</span>
-      <span class="msn-menu-item">Help</span>
-    </div>
-    <div class="msn-toolbar">
-      <div class="msn-tb-actions">
-        <button class="msn-tb-btn"><span class="msn-tb-icon">👥</span><span>Invite</span></button>
-        <button class="msn-tb-btn"><span class="msn-tb-icon">📁</span><span>Send Files</span></button>
-        <button class="msn-tb-btn"><span class="msn-tb-icon">📹</span><span>Video</span></button>
-        <button class="msn-tb-btn"><span class="msn-tb-icon">🎤</span><span>Voice</span></button>
-        <button class="msn-tb-btn"><span class="msn-tb-icon">🎯</span><span>Activities</span></button>
-        <button class="msn-tb-btn"><span class="msn-tb-icon">🃏</span><span>Games</span></button>
-      </div>
-      <div class="msn-tb-logo"><em>msn</em>🦋</div>
-    </div>
-    <div class="msn-body">
-      <div class="msn-left">
-        <div class="msn-chat-history">
-          <div class="msn-to-line">To: <strong>~~gAzZa~~</strong></div>
-          <div class="msn-messages" id="msn-messages">
-            <div class="msn-chat-msg">
-              <span class="msn-chat-sender">~~gAzZa~~</span><span class="msn-chat-says"> says:</span><br>
-              <span class="msn-chat-text">orite m8
-                <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/winking-smile.png" class="msn-emote" alt=";)">
-                <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/note.png" class="msn-emote" alt="(8)">
-                <img src="https://raw.githubusercontent.com/bernzrdo/msn-emoticons/main/original/star.png" class="msn-emote" alt="(*)">
-              </span>
-            </div>
-            <div class="msn-chat-msg" id="msn-msg-2" style="display:none">
-              <span class="msn-chat-sender">~~gAzZa~~</span><span class="msn-chat-says"> says:</span><br>
-              <span class="msn-chat-text">this tuchel lad is canny as owt</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="msn-right">
-        <div class="msn-dp-panel">
-          <img src="img/gazza-crying.jpg" class="msn-dp-img" style="filter:url(#gazza-ripple)" alt="Gazza">
-          <button class="msn-dp-arrow">▼</button>
-        </div>
-        <div class="msn-dp-panel">
-          <div id="msn-dp-user-inner" class="msn-dp-default">👤</div>
-          <button class="msn-dp-arrow">▼</button>
+    <!-- Team Result Notification -->
+    <div class="auth-modal-overlay" id="teamResultModal">
+      <div class="auth-modal" style="text-align:center">
+        <canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:200"></canvas>
+        <div class="result-emoji" id="resultEmoji" style="font-size:3.5rem;line-height:1;margin-bottom:8px"></div>
+        <h2 style="text-align:center;margin-bottom:4px" id="resultTitle"></h2>
+        <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:4px" id="resultSubtitle"></p>
+        <div id="resultDetails" style="text-align:left;margin-bottom:18px;font-size:0.88rem;color:var(--text-secondary);line-height:1.6"></div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="dismissTeamResults()">Got it</button>
         </div>
       </div>
     </div>
-    <div class="msn-input-section">
-      <div class="msn-input-toolbar">
-        <button class="msn-input-btn" title="Font" style="font-weight:bold;font-family:serif;font-size:14px">A</button>
-        <button class="msn-input-btn" title="Emoticons">☺</button>
-        <button class="msn-input-btn msn-input-btn-wide" title="Voice Clip">🔊 Voice Clip</button>
-        <button class="msn-input-btn" title="Wink">😉</button>
-        <button class="msn-input-btn" title="Background">🖼</button>
-        <button class="msn-input-btn" title="Ink">✏️</button>
-      </div>
-      <div class="msn-input-row">
-        <textarea class="msn-input-field" id="msn-input-field" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();msnSendMessage();}"></textarea>
-        <div class="msn-send-col">
-          <button class="msn-send-btn" onclick="msnSendMessage()">Send</button>
-          <button class="msn-send-btn">Search</button>
-        </div>
-      </div>
+
+    <!-- Player Profile Modal -->
+    <div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
+      <div class="profile-card" id="profileCard"></div>
     </div>
-    <div class="msn-statusbar">Click for new Emoticons and Theme Packs from Blue Mountain</div>
+
+    <!-- Match Predictions Panel -->
+    <div class="pred-panel-overlay" id="predPanelOverlay" onclick="if(event.target===this)closePredPanel()">
+      <div class="pred-panel" id="predPanel"></div>
+    </div>
+
+    <footer>⚽ World Cup 2026 Sweepstakes</footer>
   </div>
 
-  <!-- ── LimeWire 4.12.3 ── -->
-  <div id="xp-window-limewire" class="xp-window" data-win="limewire" data-no-explorer
-       style="display:none;width:580px;height:400px;top:80px;left:100px">
-    <div class="title-bar" onmousedown="startDrag(event,'limewire')">
-      <div class="title-bar-text">
-        <img src="img/limewire-tray.ico" style="width:14px;height:14px;image-rendering:pixelated;vertical-align:middle;margin-right:4px" alt="">
-        LimeWire 4.12.3
-      </div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('limewire')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('limewire')"></button>
-        <button aria-label="Close" onclick="closeWindow('limewire')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content lw-content">
-      <div class="lw-menubar">
-        <span>File</span><span>View</span><span>Tools</span><span>Help</span>
-      </div>
-      <div class="lw-header">
-        <img src="img/limewire-logo-crop.png" class="lw-logo-img" alt="LimeWire">
-        <div class="lw-search-area">
-          <span class="lw-search-label">Search:</span>
-          <input class="lw-search-input" type="text" value="world cup songs" readonly>
-          <button class="lw-search-btn" onclick="return false">Search</button>
-        </div>
-      </div>
-      <div class="lw-tabs">
-        <button class="lw-tab" onclick="return false">Search</button>
-        <button class="lw-tab" onclick="return false">Library</button>
-        <button class="lw-tab lw-tab-active" onclick="return false">Monitor</button>
-        <button class="lw-tab" onclick="return false">Chat</button>
-        <button class="lw-tab" onclick="return false">My LimeWire</button>
-      </div>
-      <div class="lw-body">
-        <div class="lw-dl-toolbar">
-          <button class="lw-dl-btn" onclick="return false">Resume</button>
-          <button class="lw-dl-btn" onclick="return false">Pause</button>
-          <button class="lw-dl-btn" onclick="return false">Remove</button>
-          <button class="lw-dl-btn" onclick="return false">Open Folder</button>
-        </div>
-        <div class="lw-dl-wrap">
-          <table class="lw-dl-table">
-            <thead>
-              <tr>
-                <th>Filename</th>
-                <th>Size</th>
-                <th>Progress</th>
-                <th>Speed</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="lw-downloads-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="lw-statusbar">
-        <span class="lw-conn-light"></span>
-        <span id="lw-status-text">Connected to 1,247 hosts</span>
-        <span class="lw-status-sep">·</span>
-        <span>Sharing 87 files</span>
-        <span class="lw-status-sep">·</span>
-        <span id="lw-active-count">2 active downloads</span>
-      </div>
-    </div>
+  <script src="h2h-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-server@3/dist/topojson-server.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/render-matches.js"></script>
+  <script src="js/render-groups.js"></script>
+  <script src="js/render-leaderboard.js"></script>
+  <script src="js/render-predictions.js"></script>
+  <script src="js/render-teams.js"></script>
+  <script src="js/render-myteams.js"></script>
+  <script src="js/render-profile.js"></script>
+  <script src="js/globe.js"></script>
+  <script src="js/shooter.js"></script>
+  <script src="js/team-results.js"></script>
+  <script src="js/profile-picture.js"></script>
+  <script src="js/render-user-profile.js"></script>
+  <script src="js/render-bracket.js"></script>
+  <script src="js/version.js"></script>
+  <script src="js/version-refresh.js"></script>
+  <script src="js/main.js"></script>
+  <div id="joker-video-overlay" onclick="closeJokerVideo()">
+    <video id="joker-video" src="media/joker.mp4" preload="auto" playsinline></video>
   </div>
-
-  <!-- ── R32 Draw ── -->
-  <div id="xp-window-r32" class="xp-window" data-win="r32" data-no-explorer
-       style="display:none;width:340px;height:500px;top:60px;left:340px">
-    <div class="title-bar" onmousedown="startDrag(event,'r32')">
-      <div class="title-bar-text">🎯 R32 Draw</div>
-      <div class="title-bar-controls">
-        <button aria-label="Minimize" onclick="minimizeWindow('r32')"></button>
-        <button aria-label="Maximize" onclick="maximizeWindow('r32')"></button>
-        <button aria-label="Close" onclick="closeWindow('r32')"></button>
-      </div>
-    </div>
-    <div class="xp-window-content" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
-      <div id="xp-r32-content"></div>
-    </div>
-  </div>
-
-  <!-- ══ TASKBAR ══ -->
-  <div id="xp-taskbar">
-    <button id="xp-start-btn" onclick="toggleStartMenu()" aria-label="Start"></button>
-    <div id="xp-taskbar-windows"></div>
-    <div id="xp-system-tray">
-      <div id="xp-auth-tray"></div>
-      <img src="img/msn-tray.png" class="xp-tray-icon xp-tray-msn" title="MSN Messenger" alt="MSN Messenger" onclick="msnOpenChat()" style="width:18px;height:auto">
-      <img src="img/steam-tray.ico" class="xp-tray-icon" title="Steam" alt="Steam">
-      <div id="xp-clock">00:00</div>
-    </div>
-  </div>
-
-  <!-- ══ START MENU ══ -->
-  <div id="xp-start-menu">
-    <div class="xp-start-header">
-      <span id="xp-start-user-name">World Cup 2026</span>
-    </div>
-    <div class="xp-start-items">
-      <button class="xp-start-item" onclick="switchTab('matches');closeStartMenu()">⏱️ Matches</button>
-      <button class="xp-start-item" onclick="switchTab('players');closeStartMenu()">🏆 Players</button>
-      <button class="xp-start-item" onclick="switchTab('groups');closeStartMenu()">📋 Groups</button>
-      <button class="xp-start-item" onclick="switchTab('leaderboard');closeStartMenu()">🏅 Leaderboard</button>
-      <div class="xp-start-separator"></div>
-      <button class="xp-start-item" onclick="switchTab('teams');closeStartMenu()">🌍 Teams</button>
-      <button class="xp-start-item" onclick="switchTab('map');closeStartMenu()">🌐 Battle Map</button>
-      <button class="xp-start-item" onclick="switchTab('shooter');closeStartMenu()">🔫 Shooter</button>
-      <div class="xp-start-separator"></div>
-      <button class="xp-start-item xp-start-item-auth" onclick="switchTab('myteams');closeStartMenu()" style="display:none">⭐ My Teams</button>
-      <button class="xp-start-item xp-start-item-auth" onclick="switchTab('predictions');closeStartMenu()" style="display:none">🔮 Predictions</button>
-      <button class="xp-start-item" onclick="switchTab('profile');closeStartMenu()">👤 Profile</button>
-      <div class="xp-start-separator"></div>
-      <button class="xp-start-item" onclick="openWindow('home');closeStartMenu()">⚽ About</button>
-    </div>
-  </div>
-
-</div><!-- #xp-desktop -->
-
-<!-- ════════════════════════════════════════════
-     MODALS — outside desktop, overlay everything
-════════════════════════════════════════════ -->
-
-<!-- Sign In Modal -->
-<div class="auth-modal-overlay" id="signInModal">
-  <div class="auth-modal">
-    <h2>Sign in</h2>
-    <div class="error-msg" id="signInError"></div>
-    <label>Email</label>
-    <input type="email" id="signInEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignIn()">
-    <label>Password</label>
-    <input type="password" id="signInPassword" placeholder="Your password" onkeydown="if(event.key==='Enter')doSignIn()">
-    <div class="btn-row">
-      <button class="btn-ghost" onclick="closeModals()">Cancel</button>
-      <button class="btn-primary" onclick="doSignIn()">Sign in</button>
-    </div>
-    <div class="switch-link">No account? <a onclick="showSignUp()">Create one</a></div>
-  </div>
-</div>
-
-<!-- Sign Up Modal -->
-<div class="auth-modal-overlay" id="signUpModal">
-  <div class="auth-modal">
-    <h2>Create account</h2>
-    <div class="error-msg" id="signUpError"></div>
-    <label>Your name</label>
-    <select id="signUpPlayer">
-      <option value="">Choose your sweepstakes name…</option>
-      <option>Anton</option><option>Chris</option><option>Dan</option>
-      <option>Laurie</option><option>Pat</option><option>Steven</option>
-    </select>
-    <label>Email</label>
-    <input type="email" id="signUpEmail" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doSignUp()">
-    <label>Password</label>
-    <input type="password" id="signUpPassword" placeholder="6+ characters" onkeydown="if(event.key==='Enter')doSignUp()">
-    <label>Invite code</label>
-    <input type="text" id="signUpCode" placeholder="Enter sweepstakes code" onkeydown="if(event.key==='Enter')doSignUp()">
-    <div class="btn-row">
-      <button class="btn-ghost" onclick="closeModals()">Cancel</button>
-      <button class="btn-primary" onclick="doSignUp()">Create account</button>
-    </div>
-    <div class="switch-link">Already have an account? <a onclick="showSignIn()">Sign in</a></div>
-  </div>
-</div>
-
-<!-- Joker Reset Notification -->
-<div class="auth-modal-overlay" id="jokerResetModal">
-  <div class="auth-modal">
-    <div style="font-size:3rem;text-align:center;line-height:1;margin-bottom:12px">🃏</div>
-    <h2 style="text-align:center">Jokers Reset</h2>
-    <p style="color:var(--text-secondary);font-size:0.88rem;line-height:1.5;margin-bottom:18px">All jokers have been wiped from previous matchdays. Please re-apply your jokers on upcoming matches before they kick off.</p>
-    <div class="btn-row">
-      <button class="btn-primary" onclick="dismissJokerNotification()">OK</button>
-    </div>
-  </div>
-</div>
-
-<!-- Team Result Notification -->
-<div class="auth-modal-overlay" id="teamResultModal">
-  <div class="auth-modal" style="text-align:center">
-    <canvas id="confettiCanvas" style="position:fixed;inset:0;pointer-events:none;z-index:200"></canvas>
-    <div class="result-emoji" id="resultEmoji" style="font-size:3.5rem;line-height:1;margin-bottom:8px"></div>
-    <h2 style="text-align:center;margin-bottom:4px" id="resultTitle"></h2>
-    <p style="color:var(--text-secondary);font-size:0.82rem;margin-bottom:4px" id="resultSubtitle"></p>
-    <div id="resultDetails" style="text-align:left;margin-bottom:18px;font-size:0.88rem;color:var(--text-secondary);line-height:1.6"></div>
-    <div class="btn-row">
-      <button class="btn-primary" onclick="dismissTeamResults()">Got it</button>
-    </div>
-  </div>
-</div>
-
-<!-- Player Profile Modal -->
-<div class="profile-overlay" id="profileOverlay" onclick="if(event.target===this)closeProfile()">
-  <div class="profile-card" id="profileCard"></div>
-</div>
-
-<!-- Match Predictions Panel -->
-<div class="pred-panel-overlay" id="predPanelOverlay" onclick="if(event.target===this)closePredPanel()">
-  <div class="pred-panel" id="predPanel"></div>
-</div>
-
-<!-- Joker Video Overlay -->
-<div id="joker-video-overlay" onclick="closeJokerVideo()">
-  <video id="joker-video" src="media/joker.mp4" preload="auto" playsinline></video>
-</div>
-
-<!-- ════════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════════ -->
-<script src="h2h-data.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-server@3/dist/topojson-server.min.js"></script>
-<script src="js/config.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/data.js"></script>
-<script src="js/render-matches.js"></script>
-<script src="js/render-groups.js"></script>
-<script src="js/render-leaderboard.js"></script>
-<script src="js/render-predictions.js"></script>
-<script src="js/render-teams.js"></script>
-<script src="js/render-myteams.js"></script>
-<script src="js/render-profile.js"></script>
-<script src="js/globe.js"></script>
-<script src="js/shooter.js"></script>
-<script src="js/team-results.js"></script>
-<script src="js/profile-picture.js"></script>
-<script src="js/render-user-profile.js"></script>
-<script src="js/render-bracket.js"></script>
-<script src="js/xp-shell.js"></script>
-<script src="js/version.js"></script>
-<script src="js/version-refresh.js"></script>
-<script src="js/main.js"></script>
 </body>
 </html>

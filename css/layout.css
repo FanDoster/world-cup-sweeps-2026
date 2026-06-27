@@ -1,33 +1,69 @@
-/* ── WINDOW CONTENT LAYOUT ── */
-
-/* Section divs inside windows are always visible */
-.section-players, .section-matches, .section-groups,
-.section-leaderboard, .section-teams, .section-myteams,
-.section-predictions, .section-map, .section-shooter,
-.section-profile, .section-bracket { display: block; }
-
-/* Content layout tokens */
-.lb-two-col { display: flex; gap: 20px; flex-wrap: wrap; }
-.lb-col { flex: 1; min-width: 260px; }
-.lb-col-header {
-  font-family: var(--font);
-  font-size: 11px;
-  font-weight: bold;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 6px;
-  padding: 0 2px;
+/* ── HEADER ── */
+header {
+  text-align: center;
+  padding: 48px 0 32px;
+  position: relative;
 }
 
-/* Footer suppressed — taskbar replaces it */
-footer { display: none; }
+header svg {
+  max-width: 420px;
+  display: block;
+  margin: 0 auto;
+}
 
-/* Auth bar suppressed — system tray replaces it */
-.auth-bar { display: none; }
+/* ── TABS ── */
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font);
+  border-radius: 8px;
+  position: relative;
+  letter-spacing: -0.01em;
+}
+.tab-btn:hover {
+  color: var(--text);
+  background: var(--card);
+}
+.tab-btn.active {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.tab-btn .emoji { /* stacked above the label via the button's flex column */ }
+.tab-btn .tab-label { /* sits on its own line below the emoji */ }
 
-/* Tab bar suppressed — desktop icons replace it */
-.tab-bar { display: none; }
+/* ── SECTION VISIBILITY ── */
+.section-players, .section-matches, .section-groups, .section-leaderboard, .section-teams { display: none; }
+.section-players.active, .section-matches.active, .section-groups.active, .section-leaderboard.active, .section-teams.active { display: block; }
 
-/* War dispatch inside home window */
-.war-dispatch { margin-bottom: 8px; }
+/* ── FOOTER ── */
+footer {
+  text-align: center;
+  padding: 40px 0 12px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+}
+footer a { color: var(--text-secondary); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+
