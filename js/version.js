@@ -3,4 +3,4 @@
 // then mirrored into Supabase so version-refresh.js can prompt open clients to
 // reload. No need to bump this by hand — the value below is just the local-dev
 // placeholder shown when running from a working copy.
-window.APP_VERSION = 'dev';
+window.APP_VERSION = '2026-06-28-001';

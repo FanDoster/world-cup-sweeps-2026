@@ -95,6 +95,12 @@ function ordinal(n) {
   return n + (['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 }
 
+function roundLabel(code) {
+  if (!code) return null;
+  const map = { R32: 'Round of 32', R16: 'Round of 16', QF: 'Quarterfinal', SF: 'Semifinal', '3P': '3rd Place', Final: 'Final' };
+  return map[code] || code;
+}
+
 function escapeHtml(s) {
   if (s == null) return '';
   return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

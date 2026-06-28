@@ -5,7 +5,7 @@ async function renderPredictions() {
 
   const now = new Date();
   const upcoming = matchData
-    .filter(m => !m.isComplete)
+    .filter(m => !m.isComplete && m.team1 !== null && m.team2 !== null)
     .map(m => ({ ...m, kickoff: toDate(m.date, m.time, m.tz) }))
     .sort((a, b) => a.kickoff - b.kickoff)
     .slice(0, 20);
@@ -68,7 +68,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card${jokerCls}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
           <span class="pmc-status locked"><span${ep.is_joker ? ' class="joker-active-score"' : ''}>🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}</span>${ep.is_joker ? '<span class="joker-locked-badge">🃏 2×</span>' : ''}</span>
         </div></div>`;
     } else if (ep) {
@@ -78,7 +78,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card${ep.is_joker ? ' joker-active' : ''}" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
           <span class="pmc-status predicted" id="pred-display-${mid}"><span class="${ep.is_joker ? 'joker-active-score' : ''}">${ep.predicted_home_score}–${ep.predicted_away_score}</span></span>
           ${jokersEnabled ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
           <div class="pmc-score" id="pred-edit-${mid}" style="display:none">
@@ -101,7 +101,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
           <span class="pmc-status locked">Locked</span>
         </div></div>`;
     } else {
@@ -111,7 +111,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">G${m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
           <div class="pmc-score">
             <div class="pmc-score-wrap">
               <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
@@ -151,7 +151,7 @@ async function renderPredictions() {
       historyHtml += `<div class="pred-history-card">
         <div class="phc-result">${badge}</div>
         <div class="phc-match">
-          <div class="phc-teams">${m.team1} vs ${m.team2} <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem">G${m.group}</span></div>
+          <div class="phc-teams">${m.team1} vs ${m.team2} <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
           <div class="phc-scores">
             Result <span class="actual">${m.score1}–${m.score2}</span> &nbsp;·&nbsp; Your pick <span class="pred">${p.predicted_home_score}–${p.predicted_away_score}</span>
           </div>

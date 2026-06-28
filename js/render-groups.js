@@ -69,6 +69,12 @@ function renderGroups() {
   const groupsEl = document.getElementById("groups");
   groupsEl.innerHTML = '';
 
+  // Group Stage Complete banner
+  const banner = document.createElement("div");
+  banner.className = "group-stage-banner";
+  banner.innerHTML = '🏁 Group Stage Complete — Knockout Phase Begins';
+  groupsEl.appendChild(banner);
+
   // Calculate standings per group
   const standings = {};
   for (const m of matchData) {
