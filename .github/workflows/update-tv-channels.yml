@@ -1,0 +1,20 @@
+name: Update TV Channels
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # 8am UTC daily
+  workflow_dispatch:       # manual trigger
+
+jobs:
+  update-tv:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run TV channel updater
+        env:
+          SUPABASE_PAT: ${{ secrets.SUPABASE_PAT }}
+        run: python3 .github/scripts/update-tv-channels.py
