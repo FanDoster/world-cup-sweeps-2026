@@ -37,29 +37,48 @@
 .bracket-cards {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   padding-bottom: 40px;
 }
 
-.bracket-match-card {
-  padding: 14px 16px;
+.bracket-empty {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 48px 20px;
 }
 
-.bracket-match-header {
+/* ── MATCH CARD ── */
+.bracket-match-card {
+  padding: 14px 18px;
+  transition: border-color 0.2s;
+}
+
+.bracket-match-card.bc-complete {
+  border-left: 3px solid var(--text-muted);
+}
+
+.bracket-match-card.bc-live {
+  border-left: 3px solid var(--live);
+  box-shadow: inset 8px 0 18px -12px var(--live-glow);
+}
+
+/* ── CARD HEADER ── */
+.bracket-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
-.bracket-match-num {
-  font-size: 0.78rem;
+.bracket-card-match {
+  font-size: 0.76rem;
   color: var(--text-muted);
   letter-spacing: 0.01em;
 }
 
 .bracket-projected-badge {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   padding: 2px 8px;
   border: 1px solid var(--accent);
   color: var(--accent);
@@ -67,12 +86,192 @@
   letter-spacing: 0.02em;
 }
 
-.bracket-slot-label {
-  font-size: 0.73rem;
-  color: var(--text-muted);
-  margin-bottom: 10px;
+.bracket-live-badge {
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border: 1px solid var(--live);
+  color: var(--live);
+  border-radius: 10px;
+  letter-spacing: 0.02em;
+  animation: bracket-live-pulse 2s infinite;
 }
 
+@keyframes bracket-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.bracket-completed-badge {
+  font-size: 0.68rem;
+  padding: 2px 8px;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+  border-radius: 10px;
+  letter-spacing: 0.02em;
+}
+
+/* ── FIXTURE (teams + score) ── */
+.bracket-fixture {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 10px 0;
+}
+
+.bf-team {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.bf-team:first-child {
+  justify-content: flex-start;
+}
+
+.bf-team:last-child {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.bf-team.bf-winner {
+  background: rgba(16,185,129,0.08);
+}
+
+.bf-team .match-owner {
+  font-size: 0.7rem;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bf-name {
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.bf-centre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 14px;
+  flex-shrink: 0;
+  min-width: 70px;
+  text-align: center;
+}
+
+.bracket-fixture-score {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.bracket-fixture-score.live {
+  color: var(--live);
+}
+
+.bracket-fixture-status {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bracket-fixture-status.live {
+  color: var(--live);
+  font-weight: 700;
+}
+
+.bracket-fixture-time {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.bracket-fixture-countdown {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bracket-real-vs {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+/* ── PREDICTION CONSENSUS STRIP ── */
+.bracket-consensus {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.bc-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.bc-hit {
+  font-weight: 700;
+}
+
+.bc-miss {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+
+/* ── PROGRESSION HINT ── */
+.bracket-progression {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  padding: 6px 4px 2px;
+  letter-spacing: 0.01em;
+}
+
+.bracket-progression strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* ── FLAG ── */
+.bracket-flag {
+  width: 22px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── TBD ── */
+.bracket-tbd {
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.88rem;
+  padding: 6px 8px;
+}
+
+/* ── OLD STYLES (kept for player projection rows in R16+) ── */
 .bracket-player-rows {
   display: flex;
   flex-direction: column;
@@ -99,115 +298,13 @@
   gap: 5px;
 }
 
-.bracket-team-owned {
-  font-weight: 700;
-}
-
 .bracket-vs {
   color: var(--text-muted);
   font-size: 0.72rem;
   text-align: center;
 }
 
-.bracket-flag {
-  width: 18px;
-  height: 13px;
-  object-fit: cover;
-  border-radius: 1px;
-  flex-shrink: 0;
-}
-
-.bracket-consensus {
-  font-size: 0.84rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 2px 0;
-}
-
-.bracket-empty {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  text-align: center;
-  padding: 48px 20px;
-}
-
-/* ── REAL FIXTURE DISPLAY ── */
-.bracket-real-fixture {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 10px;
-}
-
-.bracket-real-teams {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: 6px;
-  flex-wrap: wrap;
-}
-
-.bracket-real-vs {
-  color: var(--text-muted);
-  font-weight: 400;
-  font-size: 0.8rem;
-}
-
-.bracket-score-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.bracket-score {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--accent);
-}
-
-.bracket-status {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  padding: 2px 8px;
-  background: var(--card);
-  border-radius: 4px;
-}
-
-.bracket-kickoff-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-}
-
-.bracket-countdown {
-  font-weight: 600;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  font-size: 0.78rem;
-}
-
-.bracket-completed-badge {
-  font-size: 0.68rem;
-  padding: 2px 8px;
-  border: 1px solid var(--text-muted);
-  color: var(--text-muted);
-  border-radius: 10px;
-  letter-spacing: 0.02em;
-}
-
 .bracket-correct-call {
   background: rgba(34,197,94,0.08);
   border-radius: 4px;
-}
-
-.bracket-tbd {
-  color: var(--text-muted);
-  font-style: italic;
-  font-weight: 400;
 }

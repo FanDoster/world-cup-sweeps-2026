@@ -227,6 +227,73 @@ function calcProjectedBracket(playerName) {
   return bracket;
 }
 
+// ── PROGRESSION HINT ──
+// For a given match number, find which subsequent match it feeds into,
+// and what the other match in that pairing is. Returns HTML string or ''.
+function bracketProgressionHint(matchNum) {
+  // Find the R16 (or later) entry that references this match
+  const next = KNOCKOUT_BRACKET.find(k =>
+    k.home === 'W' + matchNum || k.away === 'W' + matchNum || k.home === 'L' + matchNum || k.away === 'L' + matchNum
+  );
+  if (!next) return '';
+
+  // Find the other match feeding into the same next match
+  const thisRef = (next.home === 'W' + matchNum || next.home === 'L' + matchNum) ? 'home' : 'away';
+  const otherRef = thisRef === 'home' ? 'away' : 'home';
+  const otherNum = parseInt(next[otherRef].substring(1));
+
+  // Find the other R32 match to get team names
+  const otherMatch = matchData.find(m => {
+    const key = `${m.team1}|${m.team2}|${m.date}`;
+    const mid = matchIdByTeamDate[key];
+    return mid === otherNum;
+  });
+
+  const roundName = roundLabel(next.round);
+  const otherLabel = otherMatch && otherMatch.team1 && otherMatch.team2
+    ? `${otherMatch.team1}/${otherMatch.team2}`
+    : 'TBD';
+
+  return `<div class="bracket-progression">→ Winner faces <strong>${otherLabel}</strong> winner in <strong>${roundName}</strong> (Match ${next.match})</div>`;
+}
+
+// ── PREDICTION CONSENSUS STRIP ──
+// For a given match, show each player's prediction status as coloured initials.
+function bracketPredConsensus(m, mid) {
+  if (!mid) return '';
+
+  const now = new Date();
+  const preds = predLookup[mid] || [];
+  const predByPlayer = {};
+  preds.forEach(p => { predByPlayer[p.player_name] = p; });
+
+  const isFinished = m.isComplete && m.score1 !== null && m.score2 !== null;
+  const kickoff = toDate(m.date, m.time, m.tz);
+  const isLocked = kickoff - now < 5 * 60 * 1000;
+  const showScores = isLocked || isFinished;
+
+  let dots = '';
+  for (const p of PLAYERS) {
+    const pred = predByPlayer[p];
+    const color = ownerHexColors[p] || '#888';
+    const initial = p[0];
+
+    if (!pred) {
+      dots += `<span class="bc-dot bc-miss" title="${p}: no prediction">${initial}</span>`;
+    } else if (isFinished) {
+      const badge = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j);
+      dots += `<span class="bc-dot bc-hit" title="${p}: ${pred.home}–${pred.away}" style="background:${color}33;color:${color}">${initial} ${badge}</span>`;
+    } else if (showScores) {
+      dots += `<span class="bc-dot bc-hit" title="${p}: ${pred.home}–${pred.away}" style="background:${color}33;color:${color}">${initial} 🔒</span>`;
+    } else {
+      dots += `<span class="bc-dot bc-hit" title="${p}: predicted" style="background:${color}33;color:${color}">${initial} ✓</span>`;
+    }
+  }
+
+  return `<div class="bracket-consensus">${dots}</div>`;
+}
+
+// ── RENDER ──
 function renderBracket() {
   const section = document.getElementById('sectionBracket');
   if (!section) return;
@@ -252,171 +319,134 @@ function renderBracket() {
       }).join('')}
     </div>`;
 
-  // Calculate all players' projected brackets (used for projection rows)
-  const allBrackets = {};
-  for (const player of PLAYERS) {
-    allBrackets[player] = calcProjectedBracket(player);
-  }
-
   let cardsHtml = '';
 
   if (bracketRound === 'R32') {
-    // Show real R32 fixtures with projections
     const realR32 = matchData.filter(m => m.round === 'R32').sort((a, b) => a.date.localeCompare(b.date));
-    
-    // Build a lookup: "team1|team2|date" → R32 slot (to match projections)
-    const slotByMatch = {};
-    for (const slot of R32_SLOTS) {
-      // Match real data against slots by looking at which teams fill each slot
-      const projHome = allBrackets['Dan']?.[slot.match]?.home;
-      const projAway = allBrackets['Dan']?.[slot.match]?.away;
-      if (projHome && projAway) {
-        slotByMatch[`${projHome}|${projAway}`] = slot;
-        slotByMatch[`${projAway}|${projHome}`] = slot;
-      }
-    }
+    const now = new Date();
 
     cardsHtml = realR32.map(m => {
       const date = new Date(m.date + 'T12:00:00');
       const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
       const localTime = formatLocalTime(m.date, m.time, m.tz);
       const isComplete = m.isComplete && m.score1 !== null && m.score2 !== null;
-      
-      // Find matching slot for projections and match number
-      const key = `${m.team1}|${m.team2}|${m.date}`;
-      const slotKey = `${m.team1}|${m.team2}`;
-      const slotKeyRev = `${m.team2}|${m.team1}`;
-      const slot = slotByMatch[slotKey] || slotByMatch[slotKeyRev];
-      const matchNum = slot ? slot.match : '?';
+      const kickoff = toDate(m.date, m.time, m.tz);
+      const inLiveWindow = kickoff <= now && (kickoff.getTime() + 2.5 * 60 * 60 * 1000) > now.getTime();
 
       // Team owners
       const o1 = teamOwner[m.team1];
       const o2 = teamOwner[m.team2];
 
-      // Player projections for this match
-      const homeTeams = PLAYERS.map(p => allBrackets[p][matchNum]?.home);
-      const awayTeams = PLAYERS.map(p => allBrackets[p][matchNum]?.away);
+      // Winner highlight
+      let winner = null;
+      if (isComplete && m.score1 > m.score2) winner = 1;
+      else if (isComplete && m.score2 > m.score1) winner = 2;
 
-      // Score display
+      // Match ID from the DB
+      const key = `${m.team1}|${m.team2}|${m.date}`;
+      const mid = matchIdByTeamDate[key];
+
+      // Find match number from R32_SLOTS (match numbers = DB match IDs)
+      const slot = R32_SLOTS.find(s => s.match === mid);
+      const matchNum = slot ? slot.match : null;
+      const progressionHint = matchNum ? bracketProgressionHint(matchNum) : '';
+
+      // Score/kickoff display
       let scoreHtml = '';
       if (isComplete) {
-        scoreHtml = `<div class="bracket-score-line">
-          <span class="bracket-score">${m.score1} – ${m.score2}</span>
-          <span class="bracket-status">FT</span>
-        </div>`;
+        scoreHtml = `<span class="bracket-fixture-score">${m.score1} – ${m.score2}</span><span class="bracket-fixture-status">FT</span>`;
+      } else if (inLiveWindow) {
+        scoreHtml = `<span class="bracket-fixture-score live">${m.score1 ?? 0} – ${m.score2 ?? 0}</span><span class="bracket-fixture-status live">LIVE</span>`;
       } else {
         const cd = getCountdown(m.date, m.time, m.tz);
-        scoreHtml = `<div class="bracket-kickoff-line">
-          <span class="bracket-local-time">${localTime}</span>
-          <span class="bracket-countdown">${cd.text || ''}</span>
-        </div>`;
+        scoreHtml = `<span class="bracket-fixture-time">${localTime}</span>${cd && cd.text ? `<span class="bracket-fixture-countdown">${cd.text}</span>` : ''}`;
       }
 
-      // Player projection rows
-      let rowsHtml = PLAYERS.map(p => {
-        const home = allBrackets[p][matchNum]?.home;
-        const away = allBrackets[p][matchNum]?.away;
-        const ownsHome = home && teamOwner[home] === p;
-        const ownsAway = away && teamOwner[away] === p;
-        const correctCall = isComplete && home === m.team1 && away === m.team2 ? ' bracket-correct-call' : '';
-        return `<div class="bracket-player-row${correctCall}">
-          <span class="bracket-player-name ${ownerColour(p)}">${p}</span>
-          <span class="bracket-team${ownsHome ? ' bracket-team-owned' : ''}">${home ? bracketTeam(home) : '?'}</span>
-          <span class="bracket-vs">vs</span>
-          <span class="bracket-team${ownsAway ? ' bracket-team-owned' : ''}">${away ? bracketTeam(away) : '?'}</span>
-        </div>`;
-      }).join('');
+      // Card classes
+      const cardCls = (isComplete ? ' bc-complete' : '') + (inLiveWindow ? ' bc-live' : '');
 
       // Badge
-      const badgeHtml = isComplete ? '<span class="bracket-completed-badge">Played</span>' : '<span class="bracket-projected-badge">Upcoming</span>';
+      let badgeHtml = '';
+      if (isComplete) badgeHtml = '<span class="bracket-completed-badge">Played</span>';
+      else if (inLiveWindow) badgeHtml = '<span class="bracket-live-badge">⚡ LIVE</span>';
+      else badgeHtml = '<span class="bracket-projected-badge">Upcoming</span>';
 
-      return `<div class="bracket-match-card card-base">
-        <div class="bracket-match-header">
-          <span class="bracket-match-num">Match ${matchNum} · ${dateStr}</span>
+      return `<div class="bracket-match-card card-base${cardCls}">
+        <div class="bracket-card-header">
+          <span class="bracket-card-match">${matchNum ? 'Match ' + matchNum : ''} · ${dateStr}</span>
           ${badgeHtml}
         </div>
-        <div class="bracket-real-fixture">
-          <div class="bracket-real-teams">
-            ${bracketTeam(m.team1)}${o1 ? `<span class="match-owner ${ownerColors[o1]}" style="margin-left:6px">${o1}</span>` : ''}
-            <span class="bracket-real-vs">vs</span>
-            ${bracketTeam(m.team2)}${o2 ? `<span class="match-owner ${ownerColors[o2]}" style="margin-left:6px">${o2}</span>` : ''}
+        <div class="bracket-fixture" onclick="showPredPanel('${safeAttr(m.team1)}|${safeAttr(m.team2)}|${m.date}')" style="cursor:pointer">
+          <div class="bf-team${winner === 1 ? ' bf-winner' : ''}">
+            <img class="bracket-flag" src="${flagUrl(teamIso[m.team1])}" alt="" loading="lazy" onerror="this.style.display='none'">
+            <span class="bf-name">${m.team1}</span>
+            ${o1 ? `<span class="match-owner ${ownerColors[o1]}">${o1}</span>` : ''}
           </div>
-          ${scoreHtml}
+          <div class="bf-centre">
+            ${scoreHtml}
+          </div>
+          <div class="bf-team${winner === 2 ? ' bf-winner' : ''}">
+            <img class="bracket-flag" src="${flagUrl(teamIso[m.team2])}" alt="" loading="lazy" onerror="this.style.display='none'">
+            <span class="bf-name">${m.team2}</span>
+            ${o2 ? `<span class="match-owner ${ownerColors[o2]}">${o2}</span>` : ''}
+          </div>
         </div>
-        <div class="bracket-player-rows">${rowsHtml}</div>
+        ${mid ? bracketPredConsensus(m, mid) : ''}
+        ${progressionHint}
       </div>`;
     }).join('');
   } else {
     // R16 and beyond: show progression from previous round results
     const roundMatches = matchData.filter(m => m.round === bracketRound).sort((a, b) => a.date.localeCompare(b.date));
-    
+
     if (roundMatches.length > 0) {
       // Build a winner lookup: matchId → winning team
       const winnerByMatch = {};
       for (const m of matchData) {
         if (m.isComplete && m.score1 !== null && m.score2 !== null) {
-          // Find match ID from matchIdByTeamDate
           const key = `${m.team1}|${m.team2}|${m.date}`;
           const mid = matchIdByTeamDate[key];
-          if (mid) {
-            winnerByMatch[mid] = m.score1 > m.score2 ? m.team1 : m.team2;
-          }
+          if (mid) winnerByMatch[mid] = m.score1 > m.score2 ? m.team1 : m.team2;
         }
       }
 
-      // Find the bracket entries for this round
-      const bracketEntries = KNOCKOUT_BRACKET.filter(k => k.round === bracketRound);
-      
       cardsHtml = roundMatches.map(m => {
         const date = new Date(m.date + 'T12:00:00');
         const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
         const localTime = formatLocalTime(m.date, m.time, m.tz);
 
-        // Resolve the Wxx / Lxx references
-        const entry = bracketEntries.find(e => {
-          const bkKey = `${m.team1}|${m.team2}|${m.date}`;
-          // match by date and time since teams are NULL
-          return e.match && m.date;
-        });
-        
         // Try to resolve winners from previous round
         let homeTeam = m.team1 || 'TBD';
         let awayTeam = m.team2 || 'TBD';
-        
+
         // If teams are NULL, try to resolve from KNOCKOUT_BRACKET references
         if (!m.team1 || !m.team2) {
-          // Find bracket entry by date matching
-          for (const kb of KNOCKOUT_BRACKET) {
-            if (kb.round !== bracketRound) continue;
-            // Match by position (index within round)
-            const idx = roundMatches.indexOf(m);
-            const kbIdx = KNOCKOUT_BRACKET.filter(k => k.round === bracketRound).indexOf(kb);
-            if (idx === kbIdx) {
-              // Resolve winner references
-              if (kb.home.startsWith('W')) {
-                const prevMatchId = parseInt(kb.home.substring(1));
-                const key = Object.keys(matchIdByTeamDate).find(k => matchIdByTeamDate[k] === prevMatchId);
-                if (key && winnerByMatch[prevMatchId]) homeTeam = winnerByMatch[prevMatchId];
-              }
-              if (kb.away.startsWith('W')) {
-                const prevMatchId = parseInt(kb.away.substring(1));
-                const key = Object.keys(matchIdByTeamDate).find(k => matchIdByTeamDate[k] === prevMatchId);
-                if (key && winnerByMatch[prevMatchId]) awayTeam = winnerByMatch[prevMatchId];
-              }
-              break;
+          const idx = roundMatches.indexOf(m);
+          const kbList = KNOCKOUT_BRACKET.filter(k => k.round === bracketRound);
+          const kb = kbList[idx];
+          if (kb) {
+            if (kb.home.startsWith('W') || kb.home.startsWith('L')) {
+              const prevMatchId = parseInt(kb.home.substring(1));
+              if (winnerByMatch[prevMatchId]) homeTeam = winnerByMatch[prevMatchId];
+            }
+            if (kb.away.startsWith('W') || kb.away.startsWith('L')) {
+              const prevMatchId = parseInt(kb.away.substring(1));
+              if (winnerByMatch[prevMatchId]) awayTeam = winnerByMatch[prevMatchId];
             }
           }
         }
 
         return `<div class="bracket-match-card card-base">
-          <div class="bracket-match-header">
-            <span class="bracket-match-num">${dateStr} · ${localTime}</span>
+          <div class="bracket-card-header">
+            <span class="bracket-card-match">${dateStr} · ${localTime}</span>
           </div>
-          <div class="bracket-real-fixture">
-            <div class="bracket-real-teams">
-              ${homeTeam !== 'TBD' ? bracketTeam(homeTeam) : '<span class="bracket-tbd">TBD</span>'}
-              <span class="bracket-real-vs">vs</span>
-              ${awayTeam !== 'TBD' ? bracketTeam(awayTeam) : '<span class="bracket-tbd">TBD</span>'}
+          <div class="bracket-fixture">
+            <div class="bf-team">
+              ${homeTeam !== 'TBD' ? `<img class="bracket-flag" src="${flagUrl(teamIso[homeTeam] || 'xx')}" alt="" loading="lazy" onerror="this.style.display='none'"><span class="bf-name">${homeTeam}</span>` : '<span class="bracket-tbd">TBD</span>'}
+            </div>
+            <div class="bf-centre"><span class="bracket-real-vs">vs</span></div>
+            <div class="bf-team">
+              ${awayTeam !== 'TBD' ? `<img class="bracket-flag" src="${flagUrl(teamIso[awayTeam] || 'xx')}" alt="" loading="lazy" onerror="this.style.display='none'"><span class="bf-name">${awayTeam}</span>` : '<span class="bracket-tbd">TBD</span>'}
             </div>
           </div>
         </div>`;
