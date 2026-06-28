@@ -59,8 +59,10 @@
 }
 
 .bracket-match-card.bc-live {
-  border-left: 3px solid var(--live);
-  box-shadow: inset 8px 0 18px -12px var(--live-glow);
+  border-left: 4px solid var(--live);
+  background: linear-gradient(90deg, rgba(239,68,68,0.07) 0%, transparent 60%);
+  box-shadow: 0 0 0 1px rgba(239,68,68,0.18), inset 0 0 30px rgba(239,68,68,0.04);
+  animation: liveGlow 2s ease-in-out infinite;
 }
 
 /* ── CARD HEADER ── */
@@ -88,17 +90,26 @@
 
 .bracket-live-badge {
   font-size: 0.65rem;
-  padding: 2px 8px;
-  border: 1px solid var(--live);
-  color: var(--live);
-  border-radius: 10px;
-  letter-spacing: 0.02em;
-  animation: bracket-live-pulse 2s infinite;
+  padding: 3px 8px 3px 6px;
+  color: #fff;
+  background: var(--live);
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+  font-weight: 800;
+  box-shadow: 0 0 8px rgba(239,68,68,0.5);
+  animation: liveBadgePulse 1.5s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-@keyframes bracket-live-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+.bracket-live-badge::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: dotPulse 1s ease-in-out infinite;
 }
 
 .bracket-completed-badge {
@@ -165,29 +176,19 @@
   text-align: center;
 }
 
-.bracket-fixture-score {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: var(--text);
-  letter-spacing: 0.02em;
-}
-
-.bracket-fixture-score.live {
-  color: var(--live);
-}
-
-.bracket-fixture-status {
-  font-size: 0.62rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.bracket-fixture-status.live {
-  color: var(--live);
+.match-score-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
   font-weight: 700;
+  background: var(--surface);
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.02em;
+  color: var(--text);
 }
 
+/* ── FIXTURE TIME ── */
 .bracket-fixture-time {
   font-size: 0.92rem;
   font-weight: 600;
@@ -200,6 +201,18 @@
   color: var(--accent);
   text-transform: uppercase;
   letter-spacing: 0.03em;
+}
+
+.bracket-fixture-status {
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bracket-fixture-status.live {
+  color: var(--live);
+  font-weight: 700;
 }
 
 .bracket-real-vs {

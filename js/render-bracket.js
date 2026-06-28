@@ -354,9 +354,9 @@ function renderBracket() {
       // Score/kickoff display
       let scoreHtml = '';
       if (isComplete) {
-        scoreHtml = `<span class="bracket-fixture-score">${m.score1} – ${m.score2}</span><span class="bracket-fixture-status">FT</span>`;
+        scoreHtml = `<span class="match-score-pill">${m.score1}–${m.score2}</span><span class="bracket-fixture-status">FT</span>`;
       } else if (inLiveWindow) {
-        scoreHtml = `<span class="bracket-fixture-score live">${m.score1 ?? 0} – ${m.score2 ?? 0}</span><span class="bracket-fixture-status live">LIVE</span>`;
+        scoreHtml = `<span class="match-score-pill live-score">${m.score1 ?? 0}–${m.score2 ?? 0}</span><span class="bracket-fixture-status live">LIVE</span>`;
       } else {
         const cd = getCountdown(m.date, m.time, m.tz);
         scoreHtml = `<span class="bracket-fixture-time">${localTime}</span>${cd && cd.text ? `<span class="bracket-fixture-countdown">${cd.text}</span>` : ''}`;
@@ -368,7 +368,7 @@ function renderBracket() {
       // Badge
       let badgeHtml = '';
       if (isComplete) badgeHtml = '<span class="bracket-completed-badge">Played</span>';
-      else if (inLiveWindow) badgeHtml = '<span class="bracket-live-badge">⚡ LIVE</span>';
+      else if (inLiveWindow) badgeHtml = '<span class="bracket-live-badge">LIVE</span>';
       else badgeHtml = '<span class="bracket-projected-badge">Upcoming</span>';
 
       return `<div class="bracket-match-card card-base${cardCls}">
