@@ -374,7 +374,10 @@ function renderBracket() {
       return `<div class="bracket-match-card card-base${cardCls}">
         <div class="bracket-card-header">
           <span class="bracket-card-match">${matchNum ? 'Match ' + matchNum : ''} · ${dateStr}</span>
-          ${badgeHtml}
+          <span class="bracket-card-badges">
+            ${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
+            ${badgeHtml}
+          </span>
         </div>
         <div class="bracket-fixture" onclick="showPredPanel('${safeAttr(m.team1)}|${safeAttr(m.team2)}|${m.date}')" style="cursor:pointer">
           <div class="bf-team${winner === 1 ? ' bf-winner' : ''}">
