@@ -146,6 +146,13 @@ async function loadData() {
   if (selectedTeam) renderTeamSchedule();
 }
 
+// Number of fixtures scheduled on a given venue-local date. Used to gate the joker:
+// the 2× pick is only offered when a match day has more than one game to choose between
+// (e.g. group stage, R32). On single-match days — typically later knockout rounds — it's hidden.
+function matchesOnDate(date) {
+  return matchData.reduce((n, m) => n + (m.date === date ? 1 : 0), 0);
+}
+
 async function loadPredData() {
   // Invalidate profile stats cache so stale RPC results don't persist across data refreshes
   Object.keys(_userPredCache).forEach(k => delete _userPredCache[k]);
