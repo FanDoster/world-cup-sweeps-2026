@@ -94,7 +94,8 @@ def fetch_fifa_matches():
 
         home_name = home.get("TeamName", [{}])[0].get("Description", "")
         away_name = away.get("TeamName", [{}])[0].get("Description", "")
-        group = m.get("GroupName", [{}])[0].get("Description", "")
+        group_name_list = m.get("GroupName") or []
+        group = group_name_list[0].get("Description", "") if group_name_list else ""
         stage = m.get("StageName", [{}])[0].get("Description", "") if m.get("StageName") else ""
 
         # Extract group letter (null for knockout)
