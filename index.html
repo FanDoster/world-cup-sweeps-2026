@@ -91,21 +91,22 @@
 
     <div class="tab-bar" id="tabBar">
       <button type="button" class="tab-btn" data-tab="players" onclick="switchTab('players')"><span class="emoji">🏆</span><span class="tab-label"> Players</span></button>
-      <button type="button" class="tab-btn active" data-tab="matches" onclick="switchTab('matches')"><span class="emoji">⏱</span><span class="tab-label"> Matches</span></button>
+      <button type="button" class="tab-btn" data-tab="matches" onclick="switchTab('matches')"><span class="emoji">⏱</span><span class="tab-label"> Matches</span></button>
       <button type="button" class="tab-btn" data-tab="groups" onclick="switchTab('groups')"><span class="emoji">📋</span><span class="tab-label"> Groups</span></button>
       <button type="button" class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')"><span class="emoji">🏅</span><span class="tab-label"> Leaderboard</span></button>
       <button type="button" class="tab-btn" data-tab="teams" onclick="switchTab('teams')"><span class="emoji">🌍</span><span class="tab-label"> Teams</span></button>
       <button type="button" class="tab-btn" data-tab="map" onclick="switchTab('map')"><span class="emoji">🌐</span><span class="tab-label"> Battle Map</span></button>
-      <button type="button" class="tab-btn" data-tab="bracket" onclick="switchTab('bracket')"><span class="emoji">🥊</span><span class="tab-label"> Knockout</span></button>
+      <button type="button" class="tab-btn active" data-tab="bracket" onclick="switchTab('bracket')"><span class="emoji">🥊</span><span class="tab-label"> Knockout</span></button>
       <button type="button" class="tab-btn shooter-tab" data-tab="shooter" onclick="switchTab('shooter')"><span class="emoji">🔫</span><span class="tab-label"> Shooter</span></button>
       <button type="button" class="tab-btn" data-tab="profile" onclick="switchTab('profile')"><span class="emoji">👤</span><span class="tab-label"> Profile</span></button>
     </div>
 
+    <!-- PLAYERS -->
     <div class="section-players" id="sectionPlayers">
     <div class="people-grid" id="people"></div>
     </div>
 
-    <div class="section-matches active" id="sectionMatches">
+    <div class="section-matches" id="sectionMatches">
     <div class="matches-toolbar">
       <div class="filter-bar" id="matchTeamFilterBar">
         <button type="button" class="filter-btn active" data-filter="all" onclick="setMatchTeamFilter('all')">All Teams</button>
@@ -210,7 +211,7 @@
       <div id="userProfileContent"></div>
     </div>
 
-    <div class="section-bracket" id="sectionBracket"></div>
+    <div class="section-bracket active" id="sectionBracket"></div>
 
     <!-- Sign In Modal -->
     <div class="auth-modal-overlay" id="signInModal">

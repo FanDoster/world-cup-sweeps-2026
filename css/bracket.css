@@ -354,3 +354,31 @@
 
 .bracket-fixture-status { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .bracket-fixture-status.live { color: var(--live); font-weight: 700; }
+
+.bracket-fixture-time {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* ── PREDICTION CONSENSUS STRIP ── */
+.bracket-consensus {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+
+.bc-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  cursor: default;
+  white-space: nowrap;
+}

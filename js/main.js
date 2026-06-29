@@ -42,6 +42,7 @@ restoreSession().then(async () => {
   return loadData().then(() => {
     renderWarDispatch();
     checkTeamResults();
+    renderBracket();          // default tab is now Knockout
     // Handle hash route for direct links (after data is loaded)
     handleHashRoute();
   });
