@@ -2,6 +2,7 @@ function getAllTeams() {
   const teams = new Map();
   for (const m of matchData) {
     for (const t of [m.team1, m.team2]) {
+      if (!t) continue;
       if (!teams.has(t)) teams.set(t, teamIso[t] || 'xx');
     }
   }
