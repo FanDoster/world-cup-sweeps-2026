@@ -166,7 +166,9 @@ async function renderPredictions() {
 
       const actualWinner = getActualKnockoutWinner(m);
       const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2, m.round ? p.predicted_winner : null, m.round ? actualWinner : null);
-      const maxPts = m.round && p.predicted_winner ? 7 : 5;
+      // Penalty-decided knockout (FT draw) with a winner pick can reach 6; otherwise 5.
+      const isPenaltyGame = m.round && m.score1 === m.score2 && actualWinner;
+      const maxPts = isPenaltyGame && p.predicted_winner ? 6 : 5;
       if (pts === maxPts) exactCount++; else if (pts >= 1) correctCount++;
 
       const badge = predResultBadge(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2, p.is_joker, m.round ? p.predicted_winner : null, m.round ? actualWinner : null);

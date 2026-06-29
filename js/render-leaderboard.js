@@ -173,7 +173,10 @@ function calcPredPoints(homePred, awayPred, homeActual, awayActual, predictedWin
   if (Math.sign(homePred - awayPred) === Math.sign(homeActual - awayActual)) pts += 1;
   if (homePred === homeActual) pts += 2;
   if (awayPred === awayActual) pts += 2;
-  if (predictedWinner && actualWinner && predictedWinner === actualWinner) pts += 2;
+  // Knockout penalty-shootout bonus: only when the full-time score was a draw (so the
+  // tie was decided on penalties). +1 for correctly calling who advanced. In every other
+  // case — decisive knockout results and all group games — the winner pick is irrelevant.
+  if (predictedWinner && actualWinner && homeActual === awayActual && predictedWinner === actualWinner) pts += 1;
   return pts;
 }
 
@@ -203,7 +206,7 @@ if (p.j) {
   if (doubled > st.jokerBest) { st.jokerBest = doubled; st.jokerBestMatch = `${m.team1} ${m.score1}-${m.score2} ${m.team2}`; }
   if (doubled < st.jokerWorst) { st.jokerWorst = doubled; st.jokerWorstMatch = `${m.team1} ${m.score1}-${m.score2} ${m.team2}`; }
 }
-      if (base === 5) st.exact++;
+      if (p.home === m.score1 && p.away === m.score2) st.exact++;
       const resultRight = Math.sign(p.home - p.away) === Math.sign(m.score1 - m.score2);
       if (resultRight) { st.scored++; st.cur++; st.best = Math.max(st.best, st.cur); }
       else st.cur = 0;
@@ -547,8 +550,10 @@ function calcPredPointsForAll() {
 function predResultBadge(homePred, awayPred, homeActual, awayActual, joker, predictedWinner, actualWinner) {
   const base = calcPredPoints(homePred, awayPred, homeActual, awayActual, predictedWinner, actualWinner);
   const pts = joker ? base * 2 : base;
-  // Max is 7 for knockout (5 score + 2 winner), 5 for group stage
-  const perfect = (predictedWinner !== undefined && predictedWinner !== null) ? 7 : 5;
+  // Max is 6 for a penalty-decided knockout (5 exact score + 1 winner) when a winner was
+  // picked; otherwise 5 (winner pick can't score in any other situation).
+  const isPenaltyGame = homeActual === awayActual && actualWinner && predictedWinner !== undefined && predictedWinner !== null;
+  const perfect = isPenaltyGame ? 6 : 5;
   const j = joker ? '<span class="joker-mini" title="Joker — points doubled">🃏</span>' : '';
   if (base === perfect) return `<span style="color:var(--gold);font-weight:700">${pts}★</span>${j}`;
   if (base >= 2) return `<span style="color:var(--accent);font-weight:700">${pts}</span>${j}`;

@@ -52,6 +52,14 @@ AS $$
                THEN 1 ELSE 0 END
           + CASE WHEN p.predicted_home_score = m.home_score THEN 2 ELSE 0 END
           + CASE WHEN p.predicted_away_score = m.away_score THEN 2 ELSE 0 END
+          -- Knockout penalty-shootout bonus: +1 for calling who advanced, but only when
+          -- the full-time score was a draw (decided on penalties). Irrelevant otherwise.
+          + CASE WHEN m.round IS NOT NULL
+                  AND m.home_score = m.away_score
+                  AND p.predicted_winner IS NOT NULL
+                  AND m.actual_winner IS NOT NULL
+                  AND p.predicted_winner = m.actual_winner
+                 THEN 1 ELSE 0 END
       END                      AS base_points,
       m.home_score IS NOT NULL AND m.away_score IS NOT NULL AS match_played
     FROM predictions p
@@ -108,7 +116,7 @@ AS $$
         'pending',              COUNT(*) FILTER (WHERE NOT match_played),
         'correct',              COUNT(*) FILTER (WHERE base_points > 0 AND match_played),
         'wrong',                COUNT(*) FILTER (WHERE base_points = 0 AND match_played),
-        'exact_scores',         COUNT(*) FILTER (WHERE base_points = 5 AND match_played),
+        'exact_scores',         COUNT(*) FILTER (WHERE base_points >= 5 AND match_played),
         'jokers_used',          COUNT(*) FILTER (WHERE is_joker),
         'jokers_settled',       COUNT(*) FILTER (WHERE is_joker AND match_played),
         'total_points',         COALESCE(SUM(points) FILTER (WHERE match_played), 0),
