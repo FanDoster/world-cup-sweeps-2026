@@ -95,9 +95,18 @@ def fetch_fifa_matches():
         home_name = home.get("TeamName", [{}])[0].get("Description", "")
         away_name = away.get("TeamName", [{}])[0].get("Description", "")
         group = m.get("GroupName", [{}])[0].get("Description", "")
+        stage = m.get("StageName", [{}])[0].get("Description", "") if m.get("StageName") else ""
 
-        # Extract group letter
-        group_letter = group.replace("Group ", "").strip()
+        # Extract group letter (null for knockout)
+        group_letter = group.replace("Group ", "").strip() if group.startswith("Group") else None
+
+        # Map FIFA round name to DB round code
+        round_map = {
+            "Round of 32": "R32", "Round of 16": "R16",
+            "Quarter-final": "QF", "Semi-final": "SF",
+            "Third place": "3P", "Final": "Final",
+        }
+        db_round = round_map.get(stage, None)
 
         # Apply name mapping
         home_db = FIFA_TO_DB.get(home_name, home_name)
@@ -109,6 +118,7 @@ def fetch_fifa_matches():
             "home_score": int(hs),
             "away_score": int(aws),
             "group": group_letter,
+            "round": db_round,
         })
 
     if skipped_live:
@@ -166,8 +176,8 @@ class SupabaseSession:
             return e.code, body
 
 
-def find_match(session, home_team, away_team, group_letter):
-    """Find a match in Supabase by team names and group. Returns (match_id, existing_hs, existing_aws) or None."""
+def find_match(session, home_team, away_team, group_letter, db_round=None):
+    """Find a match in Supabase by team names and group/round. Returns (match_id, existing_hs, existing_aws, already_complete) or None."""
     # Get all teams to resolve names → IDs
     status, body = session.get("teams?select=id,name")
     if status != 200:
@@ -185,14 +195,18 @@ def find_match(session, home_team, away_team, group_letter):
         print(f"WARN: Team not in DB: {away_team}", file=sys.stderr)
         return None
 
-    # Find the match
+    # Build query — use round for knockout, group_letter for group stage
     path = (
         f"matches"
         f"?home_team_id=eq.{home_id}"
         f"&away_team_id=eq.{away_id}"
-        f"&group_letter=eq.{group_letter}"
-        f"&select=id,home_score,away_score,is_complete"
     )
+    if db_round:
+        path += f"&round=eq.{db_round}"
+    elif group_letter:
+        path += f"&group_letter=eq.{group_letter}"
+    # else: no round and no group → match by teams only (fallback)
+    path += f"&select=id,home_score,away_score,is_complete"
     status, body = session.get(path)
     if status != 200:
         print(f"ERROR: Failed to query matches: {status}", file=sys.stderr)
@@ -233,7 +247,7 @@ def main():
     skipped = 0
 
     for r in results:
-        found = find_match(session, r["home"], r["away"], r["group"])
+        found = find_match(session, r["home"], r["away"], r.get("group"), r.get("round"))
         if found is None:
             skipped += 1
             continue
