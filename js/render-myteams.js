@@ -62,7 +62,7 @@ function renderMyTeams() {
     const elimInfo = !isAlive ? getEliminationInfo(t.name) : null;
     const elimText = elimInfo
       ? `Eliminated by ${elimInfo.by} in ${elimInfo.round}`
-      : 'Eliminated';
+      : 'Eliminated in Group Stage';
     return `<div class="myteam-card card-base${isAlive ? '' : ' mt-eliminated'}" onclick="selectTeam('${t.name}');switchTab('teams')">
       <div class="mt-header">
         <img class="mt-flag" src="${flagUrl(t.iso)}" alt="" loading="lazy" onerror="this.style.display='none'">
