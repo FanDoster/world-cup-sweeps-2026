@@ -56,33 +56,36 @@ function renderPredPanel(key) {
   const predByPlayer = {};
   preds.forEach(p => { predByPlayer[p.player_name] = p; });
 
+  const isKnockout = !!m.round;
   let rows = '';
   for (const p of PLAYERS) {
     const pred = predByPlayer[p];
     const isMe = currentProfile && currentProfile.player_name === p;
-    let predCell, statusCell;
+    let predCell, statusCell, winnerCell;
 
-    const isKnockout = !!m.round;
     if (pred && isFinished) {
-      const winnerStr = isKnockout && pred.winner ? ` <span class="pp-winner-pick">→ ${pred.winner}</span>` : '';
-      predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${winnerStr}${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
+      predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
+      winnerCell = pred.winner ? `<span class="pp-winner-pick">${pred.winner}</span>` : '<span class="pp-no-pred">—</span>';
       const actualWinner = getActualKnockoutWinner(m);
       statusCell = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j, isKnockout ? pred.winner : null, isKnockout ? actualWinner : null);
     } else if (pred && showScores) {
-      const winnerStr = isKnockout && pred.winner ? ` <span class="pp-winner-pick">→ ${pred.winner}</span>` : '';
-      predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${winnerStr}${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
+      predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
+      winnerCell = pred.winner ? `<span class="pp-winner-pick">${pred.winner}</span>` : '<span class="pp-no-pred">—</span>';
       statusCell = '<span class="pp-locked">🔒</span>';
     } else if (pred) {
       predCell = '<span class="pp-hidden">🔒 Hidden</span>';
+      winnerCell = '<span class="pp-hidden">🔒</span>';
       statusCell = '<span style="color:var(--accent);font-size:0.72rem">✓</span>';
     } else {
       predCell = '<span class="pp-no-pred">No prediction</span>';
+      winnerCell = '<span class="pp-no-pred">—</span>';
       statusCell = '<span style="color:var(--live);font-size:0.72rem">✗</span>';
     }
 
     rows += `<tr${isMe ? ' class="me"' : ''}>
       <td>${p}</td>
       <td>${predCell}</td>
+      ${isKnockout ? `<td>${winnerCell}</td>` : ''}
       <td>${statusCell}</td>
     </tr>`;
   }
@@ -189,7 +192,7 @@ function renderPredPanel(key) {
     ${h2hHtml(t1, t2)}
     ${yourPredHtml}
     <table class="pp-table">
-      <thead><tr><th>Player</th><th>Prediction</th><th></th></tr></thead>
+      <thead><tr><th>Player</th><th>Prediction</th>${isKnockout ? '<th>Winner</th>' : ''}<th></th></tr></thead>
       <tbody>${rows}</tbody>
     </table>
     <div class="pp-footer">${footerText}</div>
