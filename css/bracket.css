@@ -34,13 +34,6 @@
   cursor: not-allowed;
 }
 
-.bracket-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-bottom: 40px;
-}
-
 .bracket-empty {
   color: var(--text-muted);
   font-size: 0.9rem;
@@ -48,7 +41,188 @@
   padding: 48px 20px;
 }
 
-/* ── MATCH CARD ── */
+/* ── BRACKET TREE ── */
+.bracket-tree-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 20px;
+}
+
+.bracket-tree {
+  display: flex;
+  gap: 0;
+  min-width: max-content;
+  padding: 16px 0;
+}
+
+.bt-round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 180px;
+}
+
+.bt-round-label {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.bt-round-label.active {
+  color: var(--accent);
+}
+
+/* ── CONNECTOR COLUMN ── */
+.bt-conn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 36px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.bt-conn-line {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.bt-conn-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--border);
+}
+
+/* The vertical stem that connects paired matches to their parent */
+.bt-conn-stem {
+  position: absolute;
+  left: 50%;
+  width: 1px;
+  background: var(--border);
+}
+
+/* ── MATCH NODE ── */
+.bt-node {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: border-color 0.15s;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.bt-node:hover {
+  border-color: var(--border);
+}
+
+.bt-node.bt-winner {
+  border-color: rgba(16,185,129,0.3);
+  background: rgba(16,185,129,0.06);
+}
+
+.bt-node.bt-live {
+  border-color: rgba(239,68,68,0.4);
+  background: rgba(239,68,68,0.05);
+  animation: liveGlow 2s ease-in-out infinite;
+}
+
+.bt-team-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 0;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.bt-team-row .bracket-flag {
+  width: 16px;
+  height: 11px;
+  object-fit: cover;
+  border-radius: 1px;
+  flex-shrink: 0;
+}
+
+.bt-team-name {
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.bt-team-row.bt-advanced .bt-team-name {
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.bt-team-row.bt-eliminated .bt-team-name {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.bt-team-score {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-left: auto;
+  padding-left: 6px;
+}
+
+.bt-team-row.bt-advanced .bt-team-score {
+  color: var(--accent);
+}
+
+.bt-node-tbd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.78rem;
+}
+
+.bt-node-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 4px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.bt-node-meta .match-owner {
+  font-size: 0.6rem;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ── FLAG ── */
+.bracket-flag {
+  width: 22px;
+  height: 15px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── MATCH CARD STYLES (prediction panel popup) ── */
 .bracket-match-card {
   padding: 14px 18px;
   transition: border-color 0.2s;
@@ -65,7 +239,6 @@
   animation: liveGlow 2s ease-in-out infinite;
 }
 
-/* ── CARD HEADER ── */
 .bracket-card-header {
   display: flex;
   align-items: center;
@@ -112,6 +285,19 @@
   animation: dotPulse 1s ease-in-out infinite;
 }
 
+/* ── BRACKET TREE CONNECTOR SVG ── */
+.bt-conn-svg line {
+  transition: stroke 0.2s;
+}
+
+/* ── SINGLE-ROUND CARDS ── */
+.bracket-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 40px;
+}
+
 .bracket-completed-badge {
   font-size: 0.68rem;
   padding: 2px 8px;
@@ -121,7 +307,24 @@
   letter-spacing: 0.02em;
 }
 
-/* ── FIXTURE (teams + score) ── */
+.bracket-card-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.match-score-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  background: var(--surface);
+  padding: 3px 10px;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.02em;
+  color: var(--text);
+}
+
 .bracket-fixture {
   display: flex;
   align-items: center;
@@ -138,33 +341,6 @@
   border-radius: 8px;
 }
 
-.bf-team:first-child {
-  justify-content: flex-start;
-}
-
-.bf-team:last-child {
-  justify-content: flex-end;
-  text-align: right;
-}
-
-.bf-team.bf-winner {
-  background: rgba(16,185,129,0.08);
-}
-
-.bf-team .match-owner {
-  font-size: 0.7rem;
-  padding: 0 6px;
-  border-radius: 6px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.bf-name {
-  font-weight: 700;
-  font-size: 1rem;
-  white-space: nowrap;
-}
-
 .bf-centre {
   display: flex;
   flex-direction: column;
@@ -176,148 +352,5 @@
   text-align: center;
 }
 
-.match-score-pill {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 1.05rem;
-  font-weight: 700;
-  background: var(--surface);
-  padding: 3px 10px;
-  border-radius: var(--radius-xs);
-  letter-spacing: 0.02em;
-  color: var(--text);
-}
-
-/* ── FIXTURE TIME ── */
-.bracket-fixture-time {
-  font-size: 0.92rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.bracket-fixture-countdown {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.bracket-fixture-status {
-  font-size: 0.62rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.bracket-fixture-status.live {
-  color: var(--live);
-  font-weight: 700;
-}
-
-.bracket-real-vs {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-  font-weight: 400;
-}
-
-/* ── PREDICTION CONSENSUS STRIP ── */
-.bracket-consensus {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 4px;
-  border-top: 1px solid var(--border-subtle);
-  flex-wrap: wrap;
-}
-
-.bc-dot {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 5px;
-  cursor: default;
-  white-space: nowrap;
-}
-
-.bc-hit {
-  font-weight: 700;
-}
-
-.bc-miss {
-  background: rgba(255,255,255,0.04);
-  color: var(--text-muted);
-  opacity: 0.5;
-}
-
-/* ── PROGRESSION HINT ── */
-.bracket-progression {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  padding: 6px 4px 2px;
-  letter-spacing: 0.01em;
-}
-
-.bracket-progression strong {
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-/* ── FLAG ── */
-.bracket-flag {
-  width: 22px;
-  height: 15px;
-  object-fit: cover;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-/* ── TBD ── */
-.bracket-tbd {
-  color: var(--text-muted);
-  font-style: italic;
-  font-weight: 400;
-  font-size: 0.88rem;
-  padding: 6px 8px;
-}
-
-/* ── OLD STYLES (kept for player projection rows in R16+) ── */
-.bracket-player-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.bracket-player-row {
-  display: grid;
-  grid-template-columns: 58px 1fr 28px 1fr;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.84rem;
-  padding: 1px 0;
-}
-
-.bracket-player-name {
-  font-weight: 600;
-  font-size: 0.8rem;
-}
-
-.bracket-team {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.bracket-vs {
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  text-align: center;
-}
-
-.bracket-correct-call {
-  background: rgba(34,197,94,0.08);
-  border-radius: 4px;
-}
+.bracket-fixture-status { font-size: 0.62rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.bracket-fixture-status.live { color: var(--live); font-weight: 700; }

@@ -18,7 +18,6 @@ const R32_SLOTS = [
   { match: 88, date: '2026-07-03', home: '2D', away: '2G' },
 ];
 
-// Subsequent round pairings — winner references (W73 = winner of match 73)
 const KNOCKOUT_BRACKET = [
   { match: 89,  round: 'R16',   home: 'W73', away: 'W75' },
   { match: 90,  round: 'R16',   home: 'W74', away: 'W77' },
@@ -38,134 +37,340 @@ const KNOCKOUT_BRACKET = [
   { match: 104, round: 'Final', home: 'W101', away: 'W102' },
 ];
 
+// ── HELPERS ──
+function bracketTeam(teamName) {
+  const iso = teamIso[teamName];
+  const flag = iso ? `<img src="${flagUrl(iso)}" class="bracket-flag" alt="" loading="lazy" onerror="this.style.display='none'">` : '';
+  return `<span class="bracket-team">${flag}${escapeHtml(teamName)}</span>`;
+}
+
+function ownerColour(playerName) {
+  return ownerColors[playerName] || '';
+}
+
+// ── BUILD BRACKET NODE TREE ──
+function buildBracketTree() {
+  // match number → { match, round, homeTeam, awayTeam, feederHome, feederAway }
+  const tree = {};
+
+  // R32 nodes
+  for (const slot of R32_SLOTS) {
+    const m = findMatchByNumber(slot.match);
+    tree[slot.match] = {
+      num: slot.match, round: 'R32',
+      home: m ? m.team1 : null, away: m ? m.team2 : null,
+      score1: m ? m.score1 : null, score2: m ? m.score2 : null,
+      isComplete: m ? m.isComplete : false,
+      date: m ? m.date : null, time: m ? m.time : null, tz: m ? m.tz : null,
+      channel: m ? m.channel : null,
+      feederHome: null, feederAway: null,
+    };
+  }
+
+  // Later rounds
+  for (const kb of KNOCKOUT_BRACKET) {
+    const m = findMatchByNumber(kb.match);
+    const homeRef = parseInt(kb.home.substring(1));
+    const awayRef = parseInt(kb.away.substring(1));
+
+    // Resolve teams from feeder matches if completed
+    let homeTeam = m ? m.team1 : null;
+    let awayTeam = m ? m.team2 : null;
+    let score1 = m ? m.score1 : null;
+    let score2 = m ? m.score2 : null;
+    const isComplete = m ? m.isComplete : false;
+
+    // If teams unknown, try to resolve from completed feeder matches
+    if (!homeTeam && tree[homeRef] && tree[homeRef].isComplete) {
+      const f = tree[homeRef];
+      homeTeam = (f.score1 > f.score2) ? f.home : f.away;
+    }
+    if (!awayTeam && tree[awayRef] && tree[awayRef].isComplete) {
+      const f = tree[awayRef];
+      awayTeam = (f.score1 > f.score2) ? f.home : f.away;
+    }
+
+    tree[kb.match] = {
+      num: kb.match, round: kb.round,
+      home: homeTeam, away: awayTeam,
+      score1, score2, isComplete,
+      date: m ? m.date : null, time: m ? m.time : null, tz: m ? m.tz : null,
+      channel: m ? m.channel : null,
+      feederHome: homeRef, feederAway: awayRef,
+    };
+  }
+
+  return tree;
+}
+
+function findMatchByNumber(matchNum) {
+  // Match numbers correspond to DB IDs
+  for (const m of matchData) {
+    const key = `${m.team1}|${m.team2}|${m.date}`;
+    if (matchIdByTeamDate[key] === matchNum) return m;
+  }
+  return null;
+}
+
+// ── RENDER NODE HTML ──
+function renderBracketNode(node) {
+  const isComplete = node.isComplete && node.score1 !== null && node.score2 !== null;
+  const now = new Date();
+  const kickoff = node.date ? toDate(node.date, node.time, node.tz) : null;
+  const inLiveWindow = kickoff && kickoff <= now && (kickoff.getTime() + 2.5*60*60*1000) > now.getTime();
+  const isLive = inLiveWindow && !isComplete;
+
+  let cls = '';
+  if (isComplete) cls = ' bt-winner';
+  else if (isLive) cls = ' bt-live';
+
+  // Determine advancing team
+  let homeCls = '', awayCls = '';
+  if (isComplete) {
+    if (node.score1 > node.score2) { homeCls = ' bt-advanced'; awayCls = ' bt-eliminated'; }
+    else if (node.score2 > node.score1) { awayCls = ' bt-advanced'; homeCls = ' bt-eliminated'; }
+  }
+
+  const homeIso = node.home ? teamIso[node.home] : null;
+  const awayIso = node.away ? teamIso[node.away] : null;
+  const homeOwner = node.home ? teamOwner[node.home] : null;
+  const awayOwner = node.away ? teamOwner[node.away] : null;
+
+  const homeFlag = homeIso ? `<img class="bracket-flag" src="${flagUrl(homeIso)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '';
+  const awayFlag = awayIso ? `<img class="bracket-flag" src="${flagUrl(awayIso)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '';
+
+  const key = node.home && node.away ? `${node.home}|${node.away}|${node.date}` : '';
+
+  let html = `<div class="bt-node${cls}"${key ? ` onclick="showPredPanel('${safeAttr(node.home)}|${safeAttr(node.away)}|${node.date}')" style="cursor:pointer"` : ''}>`;
+  html += `<div class="bt-team-row${homeCls}">${homeFlag}<span class="bt-team-name">${node.home || 'TBD'}</span>${isComplete ? `<span class="bt-team-score">${node.score1}</span>` : ''}</div>`;
+  html += `<div class="bt-team-row${awayCls}">${awayFlag}<span class="bt-team-name">${node.away || 'TBD'}</span>${isComplete ? `<span class="bt-team-score">${node.score2}</span>` : ''}</div>`;
+
+  // Meta line: date/time or live indicator
+  if (isLive) {
+    html += `<div class="bt-node-meta"><span style="color:var(--live);font-weight:700">LIVE</span></div>`;
+  } else if (isComplete) {
+    html += `<div class="bt-node-meta">FT</div>`;
+  } else if (node.date) {
+    const localTime = formatLocalTime(node.date, node.time, node.tz);
+    html += `<div class="bt-node-meta">${localTime}</div>`;
+  }
+
+  // Owner chips
+  if (homeOwner || awayOwner) {
+    html += `<div class="bt-node-meta" style="gap:4px">`;
+    if (homeOwner) html += `<span class="match-owner ${ownerColors[homeOwner]}">${homeOwner}</span>`;
+    if (awayOwner) html += `<span class="match-owner ${ownerColors[awayOwner]}">${awayOwner}</span>`;
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+// ── RENDER BRACKET TREE ──
+function renderBracket() {
+  const section = document.getElementById('sectionBracket');
+  if (!section) return;
+
+  const tree = buildBracketTree();
+
+  // Rounds to display
+  const rounds = ['R32', 'R16', 'QF', 'SF', 'Final'];
+
+  // Build the round selector
+  const selectorHtml = `
+    <div class="bracket-round-selector">
+      ${rounds.map(r => {
+        return `<button class="bracket-round-btn${r === bracketRound ? ' active' : ''}"
+          onclick="setBracketRound('${r}')">${roundLabel(r)}</button>`;
+      }).join('')}
+      <button class="bracket-round-btn${bracketRound === 'all' ? ' active' : ''}"
+        onclick="setBracketRound('all')">All Rounds</button>
+    </div>`;
+
+  // If viewing a single round, show the list view
+  if (bracketRound !== 'all') {
+    section.innerHTML = selectorHtml + renderSingleRound(bracketRound, tree);
+    return;
+  }
+
+  // Build the full tree
+  // Each round is an array of match numbers in bracket order
+  const roundMatches = {
+    'R32': R32_SLOTS.map(s => s.match),
+    'R16': [89,90,91,92,93,94,95,96],
+    'QF':  [97,98,99,100],
+    'SF':  [101,102],
+    'Final': [104],
+  };
+
+  let colsHtml = '';
+  for (let ri = 0; ri < rounds.length; ri++) {
+    const round = rounds[ri];
+    const matchNums = roundMatches[round];
+    const isActive = round === bracketRound;
+
+    colsHtml += `<div class="bt-round">`;
+    colsHtml += `<div class="bt-round-label${isActive ? ' active' : ''}">${roundLabel(round)}</div>`;
+    for (const num of matchNums) {
+      const node = tree[num];
+      if (node) {
+        colsHtml += renderBracketNode(node);
+      }
+    }
+    colsHtml += `</div>`;
+
+    // Add connector column between rounds (except after last)
+    if (ri < rounds.length - 1) {
+      colsHtml += renderConnector(round, rounds[ri + 1], roundMatches, tree);
+    }
+  }
+
+  section.innerHTML = selectorHtml + `<div class="bracket-tree-wrap"><div class="bracket-tree">${colsHtml}</div></div>`;
+}
+
+function renderConnector(fromRound, toRound, roundMatches, tree) {
+  const fromMatches = roundMatches[fromRound];
+  const toMatches = roundMatches[toRound];
+
+  // Each pair of "from" matches feeds into one "to" match
+  // We need lines connecting from[n] and from[n+1] to to[n/2]
+  const pairCount = toMatches.length;
+  const itemsPerPair = fromMatches.length / pairCount;
+
+  // Draw a connector column with SVG
+  // Height matches the round columns due to flexbox
+  let html = `<div class="bt-conn"><svg class="bt-conn-svg" width="36" height="100%" preserveAspectRatio="none" style="position:absolute;inset:0">`;
+
+  // Calculate positions as percentages
+  for (let pi = 0; pi < pairCount; pi++) {
+    const fromIdx1 = pi * itemsPerPair;
+    const fromIdx2 = fromIdx1 + itemsPerPair - 1;
+    const toIdx = pi;
+
+    // Positions as fraction of total
+    const fromTotal = fromMatches.length;
+    const toTotal = toMatches.length;
+
+    // Center of "from" pair
+    const fromTop = (fromIdx1 + 0.5) / fromTotal * 100;
+    const fromBot = (fromIdx2 + 0.5) / fromTotal * 100;
+    const fromMid = (fromTop + fromBot) / 2;
+
+    // Center of "to" match
+    const toMid = (toIdx + 0.5) / toTotal * 100;
+
+    // Draw: vertical stem from fromTop to fromBot, then horizontal to toMid
+    html += `<line x1="0" y1="${fromTop}%" x2="0" y2="${fromBot}%" stroke="var(--border)" stroke-width="1"/>`;
+    html += `<line x1="0" y1="${fromMid}%" x2="36" y2="${toMid}%" stroke="var(--border)" stroke-width="1"/>`;
+  }
+
+  html += `</svg></div>`;
+  return html;
+}
+
+function renderSingleRound(round, tree) {
+  const roundMatches = {
+    'R32': R32_SLOTS.map(s => s.match),
+    'R16': [89,90,91,92,93,94,95,96],
+    'QF':  [97,98,99,100],
+    'SF':  [101,102],
+    'Final': [104],
+  };
+  const matchNums = roundMatches[round];
+  if (!matchNums) return `<p class="bracket-empty">Unknown round: ${round}</p>`;
+
+  let html = `<div class="bracket-cards">`;
+  for (const num of matchNums) {
+    const node = tree[num];
+    if (!node) continue;
+    const m = findMatchByNumber(num);
+    const dateStr = m && m.date ? new Date(m.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
+
+    html += `<div class="bracket-match-card card-base">
+      <div class="bracket-card-header">
+        <span class="bracket-card-match">${dateStr}</span>
+      </div>
+      ${renderBracketNode(node)}
+    </div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
 // ── BRACKET STATE ──
-let bracketRound = 'R32';
+let bracketRound = 'all';
 
 function setBracketRound(round) {
   bracketRound = round;
   renderBracket();
 }
 
+// Keep old projection functions for reference (unused in tree view but called by other files)
 function calcProjectedStandings(playerName) {
-  // Bucket group stage matches by group letter
   const groupMatches = {};
   for (const m of matchData) {
     if (!m.group) continue;
     if (!groupMatches[m.group]) groupMatches[m.group] = [];
     groupMatches[m.group].push(m);
   }
-
   const result = {};
-
   for (const [letter, matches] of Object.entries(groupMatches)) {
-    // Initialise record for each team in this group
     const rec = {};
     for (const m of matches) {
       if (!rec[m.team1]) rec[m.team1] = { team: m.team1, pts: 0, gd: 0, gf: 0, h2h: {} };
       if (!rec[m.team2]) rec[m.team2] = { team: m.team2, pts: 0, gd: 0, gf: 0, h2h: {} };
     }
-
-    // Apply each match
     for (const m of matches) {
       let s1, s2;
-      if (m.isComplete) {
-        s1 = m.score1;
-        s2 = m.score2;
-      } else {
-        // Look up this player's prediction
+      if (m.isComplete) { s1 = m.score1; s2 = m.score2; }
+      else {
         const mid = matchIdByTeamDate[`${m.team1}|${m.team2}|${m.date}`];
         const preds = predLookup[mid] || [];
         const pred = preds.find(p => p.player_name === playerName);
-        if (pred && pred.home !== undefined && pred.away !== undefined) {
-          s1 = pred.home;
-          s2 = pred.away;
-        } else {
-          s1 = 0; s2 = 0; // no prediction → assume 0-0
-        }
+        if (pred && pred.home !== undefined && pred.away !== undefined) { s1 = pred.home; s2 = pred.away; }
+        else { s1 = 0; s2 = 0; }
       }
-
-      const t1 = rec[m.team1];
-      const t2 = rec[m.team2];
-
-      // Overall stats
-      t1.gf += s1; t1.gd += (s1 - s2);
-      t2.gf += s2; t2.gd += (s2 - s1);
-
-      // H2H tracking (each entry tracks stats vs that specific opponent)
+      const t1 = rec[m.team1]; const t2 = rec[m.team2];
+      t1.gf += s1; t1.gd += (s1 - s2); t2.gf += s2; t2.gd += (s2 - s1);
       if (!t1.h2h[m.team2]) t1.h2h[m.team2] = { pts: 0, gd: 0, gf: 0 };
       if (!t2.h2h[m.team1]) t2.h2h[m.team1] = { pts: 0, gd: 0, gf: 0 };
-
-      if (s1 > s2) {
-        t1.pts += 3;
-        t1.h2h[m.team2].pts += 3;
-        t1.h2h[m.team2].gd += (s1 - s2); t1.h2h[m.team2].gf += s1;
-        t2.h2h[m.team1].gd += (s2 - s1); t2.h2h[m.team1].gf += s2;
-      } else if (s2 > s1) {
-        t2.pts += 3;
-        t2.h2h[m.team1].pts += 3;
-        t2.h2h[m.team1].gd += (s2 - s1); t2.h2h[m.team1].gf += s2;
-        t1.h2h[m.team2].gd += (s1 - s2); t1.h2h[m.team2].gf += s1;
-      } else {
-        t1.pts += 1; t2.pts += 1;
-        t1.h2h[m.team2].pts += 1; t1.h2h[m.team2].gf += s1;
-        t2.h2h[m.team1].pts += 1; t2.h2h[m.team1].gf += s2;
-      }
+      if (s1 > s2) { t1.pts += 3; t1.h2h[m.team2].pts += 3; t1.h2h[m.team2].gd += (s1 - s2); t1.h2h[m.team2].gf += s1; t2.h2h[m.team1].gd += (s2 - s1); t2.h2h[m.team1].gf += s2; }
+      else if (s2 > s1) { t2.pts += 3; t2.h2h[m.team1].pts += 3; t2.h2h[m.team1].gd += (s2 - s1); t2.h2h[m.team1].gf += s2; t1.h2h[m.team2].gd += (s1 - s2); t1.h2h[m.team2].gf += s1; }
+      else { t1.pts += 1; t2.pts += 1; t1.h2h[m.team2].pts += 1; t1.h2h[m.team2].gf += s1; t2.h2h[m.team1].pts += 1; t2.h2h[m.team1].gf += s2; }
     }
-
-    // Sort: group teams by points tier, apply tiebreakers within each tier
-    const teams = Object.values(rec);
-    result[letter] = sortGroupStandings(teams);
+    result[letter] = sortGroupStandings(Object.values(rec));
   }
-
   return result;
 }
 
-// Sort a group's teams with full 2026 tiebreaker chain.
-// Note: for 3-way+ ties the H2H step is applied across all tied teams;
-// in genuinely equal 3-way ties FIFA would draw lots — FIFA_RANK used instead.
 function sortGroupStandings(teams) {
-  // Group by points first
   const byPts = {};
-  for (const t of teams) {
-    if (!byPts[t.pts]) byPts[t.pts] = [];
-    byPts[t.pts].push(t);
-  }
-
+  for (const t of teams) { if (!byPts[t.pts]) byPts[t.pts] = []; byPts[t.pts].push(t); }
   const sorted = [];
   for (const pts of Object.keys(byPts).map(Number).sort((a, b) => b - a)) {
     const tier = byPts[pts];
-    if (tier.length === 1) {
-      sorted.push(tier[0]);
-    } else {
-      sorted.push(...sortByTiebreakers(tier));
-    }
+    sorted.push(...(tier.length === 1 ? tier : sortByTiebreakers(tier)));
   }
   return sorted;
 }
 
 function sortByTiebreakers(teams) {
-  // Compute H2H totals among just these teams
   const h2h = {};
   for (const t of teams) {
     h2h[t.team] = { pts: 0, gd: 0, gf: 0 };
     for (const opp of teams) {
       if (opp.team === t.team) continue;
       const r = t.h2h[opp.team] || { pts: 0, gd: 0, gf: 0 };
-      h2h[t.team].pts += r.pts;
-      h2h[t.team].gd  += r.gd;
-      h2h[t.team].gf  += r.gf;
+      h2h[t.team].pts += r.pts; h2h[t.team].gd += r.gd; h2h[t.team].gf += r.gf;
     }
   }
-
   return [...teams].sort((a, b) => {
-    // Steps 1-3: H2H among tied teams
     if (h2h[b.team].pts !== h2h[a.team].pts) return h2h[b.team].pts - h2h[a.team].pts;
-    if (h2h[b.team].gd  !== h2h[a.team].gd)  return h2h[b.team].gd  - h2h[a.team].gd;
-    if (h2h[b.team].gf  !== h2h[a.team].gf)  return h2h[b.team].gf  - h2h[a.team].gf;
-    // Steps 4-5: overall group stats
+    if (h2h[b.team].gd !== h2h[a.team].gd) return h2h[b.team].gd - h2h[a.team].gd;
+    if (h2h[b.team].gf !== h2h[a.team].gf) return h2h[b.team].gf - h2h[a.team].gf;
     if (b.gd !== a.gd) return b.gd - a.gd;
     if (b.gf !== a.gf) return b.gf - a.gf;
-    // Step 6-7 proxy: FIFA rank (lower = better)
     return (FIFA_RANK[a.team] || 999) - (FIFA_RANK[b.team] || 999);
   });
 }
@@ -173,303 +378,10 @@ function sortByTiebreakers(teams) {
 function calcProjectedQualifiers(playerName) {
   const standings = calcProjectedStandings(playerName);
   const winners = {}, runners = {}, allThirds = [];
-
   for (const [letter, teams] of Object.entries(standings)) {
-    winners[letter] = teams[0].team;
-    runners[letter] = teams[1].team;
-    // Third-placed team with their group for slot assignment
+    winners[letter] = teams[0].team; runners[letter] = teams[1].team;
     allThirds.push({ ...teams[2], group: letter });
   }
-
-  // Rank all 12 third-placed teams: pts → GD → GF → FIFA_RANK
-  allThirds.sort((a, b) => {
-    if (b.pts !== a.pts) return b.pts - a.pts;
-    if (b.gd  !== a.gd)  return b.gd  - a.gd;
-    if (b.gf  !== a.gf)  return b.gf  - a.gf;
-    return (FIFA_RANK[a.team] || 999) - (FIFA_RANK[b.team] || 999);
-  });
-
-  return {
-    winners,
-    runners,
-    qualifyingThirds: allThirds.slice(0, 8),
-  };
-}
-
-function calcProjectedBracket(playerName) {
-  const { winners, runners, qualifyingThirds } = calcProjectedQualifiers(playerName);
-  const bracket = {};
-
-  // Greedy third-place slot assignment: iterate slots in match order,
-  // assign the best-ranked unassigned qualifying third whose group is eligible.
-  const thirdsLeft = [...qualifyingThirds]; // already sorted best-to-worst
-
-  function resolvePos(pos, thirdPool) {
-    if (pos === '3rd') {
-      const idx = thirdsLeft.findIndex(t => thirdPool.includes(t.group));
-      if (idx === -1) return null;
-      const t = thirdsLeft.splice(idx, 1)[0];
-      return t.team;
-    }
-    const placement = pos[0]; // '1' or '2'
-    const group = pos[1];     // 'A'-'L'
-    return placement === '1' ? (winners[group] || null)
-                             : (runners[group]  || null);
-  }
-
-  for (const slot of R32_SLOTS) {
-    bracket[slot.match] = {
-      home: resolvePos(slot.home, slot.thirdPool),
-      away: resolvePos(slot.away, slot.thirdPool),
-    };
-  }
-
-  return bracket;
-}
-
-// ── PROGRESSION HINT ──
-// For a given match number, find which subsequent match it feeds into,
-// and what the other match in that pairing is. Returns HTML string or ''.
-function bracketProgressionHint(matchNum) {
-  // Find the R16 (or later) entry that references this match
-  const next = KNOCKOUT_BRACKET.find(k =>
-    k.home === 'W' + matchNum || k.away === 'W' + matchNum || k.home === 'L' + matchNum || k.away === 'L' + matchNum
-  );
-  if (!next) return '';
-
-  // Find the other match feeding into the same next match
-  const thisRef = (next.home === 'W' + matchNum || next.home === 'L' + matchNum) ? 'home' : 'away';
-  const otherRef = thisRef === 'home' ? 'away' : 'home';
-  const otherNum = parseInt(next[otherRef].substring(1));
-
-  // Find the other R32 match to get team names
-  const otherMatch = matchData.find(m => {
-    const key = `${m.team1}|${m.team2}|${m.date}`;
-    const mid = matchIdByTeamDate[key];
-    return mid === otherNum;
-  });
-
-  const roundName = roundLabel(next.round);
-  const otherLabel = otherMatch && otherMatch.team1 && otherMatch.team2
-    ? `${otherMatch.team1}/${otherMatch.team2}`
-    : 'TBD';
-
-  return `<div class="bracket-progression">→ Winner faces <strong>${otherLabel}</strong> winner in <strong>${roundName}</strong> (Match ${next.match})</div>`;
-}
-
-// ── PREDICTION CONSENSUS STRIP ──
-// For a given match, show each player's prediction status as coloured initials.
-function bracketPredConsensus(m, mid) {
-  if (!mid) return '';
-
-  const now = new Date();
-  const preds = predLookup[mid] || [];
-  const predByPlayer = {};
-  preds.forEach(p => { predByPlayer[p.player_name] = p; });
-
-  const isFinished = m.isComplete && m.score1 !== null && m.score2 !== null;
-  const kickoff = toDate(m.date, m.time, m.tz);
-  const isLocked = kickoff - now < 5 * 60 * 1000;
-  const showScores = isLocked || isFinished;
-
-  let dots = '';
-  for (const p of PLAYERS) {
-    const pred = predByPlayer[p];
-    const color = ownerHexColors[p] || '#888';
-    const initial = p[0];
-
-    if (!pred) {
-      dots += `<span class="bc-dot bc-miss" title="${p}: no prediction">${initial}</span>`;
-    } else if (isFinished) {
-      const badge = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j);
-      dots += `<span class="bc-dot bc-hit" title="${p}: ${pred.home}–${pred.away}" style="background:${color}33;color:${color}">${initial} ${badge}</span>`;
-    } else if (showScores) {
-      dots += `<span class="bc-dot bc-hit" title="${p}: ${pred.home}–${pred.away}" style="background:${color}33;color:${color}">${initial} 🔒</span>`;
-    } else {
-      dots += `<span class="bc-dot bc-hit" title="${p}: predicted" style="background:${color}33;color:${color}">${initial} ✓</span>`;
-    }
-  }
-
-  return `<div class="bracket-consensus">${dots}</div>`;
-}
-
-// ── RENDER ──
-function renderBracket() {
-  const section = document.getElementById('sectionBracket');
-  if (!section) return;
-
-  // Detect which rounds have real knockout matches in the DB
-  const realRounds = new Set(matchData.filter(m => m.round).map(m => m.round));
-
-  // Round selector
-  const rounds = [
-    { id: 'R32',   label: 'R32' },
-    { id: 'R16',   label: 'R16' },
-    { id: 'QF',    label: 'QF' },
-    { id: 'SF',    label: 'SF' },
-    { id: 'Final', label: 'Final' },
-  ];
-
-  const selectorHtml = `
-    <div class="bracket-round-selector">
-      ${rounds.map(r => {
-        const available = realRounds.has(r.id);
-        return `<button class="bracket-round-btn${r.id === bracketRound ? ' active' : ''}${!available ? ' disabled' : ''}"
-          onclick="${available ? `setBracketRound('${r.id}')` : ''}">${r.label}</button>`;
-      }).join('')}
-    </div>`;
-
-  let cardsHtml = '';
-
-  if (bracketRound === 'R32') {
-    const realR32 = matchData.filter(m => m.round === 'R32').sort((a, b) => a.date.localeCompare(b.date));
-    const now = new Date();
-
-    cardsHtml = realR32.map(m => {
-      const date = new Date(m.date + 'T12:00:00');
-      const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-      const localTime = formatLocalTime(m.date, m.time, m.tz);
-      const isComplete = m.isComplete && m.score1 !== null && m.score2 !== null;
-      const kickoff = toDate(m.date, m.time, m.tz);
-      const inLiveWindow = kickoff <= now && (kickoff.getTime() + 2.5 * 60 * 60 * 1000) > now.getTime();
-
-      // Team owners
-      const o1 = teamOwner[m.team1];
-      const o2 = teamOwner[m.team2];
-
-      // Winner highlight
-      let winner = null;
-      if (isComplete && m.score1 > m.score2) winner = 1;
-      else if (isComplete && m.score2 > m.score1) winner = 2;
-
-      // Match ID from the DB
-      const key = `${m.team1}|${m.team2}|${m.date}`;
-      const mid = matchIdByTeamDate[key];
-
-      // Find match number from R32_SLOTS (match numbers = DB match IDs)
-      const slot = R32_SLOTS.find(s => s.match === mid);
-      const matchNum = slot ? slot.match : null;
-      const progressionHint = matchNum ? bracketProgressionHint(matchNum) : '';
-
-      // Score/kickoff display
-      let scoreHtml = '';
-      if (isComplete) {
-        scoreHtml = `<span class="match-score-pill">${m.score1}–${m.score2}</span><span class="bracket-fixture-status">FT</span>`;
-      } else if (inLiveWindow) {
-        scoreHtml = `<span class="match-score-pill live-score">${m.score1 ?? 0}–${m.score2 ?? 0}</span><span class="bracket-fixture-status live">LIVE</span>`;
-      } else {
-        const cd = getCountdown(m.date, m.time, m.tz);
-        scoreHtml = `<span class="bracket-fixture-time">${localTime}</span>${cd && cd.text ? `<span class="bracket-fixture-countdown">${cd.text}</span>` : ''}`;
-      }
-
-      // Card classes
-      const cardCls = (isComplete ? ' bc-complete' : '') + (inLiveWindow ? ' bc-live' : '');
-
-      // Badge
-      let badgeHtml = '';
-      if (isComplete) badgeHtml = '<span class="bracket-completed-badge">Played</span>';
-      else if (inLiveWindow) badgeHtml = '<span class="bracket-live-badge">LIVE</span>';
-      else badgeHtml = '<span class="bracket-projected-badge">Upcoming</span>';
-
-      return `<div class="bracket-match-card card-base${cardCls}">
-        <div class="bracket-card-header">
-          <span class="bracket-card-match">${matchNum ? 'Match ' + matchNum : ''} · ${dateStr}</span>
-          <span class="bracket-card-badges">
-            ${m.channel ? `<a href="${m.channel.startsWith('BBC') ? 'https://www.bbc.co.uk/iplayer' : 'https://www.itv.com/watch'}" target="_blank" rel="noopener" class="match-channel ${m.channel.startsWith('BBC') ? 'channel-bbc' : 'channel-itv'}">${m.channel}</a>` : ''}
-            ${badgeHtml}
-          </span>
-        </div>
-        <div class="bracket-fixture" onclick="showPredPanel('${safeAttr(m.team1)}|${safeAttr(m.team2)}|${m.date}')" style="cursor:pointer">
-          <div class="bf-team${winner === 1 ? ' bf-winner' : ''}">
-            <img class="bracket-flag" src="${flagUrl(teamIso[m.team1])}" alt="" loading="lazy" onerror="this.style.display='none'">
-            <span class="bf-name">${m.team1}</span>
-            ${o1 ? `<span class="match-owner ${ownerColors[o1]}">${o1}</span>` : ''}
-          </div>
-          <div class="bf-centre">
-            ${scoreHtml}
-          </div>
-          <div class="bf-team${winner === 2 ? ' bf-winner' : ''}">
-            <img class="bracket-flag" src="${flagUrl(teamIso[m.team2])}" alt="" loading="lazy" onerror="this.style.display='none'">
-            <span class="bf-name">${m.team2}</span>
-            ${o2 ? `<span class="match-owner ${ownerColors[o2]}">${o2}</span>` : ''}
-          </div>
-        </div>
-        ${mid ? bracketPredConsensus(m, mid) : ''}
-        ${progressionHint}
-      </div>`;
-    }).join('');
-  } else {
-    // R16 and beyond: show progression from previous round results
-    const roundMatches = matchData.filter(m => m.round === bracketRound).sort((a, b) => a.date.localeCompare(b.date));
-
-    if (roundMatches.length > 0) {
-      // Build a winner lookup: matchId → winning team
-      const winnerByMatch = {};
-      for (const m of matchData) {
-        if (m.isComplete && m.score1 !== null && m.score2 !== null) {
-          const key = `${m.team1}|${m.team2}|${m.date}`;
-          const mid = matchIdByTeamDate[key];
-          if (mid) winnerByMatch[mid] = m.score1 > m.score2 ? m.team1 : m.team2;
-        }
-      }
-
-      cardsHtml = roundMatches.map(m => {
-        const date = new Date(m.date + 'T12:00:00');
-        const dateStr = date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
-        const localTime = formatLocalTime(m.date, m.time, m.tz);
-
-        // Try to resolve winners from previous round
-        let homeTeam = m.team1 || 'TBD';
-        let awayTeam = m.team2 || 'TBD';
-
-        // If teams are NULL, try to resolve from KNOCKOUT_BRACKET references
-        if (!m.team1 || !m.team2) {
-          const idx = roundMatches.indexOf(m);
-          const kbList = KNOCKOUT_BRACKET.filter(k => k.round === bracketRound);
-          const kb = kbList[idx];
-          if (kb) {
-            if (kb.home.startsWith('W') || kb.home.startsWith('L')) {
-              const prevMatchId = parseInt(kb.home.substring(1));
-              if (winnerByMatch[prevMatchId]) homeTeam = winnerByMatch[prevMatchId];
-            }
-            if (kb.away.startsWith('W') || kb.away.startsWith('L')) {
-              const prevMatchId = parseInt(kb.away.substring(1));
-              if (winnerByMatch[prevMatchId]) awayTeam = winnerByMatch[prevMatchId];
-            }
-          }
-        }
-
-        return `<div class="bracket-match-card card-base">
-          <div class="bracket-card-header">
-            <span class="bracket-card-match">${dateStr} · ${localTime}</span>
-          </div>
-          <div class="bracket-fixture">
-            <div class="bf-team">
-              ${homeTeam !== 'TBD' ? `<img class="bracket-flag" src="${flagUrl(teamIso[homeTeam] || 'xx')}" alt="" loading="lazy" onerror="this.style.display='none'"><span class="bf-name">${homeTeam}</span>` : '<span class="bracket-tbd">TBD</span>'}
-            </div>
-            <div class="bf-centre"><span class="bracket-real-vs">vs</span></div>
-            <div class="bf-team">
-              ${awayTeam !== 'TBD' ? `<img class="bracket-flag" src="${flagUrl(teamIso[awayTeam] || 'xx')}" alt="" loading="lazy" onerror="this.style.display='none'"><span class="bf-name">${awayTeam}</span>` : '<span class="bracket-tbd">TBD</span>'}
-            </div>
-          </div>
-        </div>`;
-      }).join('');
-    } else {
-      cardsHtml = `<p class="bracket-empty">${roundLabel(bracketRound)} fixtures will appear here once confirmed.</p>`;
-    }
-  }
-
-  section.innerHTML = selectorHtml + `<div class="bracket-cards">${cardsHtml}</div>`;
-}
-
-// Render a team name with its flag
-function bracketTeam(teamName) {
-  const iso = teamIso[teamName];
-  const flag = iso ? `<img src="${flagUrl(iso)}" class="bracket-flag" alt="" loading="lazy" onerror="this.style.display='none'">` : '';
-  return `<span class="bracket-team">${flag}${escapeHtml(teamName)}</span>`;
-}
-
-// Map player name to owner CSS colour class
-function ownerColour(playerName) {
-  return ownerColors[playerName] || '';
+  allThirds.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || (FIFA_RANK[a.team] || 999) - (FIFA_RANK[b.team] || 999));
+  return { winners, runners, qualifyingThirds: allThirds.slice(0, 8) };
 }
