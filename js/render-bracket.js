@@ -52,22 +52,49 @@ function ownerColour(playerName) {
 function buildBracketTree() {
   const tree = {};
 
-  // Build a direct lookup: for R32 matches, pair slots with matchData by date+time order.
-  // This avoids relying on matchIdByTeamDate which has incomplete Supabase RLS data.
-  const r32MatchData = matchData
-    .filter(m => m.round === 'R32' && m.team1 && m.team2)
-    .map(m => ({ ...m, kickoff: toDate(m.date, m.time, m.tz) }))
-    .sort((a, b) => a.kickoff - b.kickoff);
+  // Build team resolution from group stage results
+  // '1A' = Group A winner, '2A' = Group A runner-up
+  const groupResult = {};
+  for (const m of matchData) {
+    if (!m.group || !m.isComplete) continue;
+    const g = m.group;
+    if (!groupResult[g]) groupResult[g] = {};
+    groupResult[g][m.team1] = (groupResult[g][m.team1] || 0) + (m.score1 > m.score2 ? 3 : m.score1 === m.score2 ? 1 : 0);
+    groupResult[g][m.team2] = (groupResult[g][m.team2] || 0) + (m.score2 > m.score1 ? 3 : m.score1 === m.score2 ? 1 : 0);
+  }
 
-  const slotMatches = R32_SLOTS.map(s => ({
-    ...s,
-    kickoff: toDate(s.date, '12:00', -4), // approximate for sorting
-  })).sort((a, b) => a.kickoff - b.kickoff);
+  const groupWinners = {}, groupRunners = {};
+  for (const [g, teams] of Object.entries(groupResult)) {
+    const sorted = Object.entries(teams).sort((a, b) => b[1] - a[1]);
+    groupWinners[g] = sorted[0] ? sorted[0][0] : null;
+    groupRunners[g] = sorted[1] ? sorted[1][0] : null;
+  }
 
-  // Pair slots with match data — both arrays should have 16 entries in the same order
+  function resolveSlotTeam(ref, thirdPool) {
+    if (!ref) return null;
+    if (ref === '3rd') return null; // can't determine 3rd place without full table
+    if (ref.startsWith('1')) return groupWinners[ref.substring(1)] || null;
+    if (ref.startsWith('2')) return groupRunners[ref.substring(1)] || null;
+    return ref; // literal team name
+  }
+
+  // Build lookup: for each R32 slot, find matchData by resolved team names
   const slotToMatch = {};
-  for (let i = 0; i < Math.min(slotMatches.length, r32MatchData.length); i++) {
-    slotToMatch[slotMatches[i].match] = r32MatchData[i];
+  for (const slot of R32_SLOTS) {
+    const homeTeam = resolveSlotTeam(slot.home, slot.thirdPool);
+    const awayTeam = resolveSlotTeam(slot.away, slot.thirdPool);
+    if (homeTeam && awayTeam) {
+      const m = matchData.find(m => m.round === 'R32' && m.team1 === homeTeam && m.team2 === awayTeam);
+      if (m) slotToMatch[slot.match] = m;
+    } else if (homeTeam || awayTeam) {
+      // Partial match (one side is 3rd place) — find by date and known team
+      const known = homeTeam || awayTeam;
+      const m = matchData.find(m => m.round === 'R32' && m.date === slot.date && (m.team1 === known || m.team2 === known));
+      if (m) slotToMatch[slot.match] = m;
+    } else {
+      // Both unknown (3rd vs 3rd or similar) — fallback to date grouping
+      // This shouldn't happen in R32 but just in case
+    }
   }
 
   // R32 nodes
