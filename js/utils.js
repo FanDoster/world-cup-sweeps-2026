@@ -2,19 +2,21 @@ function flagUrl(iso) {
   return `https://flagcdn.com/${iso}.svg`;
 }
 
-// Inner markup for a player's sponsor mark (logo image or text + emoji), or '' if none.
+// Full inner markup for a player's sponsor tag (prefix + logo/emoji mark), or '' if none.
 function sponsorMarkHtml(name) {
   const s = (typeof PLAYER_SPONSORS !== 'undefined') ? PLAYER_SPONSORS[name] : null;
   if (!s) return '';
-  return s.logo
+  const mark = s.logo
     ? `<img src="${s.logo}" alt="${escapeHtml(s.name)}" class="sponsor-logo">`
     : `${escapeHtml(s.name)} <span class="sponsor-emoji">${s.emoji}</span>`;
+  const prefix = s.prefix !== undefined ? s.prefix : 'sponsored by ';
+  return `${prefix}${mark}`;
 }
 
 function playerDisplayName(name) {
   const mark = sponsorMarkHtml(name);
   if (!mark) return name;
-  return `${escapeHtml(name)} <span class="sponsor-tag">sponsored by ${mark}</span>`;
+  return `${escapeHtml(name)} <span class="sponsor-tag">${mark}</span>`;
 }
 
 function formatDateLabel(dateStr, timeStr, tz) {

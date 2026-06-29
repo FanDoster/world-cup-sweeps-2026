@@ -13,7 +13,7 @@ function renderPeople() {
     if (matchPts[name]) badges.push(`<span class="match-pts-badge">⚽${matchPts[name]}pts</span>`);
     if (predPointsByPlayer[name]) badges.push(`<span class="pred-pts-badge">🔮${predPointsByPlayer[name]}pts</span>`);
     const sponsorMark = typeof sponsorMarkHtml === 'function' ? sponsorMarkHtml(name) : '';
-    const sponsorLine = sponsorMark ? `<div class="person-sponsor">sponsored by ${sponsorMark}</div>` : '';
+    const sponsorLine = sponsorMark ? `<div class="person-sponsor">${sponsorMark}</div>` : '';
     card.innerHTML = `
       <div class="person-name">${typeof avatarHtml === 'function' ? avatarHtml(name, 24) : ''} ${escapeHtml(name)} <span class="count">${teams.length} teams</span>${badges.length ? ' ' + badges.join(' ') : ''}</div>${sponsorLine}
       <ul class="team-list">

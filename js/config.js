@@ -12,11 +12,12 @@ const ownerColors = {
 
 // Per-player sponsor tag shown next to their name (leaderboard, awards, player cards…).
 // Each entry has a `name` plus either a `logo` (image URL) or an `emoji` mark.
+// `prefix` overrides the default "sponsored by " lead-in (set '' to drop it).
 // Players not listed get no sponsor tag.
 const PLAYER_SPONSORS = {
-  Anton:  { name: 'Original Joker', emoji: '🃏' },
+  Anton:  { name: 'Original Joker', emoji: '🃏', prefix: '' },
   Laurie: { name: 'Coca-Cola', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Coca-Cola_logo.svg' },
-  Steven: { name: 'Microsoft XP', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/6a/Unofficial_fan_made_Windows_XP_logo_variant.svg' },
+  Steven: { name: 'Microsoft XP', logo: 'sponsors/windows-xp.svg' },
 };
 
 const ownerHexColors = {
