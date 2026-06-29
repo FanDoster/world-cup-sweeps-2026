@@ -18,6 +18,7 @@ async function renderPredictions() {
   if (!allMatches) { el.innerHTML = '<div class=\"pred-empty\">Unable to load match data. Try refreshing.</div>'; return; }
   const matchIdMap = {};
   if (allMatches) allMatches.forEach(m => {
+    if (!m.home_team_id || !m.away_team_id) return; // skip TBD knockout fixtures (teams not yet decided)
     matchIdMap[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
   });
 
@@ -159,7 +160,7 @@ async function renderPredictions() {
     let exactCount = 0, correctCount = 0;
     for (const p of history) {
       const am = allMatches?.find(am => am.id === p.match_id);
-      if (!am) continue;
+      if (!am || !am.home_team_id || !am.away_team_id) continue;
       const m = matchData.find(m => m.team1 === am.home_team_id.name && m.team2 === am.away_team_id.name && m.date === am.match_date);
       if (!m || !m.isComplete) continue;
 

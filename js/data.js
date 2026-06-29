@@ -165,6 +165,7 @@ async function loadPredData() {
   if (allM) {
     matchIdByTeamDate = {};
     allM.forEach(m => {
+      if (!m.home_team_id || !m.away_team_id) return; // skip TBD knockout fixtures (teams not yet decided)
       matchIdByTeamDate[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
     });
   }
