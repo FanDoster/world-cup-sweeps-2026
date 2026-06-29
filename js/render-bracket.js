@@ -272,7 +272,9 @@ function renderBracket() {
   const effectiveRound = (mobile && bracketRound === 'all') ? bracketActiveRound(tree) : bracketRound;
 
   // Build the round selector. Mobile = compact segmented control (no tree button).
+  const _ovIcon = `<svg class="ko-ov-icon" width="20" height="14" viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><line x1="0" y1="1" x2="4" y2="1"/><line x1="0" y1="4" x2="4" y2="4"/><line x1="0" y1="10" x2="4" y2="10"/><line x1="0" y1="13" x2="4" y2="13"/><path d="M4 1L5 1L5 2.5L8 2.5"/><path d="M4 4L5 4L5 2.5"/><path d="M4 10L5 10L5 11.5L8 11.5"/><path d="M4 13L5 13L5 11.5"/><line x1="8" y1="2.5" x2="12" y2="2.5"/><line x1="8" y1="11.5" x2="12" y2="11.5"/><path d="M12 2.5L13 2.5L13 7L16 7"/><path d="M12 11.5L13 11.5L13 7"/><line x1="16" y1="7" x2="20" y2="7"/></svg>`;
   const selectorHtml = `
+    <button class="ko-overview-btn" onclick="openKnockoutOverview()">${_ovIcon} Overview</button>
     <div class="bracket-round-selector${mobile ? ' bracket-round-seg' : ''}">
       ${rounds.map(r => {
         return `<button class="bracket-round-btn${r === effectiveRound ? ' active' : ''}"
@@ -285,6 +287,8 @@ function renderBracket() {
   // Single-round list view (always on mobile; on desktop when a round is picked).
   if (mobile || bracketRound !== 'all') {
     section.innerHTML = selectorHtml + renderSingleRound(effectiveRound, tree, mobile);
+    const _kov = document.getElementById('koOverlay');
+    if (_kov && _kov.style.display !== 'none') _renderKoBracket();
     return;
   }
 
@@ -367,6 +371,8 @@ function renderBracket() {
   }
 
   section.innerHTML = selectorHtml + `<div class="bracket-tree-wrap"><div class="bracket-tree">${colsHtml}</div></div>`;
+  const _kov2 = document.getElementById('koOverlay');
+  if (_kov2 && _kov2.style.display !== 'none') _renderKoBracket();
 }
 
 function renderConnector(toRound, roundMatches, centerY, totalH, labelH) {
@@ -552,4 +558,238 @@ function calcProjectedQualifiers(playerName) {
   }
   allThirds.sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || (FIFA_RANK[a.team] || 999) - (FIFA_RANK[b.team] || 999));
   return { winners, runners, qualifyingThirds: allThirds.slice(0, 8) };
+}
+
+// ── KNOCKOUT OVERVIEW PANEL ──
+const _koZoom = { scale: 1, tx: 0, ty: 0 };
+
+function openKnockoutOverview() {
+  let overlay = document.getElementById('koOverlay');
+  const isNew = !overlay;
+  if (isNew) {
+    overlay = document.createElement('div');
+    overlay.id = 'koOverlay';
+    overlay.className = 'ko-overview-overlay';
+    overlay.innerHTML = `
+      <div class="ko-ov-header">
+        <span class="ko-ov-title">Knockout Bracket</span>
+        <button class="ko-ov-close" onclick="closeKnockoutOverview()">✕</button>
+      </div>
+      <div class="ko-ov-viewport" id="koViewport">
+        <div class="ko-ov-inner" id="koInner">
+          <div class="ko-bracket-tree" id="koTree"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    _setupKoZoomPan();
+  }
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  _renderKoBracket();
+  setTimeout(_koFitToScreen, 80);
+}
+
+function closeKnockoutOverview() {
+  const overlay = document.getElementById('koOverlay');
+  if (overlay) overlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function _renderKoBracket() {
+  const tree = buildBracketTree();
+  const treeEl = document.getElementById('koTree');
+  if (!treeEl) return;
+
+  const SLOT_H = 84;
+  const TOTAL_H = R32_SLOTS.length * SLOT_H;
+  const LABEL_H = 20;
+  const CONN_W = 22;
+
+  const roundMatches = {
+    R32: R32_SLOTS.map(s => s.match),
+    R16: [89, 90, 91, 92, 93, 94, 95, 96],
+    QF:  [97, 98, 99, 100],
+    SF:  [101, 102],
+    Final: [104],
+  };
+  const rounds = ['R32', 'R16', 'QF', 'SF', 'Final'];
+
+  const allSlots = [
+    ...R32_SLOTS.map(s => ({ match: s.match, home: s.home, away: s.away })),
+    ...KNOCKOUT_BRACKET,
+  ];
+  const slotByMatch = {};
+  allSlots.forEach(s => { slotByMatch[s.match] = s; });
+
+  function parseRef(ref) {
+    if (!ref) return null;
+    const m = ref.match(/^[WL](\d+)$/);
+    return m ? parseInt(m[1]) : null;
+  }
+  function feedersOf(num) {
+    const s = slotByMatch[num];
+    if (!s) return [];
+    return [parseRef(s.home), parseRef(s.away)].filter(f => f != null);
+  }
+
+  const r32Order = [];
+  (function dfs(num) {
+    const feeders = feedersOf(num);
+    if (!feeders.length) { r32Order.push(num); return; }
+    feeders.forEach(dfs);
+  })(104);
+
+  const centerY = {};
+  r32Order.forEach((num, i) => { centerY[num] = (i + 0.5) * SLOT_H; });
+  ['R16', 'QF', 'SF', 'Final'].forEach(r => {
+    (roundMatches[r] || []).forEach(num => {
+      const ys = feedersOf(num).map(f => centerY[f]).filter(y => y != null);
+      if (ys.length) centerY[num] = ys.reduce((a, b) => a + b, 0) / ys.length;
+    });
+  });
+
+  let html = '';
+  for (let ri = 0; ri < rounds.length; ri++) {
+    const round = rounds[ri];
+    const matchNums = [...roundMatches[round]].sort((a, b) => (centerY[a] ?? 0) - (centerY[b] ?? 0));
+
+    html += `<div class="ko-col-wrap">`;
+    html += `<div class="ko-col-label">${roundShortLabel(round)}</div>`;
+    html += `<div class="ko-col" style="height:${TOTAL_H}px">`;
+    for (const num of matchNums) {
+      const node = tree[num];
+      if (!node) continue;
+      const cy = centerY[num] ?? 0;
+      html += `<div style="position:absolute;left:0;right:0;top:${cy}px;transform:translateY(-50%)">`;
+      html += _renderKoNode(node);
+      html += `</div>`;
+    }
+    html += `</div></div>`;
+
+    if (ri < rounds.length - 1) {
+      const nextRound = rounds[ri + 1];
+      let svgLines = '';
+      for (const toNum of roundMatches[nextRound]) {
+        const s = slotByMatch[toNum];
+        if (!s) continue;
+        const f1 = parseRef(s.home), f2 = parseRef(s.away);
+        const cy1 = f1 != null ? centerY[f1] : null;
+        const cy2 = f2 != null ? centerY[f2] : null;
+        const tc = centerY[toNum];
+        if (cy1 == null || cy2 == null || tc == null) continue;
+        const top = Math.min(cy1, cy2), bot = Math.max(cy1, cy2), mid = (top + bot) / 2;
+        svgLines += `<line x1="0" y1="${top}" x2="0" y2="${bot}" stroke="var(--text-muted)" stroke-width="1" stroke-opacity="0.4"/>`;
+        svgLines += `<line x1="0" y1="${mid}" x2="${CONN_W}" y2="${tc}" stroke="var(--text-muted)" stroke-width="1" stroke-opacity="0.4"/>`;
+      }
+      html += `<div class="ko-conn-col">`;
+      html += `<div style="height:${LABEL_H}px;flex-shrink:0"></div>`;
+      html += `<div style="position:relative;height:${TOTAL_H}px;width:${CONN_W}px;flex-shrink:0">`;
+      html += `<svg width="${CONN_W}" height="${TOTAL_H}" viewBox="0 0 ${CONN_W} ${TOTAL_H}" style="position:absolute;inset:0">${svgLines}</svg>`;
+      html += `</div></div>`;
+    }
+  }
+  treeEl.innerHTML = html;
+}
+
+function _renderKoNode(node) {
+  const done = node.isComplete && node.score1 !== null && node.score2 !== null;
+  const homeWon = done && node.score1 > node.score2;
+  const awayWon = done && node.score2 > node.score1;
+  const hIso = node.home ? teamIso[node.home] : null;
+  const aIso = node.away ? teamIso[node.away] : null;
+  const hFlag = hIso
+    ? `<img src="${flagUrl(hIso)}" class="ko-f" alt="" onerror="this.style.display='none'">`
+    : '<span class="ko-f-ph"></span>';
+  const aFlag = aIso
+    ? `<img src="${flagUrl(aIso)}" class="ko-f" alt="" onerror="this.style.display='none'">`
+    : '<span class="ko-f-ph"></span>';
+  const hCls = homeWon ? ' ko-w' : awayWon ? ' ko-l' : '';
+  const aCls = awayWon ? ' ko-w' : homeWon ? ' ko-l' : '';
+  const nodeCls = done ? ' ko-done' : (node.home || node.away) ? ' ko-up' : '';
+  return `<div class="ko-node${nodeCls}">` +
+    `<div class="ko-tr${hCls}">${hFlag}<span class="ko-nm">${escapeHtml(node.home || '?')}</span>${done ? `<span class="ko-sc">${node.score1}</span>` : ''}</div>` +
+    `<div class="ko-tr${aCls}">${aFlag}<span class="ko-nm">${escapeHtml(node.away || '?')}</span>${done ? `<span class="ko-sc">${node.score2}</span>` : ''}</div>` +
+    `</div>`;
+}
+
+function _applyKoTransform() {
+  const inner = document.getElementById('koInner');
+  if (inner) inner.style.transform = `translate(${_koZoom.tx}px,${_koZoom.ty}px) scale(${_koZoom.scale})`;
+}
+
+function _koFitToScreen() {
+  const vp = document.getElementById('koViewport');
+  const inner = document.getElementById('koInner');
+  if (!vp || !inner) return;
+  const vw = vp.clientWidth, vh = vp.clientHeight;
+  const cw = inner.offsetWidth, ch = inner.offsetHeight;
+  if (!cw || !ch) return;
+  const s = Math.min(vw / cw, vh / ch) * 0.88;
+  _koZoom.scale = s;
+  _koZoom.tx = (vw - cw * s) / 2;
+  _koZoom.ty = (vh - ch * s) / 2;
+  _applyKoTransform();
+}
+
+function _setupKoZoomPan() {
+  const vp = document.getElementById('koViewport');
+  if (!vp) return;
+
+  let panning = false, panStart = null, pinchStart = null;
+
+  vp.addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (e.touches.length === 2) {
+      panning = false;
+      const t1 = e.touches[0], t2 = e.touches[1];
+      pinchStart = {
+        dist: Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY),
+        midX: (t1.clientX + t2.clientX) / 2,
+        midY: (t1.clientY + t2.clientY) / 2,
+        scale: _koZoom.scale, tx: _koZoom.tx, ty: _koZoom.ty,
+      };
+    } else if (e.touches.length === 1) {
+      pinchStart = null; panning = true;
+      panStart = { x: e.touches[0].clientX - _koZoom.tx, y: e.touches[0].clientY - _koZoom.ty };
+    }
+  }, { passive: false });
+
+  vp.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 2 && pinchStart) {
+      const t1 = e.touches[0], t2 = e.touches[1];
+      const dist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+      const midX = (t1.clientX + t2.clientX) / 2;
+      const midY = (t1.clientY + t2.clientY) / 2;
+      const ratio = dist / pinchStart.dist;
+      const ns = Math.max(0.15, Math.min(8, pinchStart.scale * ratio));
+      const sr = ns / pinchStart.scale;
+      _koZoom.scale = ns;
+      _koZoom.tx = midX - (pinchStart.midX - pinchStart.tx) * sr;
+      _koZoom.ty = midY - (pinchStart.midY - pinchStart.ty) * sr;
+      _applyKoTransform();
+    } else if (e.touches.length === 1 && panning && panStart) {
+      _koZoom.tx = e.touches[0].clientX - panStart.x;
+      _koZoom.ty = e.touches[0].clientY - panStart.y;
+      _applyKoTransform();
+    }
+  }, { passive: false });
+
+  vp.addEventListener('touchend', e => {
+    if (e.touches.length < 2) pinchStart = null;
+    if (e.touches.length === 0) { panning = false; panStart = null; }
+  });
+
+  vp.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect = vp.getBoundingClientRect();
+    const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+    const factor = e.deltaY > 0 ? 0.85 : 1.18;
+    const ns = Math.max(0.15, Math.min(8, _koZoom.scale * factor));
+    const ratio = ns / _koZoom.scale;
+    _koZoom.tx = mx - (mx - _koZoom.tx) * ratio;
+    _koZoom.ty = my - (my - _koZoom.ty) * ratio;
+    _koZoom.scale = ns;
+    _applyKoTransform();
+  }, { passive: false });
 }
