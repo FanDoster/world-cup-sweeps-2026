@@ -49,6 +49,8 @@ function ownerColour(playerName) {
 }
 
 // ── BUILD BRACKET NODE TREE ──
+let bracketTreeCache = {};
+
 function buildBracketTree() {
   const tree = {};
 
@@ -147,6 +149,7 @@ function buildBracketTree() {
     };
   }
 
+  bracketTreeCache = tree;
   return tree;
 }
 
@@ -157,10 +160,12 @@ function renderBracketNode(node) {
   const kickoff = node.date ? toDate(node.date, node.time, node.tz) : null;
   const inLiveWindow = kickoff && kickoff <= now && (kickoff.getTime() + 2.5*60*60*1000) > now.getTime();
   const isLive = inLiveWindow && !isComplete;
+  const hasTeams = node.home || node.away;
 
   let cls = '';
   if (isComplete) cls = ' bt-winner';
   else if (isLive) cls = ' bt-live';
+  else if (hasTeams) cls = ' bt-upcoming';
 
   // Determine advancing team
   let homeCls = '', awayCls = '';
@@ -179,13 +184,31 @@ function renderBracketNode(node) {
 
   const key = node.home && node.away ? `${node.home}|${node.away}|${node.date}` : '';
 
+  // Feed info for TBD slots — show what feeds into this match
+  function feederLabel(ref) {
+    if (!ref) return 'TBD';
+    return `W${ref}`;
+  }
+  function feederHint(ref) {
+    // Show abbreviated team name from feeder match if resolved
+    if (!ref) return '';
+    const fn = bracketTreeCache[ref];
+    if (!fn || !fn.home || !fn.away) return '';
+    return `${fn.home.substring(0,3)}/${fn.away.substring(0,3)}`;
+  }
+
+  const homeLabel = node.home || feederLabel(node.feederHome);
+  const awayLabel = node.away || feederLabel(node.feederAway);
+  const homeHint = !node.home && node.feederHome ? feederHint(node.feederHome) : '';
+  const awayHint = !node.away && node.feederAway ? feederHint(node.feederAway) : '';
+
   let html = `<div class="bt-node${cls}"${key ? ` onclick="showPredPanel('${safeAttr(node.home)}|${safeAttr(node.away)}|${node.date}')" style="cursor:pointer"` : ''}>`;
-  html += `<div class="bt-team-row${homeCls}">${homeFlag}<span class="bt-team-name">${node.home || 'TBD'}</span>${isComplete ? `<span class="bt-team-score">${node.score1}</span>` : ''}</div>`;
-  html += `<div class="bt-team-row${awayCls}">${awayFlag}<span class="bt-team-name">${node.away || 'TBD'}</span>${isComplete ? `<span class="bt-team-score">${node.score2}</span>` : ''}</div>`;
+  html += `<div class="bt-team-row${homeCls}">${homeFlag}<span class="bt-team-name">${homeLabel}</span>${isComplete ? `<span class="bt-team-score">${node.score1}</span>` : ''}</div>`;
+  html += `<div class="bt-team-row${awayCls}">${awayFlag}<span class="bt-team-name">${awayLabel}</span>${isComplete ? `<span class="bt-team-score">${node.score2}</span>` : ''}</div>`;
 
   // Meta line: date/time or live indicator
   if (isLive) {
-    html += `<div class="bt-node-meta"><span style="color:var(--live);font-weight:700">LIVE</span></div>`;
+    html += `<div class="bt-node-meta"><span class="bt-live-text">● LIVE</span></div>`;
   } else if (isComplete) {
     html += `<div class="bt-node-meta">FT</div>`;
   } else if (node.date) {

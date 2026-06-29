@@ -60,8 +60,8 @@
   flex-direction: column;
   justify-content: space-around;
   min-width: 180px;
-  gap: 12px;
-  padding: 18px 0;
+  gap: 6px;
+  padding: 14px 0;
 }
 
 .bt-round-label {
@@ -71,7 +71,7 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding-bottom: 14px;
+  padding-bottom: 10px;
   flex-shrink: 0;
 }
 
@@ -84,76 +84,59 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  width: 36px;
+  width: 30px;
   flex-shrink: 0;
   position: relative;
 }
 
-.bt-conn-line {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.bt-conn-line::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: var(--border);
-}
-
-/* The vertical stem that connects paired matches to their parent */
-.bt-conn-stem {
-  position: absolute;
-  left: 50%;
-  width: 1px;
-  background: var(--border);
-}
-
 /* ── MATCH NODE ── */
 .bt-node {
-  padding: 6px 10px;
-  border-radius: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
   background: var(--card);
   border: 1px solid var(--border-subtle);
+  border-left: 3px solid transparent;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
   flex-shrink: 0;
   position: relative;
 }
 
 .bt-node:hover {
-  border-color: var(--border);
+  border-color: rgba(255,255,255,0.15);
+  transform: scale(1.02);
+  box-shadow: 0 0 12px rgba(255,255,255,0.04);
 }
 
 .bt-node.bt-winner {
-  border-color: rgba(16,185,129,0.3);
-  background: rgba(16,185,129,0.06);
+  border-left-color: rgba(16,185,129,0.6);
+  border-color: rgba(16,185,129,0.25);
+  background: rgba(16,185,129,0.05);
 }
 
 .bt-node.bt-live {
-  border-color: rgba(239,68,68,0.4);
+  border-left-color: rgba(239,68,68,0.7);
+  border-color: rgba(239,68,68,0.3);
   background: rgba(239,68,68,0.05);
   animation: liveGlow 2s ease-in-out infinite;
+}
+
+.bt-node.bt-upcoming {
+  border-left-color: var(--accent);
 }
 
 .bt-team-row {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 3px 0;
-  font-size: 0.8rem;
+  gap: 4px;
+  padding: 2px 0;
+  font-size: 0.78rem;
   white-space: nowrap;
 }
 
 .bt-team-row .bracket-flag {
-  width: 16px;
-  height: 11px;
+  width: 14px;
+  height: 10px;
   object-fit: cover;
   border-radius: 1px;
   flex-shrink: 0;
@@ -161,41 +144,45 @@
 
 .bt-team-name {
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--text);
 }
 
 .bt-team-row.bt-advanced .bt-team-name {
   font-weight: 700;
-  color: var(--accent);
+  color: rgb(16,185,129);
 }
 
 .bt-team-row.bt-eliminated .bt-team-name {
   color: var(--text-muted);
-  opacity: 0.6;
+  opacity: 0.55;
+  text-decoration: line-through;
+  text-decoration-color: var(--text-muted);
+  text-decoration-thickness: 1px;
 }
 
 .bt-team-score {
   font-family: var(--font-mono);
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--text-muted);
   margin-left: auto;
-  padding-left: 6px;
+  padding-left: 4px;
 }
 
 .bt-team-row.bt-advanced .bt-team-score {
-  color: var(--accent);
+  color: rgb(16,185,129);
 }
 
 .bt-node-tbd {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 8px;
   color: var(--text-muted);
   font-style: italic;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
+  opacity: 0.7;
 }
 
 .bt-node-meta {
@@ -204,15 +191,23 @@
   gap: 6px;
   padding-top: 4px;
   border-top: 1px solid var(--border-subtle);
-  margin-top: 4px;
-  font-size: 0.65rem;
+  margin-top: 3px;
+  font-size: 0.7rem;
   color: var(--text-muted);
 }
 
 .bt-node-meta .match-owner {
-  font-size: 0.6rem;
-  padding: 1px 5px;
+  font-size: 0.65rem;
+  padding: 1px 6px;
   border-radius: 4px;
+}
+
+/* Live indicator in meta */
+.bt-node-meta .bt-live-text {
+  color: var(--live);
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
 }
 
 /* ── FLAG ── */
@@ -224,7 +219,7 @@
   flex-shrink: 0;
 }
 
-/* ── MATCH CARD STYLES (prediction panel popup) ── */
+/* ── MATCH CARD STYLES (prediction panel / matches tab) ── */
 .bracket-match-card {
   padding: 14px 18px;
   transition: border-color 0.2s;
