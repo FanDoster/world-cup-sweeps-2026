@@ -94,8 +94,21 @@ function buildBracketTree() {
       const m = matchData.find(m => m.round === 'R32' && m.date === slot.date && (m.team1 === known || m.team2 === known));
       if (m) slotToMatch[slot.match] = m;
     } else {
-      // Both unknown (3rd vs 3rd or similar) — fallback to date grouping
-      // This shouldn't happen in R32 but just in case
+      // Both unknown — groups not yet complete; will be filled by second pass below
+    }
+  }
+
+  // Second pass: any R32 match in matchData not yet assigned gets matched to the
+  // remaining unmatched slot on the same date (handles the case where both group
+  // tables are still incomplete so resolveSlotTeam returned null for both sides).
+  const assignedKeys = new Set(Object.values(slotToMatch).map(m => `${m.team1}|${m.team2}|${m.date}`));
+  const unmatchedR32 = matchData.filter(m => m.round === 'R32' && !assignedKeys.has(`${m.team1}|${m.team2}|${m.date}`));
+  for (const slot of R32_SLOTS) {
+    if (slotToMatch[slot.match]) continue;
+    const idx = unmatchedR32.findIndex(m => m.date === slot.date);
+    if (idx !== -1) {
+      slotToMatch[slot.match] = unmatchedR32[idx];
+      unmatchedR32.splice(idx, 1);
     }
   }
 
@@ -702,7 +715,15 @@ function _renderKoNode(node) {
   const hCls = homeWon ? ' ko-w' : awayWon ? ' ko-l' : '';
   const aCls = awayWon ? ' ko-w' : homeWon ? ' ko-l' : '';
   const nodeCls = done ? ' ko-done' : (node.home || node.away) ? ' ko-up' : '';
+  let dateLine = '';
+  if (node.date) {
+    const d = new Date(node.date + 'T12:00:00');
+    const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    const timeStr = node.time ? formatLocalTime(node.date, node.time, node.tz) : '';
+    dateLine = `<div class="ko-dt">${dateStr}${timeStr ? ' · ' + timeStr : ''}</div>`;
+  }
   return `<div class="ko-node${nodeCls}">` +
+    dateLine +
     `<div class="ko-tr${hCls}">${hFlag}<span class="ko-nm">${escapeHtml(node.home || '?')}</span>${done ? `<span class="ko-sc">${node.score1}</span>` : ''}</div>` +
     `<div class="ko-tr${aCls}">${aFlag}<span class="ko-nm">${escapeHtml(node.away || '?')}</span>${done ? `<span class="ko-sc">${node.score2}</span>` : ''}</div>` +
     `</div>`;
