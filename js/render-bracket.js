@@ -287,8 +287,6 @@ function renderBracket() {
   // Single-round list view (always on mobile; on desktop when a round is picked).
   if (mobile || bracketRound !== 'all') {
     section.innerHTML = selectorHtml + renderSingleRound(effectiveRound, tree, mobile);
-    const _kov = document.getElementById('koOverlay');
-    if (_kov && _kov.style.display !== 'none') _renderKoBracket();
     return;
   }
 
@@ -371,8 +369,6 @@ function renderBracket() {
   }
 
   section.innerHTML = selectorHtml + `<div class="bracket-tree-wrap"><div class="bracket-tree">${colsHtml}</div></div>`;
-  const _kov2 = document.getElementById('koOverlay');
-  if (_kov2 && _kov2.style.display !== 'none') _renderKoBracket();
 }
 
 function renderConnector(toRound, roundMatches, centerY, totalH, labelH) {
