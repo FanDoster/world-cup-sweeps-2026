@@ -62,11 +62,15 @@ function renderPredPanel(key) {
     const isMe = currentProfile && currentProfile.player_name === p;
     let predCell, statusCell;
 
+    const isKnockout = !!m.round;
     if (pred && isFinished) {
-      predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
-      statusCell = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j);
+      const winnerStr = isKnockout && pred.winner ? ` <span class="pp-winner-pick">→ ${pred.winner}</span>` : '';
+      predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${winnerStr}${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
+      const actualWinner = getActualKnockoutWinner(m);
+      statusCell = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j, isKnockout ? pred.winner : null, isKnockout ? actualWinner : null);
     } else if (pred && showScores) {
-      predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
+      const winnerStr = isKnockout && pred.winner ? ` <span class="pp-winner-pick">→ ${pred.winner}</span>` : '';
+      predCell = `<span class="pp-score">${pred.home}–${pred.away}</span>${winnerStr}${pred.j ? ' <span class="joker-mini" title="Joker — double points">🃏</span>' : ''}`;
       statusCell = '<span class="pp-locked">🔒</span>';
     } else if (pred) {
       predCell = '<span class="pp-hidden">🔒 Hidden</span>';
@@ -93,9 +97,10 @@ function renderPredPanel(key) {
     </div>`;
   } else if (isLocked || isFinished) {
     if (yourPred && yourPred.home !== undefined) {
+      const winnerLocked = isKnockout && yourPred.winner ? ` → ${yourPred.winner}` : '';
       yourPredHtml = `<div class="pp-your-pred">
         <div class="pp-your-pred-title">Your Prediction</div>
-        <div class="pp-your-pred-locked">🔒 ${yourPred.home}–${yourPred.away}${yourPred.j ? ' 🃏' : ''}</div>
+        <div class="pp-your-pred-locked">🔒 ${yourPred.home}–${yourPred.away}${winnerLocked}${yourPred.j ? ' 🃏' : ''}</div>
       </div>`;
     } else {
       yourPredHtml = `<div class="pp-your-pred">
@@ -104,32 +109,49 @@ function renderPredPanel(key) {
       </div>`;
     }
   } else if (yourPred && yourPred.home !== undefined) {
+    const winnerDisplay = isKnockout && yourPred.winner ? ` → ${yourPred.winner}` : '';
+    const ppWinnerPickerHtml = winnersEnabled && isKnockout ? `
+      <div class="pmc-winner-row">
+        <span class="pmc-winner-label">Advances:</span>
+        <button class="winner-btn${yourPred.winner === t1 ? ' active' : ''}" data-winner-mid="pp-${mid}" data-team="${escapeHtml(t1)}" onclick="selectWinner('pp-${mid}','${escapeHtml(t1)}')">${t1}</button>
+        <button class="winner-btn${yourPred.winner === t2 ? ' active' : ''}" data-winner-mid="pp-${mid}" data-team="${escapeHtml(t2)}" onclick="selectWinner('pp-${mid}','${escapeHtml(t2)}')">${t2}</button>
+      </div>` : '';
     yourPredHtml = `<div class="pp-your-pred" id="pp-your-pred-${mid}">
       <div class="pp-your-pred-title">Your Prediction</div>
       <div class="pp-pred-form">
-        <span class="pp-pred-display" id="pp-pred-display-${mid}">${yourPred.home}–${yourPred.away}${yourPred.j ? ' 🃏' : ''}</span>
+        <span class="pp-pred-display" id="pp-pred-display-${mid}">${yourPred.home}–${yourPred.away}${winnerDisplay}${yourPred.j ? ' 🃏' : ''}</span>
         ${jokersEnabled ? `<button class="joker-chip${yourPred.j ? ' active' : ''}" id="pp-joker-${mid}" onclick="toggleJokerFromPanel(${mid})">🃏 2×</button>` : ''}
         <button class="pmc-btn edit" id="pp-pred-edit-btn-${mid}" onclick="editPredictionFromPanel(${mid})">Edit</button>
-        <div class="pmc-score" id="pp-pred-edit-${mid}" style="display:none">
-          <div class="pmc-score-wrap">
-            <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',1)">▴</div>
-            <input type="number" id="pp-ph-${mid}" min="0" max="20" value="${yourPred.home}">
-            <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',-1)">▾</div>
-          </div>
-          <span class="pmc-dash">–</span>
-          <div class="pmc-score-wrap">
-            <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',1)">▴</div>
-            <input type="number" id="pp-pa-${mid}" min="0" max="20" value="${yourPred.away}">
-            <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',-1)">▾</div>
+        <div class="pmc-edit-wrap" id="pp-pred-edit-${mid}" style="display:none">
+          ${ppWinnerPickerHtml}
+          <div class="pmc-score">
+            <div class="pmc-score-wrap">
+              <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',1)">▴</div>
+              <input type="number" id="pp-ph-${mid}" min="0" max="20" value="${yourPred.home}">
+              <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',-1)">▾</div>
+            </div>
+            <span class="pmc-dash">–</span>
+            <div class="pmc-score-wrap">
+              <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',1)">▴</div>
+              <input type="number" id="pp-pa-${mid}" min="0" max="20" value="${yourPred.away}">
+              <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',-1)">▾</div>
+            </div>
           </div>
         </div>
         <button class="pmc-btn save" id="pp-pred-save-btn-${mid}" onclick="submitPredictionFromPanel(${mid})" style="display:none">Save</button>
       </div>
     </div>`;
   } else {
+    const ppWinnerPickerHtml = winnersEnabled && isKnockout ? `
+      <div class="pmc-winner-row">
+        <span class="pmc-winner-label">Advances:</span>
+        <button class="winner-btn" data-winner-mid="pp-${mid}" data-team="${escapeHtml(t1)}" onclick="selectWinner('pp-${mid}','${escapeHtml(t1)}')">${t1}</button>
+        <button class="winner-btn" data-winner-mid="pp-${mid}" data-team="${escapeHtml(t2)}" onclick="selectWinner('pp-${mid}','${escapeHtml(t2)}')">${t2}</button>
+      </div>` : '';
     yourPredHtml = `<div class="pp-your-pred" id="pp-your-pred-${mid}">
       <div class="pp-your-pred-title">Your Prediction</div>
       <div class="pp-pred-form">
+        ${ppWinnerPickerHtml}
         <div class="pmc-score">
           <div class="pmc-score-wrap">
             <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',1)">▴</div>
@@ -160,7 +182,7 @@ function renderPredPanel(key) {
     <div class="pp-header">
       <div>
         <div class="pp-match">${t1} vs ${t2}</div>
-        <div class="pp-meta">${formatDateLabel(m.date,m.time,m.tz)} · ${formatLocalTime(m.date,m.time,m.tz)} · G${m.group}</div>
+        <div class="pp-meta">${formatDateLabel(m.date,m.time,m.tz)} · ${formatLocalTime(m.date,m.time,m.tz)} · ${m.round ? roundLabel(m.round) : 'G' + m.group}</div>
       </div>
       <button class="pp-close" onclick="closePredPanel()">✕</button>
     </div>

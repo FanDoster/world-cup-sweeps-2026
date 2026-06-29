@@ -160,11 +160,20 @@ function renderAwards(standings) {
     <div class="award-card"><span class="aw-icon">${icon}</span><div><div class="aw-name">${name}</div><div class="aw-holder">${holder === 'Laurie' ? playerDisplayName('Laurie') : holder}</div><div class="aw-detail">${detail}</div></div></div>`).join('')}</div>` : '';
 }
 
-function calcPredPoints(homePred, awayPred, homeActual, awayActual) {
+// For knockout matches: determine who actually advanced (derived from score, or DB value for ET/pens)
+function getActualKnockoutWinner(m) {
+  if (!m.round || m.score1 === null || m.score2 === null) return null;
+  if (m.score1 > m.score2) return m.team1;
+  if (m.score2 > m.score1) return m.team2;
+  return m.actualWinner || null; // ET/pens — set by admin in DB
+}
+
+function calcPredPoints(homePred, awayPred, homeActual, awayActual, predictedWinner, actualWinner) {
   let pts = 0;
   if (Math.sign(homePred - awayPred) === Math.sign(homeActual - awayActual)) pts += 1;
   if (homePred === homeActual) pts += 2;
   if (awayPred === awayActual) pts += 2;
+  if (predictedWinner && actualWinner && predictedWinner === actualWinner) pts += 2;
   return pts;
 }
 
@@ -183,7 +192,8 @@ function getPredStatsByPlayer() {
     if (m.score1 === null || m.score2 === null) continue;
 if (!stats[p.player_name]) stats[p.player_name] = { settled: 0, pts: 0, exact: 0, scored: 0, cur: 0, best: 0, upsets: 0, jokerPts: 0, jokersUsed: 0, jokerBest: 0, jokerBestMatch: '', jokerWorst: 999, jokerWorstMatch: '' };
 const st = stats[p.player_name];
-const base = calcPredPoints(p.home, p.away, m.score1, m.score2);
+const actualWinner = getActualKnockoutWinner(m);
+const base = calcPredPoints(p.home, p.away, m.score1, m.score2, m.round ? p.winner : null, m.round ? actualWinner : null);
 st.settled++;
 st.pts += p.j ? base * 2 : base;
 if (p.j) {
@@ -224,10 +234,11 @@ function calcTerritoryControl() {
         const matchId = matchIdByTeamDate[key];
         if (!matchId) continue;
         const preds = predLookup[matchId] || [];
+        const actualWinner = getActualKnockoutWinner(m);
         for (const player of PLAYERS) {
           const pred = preds.find(p => p.player_name === player);
           if (pred && pred.home !== null && pred.home !== undefined) {
-            totals[player] += calcPredPoints(pred.home, pred.away, m.score1, m.score2);
+            totals[player] += calcPredPoints(pred.home, pred.away, m.score1, m.score2, m.round ? pred.winner : null, m.round ? actualWinner : null);
           }
         }
       }
@@ -268,10 +279,11 @@ function calcTerritoryControlForTerritory(territory, excludeKeys) {
       const matchId = matchIdByTeamDate[key];
       if (!matchId) continue;
       const preds = predLookup[matchId] || [];
+      const actualWinner = getActualKnockoutWinner(m);
       for (const player of PLAYERS) {
         const pred = preds.find(p => p.player_name === player);
         if (pred && pred.home !== null && pred.home !== undefined) {
-          totals[player] += calcPredPoints(pred.home, pred.away, m.score1, m.score2);
+          totals[player] += calcPredPoints(pred.home, pred.away, m.score1, m.score2, m.round ? pred.winner : null, m.round ? actualWinner : null);
         }
       }
     }
@@ -532,11 +544,13 @@ function calcPredPointsForAll() {
   for (const [name, st] of Object.entries(getPredStatsByPlayer())) predPointsByPlayer[name] = st.pts;
 }
 
-function predResultBadge(homePred, awayPred, homeActual, awayActual, joker) {
-  const base = calcPredPoints(homePred, awayPred, homeActual, awayActual);
+function predResultBadge(homePred, awayPred, homeActual, awayActual, joker, predictedWinner, actualWinner) {
+  const base = calcPredPoints(homePred, awayPred, homeActual, awayActual, predictedWinner, actualWinner);
   const pts = joker ? base * 2 : base;
+  // Max is 7 for knockout (5 score + 2 winner), 5 for group stage
+  const perfect = (predictedWinner !== undefined && predictedWinner !== null) ? 7 : 5;
   const j = joker ? '<span class="joker-mini" title="Joker — points doubled">🃏</span>' : '';
-  if (base === 5) return `<span style="color:var(--gold);font-weight:700">${pts}★</span>${j}`;
+  if (base === perfect) return `<span style="color:var(--gold);font-weight:700">${pts}★</span>${j}`;
   if (base >= 2) return `<span style="color:var(--accent);font-weight:700">${pts}</span>${j}`;
   if (base === 1) return `<span style="color:var(--text-secondary);font-weight:700">${pts}</span>${j}`;
   return `<span style="color:var(--live)">✗</span>${j}`;

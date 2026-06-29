@@ -23,7 +23,9 @@ function switchTab(tab) {
   if (tab === 'shooter') initShooter();
   if (tab !== 'shooter') pauseShooter();
   if (tab === 'profile') {
-    // Profile rendering is handled explicitly by showUserProfile / handleHashRoute
+    const playerToShow = (typeof userProfilePlayer !== 'undefined' && userProfilePlayer)
+      || (currentProfile && currentProfile.player_name);
+    if (playerToShow) renderUserProfile(playerToShow);
   }
 
   // Update hash URL for all tabs (use pushState so back/forward works between tabs)

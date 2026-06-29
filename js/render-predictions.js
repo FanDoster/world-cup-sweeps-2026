@@ -10,7 +10,7 @@ async function renderPredictions() {
     .sort((a, b) => a.kickoff - b.kickoff)
     .slice(0, 20);
 
-  const { data: existing } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '')).eq('user_id', currentSession.user.id);
+  const { data: existing } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '') + (winnersEnabled ? ',predicted_winner' : '')).eq('user_id', currentSession.user.id);
   const predMap = {};
   if (existing) existing.forEach(p => { predMap[p.match_id] = p; });
 
@@ -63,35 +63,51 @@ async function renderPredictions() {
     const ep = mid ? predMap[mid] : null;
     const isLocked = m.kickoff - now < 5 * 60 * 1000;
 
+    const isKnockout = !!m.round;
+    const roundBadge = `<span class="pmc-group badge-mono">${isKnockout ? roundLabel(m.round) : 'G' + m.group}</span>`;
+
+    // Winner picker HTML (knockout only, editable state)
+    const winnerPickerHtml = (existingWinner) => winnersEnabled && isKnockout ? `
+      <div class="pmc-winner-row" id="winner-row-${mid}">
+        <span class="pmc-winner-label">Advances:</span>
+        <button class="winner-btn${existingWinner === m.team1 ? ' active' : ''}" data-winner-mid="${mid}" data-team="${escapeHtml(m.team1)}" onclick="selectWinner(${mid},'${escapeHtml(m.team1)}')">${m.team1}</button>
+        <button class="winner-btn${existingWinner === m.team2 ? ' active' : ''}" data-winner-mid="${mid}" data-team="${escapeHtml(m.team2)}" onclick="selectWinner(${mid},'${escapeHtml(m.team2)}')">${m.team2}</button>
+      </div>` : '';
+
     if (ep && isLocked) {
       const jokerCls = ep.is_joker ? ' joker-active' : '';
+      const winnerDisplay = isKnockout && ep.predicted_winner ? ` <span class="pmc-winner-locked">→ ${ep.predicted_winner}</span>` : '';
       html += `<div class="pred-match-card${jokerCls}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
-          <span class="pmc-status locked"><span${ep.is_joker ? ' class="joker-active-score"' : ''}>🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}</span>${ep.is_joker ? '<span class="joker-locked-badge">🃏 2×</span>' : ''}</span>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} ${roundBadge}</div>
+          <span class="pmc-status locked"><span${ep.is_joker ? ' class="joker-active-score"' : ''}>🔒 ${ep.predicted_home_score}–${ep.predicted_away_score}${winnerDisplay}</span>${ep.is_joker ? '<span class="joker-locked-badge">🃏 2×</span>' : ''}</span>
         </div></div>`;
     } else if (ep) {
       const lockMs = m.kickoff - 5 * 60 * 1000;
       const lockStr = getLockCountdown(lockMs);
       hasOpen = true;
+      const winnerDisplay = isKnockout && ep.predicted_winner ? ` → ${ep.predicted_winner}` : '';
       html += `<div class="pred-match-card${ep.is_joker ? ' joker-active' : ''}" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
-          <span class="pmc-status predicted" id="pred-display-${mid}"><span class="${ep.is_joker ? 'joker-active-score' : ''}">${ep.predicted_home_score}–${ep.predicted_away_score}</span></span>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} ${roundBadge}</div>
+          <span class="pmc-status predicted" id="pred-display-${mid}"><span class="${ep.is_joker ? 'joker-active-score' : ''}">${ep.predicted_home_score}–${ep.predicted_away_score}${winnerDisplay}</span></span>
           ${jokersEnabled ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
-          <div class="pmc-score" id="pred-edit-${mid}" style="display:none">
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
-              <input type="number" id="ph-${mid}" min="0" max="20" value="${ep.predicted_home_score}">
-              <div class="pmc-step" onclick="stepScore('ph-${mid}',-1)">▾</div>
-            </div>
-            <span class="pmc-dash">–</span>
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('pa-${mid}',1)">▴</div>
-              <input type="number" id="pa-${mid}" min="0" max="20" value="${ep.predicted_away_score}">
-              <div class="pmc-step" onclick="stepScore('pa-${mid}',-1)">▾</div>
+          <div class="pmc-edit-wrap" id="pred-edit-${mid}" style="display:none">
+            ${winnerPickerHtml(ep.predicted_winner)}
+            <div class="pmc-score">
+              <div class="pmc-score-wrap">
+                <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
+                <input type="number" id="ph-${mid}" min="0" max="20" value="${ep.predicted_home_score}">
+                <div class="pmc-step" onclick="stepScore('ph-${mid}',-1)">▾</div>
+              </div>
+              <span class="pmc-dash">–</span>
+              <div class="pmc-score-wrap">
+                <div class="pmc-step" onclick="stepScore('pa-${mid}',1)">▴</div>
+                <input type="number" id="pa-${mid}" min="0" max="20" value="${ep.predicted_away_score}">
+                <div class="pmc-step" onclick="stepScore('pa-${mid}',-1)">▾</div>
+              </div>
             </div>
           </div>
           <button class="pmc-btn edit" id="pred-edit-btn-${mid}" onclick="editPrediction(${mid})">Edit</button>
@@ -101,7 +117,7 @@ async function renderPredictions() {
       html += `<div class="pred-match-card">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock locked-out">Locked</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} ${roundBadge}</div>
           <span class="pmc-status locked">Locked</span>
         </div></div>`;
     } else {
@@ -111,18 +127,21 @@ async function renderPredictions() {
       html += `<div class="pred-match-card" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
-          <div class="pmc-teams">${m.team1} vs ${m.team2} <span class="pmc-group badge-mono">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
-          <div class="pmc-score">
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
-              <input type="number" id="ph-${mid}" min="0" max="20" value="0">
-              <div class="pmc-step" onclick="stepScore('ph-${mid}',-1)">▾</div>
-            </div>
-            <span class="pmc-dash">–</span>
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('pa-${mid}',1)">▴</div>
-              <input type="number" id="pa-${mid}" min="0" max="20" value="0">
-              <div class="pmc-step" onclick="stepScore('pa-${mid}',-1)">▾</div>
+          <div class="pmc-teams">${m.team1} vs ${m.team2} ${roundBadge}</div>
+          <div>
+            ${winnerPickerHtml(null)}
+            <div class="pmc-score">
+              <div class="pmc-score-wrap">
+                <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
+                <input type="number" id="ph-${mid}" min="0" max="20" value="0">
+                <div class="pmc-step" onclick="stepScore('ph-${mid}',-1)">▾</div>
+              </div>
+              <span class="pmc-dash">–</span>
+              <div class="pmc-score-wrap">
+                <div class="pmc-step" onclick="stepScore('pa-${mid}',1)">▴</div>
+                <input type="number" id="pa-${mid}" min="0" max="20" value="0">
+                <div class="pmc-step" onclick="stepScore('pa-${mid}',-1)">▾</div>
+              </div>
             </div>
           </div>
           <button class="pmc-btn predict" onclick="submitPrediction(${mid})">Predict</button>
@@ -134,7 +153,7 @@ async function renderPredictions() {
     html += '<div class="pred-empty"><div class="pe-icon">🏁</div>No upcoming matches to predict.</div>';
   }
 
-  const { data: history } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '')).eq('user_id', currentSession.user.id).order('created_at', { ascending: false }).limit(30);
+  const { data: history } = await sb.from('predictions').select('match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '') + (winnersEnabled ? ',predicted_winner' : '')).eq('user_id', currentSession.user.id).order('created_at', { ascending: false }).limit(30);
   if (history && history.length > 0) {
     let historyHtml = '';
     let exactCount = 0, correctCount = 0;
@@ -144,16 +163,19 @@ async function renderPredictions() {
       const m = matchData.find(m => m.team1 === am.home_team_id.name && m.team2 === am.away_team_id.name && m.date === am.match_date);
       if (!m || !m.isComplete) continue;
 
-      const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2);
-      if (pts === 5) exactCount++; else if (pts >= 1) correctCount++;
+      const actualWinner = getActualKnockoutWinner(m);
+      const pts = calcPredPoints(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2, m.round ? p.predicted_winner : null, m.round ? actualWinner : null);
+      const maxPts = m.round && p.predicted_winner ? 7 : 5;
+      if (pts === maxPts) exactCount++; else if (pts >= 1) correctCount++;
 
-      const badge = predResultBadge(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2, p.is_joker);
+      const badge = predResultBadge(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2, p.is_joker, m.round ? p.predicted_winner : null, m.round ? actualWinner : null);
+      const winnerPickLine = m.round && p.predicted_winner ? ` &nbsp;·&nbsp; Advances: <span class="pred">${p.predicted_winner}</span>${actualWinner ? (p.predicted_winner === actualWinner ? ' <span class="hit-marker">✓</span>' : ' <span class="miss-marker">✗</span>') : ''}` : '';
       historyHtml += `<div class="pred-history-card">
         <div class="phc-result">${badge}</div>
         <div class="phc-match">
           <div class="phc-teams">${m.team1} vs ${m.team2} <span style="color:var(--text-muted);font-weight:400;font-size:0.75rem">${m.round ? roundLabel(m.round) : 'G' + m.group}</span></div>
           <div class="phc-scores">
-            Result <span class="actual">${m.score1}–${m.score2}</span> &nbsp;·&nbsp; Your pick <span class="pred">${p.predicted_home_score}–${p.predicted_away_score}</span>
+            Result <span class="actual">${m.score1}–${m.score2}</span> &nbsp;·&nbsp; Your pick <span class="pred">${p.predicted_home_score}–${p.predicted_away_score}</span>${winnerPickLine}
           </div>
         </div>
       </div>`;
@@ -174,14 +196,25 @@ async function renderPredictions() {
 async function submitPrediction(matchId) {
   const h = parseInt(document.getElementById(`ph-${matchId}`).value) || 0;
   const a = parseInt(document.getElementById(`pa-${matchId}`).value) || 0;
-  const { error } = await sb.from('predictions').upsert({
+  const upsertData = {
     user_id: currentSession.user.id,
     match_id: matchId,
     predicted_home_score: h,
     predicted_away_score: a
-  }, { onConflict: 'user_id,match_id' });
+  };
+  if (winnersEnabled) {
+    const winnerBtn = document.querySelector(`[data-winner-mid="${matchId}"].winner-btn.active`);
+    upsertData.predicted_winner = winnerBtn ? winnerBtn.dataset.team : null;
+  }
+  const { error } = await sb.from('predictions').upsert(upsertData, { onConflict: 'user_id,match_id' });
   if (error) { alert('Error: ' + error.message); return; }
   renderPredictions();
+}
+
+function selectWinner(matchId, team) {
+  document.querySelectorAll(`[data-winner-mid="${matchId}"].winner-btn`).forEach(b => b.classList.remove('active'));
+  const btn = document.querySelector(`[data-winner-mid="${matchId}"][data-team="${team}"]`);
+  if (btn) btn.classList.add('active');
 }
 
 async function toggleJoker(matchId) {
@@ -226,12 +259,17 @@ function editPredictionFromPanel(matchId) {
 async function submitPredictionFromPanel(matchId) {
   const h = parseInt(document.getElementById(`pp-ph-${matchId}`).value) || 0;
   const a = parseInt(document.getElementById(`pp-pa-${matchId}`).value) || 0;
-  const { error } = await sb.from('predictions').upsert({
+  const upsertData = {
     user_id: currentSession.user.id,
     match_id: matchId,
     predicted_home_score: h,
     predicted_away_score: a
-  }, { onConflict: 'user_id,match_id' });
+  };
+  if (winnersEnabled) {
+    const winnerBtn = document.querySelector(`[data-winner-mid="pp-${matchId}"].winner-btn.active`);
+    upsertData.predicted_winner = winnerBtn ? winnerBtn.dataset.team : null;
+  }
+  const { error } = await sb.from('predictions').upsert(upsertData, { onConflict: 'user_id,match_id' });
   if (error) { alert('Error: ' + error.message); return; }
   await loadPredData();
   const m = matchData.find(m => {

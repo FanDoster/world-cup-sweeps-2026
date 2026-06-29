@@ -150,7 +150,7 @@ function renderMatches() {
         for (const p of PLAYERS) {
           const pred = predByPlayer[p];
           if (pred && showScores) {
-            const icon = isFinished ? predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j) : '';
+            const icon = isFinished ? predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j, m.round ? pred.winner : null, m.round ? getActualKnockoutWinner(m) : null) : '';
             dots += `<span class="bc-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
           } else if (pred) {
             dots += `<span class="bc-dot has-pred" title="${p} predicted">${p[0]}✓</span>`;

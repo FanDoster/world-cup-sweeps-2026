@@ -540,7 +540,7 @@ function renderTerritoryPanel(territoryName) {
         const pred = predByPlayer[p];
         if (pred && (locked || isFinished) && pred.home !== undefined && pred.home !== null) {
           let badge = '';
-          if (isFinished) badge = predResultBadge(pred.home, pred.away, score1, score2, pred.j || false);
+          if (isFinished) badge = predResultBadge(pred.home, pred.away, score1, score2, pred.j || false, m.round ? pred.winner : null, m.round ? getActualKnockoutWinner(m) : null);
           predHtml += `<span class="vm-pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]} ${pred.home}–${pred.away}${badge}</span>`;
         } else if (pred) {
           predHtml += `<span class="vm-pred-dot has-pred" title="${p} has predicted">✓${p[0]}</span>`;
@@ -609,7 +609,7 @@ function renderVenueMatches(venueName) {
       const pred = predByPlayer[p];
       if (pred && (locked || isFinished) && pred.home !== undefined && pred.home !== null) {
         let badge = '';
-        if (isFinished) badge = predResultBadge(pred.home, pred.away, score1, score2, pred.j || false);
+        if (isFinished) badge = predResultBadge(pred.home, pred.away, score1, score2, pred.j || false, m.round ? pred.winner : null, m.round ? getActualKnockoutWinner(m) : null);
         predHtml += `<span class="vm-pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]} ${pred.home}–${pred.away}${badge}</span>`;
       } else if (pred) {
         predHtml += `<span class="vm-pred-dot has-pred" title="${p} has predicted">✓${p[0]}</span>`;

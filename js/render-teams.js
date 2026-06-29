@@ -121,7 +121,7 @@ function renderTeamSchedule() {
               if (pred && showScores) {
                 let icon = '';
                 if (isFinished) {
-                  icon = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j);
+                  icon = predResultBadge(pred.home, pred.away, m.score1, m.score2, pred.j, m.round ? pred.winner : null, m.round ? getActualKnockoutWinner(m) : null);
                 }
                 dots += `<span class="pred-dot has-pred" title="${p}: ${pred.home}–${pred.away}">${p[0]}${icon}</span>`;
               } else if (pred) {

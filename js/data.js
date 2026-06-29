@@ -25,6 +25,7 @@ let matchIdByTeamDate = {};
 let predPointsByPlayer = {};
 let jokersEnabled = false;
 let commentsEnabled = false;
+let winnersEnabled = false;
 let featureProbeDone = false;
 
 async function loadData() {
@@ -115,8 +116,17 @@ async function loadData() {
       prob2:      r.prob_away,
       isComplete,
       round:      r.round || null,
+      actualWinner: null, // populated below if actual_winner column exists
     };
   });
+
+  // Optional: enrich matchData with actual_winner for ET/pens knockout results
+  const { data: winnerRows, error: winnerErr } = await sb.from('matches').select('id,actual_winner');
+  if (!winnerErr && winnerRows) {
+    const winnerById = {};
+    winnerRows.forEach(r => { if (r.actual_winner) winnerById[r.id] = r.actual_winner; });
+    matchData.forEach(m => { if (winnerById[m.id]) m.actualWinner = winnerById[m.id]; });
+  }
 
   // Build matchByKey for globe venue panel
   matchByKey = {};
@@ -140,12 +150,14 @@ async function loadPredData() {
   // Invalidate profile stats cache so stale RPC results don't persist across data refreshes
   Object.keys(_userPredCache).forEach(k => delete _userPredCache[k]);
   if (!featureProbeDone) {
-    const [j, c] = await Promise.all([
+    const [j, c, w] = await Promise.all([
       sb.from('predictions').select('is_joker').limit(1),
       sb.from('match_comments').select('id').limit(1),
+      sb.from('predictions').select('predicted_winner').limit(1),
     ]);
     jokersEnabled = !j.error;
     commentsEnabled = !c.error;
+    winnersEnabled = !w.error;
     featureProbeDone = true;
   }
   // Get match IDs
@@ -161,7 +173,7 @@ async function loadPredData() {
   // players' scores until kickoff) plus existence-only rows from the
   // prediction_status view so the ✓/✗ dots still work before kickoff.
   // Falls back to the scores query while the view doesn't exist yet.
-  const { data: preds } = await sb.from('predictions').select('user_id,match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : ''));
+  const { data: preds } = await sb.from('predictions').select('user_id,match_id,predicted_home_score,predicted_away_score' + (jokersEnabled ? ',is_joker' : '') + (winnersEnabled ? ',predicted_winner' : ''));
   const { data: status } = await sb.from('prediction_status').select('user_id,match_id');
   const { data: profs } = await sb.from('player_profiles').select('id,player_name');
   if (profs) {
@@ -179,7 +191,8 @@ async function loadPredData() {
         player_name: nameById[p.user_id] || 'Unknown',
         home: sc ? sc.predicted_home_score : undefined,
         away: sc ? sc.predicted_away_score : undefined,
-        j: sc ? !!sc.is_joker : false
+        j: sc ? !!sc.is_joker : false,
+        winner: sc && winnersEnabled ? (sc.predicted_winner || null) : null,
       });
     });
   }
