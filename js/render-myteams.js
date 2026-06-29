@@ -11,15 +11,23 @@ function getNextMatch(teamName) {
     .sort((a, b) => a.kickoff - b.kickoff)[0] || null;
 }
 
-// Build a set of teams still alive (appearing in any knockout match)
+// Build a set of teams still alive (not eliminated in knockout)
 function getAliveTeams() {
   const alive = new Set();
+  const dead = new Set();
   for (const m of matchData) {
-    if (m.round) {
-      if (m.team1) alive.add(m.team1);
-      if (m.team2) alive.add(m.team2);
+    if (!m.round) continue;
+    // Teams appearing in knockout matches start as alive
+    if (m.team1) alive.add(m.team1);
+    if (m.team2) alive.add(m.team2);
+    // Knockout loser is eliminated (only if match is complete)
+    if (m.isComplete && m.score1 !== null && m.score2 !== null && m.score1 !== m.score2) {
+      const loser = m.score1 > m.score2 ? m.team2 : m.team1;
+      dead.add(loser);
     }
   }
+  // Remove dead teams from alive set
+  for (const d of dead) alive.delete(d);
   return alive;
 }
 
@@ -48,7 +56,7 @@ function renderMyTeams() {
       ${next ? `<div class="mt-next">Next: <strong>vs ${opponent}</strong> — ${formatDateLabel(next.date, next.time, next.tz)} ${formatLocalTime(next.date, next.time, next.tz)}</div>
       <div class="mt-countdown">${cd ? cd.text : ''}</div>` : ''}
       ${!next && isAlive ? '<div class="mt-next" style="color:var(--text-muted)">Awaiting R32 fixture</div>' : ''}
-      ${!isAlive ? '<div class="mt-next" style="color:var(--gold-dim)">Eliminated in Group Stage</div>' : ''}
+      ${!isAlive ? `<div class="mt-next" style="color:var(--gold-dim)">Eliminated</div>` : ''}
     </div>`;
   }).join('');
 }
