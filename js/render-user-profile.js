@@ -803,9 +803,48 @@ function pfpHandleFile(file) {
           heroAvatar.appendChild(overlay);
         }
       }
+      // Auto-upload immediately (integrated hero UX — no separate confirm step)
+      pfpHeroAutoUpload(heroAvatar);
     }
   };
   reader.readAsDataURL(file);
+}
+
+// Upload the previewed hero avatar immediately (full-page Profile integrated UX).
+// Used when there's no standalone #pfpAvatar editor section — the hero avatar IS the editor.
+function pfpHeroAutoUpload(heroAvatar) {
+  if (!pfpPreviewFile || pfpUploading) return;
+  pfpUploading = true;
+
+  // Allow re-selecting the same file later
+  var input = document.getElementById('pfpInput');
+  if (input) input.value = '';
+
+  var overlay = heroAvatar ? heroAvatar.querySelector('.up-hero-camera-overlay') : null;
+  if (overlay) overlay.textContent = '⏳';
+
+  function restoreHero() {
+    if (heroAvatar && typeof avatarHtml === 'function') {
+      heroAvatar.innerHTML = avatarHtml(userProfilePlayer, 72) +
+        (heroAvatar.classList.contains('own-profile') ? '<div class="up-hero-camera-overlay">📷</div>' : '');
+    } else if (overlay) {
+      overlay.textContent = '📷';
+    }
+  }
+
+  uploadAvatar(pfpPreviewFile).then(function(url) {
+    pfpUploading = false;
+    pfpPreviewFile = null;
+    // Cache-bust so re-uploading (same storage path) refreshes the image visibly
+    if (typeof avatarCache !== 'undefined') avatarCache[userProfilePlayer] = url + '?t=' + Date.now();
+    restoreHero();
+    if (typeof updateAuthBar === 'function') updateAuthBar();
+  }).catch(function(err) {
+    pfpUploading = false;
+    pfpPreviewFile = null;
+    restoreHero();
+    alert(err && err.message ? err.message : 'Upload failed. Please try again.');
+  });
 }
 
 function pfpShowError(msg) {
