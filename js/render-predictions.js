@@ -172,7 +172,9 @@ async function renderPredictions() {
       if (pts === maxPts) exactCount++; else if (pts >= 1) correctCount++;
 
       const badge = predResultBadge(p.predicted_home_score, p.predicted_away_score, m.score1, m.score2, p.is_joker, m.round ? p.predicted_winner : null, m.round ? actualWinner : null);
-      const winnerPickLine = m.round && p.predicted_winner ? ` &nbsp;·&nbsp; Advances: <span class="pred">${p.predicted_winner}</span>${actualWinner ? (p.predicted_winner === actualWinner ? ' <span class="hit-marker">✓</span>' : ' <span class="miss-marker">✗</span>') : ''}` : '';
+      // Only relevant on penalty-decided games (FT draw) — the winner pick is irrelevant
+      // to scoring on decisive knockout results, so don't show it there.
+      const winnerPickLine = m.round && m.score1 === m.score2 && p.predicted_winner ? ` &nbsp;·&nbsp; Advances: <span class="pred">${p.predicted_winner}</span>${actualWinner ? (p.predicted_winner === actualWinner ? ' <span class="hit-marker">✓</span>' : ' <span class="miss-marker">✗</span>') : ''}` : '';
       historyHtml += `<div class="pred-history-card">
         <div class="phc-result">${badge}</div>
         <div class="phc-match">
