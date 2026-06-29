@@ -55,7 +55,7 @@ async function loadData() {
 
   // Fetch matches
   let { data: m, error } = await sb.from('matches').select(`
-    match_date, kickoff_time, tz_offset,
+    id, match_date, kickoff_time, tz_offset,
     home:home_team_id(name), away:away_team_id(name),
     group_letter, home_score, away_score, tv_channel,
     prob_home, prob_draw, prob_away, is_complete, round
@@ -65,7 +65,7 @@ async function loadData() {
   let hasIsComplete = true;
   if (error || !m) {
     const retry = await sb.from('matches').select(`
-      match_date, kickoff_time, tz_offset,
+      id, match_date, kickoff_time, tz_offset,
       home:home_team_id(name), away:away_team_id(name),
       group_letter, home_score, away_score, tv_channel,
       prob_home, prob_draw, prob_away, round
@@ -75,7 +75,7 @@ async function loadData() {
     // If round column doesn't exist yet, fall back without it
     if (!m) {
       const retry2 = await sb.from('matches').select(`
-        match_date, kickoff_time, tz_offset,
+        id, match_date, kickoff_time, tz_offset,
         home:home_team_id(name), away:away_team_id(name),
         group_letter, home_score, away_score, tv_channel,
         prob_home, prob_draw, prob_away
@@ -100,6 +100,7 @@ async function loadData() {
       isComplete = score1 !== null && score2 !== null && now >= kickoff;
     }
     return {
+      id:         r.id,
       date:       r.match_date,
       time:       r.kickoff_time.substring(0, 5),
       tz:         r.tz_offset,

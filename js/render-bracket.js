@@ -128,20 +128,21 @@ function buildBracketTree() {
 
   // Later rounds
   for (const kb of KNOCKOUT_BRACKET) {
-    // Look for existing match data by round + date
-    const existing = matchData.find(m => m.round === kb.round && m.team1 && m.team2);
+    // Look up by DB id — same row carries date/time (always), teams and
+    // scores (once the match has been played and populated in Supabase).
+    const byId = matchData.find(m => m.id === kb.match);
     const homeRef = parseInt(kb.home.substring(1));
     const awayRef = parseInt(kb.away.substring(1));
 
-    let homeTeam = existing ? existing.team1 : null;
-    let awayTeam = existing ? existing.team2 : null;
-    let score1 = existing ? existing.score1 : null;
-    let score2 = existing ? existing.score2 : null;
-    let isComplete = existing ? existing.isComplete : false;
-    let date = existing ? existing.date : null;
-    let time = existing ? existing.time : null;
-    let tz = existing ? existing.tz : null;
-    let channel = existing ? existing.channel : null;
+    let homeTeam = byId && byId.team1 ? byId.team1 : null;
+    let awayTeam = byId && byId.team2 ? byId.team2 : null;
+    let score1 = byId ? byId.score1 : null;
+    let score2 = byId ? byId.score2 : null;
+    let isComplete = byId ? byId.isComplete : false;
+    let date = byId ? byId.date : null;
+    let time = byId ? byId.time : null;
+    let tz = byId ? byId.tz : null;
+    let channel = byId ? byId.channel : null;
 
     // Resolve from completed feeder matches if still unknown
     if (!homeTeam && tree[homeRef] && tree[homeRef].isComplete) {
