@@ -50,12 +50,29 @@ function ownerColour(playerName) {
 
 // ── BUILD BRACKET NODE TREE ──
 function buildBracketTree() {
-  // match number → { match, round, homeTeam, awayTeam, feederHome, feederAway }
   const tree = {};
+
+  // Build a direct lookup: for R32 matches, pair slots with matchData by date+time order.
+  // This avoids relying on matchIdByTeamDate which has incomplete Supabase RLS data.
+  const r32MatchData = matchData
+    .filter(m => m.round === 'R32' && m.team1 && m.team2)
+    .map(m => ({ ...m, kickoff: toDate(m.date, m.time, m.tz) }))
+    .sort((a, b) => a.kickoff - b.kickoff);
+
+  const slotMatches = R32_SLOTS.map(s => ({
+    ...s,
+    kickoff: toDate(s.date, '12:00', -4), // approximate for sorting
+  })).sort((a, b) => a.kickoff - b.kickoff);
+
+  // Pair slots with match data — both arrays should have 16 entries in the same order
+  const slotToMatch = {};
+  for (let i = 0; i < Math.min(slotMatches.length, r32MatchData.length); i++) {
+    slotToMatch[slotMatches[i].match] = r32MatchData[i];
+  }
 
   // R32 nodes
   for (const slot of R32_SLOTS) {
-    const m = findMatchByNumber(slot.match);
+    const m = slotToMatch[slot.match];
     tree[slot.match] = {
       num: slot.match, round: 'R32',
       home: m ? m.team1 : null, away: m ? m.team2 : null,
@@ -69,18 +86,22 @@ function buildBracketTree() {
 
   // Later rounds
   for (const kb of KNOCKOUT_BRACKET) {
-    const m = findMatchByNumber(kb.match);
+    // Look for existing match data by round + date
+    const existing = matchData.find(m => m.round === kb.round && m.team1 && m.team2);
     const homeRef = parseInt(kb.home.substring(1));
     const awayRef = parseInt(kb.away.substring(1));
 
-    // Resolve teams from feeder matches if completed
-    let homeTeam = m ? m.team1 : null;
-    let awayTeam = m ? m.team2 : null;
-    let score1 = m ? m.score1 : null;
-    let score2 = m ? m.score2 : null;
-    const isComplete = m ? m.isComplete : false;
+    let homeTeam = existing ? existing.team1 : null;
+    let awayTeam = existing ? existing.team2 : null;
+    let score1 = existing ? existing.score1 : null;
+    let score2 = existing ? existing.score2 : null;
+    let isComplete = existing ? existing.isComplete : false;
+    let date = existing ? existing.date : null;
+    let time = existing ? existing.time : null;
+    let tz = existing ? existing.tz : null;
+    let channel = existing ? existing.channel : null;
 
-    // If teams unknown, try to resolve from completed feeder matches
+    // Resolve from completed feeder matches if still unknown
     if (!homeTeam && tree[homeRef] && tree[homeRef].isComplete) {
       const f = tree[homeRef];
       homeTeam = (f.score1 > f.score2) ? f.home : f.away;
@@ -94,22 +115,12 @@ function buildBracketTree() {
       num: kb.match, round: kb.round,
       home: homeTeam, away: awayTeam,
       score1, score2, isComplete,
-      date: m ? m.date : null, time: m ? m.time : null, tz: m ? m.tz : null,
-      channel: m ? m.channel : null,
+      date, time, tz, channel,
       feederHome: homeRef, feederAway: awayRef,
     };
   }
 
   return tree;
-}
-
-function findMatchByNumber(matchNum) {
-  // Match numbers correspond to DB IDs
-  for (const m of matchData) {
-    const key = `${m.team1}|${m.team2}|${m.date}`;
-    if (matchIdByTeamDate[key] === matchNum) return m;
-  }
-  return null;
 }
 
 // ── RENDER NODE HTML ──
@@ -284,8 +295,7 @@ function renderSingleRound(round, tree) {
   for (const num of matchNums) {
     const node = tree[num];
     if (!node) continue;
-    const m = findMatchByNumber(num);
-    const dateStr = m && m.date ? new Date(m.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
+    const dateStr = node.date ? new Date(node.date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
 
     html += `<div class="bracket-match-card card-base">
       <div class="bracket-card-header">
