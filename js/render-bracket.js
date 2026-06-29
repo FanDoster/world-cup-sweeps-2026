@@ -268,7 +268,7 @@ function renderBracket() {
   // Compute center Y (px) for each match node — R32 evenly spaced, later rounds at midpoint of feeders
   const SLOT_H = 110; // px per R32 slot
   const TOTAL_H = R32_SLOTS.length * SLOT_H;
-  const LABEL_H = 34; // approx px for the round label row
+  const LABEL_H = 24; // px for the round label row (must match .bt-round-label height)
 
   const allSlots2 = [
     ...R32_SLOTS.map(s => ({ match: s.match, home: s.home, away: s.away })),
@@ -281,26 +281,36 @@ function renderBracket() {
     const m = ref.match(/^[WL](\d+)$/);
     return m ? parseInt(m[1]) : null;
   }
+  function feedersOf(num) {
+    const s = slotByMatch2[num];
+    if (!s) return [];
+    return [parseRef2(s.home), parseRef2(s.away)].filter(f => f != null);
+  }
 
+  // Derive the bracket-tree display order: DFS from the Final down to R32 so that
+  // each match's two feeders are physically adjacent (no crossing connector lines).
+  const r32Order = [];
+  (function dfs(num) {
+    const feeders = feedersOf(num);
+    if (feeders.length === 0) { r32Order.push(num); return; }
+    feeders.forEach(dfs);
+  })(roundMatches['Final'][0]);
+
+  // Assign vertical centers: R32 leaves evenly spaced in tree order, parents at feeder midpoint.
   const centerY = {};
-  roundMatches['R32'].forEach((num, i) => { centerY[num] = (i + 0.5) * SLOT_H; });
+  r32Order.forEach((num, i) => { centerY[num] = (i + 0.5) * SLOT_H; });
   ['R16', 'QF', 'SF', 'Final'].forEach(r => {
     (roundMatches[r] || []).forEach(num => {
-      const s = slotByMatch2[num];
-      if (!s) return;
-      const f1 = parseRef2(s.home), f2 = parseRef2(s.away);
-      const y1 = f1 != null ? centerY[f1] : null;
-      const y2 = f2 != null ? centerY[f2] : null;
-      if (y1 != null && y2 != null) centerY[num] = (y1 + y2) / 2;
-      else if (y1 != null) centerY[num] = y1;
-      else if (y2 != null) centerY[num] = y2;
+      const ys = feedersOf(num).map(f => centerY[f]).filter(y => y != null);
+      if (ys.length) centerY[num] = ys.reduce((a, b) => a + b, 0) / ys.length;
     });
   });
 
   let colsHtml = '';
   for (let ri = 0; ri < rounds.length; ri++) {
     const round = rounds[ri];
-    const matchNums = roundMatches[round];
+    // Render each column in tree order (by vertical position), not match-number order.
+    const matchNums = [...roundMatches[round]].sort((a, b) => (centerY[a] ?? 0) - (centerY[b] ?? 0));
     const isActive = round === bracketRound;
 
     colsHtml += `<div class="bt-round-wrap">`;
