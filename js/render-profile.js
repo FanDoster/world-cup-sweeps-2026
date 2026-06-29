@@ -123,7 +123,7 @@ function renderPredPanel(key) {
       <div class="pp-your-pred-title">Your Prediction</div>
       <div class="pp-pred-form">
         <span class="pp-pred-display" id="pp-pred-display-${mid}">${yourPred.home}–${yourPred.away}${winnerDisplay}${yourPred.j ? ' 🃏' : ''}</span>
-        ${jokersEnabled ? `<button class="joker-chip${yourPred.j ? ' active' : ''}" id="pp-joker-${mid}" onclick="toggleJokerFromPanel(${mid})">🃏 2×</button>` : ''}
+        ${jokersEnabled && !isKnockout ? `<button class="joker-chip${yourPred.j ? ' active' : ''}" id="pp-joker-${mid}" onclick="toggleJokerFromPanel(${mid})">🃏 2×</button>` : ''}
         <button class="pmc-btn edit" id="pp-pred-edit-btn-${mid}" onclick="editPredictionFromPanel(${mid})">Edit</button>
         <div class="pmc-edit-wrap" id="pp-pred-edit-${mid}" style="display:none">
           ${ppWinnerPickerHtml}

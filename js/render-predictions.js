@@ -94,7 +94,7 @@ async function renderPredictions() {
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
           <div class="pmc-teams">${m.team1} vs ${m.team2} ${roundBadge}</div>
           <span class="pmc-status predicted" id="pred-display-${mid}"><span class="${ep.is_joker ? 'joker-active-score' : ''}">${ep.predicted_home_score}–${ep.predicted_away_score}${winnerDisplay}</span></span>
-          ${jokersEnabled ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
+          ${jokersEnabled && !isKnockout ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
           <div class="pmc-edit-wrap" id="pred-edit-${mid}" style="display:none">
             ${winnerPickerHtml(ep.predicted_winner)}
             <div class="pmc-score">
