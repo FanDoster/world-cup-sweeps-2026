@@ -285,6 +285,8 @@ def update_match_odds(session):
     # Build slug → match lookup
     slugs_to_match = {}
     for m in matches:
+        if m['home_team_id'] is None or m['away_team_id'] is None:
+            continue  # skip placeholder knockout matches (teams TBD)
         t1 = m['home_team_id']['name']
         t2 = m['away_team_id']['name']
         iso1 = TEAM_ISO.get(t1)
