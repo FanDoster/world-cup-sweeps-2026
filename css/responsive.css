@@ -102,6 +102,23 @@
 
   /* Hide shooter tab on mobile — not playable without mouse/keyboard */
   .shooter-tab { display: none; }
+
+  /* Matches toolbar — stack filter bars vertically so they don't overflow */
+  .matches-toolbar {
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .matches-toolbar .filter-bar {
+    width: 100%;
+  }
+  .matches-toolbar .filter-bar .filter-btn {
+    flex: 1;
+  }
+
+  /* Bracket match cards — tighten on mobile */
+  .bf-centre { min-width: 56px; padding: 0 8px; }
+  .bf-name { font-size: 0.82rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

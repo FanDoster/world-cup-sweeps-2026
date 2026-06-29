@@ -349,12 +349,23 @@
 
 .bf-team {
   flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
   border-radius: 8px;
 }
+.bf-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.bf-team.bf-winner .bf-name { color: var(--accent); }
 
 .bf-centre {
   display: flex;
