@@ -266,7 +266,7 @@ function renderBracket() {
   };
 
   // Compute center Y (px) for each match node — R32 evenly spaced, later rounds at midpoint of feeders
-  const SLOT_H = 72; // px per R32 slot
+  const SLOT_H = 110; // px per R32 slot
   const TOTAL_H = R32_SLOTS.length * SLOT_H;
   const LABEL_H = 34; // approx px for the round label row
 
