@@ -261,8 +261,8 @@ function renderConnector(fromRound, toRound, roundMatches, tree) {
     const toMid = (toIdx + 0.5) / toTotal * 100;
 
     // Draw: vertical stem from fromTop to fromBot, then horizontal to toMid
-    html += `<line x1="0" y1="${fromTop}%" x2="0" y2="${fromBot}%" stroke="var(--border)" stroke-width="1"/>`;
-    html += `<line x1="0" y1="${fromMid}%" x2="36" y2="${toMid}%" stroke="var(--border)" stroke-width="1"/>`;
+    html += `<line x1="0" y1="${fromTop}%" x2="0" y2="${fromBot}%" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
+    html += `<line x1="0" y1="${fromMid}%" x2="36" y2="${toMid}%" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
   }
 
   html += `</svg></div>`;
