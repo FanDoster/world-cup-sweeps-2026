@@ -265,69 +265,112 @@ function renderBracket() {
     'Final': [104],
   };
 
+  // Compute center Y (px) for each match node — R32 evenly spaced, later rounds at midpoint of feeders
+  const SLOT_H = 72; // px per R32 slot
+  const TOTAL_H = R32_SLOTS.length * SLOT_H;
+  const LABEL_H = 34; // approx px for the round label row
+
+  const allSlots2 = [
+    ...R32_SLOTS.map(s => ({ match: s.match, home: s.home, away: s.away })),
+    ...KNOCKOUT_BRACKET,
+  ];
+  const slotByMatch2 = {};
+  allSlots2.forEach(s => { slotByMatch2[s.match] = s; });
+  function parseRef2(ref) {
+    if (!ref) return null;
+    const m = ref.match(/^[WL](\d+)$/);
+    return m ? parseInt(m[1]) : null;
+  }
+
+  const centerY = {};
+  roundMatches['R32'].forEach((num, i) => { centerY[num] = (i + 0.5) * SLOT_H; });
+  ['R16', 'QF', 'SF', 'Final'].forEach(r => {
+    (roundMatches[r] || []).forEach(num => {
+      const s = slotByMatch2[num];
+      if (!s) return;
+      const f1 = parseRef2(s.home), f2 = parseRef2(s.away);
+      const y1 = f1 != null ? centerY[f1] : null;
+      const y2 = f2 != null ? centerY[f2] : null;
+      if (y1 != null && y2 != null) centerY[num] = (y1 + y2) / 2;
+      else if (y1 != null) centerY[num] = y1;
+      else if (y2 != null) centerY[num] = y2;
+    });
+  });
+
   let colsHtml = '';
   for (let ri = 0; ri < rounds.length; ri++) {
     const round = rounds[ri];
     const matchNums = roundMatches[round];
     const isActive = round === bracketRound;
 
-    colsHtml += `<div class="bt-round">`;
+    colsHtml += `<div class="bt-round-wrap">`;
     colsHtml += `<div class="bt-round-label${isActive ? ' active' : ''}">${roundLabel(round)}</div>`;
+    colsHtml += `<div class="bt-round" style="position:relative;height:${TOTAL_H}px">`;
     for (const num of matchNums) {
       const node = tree[num];
       if (node) {
+        const cy = centerY[num] ?? 0;
+        colsHtml += `<div style="position:absolute;left:0;right:0;top:${cy}px;transform:translateY(-50%)">`;
         colsHtml += renderBracketNode(node);
+        colsHtml += `</div>`;
       }
     }
-    colsHtml += `</div>`;
+    colsHtml += `</div></div>`;
 
     // Add connector column between rounds (except after last)
     if (ri < rounds.length - 1) {
-      colsHtml += renderConnector(round, rounds[ri + 1], roundMatches, tree);
+      colsHtml += renderConnector(rounds[ri + 1], roundMatches, centerY, TOTAL_H, LABEL_H);
     }
   }
 
   section.innerHTML = selectorHtml + `<div class="bracket-tree-wrap"><div class="bracket-tree">${colsHtml}</div></div>`;
 }
 
-function renderConnector(fromRound, toRound, roundMatches, tree) {
-  const fromMatches = roundMatches[fromRound];
+function renderConnector(toRound, roundMatches, centerY, totalH, labelH) {
   const toMatches = roundMatches[toRound];
 
-  // Each pair of "from" matches feeds into one "to" match
-  // We need lines connecting from[n] and from[n+1] to to[n/2]
-  const pairCount = toMatches.length;
-  const itemsPerPair = fromMatches.length / pairCount;
+  const allSlots = [
+    ...R32_SLOTS.map(s => ({ match: s.match, home: s.home, away: s.away })),
+    ...KNOCKOUT_BRACKET,
+  ];
+  const slotByMatch = {};
+  allSlots.forEach(s => { slotByMatch[s.match] = s; });
 
-  // Draw a connector column with SVG
-  // Height matches the round columns due to flexbox
-  let html = `<div class="bt-conn"><svg class="bt-conn-svg" width="36" height="100%" preserveAspectRatio="none" style="position:absolute;inset:0">`;
-
-  // Calculate positions as percentages
-  for (let pi = 0; pi < pairCount; pi++) {
-    const fromIdx1 = pi * itemsPerPair;
-    const fromIdx2 = fromIdx1 + itemsPerPair - 1;
-    const toIdx = pi;
-
-    // Positions as fraction of total
-    const fromTotal = fromMatches.length;
-    const toTotal = toMatches.length;
-
-    // Center of "from" pair
-    const fromTop = (fromIdx1 + 0.5) / fromTotal * 100;
-    const fromBot = (fromIdx2 + 0.5) / fromTotal * 100;
-    const fromMid = (fromTop + fromBot) / 2;
-
-    // Center of "to" match
-    const toMid = (toIdx + 0.5) / toTotal * 100;
-
-    // Draw: vertical stem from fromTop to fromBot, then horizontal to toMid
-    html += `<line x1="0" y1="${fromTop}%" x2="0" y2="${fromBot}%" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
-    html += `<line x1="0" y1="${fromMid}%" x2="36" y2="${toMid}%" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
+  function parseMatchRef(ref) {
+    if (!ref) return null;
+    const m = ref.match(/^[WL](\d+)$/);
+    return m ? parseInt(m[1]) : null;
   }
 
-  html += `</svg></div>`;
-  return html;
+  let svgLines = '';
+  for (const toMatchNum of toMatches) {
+    const slot = slotByMatch[toMatchNum];
+    if (!slot) continue;
+    const f1 = parseMatchRef(slot.home);
+    const f2 = parseMatchRef(slot.away);
+    const cy1 = f1 != null ? centerY[f1] : null;
+    const cy2 = f2 != null ? centerY[f2] : null;
+    const tc = centerY[toMatchNum];
+    if (cy1 == null || cy2 == null || tc == null) continue;
+
+    const top = Math.min(cy1, cy2);
+    const bot = Math.max(cy1, cy2);
+    const mid = (top + bot) / 2;
+
+    // Vertical stem on left connecting the two feeder nodes
+    svgLines += `<line x1="0" y1="${top}" x2="0" y2="${bot}" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
+    // Horizontal line from midpoint to right edge (tc === mid since target is positioned at midpoint)
+    svgLines += `<line x1="0" y1="${mid}" x2="36" y2="${tc}" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
+  }
+
+  return `<div class="bt-conn-wrap">
+    <div style="height:${labelH}px;flex-shrink:0"></div>
+    <div class="bt-conn" style="height:${totalH}px">
+      <svg class="bt-conn-svg" width="36" height="${totalH}" viewBox="0 0 36 ${totalH}" style="position:absolute;inset:0">
+        ${svgLines}
+      </svg>
+    </div>
+  </div>`;
 }
 
 function renderSingleRound(round, tree) {
