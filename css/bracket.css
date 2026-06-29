@@ -232,6 +232,17 @@
   transition: border-color 0.2s;
 }
 
+/* In the card (single-round) view, verbose "Winner: X v Y" labels need to wrap */
+.bracket-match-card .bt-team-row { white-space: normal; }
+.bracket-match-card .bt-node { border: none; background: transparent; padding: 0; cursor: pointer; }
+.bracket-match-card .bt-node:hover { transform: none; box-shadow: none; }
+.bt-team-name.bt-team-tbd {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
 .bracket-match-card.bc-complete {
   border-left: 3px solid var(--text-muted);
 }
@@ -385,4 +396,76 @@
   border-radius: 5px;
   cursor: default;
   white-space: nowrap;
+}
+
+/* ── MOBILE: ROUND PAGER ── */
+.bt-mobile-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 14px;
+}
+
+.bt-nav-btn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 1.5rem;
+  line-height: 1;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, opacity 0.15s;
+}
+
+.bt-nav-btn:active { background: var(--surface); }
+.bt-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+.bt-nav-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2;
+}
+
+.bt-nav-count {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ── MOBILE: SEGMENTED ROUND SELECTOR ── */
+@media (max-width: 700px) {
+  .bracket-round-seg {
+    gap: 4px;
+    padding: 12px 0 4px;
+    overflow-x: visible;
+  }
+  .bracket-round-seg .bracket-round-btn {
+    flex: 1;
+    padding: 8px 0;
+    text-align: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  /* Larger tap targets and comfortable spacing for the card list */
+  .bracket-cards { gap: 12px; }
+  .bracket-match-card { padding: 14px 16px; }
+  .bracket-match-card .bt-team-row { padding: 5px 0; font-size: 0.95rem; }
+  .bracket-match-card .bt-team-name { font-size: 0.98rem; }
+  .bracket-match-card .bt-team-row .bracket-flag { width: 22px; height: 15px; }
+  .bracket-match-card .bt-team-score { font-size: 1rem; }
 }

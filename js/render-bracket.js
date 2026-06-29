@@ -154,7 +154,8 @@ function buildBracketTree() {
 }
 
 // ── RENDER NODE HTML ──
-function renderBracketNode(node) {
+function renderBracketNode(node, opts) {
+  opts = opts || {};
   const isComplete = node.isComplete && node.score1 !== null && node.score2 !== null;
   const now = new Date();
   const kickoff = node.date ? toDate(node.date, node.time, node.tz) : null;
@@ -184,27 +185,26 @@ function renderBracketNode(node) {
 
   const key = node.home && node.away ? `${node.home}|${node.away}|${node.date}` : '';
 
-  // Feed info for TBD slots — show what feeds into this match
+  // Feed info for TBD slots — show what feeds into this match.
+  // Compact (tree): "W75". Verbose (cards): resolve to the feeder matchup if known.
   function feederLabel(ref) {
     if (!ref) return 'TBD';
+    if (opts.verbose) {
+      const fn = bracketTreeCache[ref];
+      if (fn && fn.home && fn.away) return `Winner: ${fn.home} v ${fn.away}`;
+      return `Winner of Match ${ref}`;
+    }
     return `W${ref}`;
-  }
-  function feederHint(ref) {
-    // Show abbreviated team name from feeder match if resolved
-    if (!ref) return '';
-    const fn = bracketTreeCache[ref];
-    if (!fn || !fn.home || !fn.away) return '';
-    return `${fn.home.substring(0,3)}/${fn.away.substring(0,3)}`;
   }
 
   const homeLabel = node.home || feederLabel(node.feederHome);
   const awayLabel = node.away || feederLabel(node.feederAway);
-  const homeHint = !node.home && node.feederHome ? feederHint(node.feederHome) : '';
-  const awayHint = !node.away && node.feederAway ? feederHint(node.feederAway) : '';
+  const homeTbd = node.home ? '' : ' bt-team-tbd';
+  const awayTbd = node.away ? '' : ' bt-team-tbd';
 
   let html = `<div class="bt-node${cls}"${key ? ` onclick="showPredPanel('${safeAttr(node.home)}|${safeAttr(node.away)}|${node.date}')" style="cursor:pointer"` : ''}>`;
-  html += `<div class="bt-team-row${homeCls}">${homeFlag}<span class="bt-team-name">${homeLabel}</span>${isComplete ? `<span class="bt-team-score">${node.score1}</span>` : ''}</div>`;
-  html += `<div class="bt-team-row${awayCls}">${awayFlag}<span class="bt-team-name">${awayLabel}</span>${isComplete ? `<span class="bt-team-score">${node.score2}</span>` : ''}</div>`;
+  html += `<div class="bt-team-row${homeCls}">${homeFlag}<span class="bt-team-name${homeTbd}">${homeLabel}</span>${isComplete ? `<span class="bt-team-score">${node.score1}</span>` : ''}</div>`;
+  html += `<div class="bt-team-row${awayCls}">${awayFlag}<span class="bt-team-name${awayTbd}">${awayLabel}</span>${isComplete ? `<span class="bt-team-score">${node.score2}</span>` : ''}</div>`;
 
   // Meta line: date/time or live indicator
   if (isLive) {
@@ -228,6 +228,34 @@ function renderBracketNode(node) {
   return html;
 }
 
+// ── MOBILE HELPERS ──
+const BRACKET_ROUND_MATCHES = {
+  'R32': R32_SLOTS.map(s => s.match),
+  'R16': [89, 90, 91, 92, 93, 94, 95, 96],
+  'QF':  [97, 98, 99, 100],
+  'SF':  [101, 102],
+  'Final': [104],
+};
+
+function bracketIsMobile() {
+  return typeof window !== 'undefined' && window.matchMedia &&
+    window.matchMedia('(max-width: 700px)').matches;
+}
+
+function roundShortLabel(code) {
+  return { R32: 'R32', R16: 'R16', QF: 'QF', SF: 'SF', Final: 'Final' }[code] || code;
+}
+
+// The "current" round to focus on mobile: earliest round still containing an
+// incomplete match (i.e. the round being played / next up), else the Final.
+function bracketActiveRound(tree) {
+  const order = ['R32', 'R16', 'QF', 'SF', 'Final'];
+  for (const r of order) {
+    if (BRACKET_ROUND_MATCHES[r].some(n => tree[n] && !tree[n].isComplete)) return r;
+  }
+  return 'Final';
+}
+
 // ── RENDER BRACKET TREE ──
 function renderBracket() {
   const section = document.getElementById('sectionBracket');
@@ -238,20 +266,25 @@ function renderBracket() {
   // Rounds to display
   const rounds = ['R32', 'R16', 'QF', 'SF', 'Final'];
 
-  // Build the round selector
+  const mobile = bracketIsMobile();
+  // On mobile the horizontal tree doesn't fit, so "All Rounds" is replaced by a
+  // single-round paginated view focused on the current round.
+  const effectiveRound = (mobile && bracketRound === 'all') ? bracketActiveRound(tree) : bracketRound;
+
+  // Build the round selector. Mobile = compact segmented control (no tree button).
   const selectorHtml = `
-    <div class="bracket-round-selector">
+    <div class="bracket-round-selector${mobile ? ' bracket-round-seg' : ''}">
       ${rounds.map(r => {
-        return `<button class="bracket-round-btn${r === bracketRound ? ' active' : ''}"
-          onclick="setBracketRound('${r}')">${roundLabel(r)}</button>`;
+        return `<button class="bracket-round-btn${r === effectiveRound ? ' active' : ''}"
+          onclick="setBracketRound('${r}')">${mobile ? roundShortLabel(r) : roundLabel(r)}</button>`;
       }).join('')}
-      <button class="bracket-round-btn${bracketRound === 'all' ? ' active' : ''}"
-        onclick="setBracketRound('all')">All Rounds</button>
+      ${mobile ? '' : `<button class="bracket-round-btn${bracketRound === 'all' ? ' active' : ''}"
+        onclick="setBracketRound('all')">All Rounds</button>`}
     </div>`;
 
-  // If viewing a single round, show the list view
-  if (bracketRound !== 'all') {
-    section.innerHTML = selectorHtml + renderSingleRound(bracketRound, tree);
+  // Single-round list view (always on mobile; on desktop when a round is picked).
+  if (mobile || bracketRound !== 'all') {
+    section.innerHTML = selectorHtml + renderSingleRound(effectiveRound, tree, mobile);
     return;
   }
 
@@ -383,18 +416,30 @@ function renderConnector(toRound, roundMatches, centerY, totalH, labelH) {
   </div>`;
 }
 
-function renderSingleRound(round, tree) {
-  const roundMatches = {
-    'R32': R32_SLOTS.map(s => s.match),
-    'R16': [89,90,91,92,93,94,95,96],
-    'QF':  [97,98,99,100],
-    'SF':  [101,102],
-    'Final': [104],
-  };
-  const matchNums = roundMatches[round];
+function renderSingleRound(round, tree, mobile) {
+  const order = ['R32', 'R16', 'QF', 'SF', 'Final'];
+  const matchNums = BRACKET_ROUND_MATCHES[round];
   if (!matchNums) return `<p class="bracket-empty">Unknown round: ${round}</p>`;
 
-  let html = `<div class="bracket-cards">`;
+  let html = '';
+
+  // Mobile: prev/next round pager so you can thumb through the bracket.
+  if (mobile) {
+    const idx = order.indexOf(round);
+    const prev = idx > 0 ? order[idx - 1] : null;
+    const next = idx < order.length - 1 ? order[idx + 1] : null;
+    const played = matchNums.filter(n => tree[n] && tree[n].isComplete).length;
+    const countLabel = round === 'Final'
+      ? '1 match'
+      : `${played}/${matchNums.length} played`;
+    html += `<div class="bt-mobile-nav">
+      <button class="bt-nav-btn" ${prev ? `onclick="setBracketRound('${prev}')"` : 'disabled'} aria-label="Previous round">‹</button>
+      <div class="bt-nav-title">${roundLabel(round)}<span class="bt-nav-count">${countLabel}</span></div>
+      <button class="bt-nav-btn" ${next ? `onclick="setBracketRound('${next}')"` : 'disabled'} aria-label="Next round">›</button>
+    </div>`;
+  }
+
+  html += `<div class="bracket-cards">`;
   for (const num of matchNums) {
     const node = tree[num];
     if (!node) continue;
@@ -402,9 +447,9 @@ function renderSingleRound(round, tree) {
 
     html += `<div class="bracket-match-card card-base">
       <div class="bracket-card-header">
-        <span class="bracket-card-match">${dateStr}</span>
+        <span class="bracket-card-match">${dateStr || 'Date TBD'}</span>
       </div>
-      ${renderBracketNode(node)}
+      ${renderBracketNode(node, { verbose: true })}
     </div>`;
   }
   html += `</div>`;
@@ -418,6 +463,16 @@ function setBracketRound(round) {
   bracketRound = round;
   renderBracket();
 }
+
+// Re-render when crossing the mobile breakpoint so the layout adapts on rotate/resize.
+let _bracketWasMobile = bracketIsMobile();
+window.addEventListener('resize', () => {
+  const nowMobile = bracketIsMobile();
+  if (nowMobile === _bracketWasMobile) return;
+  _bracketWasMobile = nowMobile;
+  const section = document.getElementById('sectionBracket');
+  if (section && section.classList.contains('active')) renderBracket();
+});
 
 // Keep old projection functions for reference (unused in tree view but called by other files)
 function calcProjectedStandings(playerName) {
