@@ -31,6 +31,19 @@ function getAliveTeams() {
   return alive;
 }
 
+function getEliminationInfo(teamName) {
+  for (const m of matchData) {
+    if (!m.round || !m.isComplete || m.score1 === null || m.score2 === null) continue;
+    if (m.score1 === m.score2) continue;
+    const loser = m.score1 > m.score2 ? m.team2 : m.team1;
+    const winner = m.score1 > m.score2 ? m.team1 : m.team2;
+    if (loser === teamName) {
+      return { by: winner, round: roundLabel(m.round) };
+    }
+  }
+  return null;
+}
+
 function renderMyTeams() {
   const el = document.getElementById('myTeamsGrid');
   const teams = getPlayerTeams();
@@ -46,6 +59,10 @@ function renderMyTeams() {
     const statusBadge = isAlive
       ? (next ? `<span class="mt-alive-badge">🟢 R32</span>` : `<span class="mt-alive-badge">🟢 Qualified</span>`)
       : `<span class="mt-elim-badge">🔴 Eliminated</span>`;
+    const elimInfo = !isAlive ? getEliminationInfo(t.name) : null;
+    const elimText = elimInfo
+      ? `Eliminated by ${elimInfo.by} in ${elimInfo.round}`
+      : 'Eliminated';
     return `<div class="myteam-card card-base${isAlive ? '' : ' mt-eliminated'}" onclick="selectTeam('${t.name}');switchTab('teams')">
       <div class="mt-header">
         <img class="mt-flag" src="${flagUrl(t.iso)}" alt="" loading="lazy" onerror="this.style.display='none'">
@@ -56,7 +73,7 @@ function renderMyTeams() {
       ${next ? `<div class="mt-next">Next: <strong>vs ${opponent}</strong> — ${formatDateLabel(next.date, next.time, next.tz)} ${formatLocalTime(next.date, next.time, next.tz)}</div>
       <div class="mt-countdown">${cd ? cd.text : ''}</div>` : ''}
       ${!next && isAlive ? '<div class="mt-next" style="color:var(--text-muted)">Awaiting R32 fixture</div>' : ''}
-      ${!isAlive ? `<div class="mt-next" style="color:var(--gold-dim)">Eliminated</div>` : ''}
+      ${!isAlive ? `<div class="mt-next" style="color:var(--gold-dim)">${elimText}</div>` : ''}
     </div>`;
   }).join('');
 }
