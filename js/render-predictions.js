@@ -67,14 +67,6 @@ async function renderPredictions() {
     const isKnockout = !!m.round;
     const roundBadge = `<span class="pmc-group badge-mono">${isKnockout ? roundLabel(m.round) : 'G' + m.group}</span>`;
 
-    // Winner picker HTML (knockout only, editable state)
-    const winnerPickerHtml = (existingWinner) => winnersEnabled && isKnockout ? `
-      <div class="pmc-winner-row" id="winner-row-${mid}">
-        <span class="pmc-winner-label">Winner:</span>
-        <button class="winner-btn${existingWinner === m.team1 ? ' active' : ''}" data-winner-mid="${mid}" data-team="${escapeHtml(m.team1)}" onclick="selectWinner(${mid},'${escapeHtml(m.team1)}')">${m.team1}</button>
-        <button class="winner-btn${existingWinner === m.team2 ? ' active' : ''}" data-winner-mid="${mid}" data-team="${escapeHtml(m.team2)}" onclick="selectWinner(${mid},'${escapeHtml(m.team2)}')">${m.team2}</button>
-      </div>` : '';
-
     if (ep && isLocked) {
       const jokerCls = ep.is_joker ? ' joker-active' : '';
       const winnerDisplay = isKnockout && ep.predicted_winner ? ` <span class="pmc-winner-locked">→ ${ep.predicted_winner}</span>` : '';
@@ -96,20 +88,7 @@ async function renderPredictions() {
           <span class="pmc-status predicted" id="pred-display-${mid}"><span class="${ep.is_joker ? 'joker-active-score' : ''}">${ep.predicted_home_score}–${ep.predicted_away_score}${winnerDisplay}</span></span>
           ${jokersEnabled && matchesOnDate(m.date) > 1 ? `<button class="joker-chip${ep.is_joker ? ' active' : ''}" onclick="toggleJoker(${mid})" title="Joker doubles this match's points — one per match day">🃏 2×</button>` : ''}
           <div class="pmc-edit-wrap" id="pred-edit-${mid}" style="display:none">
-            <div class="pmc-score">
-              <div class="pmc-score-wrap">
-                <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
-                <input type="number" id="ph-${mid}" min="0" max="20" value="${ep.predicted_home_score}">
-                <div class="pmc-step" onclick="stepScore('ph-${mid}',-1)">▾</div>
-              </div>
-              <span class="pmc-dash">–</span>
-              <div class="pmc-score-wrap">
-                <div class="pmc-step" onclick="stepScore('pa-${mid}',1)">▴</div>
-                <input type="number" id="pa-${mid}" min="0" max="20" value="${ep.predicted_away_score}">
-                <div class="pmc-step" onclick="stepScore('pa-${mid}',-1)">▾</div>
-              </div>
-            </div>
-            ${winnerPickerHtml(ep.predicted_winner)}
+            ${predEntryBody(mid, m.team1, m.team2, isKnockout, ep.predicted_winner, `ph-${mid}`, `pa-${mid}`, ep.predicted_home_score, ep.predicted_away_score)}
           </div>
           <button class="pmc-btn edit" id="pred-edit-btn-${mid}" onclick="editPrediction(${mid})">Edit</button>
           <button class="pmc-btn save" id="pred-save-btn-${mid}" onclick="submitPrediction(${mid})" style="display:none">Save</button>
@@ -130,20 +109,7 @@ async function renderPredictions() {
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
           <div class="pmc-teams">${m.team1} vs ${m.team2} ${roundBadge}</div>
           <div>
-            <div class="pmc-score">
-              <div class="pmc-score-wrap">
-                <div class="pmc-step" onclick="stepScore('ph-${mid}',1)">▴</div>
-                <input type="number" id="ph-${mid}" min="0" max="20" value="0">
-                <div class="pmc-step" onclick="stepScore('ph-${mid}',-1)">▾</div>
-              </div>
-              <span class="pmc-dash">–</span>
-              <div class="pmc-score-wrap">
-                <div class="pmc-step" onclick="stepScore('pa-${mid}',1)">▴</div>
-                <input type="number" id="pa-${mid}" min="0" max="20" value="0">
-                <div class="pmc-step" onclick="stepScore('pa-${mid}',-1)">▾</div>
-              </div>
-            </div>
-            ${winnerPickerHtml(null)}
+            ${predEntryBody(mid, m.team1, m.team2, isKnockout, null, `ph-${mid}`, `pa-${mid}`, 0, 0)}
           </div>
           <button class="pmc-btn predict" onclick="submitPrediction(${mid})">Predict</button>
         </div></div>`;
@@ -227,10 +193,49 @@ async function submitPrediction(matchId) {
   renderPredictions();
 }
 
+// Knockout-aware prediction entry body: pick who advances first, then reveal the
+// FT-score picker. `token` is the id shared with selectWinner / data-winner-mid
+// (numeric match id on the Predictions tab, or `pp-${mid}` in the profile panel).
+// For group-stage matches (or when the winner feature is off) the score shows immediately.
+function predEntryBody(token, team1, team2, isKnockout, existingWinner, homeId, awayId, homeVal, awayVal) {
+  const scoreBlock = `
+    <div class="pmc-score">
+      <div class="pmc-score-wrap">
+        <div class="pmc-step" onclick="stepScore('${homeId}',1)">▴</div>
+        <input type="number" id="${homeId}" min="0" max="20" value="${homeVal}">
+        <div class="pmc-step" onclick="stepScore('${homeId}',-1)">▾</div>
+      </div>
+      <span class="pmc-dash">–</span>
+      <div class="pmc-score-wrap">
+        <div class="pmc-step" onclick="stepScore('${awayId}',1)">▴</div>
+        <input type="number" id="${awayId}" min="0" max="20" value="${awayVal}">
+        <div class="pmc-step" onclick="stepScore('${awayId}',-1)">▾</div>
+      </div>
+    </div>`;
+
+  if (!(winnersEnabled && isKnockout)) return scoreBlock;
+
+  const hasWinner = !!existingWinner;
+  return `
+    <div class="pmc-ko-entry">
+      <div class="pmc-ko-prompt" id="ko-prompt-${token}">${hasWinner ? 'Now predict an FT score including ET:' : 'First predict who will advance:'}</div>
+      <div class="pmc-winner-row" id="winner-row-${token}">
+        <button class="winner-btn${existingWinner === team1 ? ' active' : ''}" data-winner-mid="${token}" data-team="${escapeHtml(team1)}" onclick="selectWinner('${token}','${escapeHtml(team1)}')">${team1}</button>
+        <button class="winner-btn${existingWinner === team2 ? ' active' : ''}" data-winner-mid="${token}" data-team="${escapeHtml(team2)}" onclick="selectWinner('${token}','${escapeHtml(team2)}')">${team2}</button>
+      </div>
+      <div class="pmc-score-section" id="score-section-${token}"${hasWinner ? '' : ' style="display:none"'}>${scoreBlock}</div>
+    </div>`;
+}
+
 function selectWinner(matchId, team) {
   document.querySelectorAll(`[data-winner-mid="${matchId}"].winner-btn`).forEach(b => b.classList.remove('active'));
   const btn = document.querySelector(`[data-winner-mid="${matchId}"][data-team="${team}"]`);
   if (btn) btn.classList.add('active');
+  // Once a winner is chosen, reveal the FT-score picker and switch the prompt text
+  const section = document.getElementById(`score-section-${matchId}`);
+  if (section) section.style.display = '';
+  const prompt = document.getElementById(`ko-prompt-${matchId}`);
+  if (prompt) prompt.textContent = 'Now predict an FT score including ET:';
 }
 
 async function toggleJoker(matchId) {

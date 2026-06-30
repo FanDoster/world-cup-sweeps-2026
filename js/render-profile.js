@@ -113,12 +113,6 @@ function renderPredPanel(key) {
     }
   } else if (yourPred && yourPred.home !== undefined) {
     const winnerDisplay = isKnockout && yourPred.winner ? ` → ${yourPred.winner}` : '';
-    const ppWinnerPickerHtml = winnersEnabled && isKnockout ? `
-      <div class="pmc-winner-row" id="winner-row-pp-${mid}">
-        <span class="pmc-winner-label">Winner:</span>
-        <button class="winner-btn${yourPred.winner === t1 ? ' active' : ''}" data-winner-mid="pp-${mid}" data-team="${escapeHtml(t1)}" onclick="selectWinner('pp-${mid}','${escapeHtml(t1)}')">${t1}</button>
-        <button class="winner-btn${yourPred.winner === t2 ? ' active' : ''}" data-winner-mid="pp-${mid}" data-team="${escapeHtml(t2)}" onclick="selectWinner('pp-${mid}','${escapeHtml(t2)}')">${t2}</button>
-      </div>` : '';
     yourPredHtml = `<div class="pp-your-pred" id="pp-your-pred-${mid}">
       <div class="pp-your-pred-title">Your Prediction</div>
       <div class="pp-pred-form">
@@ -126,48 +120,16 @@ function renderPredPanel(key) {
         ${jokersEnabled && matchesOnDate(m.date) > 1 ? `<button class="joker-chip${yourPred.j ? ' active' : ''}" id="pp-joker-${mid}" onclick="toggleJokerFromPanel(${mid})">🃏 2×</button>` : ''}
         <button class="pmc-btn edit" id="pp-pred-edit-btn-${mid}" onclick="editPredictionFromPanel(${mid})">Edit</button>
         <div class="pmc-edit-wrap" id="pp-pred-edit-${mid}" style="display:none">
-          <div class="pmc-score">
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',1)">▴</div>
-              <input type="number" id="pp-ph-${mid}" min="0" max="20" value="${yourPred.home}">
-              <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',-1)">▾</div>
-            </div>
-            <span class="pmc-dash">–</span>
-            <div class="pmc-score-wrap">
-              <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',1)">▴</div>
-              <input type="number" id="pp-pa-${mid}" min="0" max="20" value="${yourPred.away}">
-              <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',-1)">▾</div>
-            </div>
-          </div>
-          ${ppWinnerPickerHtml}
+          ${predEntryBody(`pp-${mid}`, t1, t2, isKnockout, yourPred.winner, `pp-ph-${mid}`, `pp-pa-${mid}`, yourPred.home, yourPred.away)}
         </div>
         <button class="pmc-btn save" id="pp-pred-save-btn-${mid}" onclick="submitPredictionFromPanel(${mid})" style="display:none">Save</button>
       </div>
     </div>`;
   } else {
-    const ppWinnerPickerHtml = winnersEnabled && isKnockout ? `
-      <div class="pmc-winner-row" id="winner-row-pp-${mid}">
-        <span class="pmc-winner-label">Winner:</span>
-        <button class="winner-btn" data-winner-mid="pp-${mid}" data-team="${escapeHtml(t1)}" onclick="selectWinner('pp-${mid}','${escapeHtml(t1)}')">${t1}</button>
-        <button class="winner-btn" data-winner-mid="pp-${mid}" data-team="${escapeHtml(t2)}" onclick="selectWinner('pp-${mid}','${escapeHtml(t2)}')">${t2}</button>
-      </div>` : '';
     yourPredHtml = `<div class="pp-your-pred" id="pp-your-pred-${mid}">
       <div class="pp-your-pred-title">Your Prediction</div>
       <div class="pp-pred-form">
-        <div class="pmc-score">
-          <div class="pmc-score-wrap">
-            <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',1)">▴</div>
-            <input type="number" id="pp-ph-${mid}" min="0" max="20" value="0">
-            <div class="pmc-step" onclick="stepScore('pp-ph-${mid}',-1)">▾</div>
-          </div>
-          <span class="pmc-dash">–</span>
-          <div class="pmc-score-wrap">
-            <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',1)">▴</div>
-            <input type="number" id="pp-pa-${mid}" min="0" max="20" value="0">
-            <div class="pmc-step" onclick="stepScore('pp-pa-${mid}',-1)">▾</div>
-          </div>
-        </div>
-        ${ppWinnerPickerHtml}
+        ${predEntryBody(`pp-${mid}`, t1, t2, isKnockout, null, `pp-ph-${mid}`, `pp-pa-${mid}`, 0, 0)}
         <button class="pmc-btn predict" onclick="submitPredictionFromPanel(${mid})">Predict</button>
       </div>
     </div>`;

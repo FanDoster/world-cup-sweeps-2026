@@ -186,6 +186,23 @@
   align-items: flex-start;
 }
 
+.pmc-ko-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+}
+.pmc-ko-prompt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.pmc-score-section {
+  margin-top: 2px;
+}
 .pmc-winner-row {
   display: flex;
   align-items: center;
