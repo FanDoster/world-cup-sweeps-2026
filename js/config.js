@@ -16,6 +16,7 @@ const ownerColors = {
 // Players not listed get no sponsor tag.
 const PLAYER_SPONSORS = {
   Anton:  { name: 'Original Joker', emoji: '🃏', prefix: '' },
+  Chris:  { name: 'LittleBigPlanet', logo: 'sponsors/SackboySeat.webp' },
   Laurie: { name: 'Coca-Cola', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Coca-Cola_logo.svg' },
   Steven: { name: 'Microsoft XP', logo: 'sponsors/windows-xp.svg' },
 };
