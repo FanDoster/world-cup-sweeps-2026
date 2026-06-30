@@ -148,8 +148,8 @@ def parse_match_status(m):
       is_finished (bool),
       is_live (bool),
     """
-    home = m.get("Home", {})
-    away = m.get("Away", {})
+    home = m.get("Home") or {}
+    away = m.get("Away") or {}
     home_name = home.get("TeamName", [{}])[0].get("Description", "")
     away_name = away.get("TeamName", [{}])[0].get("Description", "")
     hs = m.get("HomeTeamScore")

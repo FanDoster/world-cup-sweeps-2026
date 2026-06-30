@@ -73,8 +73,8 @@ def fetch_fifa_matches():
         if "World Cup" not in comp:
             continue
 
-        home = m.get("Home", {})
-        away = m.get("Away", {})
+        home = m.get("Home") or {}
+        away = m.get("Away") or {}
         hs = m.get("HomeTeamScore")
         aws = m.get("AwayTeamScore")
 
