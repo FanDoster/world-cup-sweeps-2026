@@ -185,3 +185,6 @@ CREATE POLICY "matches_read" ON matches FOR SELECT USING (true);
 CREATE POLICY "picks_read" ON picks FOR SELECT USING (true);
 CREATE POLICY "picks_insert" ON picks FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "picks_delete" ON picks FOR DELETE USING (auth.uid() = user_id);
+
+ALTER TABLE app_version ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "app_version_read" ON app_version FOR SELECT USING (true);
