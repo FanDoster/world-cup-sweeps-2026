@@ -115,9 +115,14 @@ function renderMatches() {
 
       // Winner highlight
       let homeWinner = false, awayWinner = false;
+      let homeLoser = false, awayLoser = false;
       if (isFinished && m.score1 !== null && m.score2 !== null) {
-        homeWinner = m.score1 > m.score2;
-        awayWinner = m.score2 > m.score1;
+        if (m.score1 > m.score2) { homeWinner = true; awayLoser = true; }
+        else if (m.score2 > m.score1) { awayWinner = true; homeLoser = true; }
+        else if (m.actualWinner) {
+          if (m.actualWinner === m.team1) { homeWinner = true; awayLoser = true; }
+          else if (m.actualWinner === m.team2) { awayWinner = true; homeLoser = true; }
+        }
       }
 
       // Badge
@@ -173,13 +178,13 @@ function renderMatches() {
             </span>
           </div>
           <div class="bracket-fixture" onclick="showPredPanel('${safeAttr(m.team1)}|${safeAttr(m.team2)}|${m.date}')" style="cursor:pointer">
-            <div class="bf-team${homeWinner ? ' bf-winner' : ''}">
+            <div class="bf-team${homeWinner ? ' bf-winner' : (homeLoser ? ' bf-eliminated' : '')}">
               <img class="bracket-flag" src="${flagUrl(i1)}" alt="" loading="lazy" onerror="this.style.display='none'">
               <span class="bf-name">${m.team1}</span>
               ${o1 ? `<span class="match-owner ${ownerColors[o1]}">${o1}</span>` : ''}
             </div>
             <div class="bf-centre">${scoreHtml}</div>
-            <div class="bf-team${awayWinner ? ' bf-winner' : ''}">
+            <div class="bf-team${awayWinner ? ' bf-winner' : (awayLoser ? ' bf-eliminated' : '')}">
               <img class="bracket-flag" src="${flagUrl(i2)}" alt="" loading="lazy" onerror="this.style.display='none'">
               <span class="bf-name">${m.team2}</span>
               ${o2 ? `<span class="match-owner ${ownerColors[o2]}">${o2}</span>` : ''}

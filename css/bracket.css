@@ -366,6 +366,13 @@
   min-width: 0;
 }
 .bf-team.bf-winner .bf-name { color: var(--accent); }
+.bf-team.bf-eliminated .bf-name {
+  color: var(--text-muted);
+  opacity: 0.55;
+  text-decoration: line-through;
+  text-decoration-color: var(--text-muted);
+  text-decoration-thickness: 1px;
+}
 
 .bf-centre {
   display: flex;

@@ -122,6 +122,7 @@ function buildBracketTree() {
       isComplete: m ? m.isComplete : false,
       date: m ? m.date : null, time: m ? m.time : null, tz: m ? m.tz : null,
       channel: m ? m.channel : null,
+      actualWinner: m ? m.actualWinner : null,
       feederHome: null, feederAway: null,
     };
   }
@@ -144,6 +145,8 @@ function buildBracketTree() {
     let tz = byId ? byId.tz : null;
     let channel = byId ? byId.channel : null;
 
+    let actualWinner = byId ? byId.actualWinner : null;
+
     // Resolve from completed feeder matches if still unknown
     if (!homeTeam && tree[homeRef] && tree[homeRef].isComplete) {
       const f = tree[homeRef];
@@ -159,6 +162,7 @@ function buildBracketTree() {
       home: homeTeam, away: awayTeam,
       score1, score2, isComplete,
       date, time, tz, channel,
+      actualWinner,
       feederHome: homeRef, feederAway: awayRef,
     };
   }
@@ -187,6 +191,11 @@ function renderBracketNode(node, opts) {
   if (isComplete) {
     if (node.score1 > node.score2) { homeCls = ' bt-advanced'; awayCls = ' bt-eliminated'; }
     else if (node.score2 > node.score1) { awayCls = ' bt-advanced'; homeCls = ' bt-eliminated'; }
+    else if (node.actualWinner) {
+      // Draw after 90/120 min — use actual_winner (e.g. pens)
+      if (node.actualWinner === node.home) { homeCls = ' bt-advanced'; awayCls = ' bt-eliminated'; }
+      else if (node.actualWinner === node.away) { awayCls = ' bt-advanced'; homeCls = ' bt-eliminated'; }
+    }
   }
 
   const homeIso = node.home ? teamIso[node.home] : null;
