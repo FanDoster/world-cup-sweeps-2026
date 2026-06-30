@@ -442,10 +442,13 @@ function renderConnector(toRound, roundMatches, centerY, totalH, labelH) {
     const bot = Math.max(cy1, cy2);
     const mid = (top + bot) / 2;
 
-    // Vertical stem on left connecting the two feeder nodes
-    svgLines += `<line x1="0" y1="${top}" x2="0" y2="${bot}" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
-    // Horizontal line from midpoint to right edge (tc === mid since target is positioned at midpoint)
-    svgLines += `<line x1="0" y1="${mid}" x2="36" y2="${tc}" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
+    // Horizontal stubs from each feeder node into the connector
+    svgLines += `<line x1="0" y1="${cy1}" x2="10" y2="${cy1}" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
+    svgLines += `<line x1="0" y1="${cy2}" x2="10" y2="${cy2}" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
+    // Vertical stem connecting the two stubs
+    svgLines += `<line x1="10" y1="${top}" x2="10" y2="${bot}" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
+    // Horizontal line from midpoint to right edge (towards next round)
+    svgLines += `<line x1="10" y1="${mid}" x2="36" y2="${tc}" stroke="var(--text-muted)" stroke-width="1.5" stroke-opacity="0.5"/>`;
   }
 
   return `<div class="bt-conn-wrap">
