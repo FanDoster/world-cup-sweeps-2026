@@ -1,3 +1,27 @@
+// ── Globe lazy-loader: D3 + topojson + globe.js (~175 KB) are fetched only
+// when the Battle Map tab is first clicked, instead of blocking every page load.
+let _globeScriptsPromise = null;
+function _loadScript(src) {
+  return new Promise(function (resolve, reject) {
+    var s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+function loadGlobeScripts() {
+  if (!_globeScriptsPromise) {
+    _globeScriptsPromise = (function () {
+      return _loadScript('https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js')
+        .then(function () { return _loadScript('https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js'); })
+        .then(function () { return _loadScript('https://cdn.jsdelivr.net/npm/topojson-server@3/dist/topojson-server.min.js'); })
+        .then(function () { return _loadScript('js/globe.js'); });
+    })();
+  }
+  return _globeScriptsPromise;
+}
+
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
@@ -14,7 +38,7 @@ function switchTab(tab) {
   document.getElementById('sectionProfile').classList.toggle('active', tab === 'profile');
   document.getElementById('sectionBracket').classList.toggle('active', tab === 'bracket');
   if (tab === 'teams') { renderTeamChips(); }
-  if (tab === 'map') { initGlobe(); renderTerritoryStandings(); }
+  if (tab === 'map') { loadGlobeScripts().then(function () { initGlobe(); renderTerritoryStandings(); }); }
   if (tab !== 'map') stopAutoRotate();
   if (tab === 'leaderboard') renderLeaderboard();
   if (tab === 'myteams') renderMyTeams();
