@@ -217,6 +217,17 @@
   letter-spacing: 0.05em;
 }
 
+/* Prediction status badge on bracket nodes */
+.bt-pred-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 4px;
+}
+.bt-pred-badge.bt-pred-ok            { color: var(--accent); background: rgba(16,185,129,0.1); }
+.bt-pred-badge.bt-pred-needs-winner  { color: #f59e0b; background: rgba(245,158,11,0.12); }
+.bt-pred-badge.bt-pred-none          { color: #ef4444; background: rgba(239,68,68,0.1); }
+
 /* ── FLAG ── */
 .bracket-flag {
   width: 22px;
@@ -230,6 +241,10 @@
 .bracket-match-card {
   padding: 14px 18px;
   transition: border-color 0.2s;
+}
+.bracket-match-card.bc-needs-winner {
+  border-left: 4px solid rgba(239,68,68,0.6);
+  background: linear-gradient(90deg, rgba(239,68,68,0.06) 0%, transparent 30%);
 }
 
 /* In the card (single-round) view, verbose "Winner: X v Y" labels need to wrap */

@@ -67,6 +67,7 @@ async function renderPredictions() {
     const isKnockout = !!m.round;
     const roundBadge = `<span class="pmc-group badge-mono">${isKnockout ? roundLabel(m.round) : 'G' + m.group}</span>`;
 
+    // Winner picker HTML (knockout only, editable state)
     if (ep && isLocked) {
       const jokerCls = ep.is_joker ? ' joker-active' : '';
       const winnerDisplay = isKnockout && ep.predicted_winner ? ` <span class="pmc-winner-locked">→ ${ep.predicted_winner}</span>` : '';
@@ -81,7 +82,8 @@ async function renderPredictions() {
       const lockStr = getLockCountdown(lockMs);
       hasOpen = true;
       const winnerDisplay = isKnockout && ep.predicted_winner ? ` → ${ep.predicted_winner}` : '';
-      html += `<div class="pred-match-card${ep.is_joker ? ' joker-active' : ''}" id="pred-${mid}">
+      const needsWinnerCls = isKnockout && !ep.predicted_winner ? ' needs-winner' : '';
+      html += `<div class="pred-match-card${ep.is_joker ? ' joker-active' : ''}${needsWinnerCls}" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
           <div class="pmc-teams">${m.team1} vs ${m.team2} ${roundBadge}</div>
@@ -104,7 +106,8 @@ async function renderPredictions() {
       const lockMs = m.kickoff - 5 * 60 * 1000;
       const lockStr = getLockCountdown(lockMs);
       hasOpen = true;
-      html += `<div class="pred-match-card" id="pred-${mid}">
+      const needsWinnerCls = isKnockout ? ' needs-winner' : '';
+      html += `<div class="pred-match-card${needsWinnerCls}" id="pred-${mid}">
         <div class="pmc-inner">
           <div class="pmc-date"><div class="pmc-day">${formatDateLabel(m.date,m.time,m.tz)}</div><div class="pmc-time">${formatLocalTime(m.date,m.time,m.tz)}</div><div class="pmc-lock">${lockStr}</div></div>
           <div class="pmc-teams">${m.team1} vs ${m.team2} ${roundBadge}</div>
@@ -194,9 +197,9 @@ async function submitPrediction(matchId) {
 }
 
 // Knockout-aware prediction entry body: pick who advances first, then reveal the
-// FT-score picker. `token` is the id shared with selectWinner / data-winner-mid
-// (numeric match id on the Predictions tab, or `pp-${mid}` in the profile panel).
-// For group-stage matches (or when the winner feature is off) the score shows immediately.
+// FT-score picker. `token` matches the `id` / `data-winner-mid` prefix (numeric mid
+// on the Predictions tab, or `pp-${mid}` in the profile panel). Group-stage matches
+// (or when the winner feature is off) show the score immediately.
 function predEntryBody(token, team1, team2, isKnockout, existingWinner, homeId, awayId, homeVal, awayVal) {
   const scoreBlock = `
     <div class="pmc-score">
@@ -220,8 +223,11 @@ function predEntryBody(token, team1, team2, isKnockout, existingWinner, homeId, 
     <div class="pmc-ko-entry">
       <div class="pmc-ko-prompt" id="ko-prompt-${token}">${hasWinner ? 'Now predict an FT score including ET:' : 'First predict who will advance:'}</div>
       <div class="pmc-winner-row" id="winner-row-${token}">
-        <button class="winner-btn${existingWinner === team1 ? ' active' : ''}" data-winner-mid="${token}" data-team="${escapeHtml(team1)}" onclick="selectWinner('${token}','${escapeHtml(team1)}')">${team1}</button>
-        <button class="winner-btn${existingWinner === team2 ? ' active' : ''}" data-winner-mid="${token}" data-team="${escapeHtml(team2)}" onclick="selectWinner('${token}','${escapeHtml(team2)}')">${team2}</button>
+        <span class="pmc-winner-label">Winner:</span>
+        <div class="pmc-winner-btns">
+          <button class="winner-btn${existingWinner === team1 ? ' active' : ''}" data-winner-mid="${token}" data-team="${escapeHtml(team1)}" onclick="selectWinner('${token}','${escapeHtml(team1)}')">${team1}</button>
+          <button class="winner-btn${existingWinner === team2 ? ' active' : ''}" data-winner-mid="${token}" data-team="${escapeHtml(team2)}" onclick="selectWinner('${token}','${escapeHtml(team2)}')">${team2}</button>
+        </div>
       </div>
       <div class="pmc-score-section" id="score-section-${token}"${hasWinner ? '' : ' style="display:none"'}>${scoreBlock}</div>
     </div>`;

@@ -208,6 +208,22 @@ function renderBracketNode(node, opts) {
 
   const key = node.home && node.away ? `${node.home}|${node.away}|${node.date}` : '';
 
+  // Prediction status indicator for current user
+  let predBadge = '';
+  if (currentSession && key && !isComplete) {
+    const mid = matchIdByTeamDate[key];
+    if (mid) {
+      const myPred = (predLookup[mid] || []).find(p => p.user_id === currentSession.user.id);
+      if (!myPred) {
+        predBadge = '<span class="bt-pred-badge bt-pred-none">—</span>';
+      } else if (node.round && !myPred.winner) {
+        predBadge = '<span class="bt-pred-badge bt-pred-needs-winner">⚠</span>';
+      } else {
+        predBadge = '<span class="bt-pred-badge bt-pred-ok">✓</span>';
+      }
+    }
+  }
+
   // Feed info for TBD slots — show what feeds into this match.
   // Compact (tree): "W75". Verbose (cards): resolve to the feeder matchup if known.
   function feederLabel(ref) {
@@ -246,6 +262,7 @@ function renderBracketNode(node, opts) {
     if (awayOwner) html += `<span class="match-owner ${ownerColors[awayOwner]}">${awayOwner}</span>`;
     html += `</div>`;
   }
+  if (predBadge) html += `<div class="bt-node-meta">${predBadge}</div>`;
 
   html += `</div>`;
   return html;
@@ -324,7 +341,7 @@ function renderBracket() {
   };
 
   // Compute center Y (px) for each match node — R32 evenly spaced, later rounds at midpoint of feeders
-  const SLOT_H = 110; // px per R32 slot
+  const SLOT_H = 140; // px per R32 slot
   const TOTAL_H = R32_SLOTS.length * SLOT_H;
   const LABEL_H = 24; // px for the round label row (must match .bt-round-label height)
 

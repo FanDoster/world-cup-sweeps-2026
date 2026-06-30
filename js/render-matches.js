@@ -144,6 +144,14 @@ function renderMatches() {
       // Prediction consensus
       const key = `${m.team1}|${m.team2}|${m.date}`;
       const mid = matchIdByTeamDate[key];
+      // Highlight knockout cards where current user hasn't picked a winner
+      let needsWinnerKlass = '';
+      if (currentSession && mid && m.round) {
+        const myPred = (predLookup[mid] || []).find(p => p.user_id === currentSession.user.id);
+        if (!myPred || (myPred.home !== undefined && !myPred.winner)) {
+          needsWinnerKlass = ' bc-needs-winner';
+        }
+      }
       let consensusHtml = '';
       if (mid) {
         const preds = predLookup[mid] || [];
@@ -169,7 +177,7 @@ function renderMatches() {
       }
 
       html += `
-        <div class="bracket-match-card card-base${cardCls}">
+        <div class="bracket-match-card card-base${cardCls}${needsWinnerKlass}">
           <div class="bracket-card-header">
             <span class="bracket-card-match">${roundLabel(m.round)} · ${dateStr}</span>
             <span class="bracket-card-badges">
