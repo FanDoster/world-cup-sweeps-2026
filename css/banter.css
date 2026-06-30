@@ -1,0 +1,70 @@
+/* ── BANTER FEED ── */
+.section-banter { display: none; }
+.section-banter.active { display: block; }
+
+.banter-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 48px 20px;
+  font-size: 0.9rem;
+}
+
+#banterFeed {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 16px 24px;
+}
+
+.banter-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.banter-item:last-child { border-bottom: none; }
+
+.banter-match-ctx {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.banter-match-ctx:hover { color: var(--accent); }
+.banter-match-teams {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.banter-body-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.banter-avatar { flex-shrink: 0; }
+.banter-bubble {
+  flex: 1;
+  min-width: 0;
+}
+.banter-author {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  display: block;
+  margin-bottom: 2px;
+}
+.banter-text {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+.banter-text a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.banter-time {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

@@ -36,6 +36,7 @@ function switchTab(tab) {
   document.getElementById('sectionMap').classList.toggle('active', tab === 'map');
   document.getElementById('sectionShooter').classList.toggle('active', tab === 'shooter');
   document.getElementById('sectionProfile').classList.toggle('active', tab === 'profile');
+  document.getElementById('sectionBanter').classList.toggle('active', tab === 'banter');
   document.getElementById('sectionBracket').classList.toggle('active', tab === 'bracket');
   if (tab === 'teams') { renderTeamChips(); }
   if (tab === 'map') { loadGlobeScripts().then(function () { initGlobe(); renderTerritoryStandings(); }); }
@@ -44,6 +45,7 @@ function switchTab(tab) {
   if (tab === 'myteams') renderMyTeams();
   if (tab === 'predictions') renderPredictions();
   if (tab === 'bracket') renderBracket();
+  if (tab === 'banter') renderBanter();
   if (tab === 'shooter') initShooter();
   if (tab !== 'shooter') pauseShooter();
   if (tab === 'profile') {

@@ -610,7 +610,7 @@ function handleHashRoute() {
   }
 
   // Check for main tab route: #/tabName
-  const validTabs = ['players', 'matches', 'groups', 'leaderboard', 'teams', 'map', 'shooter', 'myteams', 'predictions', 'bracket'];
+  const validTabs = ['players', 'matches', 'groups', 'leaderboard', 'teams', 'map', 'shooter', 'myteams', 'predictions', 'bracket', 'banter'];
   const tabMatch = hash.match(/^#\/(\w+)$/);
   if (tabMatch) {
     const tab = tabMatch[1];
@@ -847,7 +847,7 @@ window.addEventListener('hashchange', () => {
   }
 
   // Check for main tab route: #/tabName
-  const validTabs = ['players', 'matches', 'groups', 'leaderboard', 'teams', 'map', 'shooter', 'myteams', 'predictions', 'bracket'];
+  const validTabs = ['players', 'matches', 'groups', 'leaderboard', 'teams', 'map', 'shooter', 'myteams', 'predictions', 'bracket', 'banter'];
   const tabMatch = hash.match(/^#\/(\w+)$/);
   if (tabMatch) {
     const tab = tabMatch[1];

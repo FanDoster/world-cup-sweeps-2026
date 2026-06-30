@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="css/bracket.css">
   <link rel="stylesheet" href="css/responsive.css">
   <link rel="stylesheet" href="css/update-notification.css">
+  <link rel="stylesheet" href="css/banter.css">
 </head>
 <body>
   <div class="container">
@@ -99,6 +100,7 @@
       <button type="button" class="tab-btn" data-tab="map" onclick="switchTab('map')"><span class="emoji">🌐</span><span class="tab-label"> Battle Map</span></button>
       <button type="button" class="tab-btn shooter-tab" data-tab="shooter" onclick="switchTab('shooter')"><span class="emoji">🔫</span><span class="tab-label"> Shooter</span></button>
       <button type="button" class="tab-btn" data-tab="profile" onclick="switchTab('profile')"><span class="emoji">👤</span><span class="tab-label"> Profile</span></button>
+      <button type="button" class="tab-btn" data-tab="banter" onclick="switchTab('banter')"><span class="emoji">💬</span><span class="tab-label"> Banter</span></button>
     </div>
 
     <!-- PLAYERS -->
@@ -211,6 +213,10 @@
       <div id="userProfileContent"></div>
     </div>
 
+    <div class="section-banter" id="sectionBanter">
+      <div id="banterFeed"></div>
+    </div>
+
     <div class="section-bracket active" id="sectionBracket"></div>
 
     <!-- Sign In Modal -->
@@ -311,6 +317,7 @@
   <script src="js/profile-picture.js"></script>
   <script src="js/render-user-profile.js"></script>
   <script src="js/render-bracket.js"></script>
+  <script src="js/render-banter.js"></script>
   <script src="js/version.js"></script>
   <script src="js/version-refresh.js"></script>
   <script src="js/main.js"></script>
