@@ -219,9 +219,11 @@ function predEntryBody(token, team1, team2, isKnockout, existingWinner, homeId, 
   if (!(winnersEnabled && isKnockout)) return scoreBlock;
 
   const hasWinner = !!existingWinner;
+  // Always start with the prompt-first flow — scores hidden until a winner is chosen,
+  // even when editing an existing prediction. existingWinner only pre-selects the button.
   return `
     <div class="pmc-ko-entry">
-      <div class="pmc-ko-prompt" id="ko-prompt-${token}">${hasWinner ? 'Now predict an FT score including ET:' : 'First predict who will advance:'}</div>
+      <div class="pmc-ko-prompt" id="ko-prompt-${token}">First predict who will advance:</div>
       <div class="pmc-winner-row" id="winner-row-${token}">
         <span class="pmc-winner-label">Winner:</span>
         <div class="pmc-winner-btns">
@@ -229,7 +231,7 @@ function predEntryBody(token, team1, team2, isKnockout, existingWinner, homeId, 
           <button class="winner-btn${existingWinner === team2 ? ' active' : ''}" data-winner-mid="${token}" data-team="${escapeHtml(team2)}" onclick="selectWinner('${token}','${escapeHtml(team2)}')">${team2}</button>
         </div>
       </div>
-      <div class="pmc-score-section" id="score-section-${token}"${hasWinner ? '' : ' style="display:none"'}>${scoreBlock}</div>
+      <div class="pmc-score-section" id="score-section-${token}" style="display:none">${scoreBlock}</div>
     </div>`;
 }
 
