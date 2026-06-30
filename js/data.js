@@ -120,6 +120,14 @@ async function loadData() {
     };
   });
 
+  // Build matchIdByTeamDate from the just-loaded matchData — avoids a second
+  // Supabase query in loadPredData() that previously re-fetched the same rows.
+  matchIdByTeamDate = {};
+  for (const m of matchData) {
+    if (!m.team1 || !m.team2) continue; // skip TBD knockout fixtures
+    matchIdByTeamDate[`${m.team1}|${m.team2}|${m.date}`] = m.id;
+  }
+
   // Optional: enrich matchData with actual_winner for ET/pens knockout results
   const { data: winnerRows, error: winnerErr } = await sb.from('matches').select('id,actual_winner');
   if (!winnerErr && winnerRows) {
@@ -167,16 +175,6 @@ async function loadPredData() {
     winnersEnabled = !w.error;
     featureProbeDone = true;
   }
-  // Get match IDs
-  const { data: allM } = await sb.from('matches').select('id,match_date,home_team_id(name),away_team_id(name)');
-  if (allM) {
-    matchIdByTeamDate = {};
-    allM.forEach(m => {
-      if (!m.home_team_id || !m.away_team_id) return; // skip TBD knockout fixtures (teams not yet decided)
-      matchIdByTeamDate[`${m.home_team_id.name}|${m.away_team_id.name}|${m.match_date}`] = m.id;
-    });
-  }
-
   // Prediction scores (once supabase-fixes.sql has run, RLS hides other
   // players' scores until kickoff) plus existence-only rows from the
   // prediction_status view so the ✓/✗ dots still work before kickoff.

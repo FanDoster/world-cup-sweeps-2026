@@ -154,8 +154,9 @@ def parse_match_status(m):
     away_name = away.get("TeamName", [{}])[0].get("Description", "")
     hs = m.get("HomeTeamScore")
     aws = m.get("AwayTeamScore")
-    group = m.get("GroupName", [{}])[0].get("Description", "")
-    group_letter = group.replace("Group ", "").strip()
+    group_name_list = m.get("GroupName") or []
+    group = group_name_list[0].get("Description", "") if group_name_list else ""
+    group_letter = group.replace("Group ", "").strip() if group else ""
 
     # MatchTime is like "37'" or "45+2'" (stoppage) — take the base minute.
     match_time_str = m.get("MatchTime", "")
