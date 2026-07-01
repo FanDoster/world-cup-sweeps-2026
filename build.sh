@@ -23,6 +23,7 @@ cat css/tokens.css \
     css/leaderboard.css \
     css/teams.css \
     css/dispatch.css \
+    css/ticker.css \
     css/predictions.css \
     css/profile.css \
     css/auth.css \
@@ -43,6 +44,7 @@ cat js/config.js \
     js/utils.js \
     js/auth.js \
     js/data.js \
+    js/ticker.js \
     js/render-matches.js \
     js/render-groups.js \
     js/render-leaderboard.js \

@@ -418,8 +418,10 @@ function renderWarDispatch() {
       <span class="wd-masthead-sub">AFTER LAST 5 RESULTS</span>
     </div>`;
 
+  const tickerHtml = renderTicker();
+
   if (!stories.length) {
-    el.innerHTML = masthead + `<div class="wd-empty">NO TERRITORY CHANGES FROM LAST 5 RESULTS</div>`;
+    el.innerHTML = tickerHtml + masthead + `<div class="wd-empty">NO TERRITORY CHANGES FROM LAST 5 RESULTS</div>`;
     return;
   }
 
@@ -539,7 +541,7 @@ function renderWarDispatch() {
     </div>`;
   }).join('');
 
-  el.innerHTML = masthead + `<div>${storyHtml}</div>`;
+  el.innerHTML = tickerHtml + masthead + `<div>${storyHtml}</div>`;
 }
 
 function calcPredPointsForAll() {

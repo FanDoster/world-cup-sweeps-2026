@@ -18,11 +18,15 @@ echo "Bumping version: $CUR → $NEW_VERSION"
 
 sed -i '' "s/APP_VERSION = '.*'/APP_VERSION = '$NEW_VERSION'/" "$VERSION_FILE"
 
-# 2. Deploy to Surge
-echo "Deploying to $DOMAIN..."
-npx surge . --domain "$DOMAIN"
+# 2. Build (concatenate CSS + JS into bundles)
+echo "Building…"
+BUILD_DIR=$(bash build.sh | tail -1)
 
-# 3. Wait for CDN propagation (health check)
+# 3. Deploy to Surge
+echo "Deploying to $DOMAIN…"
+npx surge "$BUILD_DIR" --domain "$DOMAIN"
+
+# 4. Wait for CDN propagation (health check)
 echo "Waiting for site to be reachable..."
 for i in $(seq 1 30); do
   HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 5 "https://$DOMAIN" || echo "000")
@@ -34,7 +38,7 @@ for i in $(seq 1 30); do
   sleep 3
 done
 
-# 4. Update Supabase (with retries)
+# 5. Update Supabase (with retries)
 echo "Updating Supabase app_version..."
 SQL="INSERT INTO public.app_version (id, version, updated_at) VALUES (1, '$NEW_VERSION', now()) ON CONFLICT (id) DO UPDATE SET version = EXCLUDED.version, updated_at = EXCLUDED.updated_at;"
 for i in $(seq 1 3); do
@@ -48,3 +52,4 @@ for i in $(seq 1 3); do
 done
 
 echo "Done — version $NEW_VERSION deployed."
+rm -rf "$BUILD_DIR"

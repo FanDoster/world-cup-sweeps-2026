@@ -1,0 +1,180 @@
+/* ── DISPATCH TICKER ──
+   Integrated into .war-dispatch between masthead and stories.
+   Matches the tactical-briefing monospace aesthetic. */
+
+.dt-strip {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-bottom: 1px dashed var(--border-alpha-mid);
+  font-family: var(--font-mono);
+  height: 34px;
+  overflow: hidden;
+  position: relative;
+}
+
+.dt-label {
+  flex-shrink: 0;
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin: 0 10px;
+  /* Match .wd-sitrep badge style exactly */
+}
+
+.dt-track-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.dt-track-wrap::before,
+.dt-track-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.dt-track-wrap::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--card) 0%, transparent 100%);
+}
+
+.dt-track-wrap::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--card) 0%, transparent 100%);
+}
+
+.dt-track {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  animation: dt-scroll 40s linear infinite;
+  height: 100%;
+  align-items: center;
+}
+
+.dt-track:hover,
+.dt-strip:hover .dt-track {
+  animation-play-state: paused;
+}
+
+.dt-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  border-right: 1px dashed var(--border-alpha);
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.dt-item.dt-clickable {
+  cursor: pointer;
+}
+
+.dt-item.dt-clickable:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.dt-item .dt-time {
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  min-width: 30px;
+}
+
+.dt-item .dt-team {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--text);
+}
+
+.dt-item .dt-vs {
+  color: var(--text-muted);
+  font-size: 0.55rem;
+  font-weight: 600;
+}
+
+.dt-item .dt-score {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.68rem;
+  min-width: 20px;
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.dt-item .dt-round {
+  color: var(--text-muted);
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border: 1px solid var(--border-alpha);
+  border-radius: 2px;
+}
+
+.dt-item .dt-flags {
+  display: inline-flex;
+  align-items: center;
+}
+
+.dt-item .dt-flags img {
+  width: 16px;
+  height: 11px;
+  border-radius: 1px;
+  object-fit: cover;
+}
+
+/* LIVE */
+.dt-item .dt-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--live);
+  font-weight: 700;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@keyframes dt-live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.dt-item .dt-live::first-letter {
+  animation: dt-live-pulse 1.2s ease-in-out infinite;
+}
+
+.dt-item.dt-live-item {
+  background: linear-gradient(90deg, rgba(239,68,68,0.05) 0%, transparent 100%);
+}
+
+.dt-item.dt-ft-item {
+  opacity: 0.55;
+}
+
+@keyframes dt-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}

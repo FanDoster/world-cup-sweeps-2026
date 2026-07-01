@@ -20,7 +20,12 @@ jobs:
           VERSION="$(date -u +%Y-%m-%d)-${GITHUB_SHA::7}"
           sed -i "s/window.APP_VERSION = '.*';/window.APP_VERSION = '$VERSION';/" js/version.js
           echo "Stamped version: $VERSION"
-      - run: npx surge . --domain world-cup-sweeps-2026.surge.sh
+      - name: Build (concatenate CSS + JS)
+        id: build
+        run: |
+          BUILD_DIR=$(bash build.sh | tail -1)
+          echo "build_dir=$BUILD_DIR" >> "$GITHUB_OUTPUT"
+      - run: npx surge "${{ steps.build.outputs.build_dir }}" --domain world-cup-sweeps-2026.surge.sh
         env:
           SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
       - name: Wait for CDN propagation
