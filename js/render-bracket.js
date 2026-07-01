@@ -251,8 +251,11 @@ function renderBracketNode(node, opts) {
   } else if (isComplete) {
     html += `<div class="bt-node-meta">FT</div>`;
   } else if (node.date) {
-    const localTime = formatLocalTime(node.date, node.time, node.tz);
-    html += `<div class="bt-node-meta">${localTime}</div>`;
+    const d = toDate(node.date, node.time, node.tz);
+    const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const dayStr = days[d.getDay()];
+    const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    html += `<div class="bt-node-meta">${dayStr} ${timeStr}</div>`;
   }
 
   // Owner chips
