@@ -30,7 +30,28 @@ function renderPredPanel(key) {
   const el = document.getElementById('predPanel');
   const [t1, t2, date] = key.split('|');
   const mid = matchIdByTeamDate[key];
-  const m = matchData.find(m => m.team1 === t1 && m.team2 === t2 && m.date === date);
+  let m = matchData.find(m => m.date === date && ((m.team1 === t1 && m.team2 === t2) || (m.team1 === t2 && m.team2 === t1)));
+  // Fallback: knockout placeholder where bracket tree resolved teams
+  // but the DB row still has NULL home/away (e.g. R16+ TBD fixtures
+  // resolved from completed feeder matches).
+  if (!m && mid) {
+    m = matchData.find(m => m.id === mid);
+  }
+  // Second fallback: after a data refresh, matchIdByTeamDate may have been
+  // rebuilt from DB rows (losing bracket-resolved entries), but the bracket
+  // tree cache still holds the resolved teams. Search by date + round.
+  if (!m && bracketTreeCache) {
+    for (const node of Object.values(bracketTreeCache)) {
+      if (node.date === date && node.home === t1 && node.away === t2 && node.num) {
+        m = matchData.find(m => m.id === node.num);
+        break;
+      }
+      if (node.date === date && node.home === t2 && node.away === t1 && node.num) {
+        m = matchData.find(m => m.id === node.num);
+        break;
+      }
+    }
+  }
   if (!m) { el.innerHTML = '<p style="padding:20px;color:var(--text-muted)">Match not found.</p>'; return; }
 
   const now = new Date();

@@ -126,6 +126,7 @@ async function loadData() {
   for (const m of matchData) {
     if (!m.team1 || !m.team2) continue; // skip TBD knockout fixtures
     matchIdByTeamDate[`${m.team1}|${m.team2}|${m.date}`] = m.id;
+    matchIdByTeamDate[`${m.team2}|${m.team1}|${m.date}`] = m.id;
   }
 
   // Optional: enrich matchData with actual_winner for ET/pens knockout results

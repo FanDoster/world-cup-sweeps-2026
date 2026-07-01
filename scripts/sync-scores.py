@@ -234,6 +234,125 @@ def update_score(session, match_id, home_score, away_score):
     return status in (200, 204)
 
 
+# ── Knockout bracket structure (matches js/render-bracket.js) ──
+# Each tuple: (target_match_id, feeder_a_id, feeder_b_id, [losers])
+# When feeder matches complete, their winners populate the target's team slots.
+# The optional fourth field: True = take losers instead of winners (3rd place).
+
+BRACKET_STAGES = [
+    # R32 winners → R16
+    [(89, 73, 75), (90, 74, 77), (91, 76, 78), (92, 79, 80),
+     (93, 83, 84), (94, 81, 82), (95, 86, 88), (96, 85, 87)],
+    # R16 winners → QF
+    [(97, 89, 90), (98, 93, 94), (99, 91, 92), (100, 95, 96)],
+    # QF winners → SF
+    [(101, 97, 98), (102, 99, 100)],
+    # SF winners → Final; SF losers → 3rd Place
+    [(104, 101, 102), (103, 101, 102, True)],
+]
+
+
+def _resolve_winner(m, take_losers=False):
+    """Return (winner_team_id, winner_name) or (None, None) if unresolved."""
+    if not m or not m.get("is_complete"):
+        return None, None
+    h, a = m.get("home_score"), m.get("away_score")
+    if h is None or a is None:
+        return None, None
+    if take_losers:
+        # Losers: the team that DIDN'T win
+        if h > a:
+            return m.get("away_team_id"), m.get("away_name")
+        if a > h:
+            return m.get("home_team_id"), m.get("home_name")
+        aw = m.get("actual_winner")
+        if aw:
+            return (m.get("away_team_id") if aw == m.get("home_name") else m.get("home_team_id"),
+                    m.get("away_name") if aw == m.get("home_name") else m.get("home_name"))
+        return None, None
+    # Winners
+    if h > a:
+        return m.get("home_team_id"), m.get("home_name")
+    if a > h:
+        return m.get("away_team_id"), m.get("away_name")
+    aw = m.get("actual_winner")
+    if aw:
+        return (m.get("home_team_id") if aw == m.get("home_name") else m.get("away_team_id"),
+                m.get("home_name") if aw == m.get("home_name") else m.get("away_name"))
+    return None, None
+
+
+def resolve_bracket_placeholders(session):
+    """Populate NULL home_team_id/away_team_id on knockout placeholder rows
+    once both feeder matches are complete. Cascades through the bracket
+    so R32→R16→QF→SF→Final placeholders fill in automatically."""
+    # Fetch all knockout matches with team IDs and score info
+    status, body = session.get(
+        "matches?select=id,home_team_id,away_team_id,home_score,away_score,"
+        "is_complete,round,actual_winner,"
+        "home:home_team_id(name),away:away_team_id(name)"
+        "&round=not.is.null&order=id"
+    )
+    if status != 200:
+        print(f"ERROR: Failed to fetch knockout matches: {status}", file=sys.stderr)
+        return 0
+
+    rows = json.loads(body)
+    by_id = {}
+    for r in rows:
+        h = r.get("home") or {}
+        a = r.get("away") or {}
+        by_id[r["id"]] = {
+            "home_team_id": r.get("home_team_id"),
+            "away_team_id": r.get("away_team_id"),
+            "home_name": h.get("name") if h else None,
+            "away_name": a.get("name") if a else None,
+            "home_score": r.get("home_score"),
+            "away_score": r.get("away_score"),
+            "is_complete": r.get("is_complete"),
+            "actual_winner": r.get("actual_winner"),
+            "round": r.get("round"),
+        }
+
+    resolved = 0
+    for stage in BRACKET_STAGES:
+        for target_id, fa, fb, *opts in stage:
+            take_losers = opts[0] if opts else False
+            target = by_id.get(target_id)
+            if not target:
+                continue
+            # Only fill placeholders that still have NULL teams
+            if target["home_team_id"] is not None and target["away_team_id"] is not None:
+                continue
+
+            feeder_a = by_id.get(fa)
+            feeder_b = by_id.get(fb)
+            if not feeder_a or not feeder_b:
+                continue
+
+            home_id, home_name = _resolve_winner(feeder_a, take_losers)
+            away_id, away_name = _resolve_winner(feeder_b, take_losers)
+            if home_id is None or away_id is None:
+                continue
+
+            path = f"matches?id=eq.{target_id}"
+            body_patch = {"home_team_id": home_id, "away_team_id": away_id}
+            st, _ = session.patch(path, body_patch)
+            if st in (200, 204):
+                print(f"  Resolved #{target_id} ({target['round']}): "
+                      f"{home_name} vs {away_name}")
+                # Update in-memory cache so cascading stages see the new data
+                by_id[target_id]["home_team_id"] = home_id
+                by_id[target_id]["away_team_id"] = away_id
+                by_id[target_id]["home_name"] = home_name
+                by_id[target_id]["away_name"] = away_name
+                resolved += 1
+            else:
+                print(f"  ERROR resolving #{target_id}: HTTP {st}", file=sys.stderr)
+
+    return resolved
+
+
 def main():
     # Read the service_role key (sb_secret_ prefix — can write)
     sb_key = read_key(SB_KEY_FILE)
@@ -268,6 +387,13 @@ def main():
             skipped += 1
 
     print(f"\nDone. Updated: {updated}, Skipped (up to date): {skipped}")
+
+    # Resolve knockout bracket placeholders — once feeder matches complete,
+    # populate the next round's home_team_id/away_team_id so the DB stays
+    # in sync and the frontend doesn't need bracket-tree fallbacks.
+    resolved = resolve_bracket_placeholders(session)
+    if resolved:
+        print(f"Resolved {resolved} bracket placeholder(s).")
 
 
 if __name__ == "__main__":

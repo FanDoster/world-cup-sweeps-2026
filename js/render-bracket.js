@@ -306,6 +306,17 @@ function renderBracket() {
 
   const tree = buildBracketTree();
 
+  // Populate matchIdByTeamDate with bracket-resolved knockout matches
+  // so the prediction panel (renderPredPanel) can find them even when
+  // the DB row still has NULL home/away teams (e.g. R16 placeholders
+  // where teams are resolved from completed feeder matches).
+  for (const node of Object.values(tree)) {
+    if (node.home && node.away && node.date && node.num) {
+      matchIdByTeamDate[`${node.home}|${node.away}|${node.date}`] = node.num;
+      matchIdByTeamDate[`${node.away}|${node.home}|${node.date}`] = node.num;
+    }
+  }
+
   // Rounds to display
   const rounds = ['R32', 'R16', 'QF', 'SF', 'Final'];
 
