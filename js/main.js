@@ -61,6 +61,30 @@ function switchTab(tab) {
   history.pushState(null, '', tabHash);
 }
 
+// Re-render whichever tab is currently visible. loadData() already refreshes
+// matches/players/groups/leaderboard/teams, but Predictions, My Teams, Bracket
+// and Profile only render on an explicit switchTab — so if the user is sitting
+// on one of those while the initial data is still loading, it stays blank until
+// they cycle tabs. Call this once data is ready to fill the visible tab in place.
+function renderActiveTab() {
+  const activeBtn = document.querySelector('.tab-btn.active');
+  const tab = activeBtn && activeBtn.dataset.tab;
+  switch (tab) {
+    case 'predictions': renderPredictions(); break;
+    case 'myteams': renderMyTeams(); break;
+    case 'bracket': renderBracket(); break;
+    case 'leaderboard': renderLeaderboard(); break;
+    case 'teams': renderTeamChips(); if (selectedTeam) renderTeamSchedule(); break;
+    case 'profile': {
+      const p = (typeof userProfilePlayer !== 'undefined' && userProfilePlayer)
+        || (currentProfile && currentProfile.player_name);
+      if (p) renderUserProfile(p);
+      break;
+    }
+    // players / groups / matches are already re-rendered by loadData()
+  }
+}
+
 // ── INIT ──
 restoreSession().then(async () => {
   // Avatar feature detection — must complete before profile renders
@@ -73,6 +97,10 @@ restoreSession().then(async () => {
     renderBracket();          // default tab is now Knockout
     // Handle hash route for direct links (after data is loaded)
     handleHashRoute();
+    // Fill the visible tab now that data is ready — covers tabs (esp. Predictions
+    // and My Teams) that loadData() doesn't render and that the user may have
+    // opened while the initial fetch was still in flight.
+    renderActiveTab();
   });
 });
 setInterval(renderMatches, 60000);
