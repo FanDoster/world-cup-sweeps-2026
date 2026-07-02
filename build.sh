@@ -15,60 +15,31 @@ cp -R . "$BUILD_DIR"/
 cd "$BUILD_DIR"
 
 # ── CSS bundle ──
+# The file lists are derived from index.html (in document order) so the
+# bundle always matches whatever the page loads in dev — new files can never
+# silently miss the deploy again.
 echo "  Concatenating CSS…"
-cat css/tokens.css \
-    css/layout.css \
-    css/matches.css \
-    css/groups.css \
-    css/leaderboard.css \
-    css/teams.css \
-    css/dispatch.css \
-    css/ticker.css \
-    css/predictions.css \
-    css/profile.css \
-    css/auth.css \
-    css/myteams.css \
-    css/globe.css \
-    css/shooter.css \
-    css/profile-picture.css \
-    css/user-profile.css \
-    css/bracket.css \
-    css/responsive.css \
-    css/update-notification.css \
-    css/banter.css \
-    > css/b.css
+CSS_FILES=$(grep -o 'href="css/[^"]*\.css"' index.html | sed 's/^href="//;s/"$//')
+echo "$CSS_FILES" | sed 's/^/    /'
+# shellcheck disable=SC2086
+cat $CSS_FILES > css/b.css
 
-# ── JS bundle (dependency order) ──
+# ── JS bundle (dependency order = script-tag order) ──
 echo "  Concatenating JS…"
-cat js/config.js \
-    js/utils.js \
-    js/auth.js \
-    js/data.js \
-    js/ticker.js \
-    js/render-matches.js \
-    js/render-groups.js \
-    js/render-leaderboard.js \
-    js/render-predictions.js \
-    js/render-teams.js \
-    js/render-myteams.js \
-    js/render-profile.js \
-    js/shooter.js \
-    js/team-results.js \
-    js/profile-picture.js \
-    js/render-user-profile.js \
-    js/render-bracket.js \
-    js/render-banter.js \
-    js/version.js \
-    js/version-refresh.js \
-    js/main.js \
-    > js/b.js
+JS_FILES=$(grep -o 'src="js/[^"]*\.js"' index.html | sed 's/^src="//;s/"$//')
+echo "$JS_FILES" | sed 's/^/    /'
+# shellcheck disable=SC2086
+cat $JS_FILES > js/b.js
 
 # ── Rewrite index.html ──
 echo "  Rewriting index.html…"
-python3 << 'PYEOF'
+# prefer python3, but fall back to python if python3 is broken/missing
+# (e.g. the Windows Store stub that exits nonzero)
+if python3 -c 'pass' 2>/dev/null; then PY=python3; else PY=python; fi
+"$PY" << 'PYEOF'
 import re
 
-with open("index.html") as f:
+with open("index.html", encoding="utf-8") as f:
     html = f.read()
 
 # Replace CSS links (all <link rel="stylesheet" href="css/...">)
@@ -119,7 +90,7 @@ if first_js is not None:
     
     html = '\n'.join(keep_before + [bundle_line] + keep_after)
 
-with open("index.html", "w") as f:
+with open("index.html", "w", encoding="utf-8") as f:
     f.write(html)
 
 PYEOF
