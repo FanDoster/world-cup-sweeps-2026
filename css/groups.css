@@ -9,8 +9,8 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .person-card:hover {
-  border-color: var(--border);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  border-color: var(--wii-blue);
+  box-shadow: 0 4px 20px rgba(90,105,115,0.2);
 }
 .person-name {
   font-size: 1.15rem;
@@ -34,7 +34,7 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--accent);
-  background: rgba(96,165,250,0.1);
+  background: rgba(63,185,232,0.12);
   padding: 2px 9px;
   border-radius: 10px;
   white-space: nowrap;
@@ -64,7 +64,7 @@
   height: 20px;
   border-radius: 3px;
   object-fit: cover;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  box-shadow: 0 1px 3px rgba(90,105,115,0.35);
   flex-shrink: 0;
 }
 .team-name { flex: 1; font-size: 0.92rem; color: var(--text); }
@@ -151,11 +151,11 @@
   width: 24px; height: 16px;
   border-radius: 2px;
   object-fit: cover;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+  box-shadow: 0 1px 3px rgba(90,105,115,0.3);
 }
-.group-table tr.qual td { background: rgba(16,185,129,0.05); }
+.group-table tr.qual td { background: rgba(63,185,232,0.08); }
 .group-table tr.qual .pos { color: var(--accent); }
-.group-table tr.third td { background: rgba(245,158,11,0.05); }
+.group-table tr.third td { background: rgba(245,158,11,0.07); }
 .group-table tr.third .pos { color: var(--gold); }
 .thirds-note { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; margin-left: 8px; letter-spacing: 0.04em; }
 .qual-legend {
@@ -168,8 +168,8 @@
   padding: 2px 4px;
 }
 .ql-dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; vertical-align: -1px; }
-.ql-green { background: rgba(16,185,129,0.5); }
-.ql-amber { background: rgba(245,158,11,0.5); }
+.ql-green { background: rgba(63,185,232,0.6); }
+.ql-amber { background: rgba(245,158,11,0.55); }
 
 /* ── OWNER TAGS ── */
 .owner-tag, .match-owner {
@@ -181,12 +181,12 @@
   letter-spacing: 0.01em;
   flex-shrink: 0;
 }
-.owner-anton  { background: #39d35322; color: #4ade80; }
-.owner-chris  { background: #3b82f622; color: #60a5fa; }
-.owner-dan    { background: #22c55e22; color: #4ade80; }
-.owner-laurie { background: #a855f722; color: #c084fc; }
-.owner-pat   { background: #f9731622; color: #fb923c; }
-.owner-steven { background: #ef444422; color: #f87171; }
+.owner-anton  { background: #39d35326; color: #1e8c3a; }
+.owner-chris  { background: #3b82f626; color: #2563cf; }
+.owner-dan    { background: #22c55e26; color: #15803d; }
+.owner-laurie { background: #a855f726; color: #8626d4; }
+.owner-pat   { background: #f9731626; color: #c2410c; }
+.owner-steven { background: #ef444426; color: #cf2f2f; }
 
 
 /* ── QUALIFICATION SCENARIOS ── */
@@ -194,6 +194,6 @@
 .qual-line .ql-team { white-space: nowrap; margin-right: 12px; }
 .qual-line .ql-range { color: var(--text-muted); font-family: var(--font-mono); }
 .qual-tag { font-size: 0.58rem; font-weight: 800; padding: 1px 6px; border-radius: 4px; margin-left: 4px; letter-spacing: 0.03em; }
-.qual-tag.in { background: rgba(16,185,129,0.15); color: var(--accent); }
-.qual-tag.out { background: rgba(239,68,68,0.12); color: #f87171; }
-.qual-tag.third { background: rgba(245,158,11,0.13); color: var(--gold); }
+.qual-tag.in { background: rgba(63,185,232,0.15); color: var(--accent); }
+.qual-tag.out { background: rgba(224,62,62,0.12); color: #cf2f2f; }
+.qual-tag.third { background: rgba(245,158,11,0.15); color: var(--gold); }

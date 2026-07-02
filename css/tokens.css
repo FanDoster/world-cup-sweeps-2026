@@ -1,44 +1,59 @@
-/* ── DESIGN TOKENS ── */
+/* ── DESIGN TOKENS — Nintendo Wii Menu theme ── */
 :root {
-  --bg:            #070b10;
-  --surface:       #0e1620;
-  --card:          #131d2a;
-  --card-hover:    #182638;
-  --border:        #1e2e40;
-  --border-subtle: #162433;
-  --text:          #e4ebf3;
-  --text-secondary:#7d8ea0;
-  --text-muted:    #4b5b6e;
-  --accent:        #10b981;
-  --accent-dim:    #0d9668;
-  --accent-glow:   rgba(16,185,129,0.12);
-  --gold:          #f59e0b;
-  --gold-dim:      #d97706;
-  --silver:        #94a3b8;
-  --bronze:        #d08c4a;
-  --live:          #ef4444;
-  --live-glow:     rgba(239,68,68,0.18);
-  --radius:        12px;
-  --radius-sm:     8px;
-  --radius-xs:     5px;
-  --font:          -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-  --font-mono:     'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  --bg:            #e9eced;
+  --surface:       #eef1f3;
+  --card:          #ffffff;
+  --card-hover:    #f4fafd;
+  --border:        #b9c2c8;
+  --border-subtle: #d9dee2;
+  --text:          #444f58;
+  --text-secondary:#6d7a85;
+  --text-muted:    #96a1aa;
+  --accent:        #1f9bd4;
+  --accent-dim:    #157fb1;
+  --accent-glow:   rgba(46,170,220,0.20);
+  --gold:          #c8860a;
+  --gold-dim:      #e9bd55;
+  --silver:        #7e8b98;
+  --bronze:        #a8703a;
+  --live:          #e03e3e;
+  --live-glow:     rgba(224,62,62,0.16);
+  --radius:        14px;
+  --radius-sm:     10px;
+  --radius-xs:     6px;
+  --font:          'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:     'Share Tech Mono', 'SF Mono', 'JetBrains Mono', monospace;
   /* ticker colour scale */
-  --ticker-dim:        rgba(255,255,255,0.3);
-  --ticker-mid:        rgba(255,255,255,0.55);
-  --ticker-full:       rgba(255,255,255,0.75);
-  /* semi-transparent borders used on dark surfaces */
-  --border-alpha:      rgba(255,255,255,0.08);
-  --border-alpha-mid:  rgba(255,255,255,0.12);
+  --ticker-dim:        rgba(60,72,80,0.35);
+  --ticker-mid:        rgba(60,72,80,0.6);
+  --ticker-full:       rgba(60,72,80,0.8);
+  /* semi-transparent borders used on light surfaces */
+  --border-alpha:      rgba(70,85,95,0.14);
+  --border-alpha-mid:  rgba(70,85,95,0.22);
   /* third-party brand colours */
   --color-polymarket:  #2E5CFF;
   --color-stats-green: #15803d;
+
+  /* ── Wii-specific tokens ── */
+  /* glossy gray bar (Wii Menu top/bottom bars) */
+  --wii-gloss: linear-gradient(180deg, #fdfdfe 0%, #f0f3f5 45%, #dfe5e8 50%, #ebeff1 100%);
+  /* channel tile face */
+  --wii-tile: linear-gradient(180deg, #fefefe 0%, #f3f6f7 100%);
+  /* empty channel face */
+  --wii-tile-empty: linear-gradient(180deg, #eef1f2 0%, #dde2e5 100%);
+  --wii-tile-frame: #dde3e6;
+  /* selection blue (the pulsing cursor border on the Wii Menu) */
+  --wii-blue: #3fb9e8;
+  --wii-blue-deep: #1f9bd4;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  background: var(--bg);
+  /* Wii Menu backdrop: warm white with the signature fine dot grid */
+  background-color: var(--bg);
+  background-image: radial-gradient(rgba(110,126,136,0.17) 1px, transparent 1.15px);
+  background-size: 15px 15px;
   color: var(--text);
   font-family: var(--font);
   min-height: 100vh;
@@ -53,15 +68,17 @@ body {
 }
 
 /* ── UTILITY CLASSES ── */
+/* Wii channel-style tile: white face, soft frame, glass highlight */
 .card-base {
-  background: var(--card);
+  background: var(--wii-tile);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 2px 6px rgba(90,105,115,0.14);
 }
 .badge-mono {
   font-family: var(--font-mono);
   background: var(--surface);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--text-muted);
 }
 .label-sm {
@@ -72,3 +89,26 @@ body {
   letter-spacing: 0.08em;
 }
 
+/* Wii selection pulse — used on active channel tiles */
+@keyframes wiiSelectPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(63,185,232,0.85), 0 0 14px rgba(63,185,232,0.55), inset 0 1px 0 rgba(255,255,255,0.9); }
+  50%      { box-shadow: 0 0 0 3px rgba(63,185,232,0.35), 0 0 6px rgba(63,185,232,0.25), inset 0 1px 0 rgba(255,255,255,0.9); }
+}
+
+/* Wii glossy pill button (the "Wii Shop"-style rounded buttons) */
+.wii-btn {
+  background: var(--wii-gloss);
+  border: 1px solid #c3ccd1;
+  border-radius: 999px;
+  color: var(--text-secondary);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 1px 3px rgba(90,105,115,0.25);
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 700;
+  transition: all 0.15s;
+}
+.wii-btn:hover {
+  border-color: var(--wii-blue);
+  color: var(--wii-blue-deep);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.95), 0 0 8px rgba(63,185,232,0.45);
+}

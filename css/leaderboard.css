@@ -75,7 +75,7 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 .leaderboard-table tbody tr:last-child td { border-bottom: none; }
-.leaderboard-table tbody tr:hover td { background: rgba(255,255,255,0.015); }
+.leaderboard-table tbody tr:hover td { background: rgba(63,185,232,0.05); }
 .leaderboard-table .rank {
   width: 44px;
   text-align: center;
@@ -101,9 +101,9 @@
 .rank-2 { color: var(--silver) !important; }
 .rank-3 { color: var(--bronze) !important; }
 
-.leaderboard-table tbody tr:nth-child(1) td { background: linear-gradient(90deg, rgba(245,158,11,0.06) 0%, transparent 30%); }
-.leaderboard-table tbody tr:nth-child(2) td { background: linear-gradient(90deg, rgba(148,163,184,0.04) 0%, transparent 30%); }
-.leaderboard-table tbody tr:nth-child(3) td { background: linear-gradient(90deg, rgba(208,140,74,0.04) 0%, transparent 30%); }
+.leaderboard-table tbody tr:nth-child(1) td { background: linear-gradient(90deg, rgba(245,158,11,0.10) 0%, transparent 30%); }
+.leaderboard-table tbody tr:nth-child(2) td { background: linear-gradient(90deg, rgba(126,139,152,0.08) 0%, transparent 30%); }
+.leaderboard-table tbody tr:nth-child(3) td { background: linear-gradient(90deg, rgba(168,112,58,0.08) 0%, transparent 30%); }
 
 
 /* ── BADGES ── */
@@ -149,7 +149,7 @@
 .joker-table th { text-align: left; font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; padding: 8px 12px 6px; border-bottom: 1px solid var(--border-subtle); font-weight: 700; }
 .joker-table td { padding: 9px 12px; font-size: 0.8rem; border-bottom: 1px solid var(--border-subtle); }
 .joker-table tbody tr:last-child td { border-bottom: none; }
-.joker-table tbody tr:hover td { background: rgba(245,158,11,0.03); }
+.joker-table tbody tr:hover td { background: rgba(245,158,11,0.06); }
 .joker-rank { font-size: 0.85rem; }
 .joker-num { font-family: var(--font-mono); text-align: center; font-weight: 700; color: var(--text-secondary); }
 .joker-detail { font-size: 0.72rem; color: var(--text-muted); }

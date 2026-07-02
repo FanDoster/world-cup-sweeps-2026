@@ -73,9 +73,9 @@
   border-radius: 12px;
   white-space: nowrap;
 }
-.up-hero-badge.rank { background: var(--gold-dim); color: #000; }
-.up-hero-badge.total { background: var(--accent-glow); color: var(--accent); }
-.up-hero-badge.pred { background: rgba(168,85,247,0.12); color: #c084fc; }
+.up-hero-badge.rank { background: var(--gold-dim); color: #5a4407; }
+.up-hero-badge.total { background: var(--accent-glow); color: var(--accent-dim); }
+.up-hero-badge.pred { background: rgba(168,85,247,0.14); color: #8626d4; }
 .up-hero-flags {
   display: flex;
   gap: 5px;
@@ -310,7 +310,7 @@
   text-align: center;
   transition: color 0.15s;
 }
-.up-expand-toggle:hover { color: var(--accent-hover, #93c5fd); }
+.up-expand-toggle:hover { color: var(--accent-dim); }
 .up-pred-match { font-size: 0.82rem; flex: 1; min-width: 0; }
 .up-pred-match .up-pm-teams { font-weight: 700; }
 .up-pred-match .up-pm-date {
@@ -390,9 +390,9 @@
   font-weight: 600;
   padding: 3px 10px;
   border-radius: 20px;
-  background: rgba(96,165,250,0.1);
-  border: 1px solid rgba(96,165,250,0.2);
-  color: var(--accent);
+  background: rgba(63,185,232,0.1);
+  border: 1px solid rgba(63,185,232,0.3);
+  color: var(--accent-dim);
   white-space: nowrap;
 }
 .up-gauge-wrap { position: relative; width: 104px; height: 120px; flex-shrink: 0; }
@@ -467,8 +467,8 @@
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
 }
-.up-joker-card.best { background: rgba(168,85,247,0.08); border-color: rgba(168,85,247,0.2); }
-.up-joker-card.worst { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.15); }
+.up-joker-card.best { background: rgba(168,85,247,0.08); border-color: rgba(168,85,247,0.25); }
+.up-joker-card.worst { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.2); }
 .up-joker-card-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
 .up-joker-card-match { font-size: 0.85rem; font-weight: 700; margin-bottom: 2px; }
 .up-joker-card-pts { font-size: 0.75rem; color: var(--accent); font-family: var(--font-mono); font-weight: 700; }
@@ -486,7 +486,7 @@
 .up-feed-item.won { border-left-color: var(--accent); }
 .up-feed-item.lost { border-left-color: var(--live); }
 .up-feed-item.drew { border-left-color: var(--gold); }
-.up-feed-item.prediction { border-left-color: #c084fc; }
+.up-feed-item.prediction { border-left-color: #a855f7; }
 .up-feed-icon {
   font-size: 0.95rem;
   flex-shrink: 0;
@@ -565,7 +565,7 @@
   font-size: 0.6rem;
   font-weight: 700;
   font-family: var(--font-mono);
-  color: #000;
+  color: #fff;
   display: flex;
   align-items: center;
   padding: 0 6px;

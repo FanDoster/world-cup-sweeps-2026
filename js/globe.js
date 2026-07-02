@@ -80,7 +80,7 @@ async function initGlobe() {
   svg.append('circle')
     .attr('cx', W / 2).attr('cy', H / 2).attr('r', radius)
     .attr('class', 'ocean-sphere')
-    .attr('fill', '#070b10')
+    .attr('fill', '#5db4e4')
     .attr('filter', 'url(#globe-glow)');
 
   // Stars
@@ -99,14 +99,14 @@ async function initGlobe() {
     .attr('class', 'graticule')
     .attr('d', path)
     .attr('fill', 'none')
-    .attr('stroke', 'rgba(255,255,255,0.04)')
+    .attr('stroke', 'rgba(255,255,255,0.3)')
     .attr('stroke-width', 0.5);
 
   // Land
   svg.append('path').datum(land)
     .attr('class', 'land')
     .attr('d', path)
-    .attr('fill', '#0e1620')
+    .attr('fill', '#f6f9f9')
     .attr('stroke', 'none');
 
   // Stripe patterns for contested territories (all 15 player pairs)
@@ -132,7 +132,7 @@ async function initGlobe() {
       .attr('class', 'territory-fill')
       .attr('data-territory', name)
       .attr('d', path)
-      .attr('fill', 'rgba(255,255,255,0.04)')
+      .attr('fill', 'rgba(255,255,255,0)')
       .attr('fill-opacity', 0.45)
       .attr('stroke', 'none')
       .attr('pointer-events', 'all')
@@ -166,12 +166,12 @@ async function initGlobe() {
       .attr('data-territory', name)
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'middle')
-      .attr('fill', 'rgba(255,255,255,0.85)')
+      .attr('fill', '#2c4a5a')
       .attr('font-size', '9')
       .attr('font-weight', '700')
       .attr('letter-spacing', '1')
       .attr('pointer-events', 'none')
-      .attr('style', 'text-transform:uppercase;text-shadow:0 1px 4px rgba(0,0,0,0.9);font-family:var(--font)')
+      .attr('style', 'text-transform:uppercase;text-shadow:0 1px 4px rgba(255,255,255,0.9);font-family:var(--font)')
       .text(name);
   });
   updateTerritoryLabels(projection);
@@ -293,7 +293,7 @@ function resetGlobe() {
 
 function updateTerritoryFills() {
   const controlMap = Object.fromEntries(territoryControl.map(t => [t.name, t]));
-  const neutralColor = Object.fromEntries(TERRITORY_DATA.map(t => [t.name, t.color || 'rgba(255,255,255,0.15)']));
+  const neutralColor = Object.fromEntries(TERRITORY_DATA.map(t => [t.name, t.color || 'rgba(120,145,160,0.3)']));
   d3.selectAll('.territory-fill').each(function() {
     const name = this.dataset.territory;
     const tc = controlMap[name];
@@ -326,7 +326,7 @@ function updateMarkerColors() {
   d3.selectAll('.venue-marker').each(function(d) {
     if (!d || !d.name) return;
     const tc = controlMap[venueToTerr[d.name]];
-    const color = tc?.controller ? ownerHexColors[tc.controller] : 'rgba(255,255,255,0.35)';
+    const color = tc?.controller ? ownerHexColors[tc.controller] : 'rgba(70,95,110,0.5)';
     d3.select(this).select('circle.inner').attr('fill', color);
     d3.select(this).select('circle.outer').attr('fill', color);
   });
@@ -405,7 +405,7 @@ function renderVenueMarkers(markerGroup, projection, tooltip) {
   const terrControl = Object.fromEntries(territoryControl.map(t => [t.name, t]));
   const markerColor = venueName => {
     const tc = terrControl[venueToTerr[venueName]];
-    return tc?.controller ? ownerHexColors[tc.controller] : 'rgba(255,255,255,0.35)';
+    return tc?.controller ? ownerHexColors[tc.controller] : 'rgba(70,95,110,0.5)';
   };
 
   Object.entries(VENUE_DATA).forEach(([name, v]) => {

@@ -116,7 +116,7 @@ const TERRITORY_DATA = [
     name: 'Mesoamerica',
     venues: ['Estadio Azteca', 'Estadio Akron', 'Estadio BBVA'],
     geo: 'country', countryId: 484,
-    color: '#243320',
+    color: '#b7cfae',
   },
   {
     name: 'The Great North',
@@ -124,7 +124,7 @@ const TERRITORY_DATA = [
     geo: 'states',
     states: ['AK','AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT'],
     labelPoint: [-96, 60],
-    color: '#1a2a38',
+    color: '#b3c8d8',
   },
   {
     name: 'Empire',
@@ -132,7 +132,7 @@ const TERRITORY_DATA = [
     geo: 'states',
     states: ['ME','NH','VT','MA','RI','CT','NY','NJ','PA','DE','MD'],
     labelPoint: [-75, 41],
-    color: '#1e1e38',
+    color: '#b8b8d6',
   },
   {
     name: 'Dixie',
@@ -140,7 +140,7 @@ const TERRITORY_DATA = [
     geo: 'states',
     states: ['VA','WV','NC','SC','GA','FL','AL','MS','TN','KY','AR','LA'],
     labelPoint: [-84, 32],
-    color: '#382020',
+    color: '#d6b8b8',
   },
   {
     name: 'The Frontier',
@@ -148,7 +148,7 @@ const TERRITORY_DATA = [
     geo: 'states',
     states: ['TX','OK','KS','MO','NE','IA','MN','WI','IL','IN','OH','MI','ND','SD'],
     labelPoint: [-93, 40],
-    color: '#281e32',
+    color: '#c6b8d2',
   },
   {
     name: 'El Pacífico',
@@ -156,6 +156,6 @@ const TERRITORY_DATA = [
     geo: 'states',
     states: ['CA','OR','WA','NV','AZ','ID','MT','WY','CO','NM','UT','HI'],
     labelPoint: [-118, 37],
-    color: '#1a2e32',
+    color: '#b2d0d2',
   },
 ];

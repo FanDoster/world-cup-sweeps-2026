@@ -3,7 +3,7 @@
 .section-myteams.active, .section-predictions.active { display: block; }
 .myteams-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
 .myteam-card { padding: 16px 18px; cursor: pointer; transition: all 0.15s; }
-.myteam-card:hover { border-color: var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+.myteam-card:hover { border-color: var(--wii-blue); box-shadow: 0 2px 12px rgba(90,105,115,0.2); }
 .myteam-card .mt-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .myteam-card .mt-flag { width: 36px; height: 24px; border-radius: 4px; object-fit: cover; }
 .myteam-card .mt-name { font-weight: 700; font-size: 1rem; }
@@ -17,7 +17,7 @@
   padding: 2px 7px;
   border-radius: 8px;
   background: rgba(34,197,94,0.15);
-  color: #22c55e;
+  color: #15803d;
   margin-left: auto;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -29,7 +29,7 @@
   padding: 2px 7px;
   border-radius: 8px;
   background: rgba(239,68,68,0.12);
-  color: #ef4444;
+  color: #cf2f2f;
   margin-left: auto;
   font-weight: 600;
   letter-spacing: 0.02em;

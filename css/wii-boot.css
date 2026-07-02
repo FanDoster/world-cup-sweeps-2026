@@ -1,0 +1,100 @@
+/* ── WII BOOT INTRO — health & safety screen → fade into the menu ── */
+#wiiBoot {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 1s ease;
+  font-family: var(--font);
+  -webkit-user-select: none;
+  user-select: none;
+}
+#wiiBoot.wb-fade { opacity: 0; pointer-events: none; }
+#wiiBoot.wb-hidden { display: none; }
+
+.wb-warning {
+  max-width: 660px;
+  padding: 40px 28px;
+  text-align: center;
+  animation: wbWarnIn 1.2s ease both;
+}
+@keyframes wbWarnIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.wb-warn-title {
+  color: #9ea3a6;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.22em;
+}
+
+.wb-warn-divider {
+  height: 1px;
+  background: #3a3d3f;
+  margin: 18px 0;
+}
+
+.wb-warn-body {
+  color: #d4d7d9;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 2;
+  letter-spacing: 0.08em;
+}
+
+.wb-press {
+  margin-top: 34px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  animation: wbPressPulse 1.6s ease-in-out infinite;
+}
+.wb-press .wb-a-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.55em;
+  height: 1.55em;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  font-weight: 800;
+  margin: 0 2px;
+  vertical-align: -0.35em;
+}
+@keyframes wbPressPulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+/* channel tiles pop in after boot, Wii Menu style */
+.tab-bar.wii-boot-pop .tab-btn {
+  animation: wbTilePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+.tab-bar.wii-boot-pop .tab-btn:nth-child(1)  { animation-delay: 0.05s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(2)  { animation-delay: 0.10s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(3)  { animation-delay: 0.15s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(4)  { animation-delay: 0.20s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(5)  { animation-delay: 0.25s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(6)  { animation-delay: 0.30s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(7)  { animation-delay: 0.35s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(8)  { animation-delay: 0.40s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(9)  { animation-delay: 0.45s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(10) { animation-delay: 0.50s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(11) { animation-delay: 0.55s; }
+.tab-bar.wii-boot-pop .tab-btn:nth-child(12) { animation-delay: 0.60s; }
+@keyframes wbTilePop {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-bar.wii-boot-pop .tab-btn { animation: none; }
+  .wb-press { animation: none; }
+}

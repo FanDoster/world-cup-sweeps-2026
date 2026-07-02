@@ -40,7 +40,7 @@ function switchTab(tab) {
   document.getElementById('sectionBracket').classList.toggle('active', tab === 'bracket');
   if (tab === 'teams') { renderTeamChips(); }
   if (tab === 'map') { loadGlobeScripts().then(function () { initGlobe(); renderTerritoryStandings(); }); }
-  if (tab !== 'map') stopAutoRotate();
+  if (tab !== 'map' && typeof stopAutoRotate === 'function') stopAutoRotate();
   if (tab === 'leaderboard') renderLeaderboard();
   if (tab === 'myteams') renderMyTeams();
   if (tab === 'predictions') renderPredictions();

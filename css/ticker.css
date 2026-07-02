@@ -90,7 +90,7 @@
 }
 
 .dt-item.dt-clickable:hover {
-  background: rgba(255,255,255,0.04);
+  background: rgba(63,185,232,0.08);
 }
 
 .dt-item .dt-time {
@@ -167,7 +167,7 @@
 }
 
 .dt-item.dt-live-item {
-  background: linear-gradient(90deg, rgba(239,68,68,0.05) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(224,62,62,0.06) 0%, transparent 100%);
 }
 
 .dt-item.dt-ft-item {

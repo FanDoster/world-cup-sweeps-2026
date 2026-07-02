@@ -61,19 +61,19 @@
 @media (hover: hover) {
   .match-row:hover {
     transform: translateY(-1px);
-    border-color: var(--border);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    border-color: var(--wii-blue);
+    box-shadow: 0 4px 12px rgba(90,105,115,0.22);
     background: var(--card-hover);
   }
   .match-row:hover .flag-bg { opacity: 0.32; }
   .match-row.kicking-off:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25), 0 0 0 1px rgba(16,185,129,0.12);
+    box-shadow: 0 4px 12px rgba(90,105,115,0.22), 0 0 0 1px rgba(63,185,232,0.25);
     background: var(--card-hover);
   }
   .match-row.live:hover {
     transform: translateY(-1px);
-    background: rgba(19,29,42,0.95);
+    background: rgba(255,248,248,0.95);
   }
   .match-row.finished:hover { opacity: 0.90; }
   .match-row:hover .match-prob-bar {
@@ -111,18 +111,18 @@
 .match-row.finished .flag-bg { opacity: 0.08; }
 .match-row.kicking-off {
   border-left-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(16,185,129,0.08);
+  box-shadow: 0 0 0 1px rgba(63,185,232,0.2);
 }
 .match-row.live {
   border-left-color: var(--live);
   border-left-width: 4px;
-  background: linear-gradient(90deg, rgba(239,68,68,0.07) 0%, transparent 60%);
-  box-shadow: 0 0 0 1px rgba(239,68,68,0.18), inset 0 0 30px rgba(239,68,68,0.04);
+  background: linear-gradient(90deg, rgba(224,62,62,0.06) 0%, #fff 60%);
+  box-shadow: 0 0 0 1px rgba(224,62,62,0.18), inset 0 0 30px rgba(224,62,62,0.04);
   animation: liveGlow 2s ease-in-out infinite;
 }
 @keyframes liveGlow {
-  0%, 100% { box-shadow: 0 0 0 1px rgba(239,68,68,0.18), inset 0 0 30px rgba(239,68,68,0.04); }
-  50% { box-shadow: 0 0 0 1px rgba(239,68,68,0.35), inset 0 0 30px rgba(239,68,68,0.08); }
+  0%, 100% { box-shadow: 0 0 0 1px rgba(224,62,62,0.18), inset 0 0 30px rgba(224,62,62,0.04); }
+  50% { box-shadow: 0 0 0 1px rgba(224,62,62,0.35), inset 0 0 30px rgba(224,62,62,0.08); }
 }
 .match-row.finished {
   opacity: 0.70;
@@ -151,7 +151,7 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   align-self: flex-start;
-  box-shadow: 0 0 8px rgba(239,68,68,0.5);
+  box-shadow: 0 0 8px rgba(224,62,62,0.5);
   animation: liveBadgePulse 1.5s ease-in-out infinite;
 }
 .match-countdown.live-now::before {
@@ -167,8 +167,8 @@
   50% { opacity: 0.5; transform: scale(0.65); }
 }
 @keyframes liveBadgePulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(239,68,68,0.5); }
-  50% { box-shadow: 0 0 16px rgba(239,68,68,0.8); }
+  0%, 100% { box-shadow: 0 0 8px rgba(224,62,62,0.5); }
+  50% { box-shadow: 0 0 16px rgba(224,62,62,0.8); }
 }
 .match-countdown-badge {
   display: inline-block;
@@ -312,7 +312,7 @@
   width: 90px; height: 61px;
   border-radius: 3px;
   object-fit: cover;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  box-shadow: 0 1px 4px rgba(90,105,115,0.35);
   flex-shrink: 0;
 }
 .match-vs {
@@ -336,13 +336,13 @@
   text-align: center;
 }
 .match-score-pill.live-score {
-  background: rgba(239,68,68,0.12);
-  color: #fca5a5;
+  background: rgba(224,62,62,0.12);
+  color: #c22b2b;
   animation: liveScorePulse 2.5s ease-in-out infinite;
 }
 @keyframes liveScorePulse {
-  0%, 100% { background: rgba(239,68,68,0.10); }
-  50% { background: rgba(239,68,68,0.22); }
+  0%, 100% { background: rgba(224,62,62,0.10); }
+  50% { background: rgba(224,62,62,0.22); }
 }
 
 /* Full-width probability bar at the bottom of the card */
@@ -368,8 +368,8 @@
   white-space: nowrap;
 }
 .match-prob-bar .prob-h { background: var(--accent); }
-.match-prob-bar .prob-d { background: var(--text-muted); }
-.match-prob-bar .prob-a { background: #3b6ea0; }
+.match-prob-bar .prob-d { background: #b6bfc6; }
+.match-prob-bar .prob-a { background: #7fc3e4; }
 
 /* Legacy bars reference — keep so old references don't break */
 .match-prob-bars { display: none; }

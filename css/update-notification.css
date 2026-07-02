@@ -41,16 +41,17 @@
   border-radius: 2px 2px 0 0;
 }
 
-/* Main band — dark, with blur */
+/* Main band — Wii system-message panel: white, glossy */
 .update-band {
-  background: rgba(7, 11, 16, 0.94);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  border: 1px solid var(--border);
+  border: 1px solid #c6ced3;
   border-top: none;
-  border-radius: 0 0 12px 12px;
+  border-radius: 0 0 16px 16px;
   padding: 20px 36px 24px;
   text-align: center;
+  box-shadow: 0 8px 30px rgba(50,62,70,0.3);
 }
 
 /* Row: emoji + label side by side */
@@ -69,10 +70,11 @@
 }
 
 .update-label {
-  font-family: 'Impact', 'Arial Black', 'Anton', sans-serif;
-  font-size: 1.35rem;
-  letter-spacing: 0.14em;
-  color: var(--text);
+  font-family: var(--font);
+  font-weight: 900;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  color: var(--wii-blue-deep);
   text-transform: uppercase;
   line-height: 1.3;
 }
