@@ -103,6 +103,9 @@ class SupabaseClient:
         except urllib.error.HTTPError as e:
             body = e.read().decode() if e.fp else ""
             return e.code, body
+        except urllib.error.URLError as e:
+            print(f"ERROR: Request failed: {e}", file=sys.stderr)
+            return 0, ""
 
 
 # ── FIFA API ────────────────────────────────────────────
