@@ -26,6 +26,7 @@ let predPointsByPlayer = {};
 let jokersEnabled = false;
 let commentsEnabled = false;
 let winnersEnabled = false;
+let pinEnabled = false;
 let featureProbeDone = false;
 
 async function loadData() {
@@ -166,14 +167,16 @@ async function loadPredData() {
   // Invalidate profile stats cache so stale RPC results don't persist across data refreshes
   Object.keys(_userPredCache).forEach(k => delete _userPredCache[k]);
   if (!featureProbeDone) {
-    const [j, c, w] = await Promise.all([
+    const [j, c, w, p] = await Promise.all([
       sb.from('predictions').select('is_joker').limit(1),
       sb.from('match_comments').select('id').limit(1),
       sb.from('predictions').select('predicted_winner').limit(1),
+      sb.from('match_comments').select('pinned').limit(1),
     ]);
     jokersEnabled = !j.error;
     commentsEnabled = !c.error;
     winnersEnabled = !w.error;
+    pinEnabled = !p.error;
     featureProbeDone = true;
   }
   // Prediction scores (once supabase-fixes.sql has run, RLS hides other

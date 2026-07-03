@@ -68,3 +68,45 @@
   color: var(--text-muted);
   margin-top: 2px;
 }
+
+.banter-item.banter-pinned {
+  background: var(--accent-glow);
+  border-radius: var(--radius-sm, 8px);
+  padding: 12px 10px;
+  margin-bottom: 6px;
+  border-bottom: none;
+}
+
+.banter-pinned-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 6px;
+}
+
+.banter-pin-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 6px;
+  min-width: 32px;
+  min-height: 32px;
+  line-height: 1;
+  border-radius: 6px;
+  opacity: 0.45;
+  color: var(--text-muted);
+  -webkit-tap-highlight-color: transparent;
+}
+.banter-pin-btn:hover,
+.banter-pin-btn:active {
+  opacity: 1;
+  background: var(--border-subtle);
+}
+.banter-pin-btn.active {
+  opacity: 1;
+  color: var(--accent);
+}
