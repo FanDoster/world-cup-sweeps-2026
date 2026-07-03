@@ -26,15 +26,18 @@ const WII_CHANNEL_BANNERS = {
     <defs><linearGradient id="wch-ma" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74dbd8"/><stop offset="1" stop-color="#3fbdba"/></linearGradient></defs>
     <rect width="160" height="90" fill="url(#wch-ma)"/>
     <circle cx="80" cy="31" r="16" fill="#fff" stroke="#2a9c99" stroke-width="1.5"/>
-    <path d="M80 25.5 85.2 29.3 83.2 35.5 76.8 35.5 74.8 29.3Z" fill="#3a4750"/>
-    <g stroke="#3a4750" stroke-width="2.2" stroke-linecap="round" fill="none">
-      <path d="M82.6 27.4 87.6 20.5"/><path d="M84.2 32.4 92.4 35"/><path d="M80 35.5 80 44"/><path d="M75.8 32.4 67.6 35"/><path d="M77.4 27.4 72.4 20.5"/>
-    </g>
-    <g fill="#3a4750">
-      <circle cx="87.6" cy="20.5" r="1.6"/><circle cx="92.4" cy="35" r="1.6"/><circle cx="80" cy="44" r="1.6"/><circle cx="67.6" cy="35" r="1.6"/><circle cx="72.4" cy="20.5" r="1.6"/>
-    </g>
-    <g stroke="#3a4750" stroke-width="1.1" fill="none" opacity="0.8">
-      <path d="M72.4 20.5 Q80 16 87.6 20.5"/><path d="M87.6 20.5 Q94.3 26.4 92.4 35"/><path d="M92.4 35 Q89.1 43.5 80 44"/><path d="M80 44 Q70.9 43.5 67.6 35"/><path d="M67.6 35 Q65.3 26.2 72.4 20.5"/>
+    <g fill="none" stroke="#3a4750" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="80,24.26 73.66,29.58 75.33,36.33 84.67,36.33 86.34,29.58" fill="#3a4750"/>
+      <polyline points="86.34,29.58 90.75,27.71 92.9,21.61"/>
+      <polyline points="90.75,27.71 95.92,32.16"/>
+      <polyline points="73.66,29.58 69.25,27.71 67.1,21.61"/>
+      <polyline points="69.25,27.71 64.08,32.16"/>
+      <polyline points="80,24.26 80,19.47 85.33,15.91"/>
+      <polyline points="80,19.47 74.67,15.91"/>
+      <polyline points="84.67,36.33 87,40.33 84.67,46.25"/>
+      <polyline points="87,40.33 92.9,40.33"/>
+      <polyline points="75.33,36.33 73,40.33 75.36,46.29"/>
+      <polyline points="73,40.33 67.14,40.33"/>
     </g>
     <text x="80" y="76" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="19" fill="#fff" stroke="#2a9c99" stroke-width="3" paint-order="stroke">Matches</text>
   </svg>`,
