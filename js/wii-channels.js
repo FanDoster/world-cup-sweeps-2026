@@ -25,9 +25,17 @@ const WII_CHANNEL_BANNERS = {
   matches: `<svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
     <defs><linearGradient id="wch-ma" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#74dbd8"/><stop offset="1" stop-color="#3fbdba"/></linearGradient></defs>
     <rect width="160" height="90" fill="url(#wch-ma)"/>
-    <circle cx="80" cy="30" r="16" fill="#fff" stroke="#2a9c99" stroke-width="1.5"/>
-    <path d="M80 23.5l6 4.4-2.3 7h-7.4l-2.3-7z" fill="#3a4750"/>
-    <path d="M80 14.5l4 3-4 3-4-3z" fill="#3a4750"/><path d="M65 26l4.6 1 .8 5-4.4-1.6z" fill="#3a4750"/><path d="M95 26l-4.6 1-.8 5 4.4-1.6z" fill="#3a4750"/><path d="M73 44.5l2.5-4h9l2.5 4a16 16 0 0 1-14 0z" fill="#3a4750"/>
+    <circle cx="80" cy="31" r="16" fill="#fff" stroke="#2a9c99" stroke-width="1.5"/>
+    <path d="M80 25.5 85.2 29.3 83.2 35.5 76.8 35.5 74.8 29.3Z" fill="#3a4750"/>
+    <g stroke="#3a4750" stroke-width="2.2" stroke-linecap="round" fill="none">
+      <path d="M82.6 27.4 87.6 20.5"/><path d="M84.2 32.4 92.4 35"/><path d="M80 35.5 80 44"/><path d="M75.8 32.4 67.6 35"/><path d="M77.4 27.4 72.4 20.5"/>
+    </g>
+    <g fill="#3a4750">
+      <circle cx="87.6" cy="20.5" r="1.6"/><circle cx="92.4" cy="35" r="1.6"/><circle cx="80" cy="44" r="1.6"/><circle cx="67.6" cy="35" r="1.6"/><circle cx="72.4" cy="20.5" r="1.6"/>
+    </g>
+    <g stroke="#3a4750" stroke-width="1.1" fill="none" opacity="0.8">
+      <path d="M72.4 20.5 Q80 16 87.6 20.5"/><path d="M87.6 20.5 Q94.3 26.4 92.4 35"/><path d="M92.4 35 Q89.1 43.5 80 44"/><path d="M80 44 Q70.9 43.5 67.6 35"/><path d="M67.6 35 Q65.3 26.2 72.4 20.5"/>
+    </g>
     <text x="80" y="76" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size="19" fill="#fff" stroke="#2a9c99" stroke-width="3" paint-order="stroke">Matches</text>
   </svg>`,
   groups: `<svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice">
