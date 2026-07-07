@@ -60,6 +60,7 @@ Stylesheets load in dependency order via `<link>` tags in `<head>` (tokens first
 | `css/user-profile.css` | Full-page Profile tab (hero, stats, sections) |
 | `css/responsive.css` | `@media (max-width: 700px)` overrides for the main layout (auth and globe embed their own responsive rules inline) |
 | `css/update-notification.css` | Broadcast-HUD "update available" notification (used by `version-refresh.js`) |
+| `css/wii-cursor.css` | Wii Remote hand cursor sitewide (generated — edit `.claude/gen-wii-cursor.mjs` and re-run `node .claude/gen-wii-cursor.mjs`) |
 
 ## Commands
 
