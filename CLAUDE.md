@@ -32,6 +32,7 @@ Scripts load in dependency order (each file can call globals defined by earlier 
 | `js/profile-picture.js` | Avatar upload/crop to the Supabase Storage `avatars` bucket; feature-detected (`profile-picture-migration.sql`) |
 | `js/render-user-profile.js` | Full-page Profile tab (`showUserProfile`, hash route `#/users/:name`) — distinct from the `render-profile.js` popup |
 | `js/render-bracket.js` | Bracket tab: `R32_SLOTS`/`KNOCKOUT_BRACKET` fixture maps, per-player projected knockout (`calcProjectedStandings`→`calcProjectedQualifiers`→`calcProjectedBracket`), `renderBracket`, `setBracketRound` |
+| `js/wii-cursor.js` | Wii Remote pointer overlay on fine pointers (tilt, idle wobble, click blip, globe-drag fist, loading ring, per-player glow + number badge, hover/press sounds via wii-audio); touch devices fall back to the CSS cursor in `css/wii-cursor.css` |
 | `js/version.js` | `window.APP_VERSION` deploy marker string (auto-stamped at deploy time by `deploy.yml` with date + commit SHA; committed value is just the local-dev placeholder `'dev'`) |
 | `js/version-refresh.js` | Polls Supabase `app_version` every 30s; shows the broadcast-HUD update notification then reloads |
 | `js/main.js` | `switchTab` (incl. shooter start/stop), init calls (`restoreSession`, `setInterval`) |
@@ -60,7 +61,7 @@ Stylesheets load in dependency order via `<link>` tags in `<head>` (tokens first
 | `css/user-profile.css` | Full-page Profile tab (hero, stats, sections) |
 | `css/responsive.css` | `@media (max-width: 700px)` overrides for the main layout (auth and globe embed their own responsive rules inline) |
 | `css/update-notification.css` | Broadcast-HUD "update available" notification (used by `version-refresh.js`) |
-| `css/wii-cursor.css` | Wii Remote hand cursor sitewide (generated — edit `.claude/gen-wii-cursor.mjs` and re-run `node .claude/gen-wii-cursor.mjs`) |
+| `css/wii-cursor.css` | Wii Remote hand cursor: CSS-cursor fallback for touch + overlay styles for `js/wii-cursor.js` (generated — edit `.claude/gen-wii-cursor.mjs` and re-run `node .claude/gen-wii-cursor.mjs`) |
 
 ## Commands
 
