@@ -124,6 +124,7 @@ function renderLeaderboard() {
   renderPredLeaderboard();
   renderAwards(calcMatchLeaderboard());
   renderJokerStats();
+  renderGraph();
 }
 
 // ── TOURNAMENT AWARDS ──

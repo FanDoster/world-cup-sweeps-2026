@@ -1,0 +1,122 @@
+/* ── GRAPH (inside Leaderboard tab) ── */
+#leaderboardGraph {
+  margin-bottom: 32px;
+}
+
+.graph-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.graph-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.graph-title::before,
+.graph-title::after {
+  content: '';
+  width: 28px;
+  height: 2px;
+  border-radius: 2px;
+  opacity: 0.55;
+}
+.graph-title::before {
+  background: linear-gradient(90deg, transparent, var(--accent));
+}
+.graph-title::after {
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.graph-toggles {
+  display: flex;
+  gap: 6px;
+}
+
+.graph-mode-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: all 0.15s;
+}
+.graph-mode-btn:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+.graph-mode-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+}
+
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.graph-legend-item {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.graph-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.graph-canvas-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.graph-canvas-wrap canvas {
+  display: block;
+  width: 100%;
+}
+
+.graph-xaxis {
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.graph-empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+  .graph-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .graph-legend {
+    gap: 6px 12px;
+  }
+}
