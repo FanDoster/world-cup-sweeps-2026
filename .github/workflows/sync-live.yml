@@ -1,12 +1,13 @@
 name: Live Score Sync
 
 on:
-  schedule:
-    # Three 6-hour polling windows covering all match kickoff times
-    # UTC kickoffs cluster at 16:00–04:00 → three overlapping shifts
-    - cron: '0 15 * 6,7 *'    # 15:00 UTC June–July  (covers 16:00–21:00 kickoffs)
-    - cron: '0 21 * 6,7 *'    # 21:00 UTC June–July  (covers 21:00–03:00 kickoffs)
-    - cron: '0 3 * 6,7 *'     # 03:00 UTC June–July  (covers 03:00–04:00 kickoffs + overrun)
+  # Live score sync DISABLED — keeping only manual trigger
+  # schedule:
+  #   # Three 6-hour polling windows covering all match kickoff times
+  #   # UTC kickoffs cluster at 16:00–04:00 → three overlapping shifts
+  #   - cron: '0 15 * 6,7 *'    # 15:00 UTC June–July  (covers 16:00–21:00 kickoffs)
+  #   - cron: '0 21 * 6,7 *'    # 21:00 UTC June–July  (covers 21:00–03:00 kickoffs)
+  #   - cron: '0 3 * 6,7 *'     # 03:00 UTC June–July  (covers 03:00–04:00 kickoffs + overrun)
   workflow_dispatch:           # manual trigger from Actions tab
 
 jobs:
